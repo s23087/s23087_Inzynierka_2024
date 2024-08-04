@@ -1,0 +1,8 @@
+# Log and database files
+*.log
+*.sql
+
+# Directory
+
+## Database dir
+database/
