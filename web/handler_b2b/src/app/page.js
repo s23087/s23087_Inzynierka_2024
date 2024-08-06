@@ -1,19 +1,22 @@
 import Image from "next/image";
+import LoginForm from "./../components/Login_form/login_form";
 import bigLogo from "../../public/big_logo.png";
-import LoginForm from "./ui/Login_form/login_form";
 
-export default function Home() {
+export default function App() {
   return (
-    <main className="flex flex-col min-h-screen items-center justify-center">
-      <div className="mb-6">
-        <Image 
-          src={bigLogo}
-          alt="Logo"
-        />
-      </div>
+    <main className="d-flex h-100 w-100 justify-content-center align-items-center pb-5">
+      <div className="container mb-5 px-5 mx-4">
+        <div className="row mb-4">
+          <div className="col text-center">
+            <Image src={bigLogo} alt="Logo" />
+          </div>
+        </div>
 
-      <div className="mb-16">
-        <LoginForm />
+        <div className="row mb-3">
+          <div className="col">
+            <LoginForm />
+          </div>
+        </div>
       </div>
     </main>
   );

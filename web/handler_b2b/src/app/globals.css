@@ -1,28 +1,90 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "~bootstrap/dist/css/bootstrap.min.css";
 
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+
+  /* App colors */
+  --main-blue: #307ae9;
+  --sec-blue: #24559e;
+  --main-blue-hover: #0260ec;
+  --sec-blue-hover: #0848a9;
+  --main-grey: #d9d9d9;
+  --sec-grey: #989898;
+  --dark-grey: #707070;
+  --main-black: #2f3032;
+  --main-red: #dd0000;
+  --sec-red: #9a0000;
+  --main-green: #22d21f;
+  --main-yellow: #faf473;
+  --text-main-color: white;
+  --text-main-color-hover: white;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+html {
+  height: 100%;
 }
 
 body {
-  color: white;
-  background: bg_color;
+  height: 100%;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+/* Font */
+
+.black-text {
+  color: var(--main-black);
+}
+
+.grey-main-text {
+  color: var(--main-grey);
+}
+
+.grey-sec-text {
+  color: var(--sec-grey);
+}
+
+.small-text {
+  font-size: 12px;
+}
+
+/* Button variants */
+
+.btn {
+  min-height: 45px;
+}
+
+.btn-mainBlue {
+  background-color: var(--main-blue);
+  color: var(--text-main-color);
+}
+
+.btn-mainBlue:hover {
+  background-color: var(--main-blue-hover);
+  color: var(--text-main-color-hover);
+}
+
+.btn-secBlue {
+  background-color: var(--sec-blue);
+  color: var(--text-main-color);
+}
+
+.btn-secBlue:hover {
+  background-color: var(--sec-blue-hover);
+  color: var(--text-main-color-hover);
+}
+
+/* Input style */
+
+.input-style {
+  background-color: var(--main-grey);
+  min-height: 45px;
+}
+
+.input-style:focus {
+  background-color: var(--main-grey);
+}
+
+.input-style::placeholder {
+  color: var(--sec-grey);
 }
