@@ -3,7 +3,7 @@
 import Input from "../components/inputs/input";
 import { useRouter } from "next/navigation";
 
-export default function Login_Form() {
+export default function LoginForm() {
   const router = useRouter();
 
   return (

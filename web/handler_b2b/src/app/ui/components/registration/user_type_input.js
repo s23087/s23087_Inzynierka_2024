@@ -1,8 +1,10 @@
 import Image from "next/image";
+import PropTypes from 'prop-types';
+
 import user_icon from "../../../../../public/icons/user_icon.png";
 import org_user_icon from "../../../../../public/icons/org_user_icon.png";
 
-export default function User_chooser({ is_org }) {
+function UserChooser({ is_org }) {
   if (is_org) {
     return (
       <span className="bg-main_blue-primary hover:bg-main_blue-primary_hover rounded-md min-w-[259px] min-h-[122px] content-center">
@@ -31,3 +33,9 @@ export default function User_chooser({ is_org }) {
     </span>
   );
 }
+
+UserChooser.propTypes = {
+  is_org: PropTypes.bool.isRequired
+}
+
+export default UserChooser

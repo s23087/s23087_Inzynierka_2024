@@ -563,11 +563,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\dev\\s23087_Inzynierka_2024\\database_controller\\database_comunicator\\database_comunicator.csproj",
+      "projectUniqueName": "C:\\dev\\s23087_Inzynierka_2024\\database_comunicator\\database_comunicator.csproj",
       "projectName": "database_comunicator",
-      "projectPath": "C:\\dev\\s23087_Inzynierka_2024\\database_controller\\database_comunicator\\database_comunicator.csproj",
+      "projectPath": "C:\\dev\\s23087_Inzynierka_2024\\database_comunicator\\database_comunicator.csproj",
       "packagesPath": "C:\\Users\\kszwa\\.nuget\\packages\\",
-      "outputPath": "C:\\dev\\s23087_Inzynierka_2024\\database_controller\\database_comunicator\\obj\\",
+      "outputPath": "C:\\dev\\s23087_Inzynierka_2024\\database_comunicator\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\kszwa\\AppData\\Roaming\\NuGet\\NuGet.Config",

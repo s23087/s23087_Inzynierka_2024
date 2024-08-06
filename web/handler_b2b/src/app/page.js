@@ -1,6 +1,6 @@
 import Image from "next/image";
 import bigLogo from "../../public/big_logo.png";
-import Login_Form from "./ui/Login_form/login_form";
+import LoginForm from "./ui/Login_form/login_form";
 
 export default function Home() {
   return (
@@ -13,7 +13,7 @@ export default function Home() {
       </div>
 
       <div className="mb-16">
-        <Login_Form />
+        <LoginForm />
       </div>
     </main>
   );

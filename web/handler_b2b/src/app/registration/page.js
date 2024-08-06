@@ -1,6 +1,6 @@
 import Image from "next/image";
 import bigLogo from "../../../public/big_logo.png";
-import Registration_Form from "../ui/Registration_form/registration_form";
+import RegistrationForm from "../ui/Registration_form/registration_form";
 
 export default function Registration() {
   return (
@@ -10,7 +10,7 @@ export default function Registration() {
       </div>
 
       <div className="mb-16">
-        <Registration_Form />
+        <RegistrationForm />
       </div>
     </main>
   );
