@@ -3,7 +3,7 @@
 
 CREATE TABLE Action_Log (
     log_id int  NOT NULL IDENTITY(1, 1),
-    log_description varchar(500)  NOT NULL,
+    log_description varchar2(500)  NOT NULL,
     log_date date  NOT NULL,
     users_id int  NOT NULL,
     log_type_id int  NOT NULL,
@@ -12,19 +12,19 @@ CREATE TABLE Action_Log (
 
 CREATE TABLE App_User (
     id_user int  NOT NULL IDENTITY(1, 1),
-    email varchar(350)  NOT NULL,
-    username varchar(250)  NOT NULL,
-    surname varchar(250)  NOT NULL,
+    email varchar2(350)  NOT NULL,
+    username varchar2(250)  NOT NULL,
+    surname varchar2(250)  NOT NULL,
     solo_user_id int  NULL,
     org_user_id int  NULL,
-    pass_hash varchar(200)  NOT NULL,
-    pass_salt varchar(200)  NOT NULL,
+    pass_hash varchar2(200)  NOT NULL,
+    pass_salt varchar2(200)  NOT NULL,
     CONSTRAINT App_User_pk PRIMARY KEY  (id_user)
 );
 
 CREATE TABLE Availability_Status (
     availability_status_id int  NOT NULL IDENTITY(1, 1),
-    status_name varchar(150)  NOT NULL,
+    status_name varchar2(150)  NOT NULL,
     days_for_realization int  NOT NULL,
     CONSTRAINT Availability_Status_pk PRIMARY KEY  (availability_status_id)
 );
@@ -37,7 +37,7 @@ CREATE TABLE Availability_Status_Organization (
 
 CREATE TABLE Country (
     country_id int  NOT NULL IDENTITY(1, 1),
-    country_name varchar(70)  NOT NULL,
+    country_name varchar2(70)  NOT NULL,
     CONSTRAINT Country_pk PRIMARY KEY  (country_id)
 );
 
@@ -45,7 +45,7 @@ CREATE TABLE Credit_note (
     id_credit_note int  NOT NULL IDENTITY(1, 1),
     credit_note_date date  NOT NULL,
     in_system bit  NOT NULL,
-    note varchar(500)  NOT NULL,
+    note varchar2(500)  NOT NULL,
     invoice_id int  NOT NULL,
     CONSTRAINT Credit_note_pk PRIMARY KEY  (id_credit_note)
 );
@@ -60,12 +60,12 @@ CREATE TABLE Credit_note_Items (
 );
 
 CREATE TABLE Currency_Name (
-    curenncy varchar(5)  NOT NULL,
+    curenncy varchar2(5)  NOT NULL,
     CONSTRAINT Currency_Name_pk PRIMARY KEY  (curenncy)
 );
 
 CREATE TABLE Currency_Value (
-    currency_name varchar(5)  NOT NULL,
+    currency_name varchar2(5)  NOT NULL,
     update_date datetime  NOT NULL,
     currency_value decimal(5,2)  NOT NULL,
     CONSTRAINT Currency_Value_pk PRIMARY KEY  (update_date,currency_name)
@@ -73,7 +73,7 @@ CREATE TABLE Currency_Value (
 
 CREATE TABLE Currency_Value_Offer (
     offer_id int  NOT NULL,
-    currancy_name varchar(5)  NOT NULL,
+    currancy_name varchar2(5)  NOT NULL,
     curency_date datetime  NOT NULL,
     CONSTRAINT Currency_Value_Offer_pk PRIMARY KEY  (offer_id,currancy_name)
 );
@@ -90,13 +90,13 @@ CREATE TABLE Delivery (
 
 CREATE TABLE Delivery_Status (
     delivery_status_id int  NOT NULL IDENTITY(1, 1),
-    status_name varchar(30)  NOT NULL,
+    status_name varchar2(30)  NOT NULL,
     CONSTRAINT Delivery_Status_pk PRIMARY KEY  (delivery_status_id)
 );
 
 CREATE TABLE Delivery_company (
     delivery_company_id int  NOT NULL IDENTITY(1, 1),
-    delivery_company_name varchar(40)  NOT NULL,
+    delivery_company_name varchar2(40)  NOT NULL,
     CONSTRAINT Delivery_company_pk PRIMARY KEY  (delivery_company_id)
 );
 
@@ -108,18 +108,18 @@ CREATE TABLE EAN (
 
 CREATE TABLE Invoice (
     invoice_id int  NOT NULL IDENTITY(1, 1),
-    invoice_number varchar(40)  NOT NULL,
+    invoice_number varchar2(40)  NOT NULL,
     seller int  NOT NULL,
     buyer int  NOT NULL,
     invoice_date datetime  NOT NULL,
     due_date datetime  NOT NULL,
-    note varchar(500)  NOT NULL,
+    note varchar2(500)  NOT NULL,
     in_system bit  NOT NULL,
     transport_cost decimal(6,2)  NOT NULL,
-    invoice_file_path varchar(500)  NULL,
+    invoice_file_path varchar2(500)  NULL,
     taxes int  NOT NULL,
     currency_value_date datetime  NOT NULL,
-    currency_name varchar(5)  NOT NULL,
+    currency_name varchar2(5)  NOT NULL,
     payment_method_id int  NOT NULL,
     payments_status_Id int  NOT NULL,
     CONSTRAINT Invoice_pk PRIMARY KEY  (invoice_id)
@@ -127,9 +127,9 @@ CREATE TABLE Invoice (
 
 CREATE TABLE Item (
     item_id int  NOT NULL IDENTITY(1, 1),
-    item_name varchar(250)  NOT NULL,
-    item_description varchar(500)  NOT NULL,
-    part_number varchar(150)  NOT NULL,
+    item_name varchar2(250)  NOT NULL,
+    item_description varchar2(500)  NOT NULL,
+    part_number varchar2(150)  NOT NULL,
     CONSTRAINT Item_pk PRIMARY KEY  (item_id)
 );
 
@@ -143,13 +143,13 @@ CREATE TABLE Item_owner (
 
 CREATE TABLE Log_Type (
     log_type_id int  NOT NULL IDENTITY(1, 1),
-    log_type_name varchar(50)  NOT NULL,
+    log_type_name varchar2(50)  NOT NULL,
     CONSTRAINT Log_Type_pk PRIMARY KEY  (log_type_id)
 );
 
 CREATE TABLE Note (
     note_id int  NOT NULL IDENTITY(1, 1),
-    note_description varchar(500)  NOT NULL,
+    note_description varchar2(500)  NOT NULL,
     note_date datetime  NOT NULL,
     users_id int  NOT NULL,
     CONSTRAINT Note_pk PRIMARY KEY  (note_id)
@@ -163,17 +163,17 @@ CREATE TABLE Notes_Delivery (
 
 CREATE TABLE Object_type (
     object_type_id int  NOT NULL IDENTITY(1, 1),
-    object_type_name varchar(30)  NOT NULL,
+    object_type_name varchar2(30)  NOT NULL,
     CONSTRAINT Object_type_pk PRIMARY KEY  (object_type_id)
 );
 
 CREATE TABLE Offer (
     offer_id int  NOT NULL IDENTITY(1, 1),
-    offer_name varchar(100)  NOT NULL,
+    offer_name varchar2(100)  NOT NULL,
     creation_date int  NOT NULL,
     modification_date int  NOT NULL,
     organizations_id int  NULL,
-    path_to_file varchar(200)  NOT NULL,
+    path_to_file varchar2(200)  NOT NULL,
     offer_status_id int  NOT NULL,
     CONSTRAINT Offer_pk PRIMARY KEY  (offer_id)
 );
@@ -189,7 +189,7 @@ CREATE TABLE Offer_Item (
 
 CREATE TABLE Offer_status (
     offer_id int  NOT NULL IDENTITY(1, 1),
-    status_name varchar(30)  NOT NULL,
+    status_name varchar2(30)  NOT NULL,
     CONSTRAINT Offer_status_pk PRIMARY KEY  (offer_id)
 );
 
@@ -202,11 +202,11 @@ CREATE TABLE Org_User (
 
 CREATE TABLE Organization (
     organization_id int  NOT NULL IDENTITY(1, 1),
-    org_name varchar(50)  NOT NULL,
+    org_name varchar2(50)  NOT NULL,
     nip int  NULL,
-    street varchar(200)  NOT NULL,
-    city varchar(200)  NOT NULL,
-    postal_code varchar(25)  NOT NULL,
+    street varchar2(200)  NOT NULL,
+    city varchar2(200)  NOT NULL,
+    postal_code varchar2(25)  NOT NULL,
     credit_limit int  NULL,
     country_id int  NOT NULL,
     CONSTRAINT Organization_pk PRIMARY KEY  (organization_id)
@@ -245,30 +245,30 @@ CREATE TABLE Owned_Item (
 
 CREATE TABLE Payment_Method (
     payment_method_id int  NOT NULL IDENTITY(1, 1),
-    method_name varchar(35)  NOT NULL,
+    method_name varchar2(35)  NOT NULL,
     CONSTRAINT Payment_Method_pk PRIMARY KEY  (payment_method_id)
 );
 
 CREATE TABLE Payment_Status (
     payment_status_id int  NOT NULL IDENTITY(1, 1),
-    status_name varchar(30)  NOT NULL,
+    status_name varchar2(30)  NOT NULL,
     CONSTRAINT Payment_Status_pk PRIMARY KEY  (payment_status_id)
 );
 
 CREATE TABLE Proforma (
     proforma_id int  NOT NULL IDENTITY(1, 1),
-    proforma_number varchar(40)  NOT NULL,
+    proforma_number varchar2(40)  NOT NULL,
     seller int  NOT NULL,
     buyer int  NOT NULL,
     proforma_date datetime  NOT NULL,
     transport_cost decimal(6,2)  NOT NULL,
-    note varchar(500)  NOT NULL,
+    note varchar2(500)  NOT NULL,
     in_system bit  NOT NULL,
-    proforma_file_path varchar(500)  NULL,
+    proforma_file_path varchar2(500)  NULL,
     taxes int  NOT NULL,
     payment_method_id int  NOT NULL,
     currency_value_date datetime  NOT NULL,
-    currency_name varchar(5)  NOT NULL,
+    currency_name varchar2(5)  NOT NULL,
     invoice_id int  NULL,
     CONSTRAINT Proforma_pk PRIMARY KEY  (proforma_id)
 );
@@ -287,7 +287,7 @@ CREATE TABLE Purchase_Price (
     owned_item_id int  NOT NULL,
     invoice_id int  NOT NULL,
     price_date int  NOT NULL,
-    curenncy varchar(5)  NOT NULL,
+    curenncy varchar2(5)  NOT NULL,
     purchase_price decimal(20,2)  NOT NULL,
     CONSTRAINT Purchase_Price_pk PRIMARY KEY  (purchase_price_id,owned_item_id,invoice_id)
 );
@@ -325,7 +325,7 @@ CREATE TABLE Request_Proforma (
 
 CREATE TABLE Request_status (
     request_status_id int  NOT NULL IDENTITY(1, 1),
-    status_name varchar(50)  NOT NULL,
+    status_name varchar2(50)  NOT NULL,
     CONSTRAINT Request_status_pk PRIMARY KEY  (request_status_id)
 );
 
@@ -344,20 +344,20 @@ CREATE TABLE Taxes (
 CREATE TABLE User_notification (
     notification_id int  NOT NULL IDENTITY(1, 1),
     users_id int  NOT NULL,
-    info varchar(250)  NOT NULL,
+    info varchar2(250)  NOT NULL,
     object_type_id int  NOT NULL,
     CONSTRAINT User_notification_pk PRIMARY KEY  (notification_id)
 );
 
 CREATE TABLE User_role (
     role_id int  NOT NULL IDENTITY(1, 1),
-    role_name varchar(25)  NOT NULL,
+    role_name varchar2(25)  NOT NULL,
     CONSTRAINT User_role_pk PRIMARY KEY  (role_id)
 );
 
 CREATE TABLE Waybill (
     waybill_id int  NOT NULL IDENTITY(1, 1),
-    waybill varchar(50)  NOT NULL,
+    waybill varchar2(50)  NOT NULL,
     deliveries_id int  NOT NULL,
     delivery_company_id int  NOT NULL,
     CONSTRAINT Waybill_pk PRIMARY KEY  (waybill_id)
@@ -698,7 +698,7 @@ Values ('Afghanistan'),
 ('Congo, Democratic Republic of the'),
 ('Congo, Republic of the'),
 ('Costa Rica'),
-('Côte d’Ivoire'),
+('Cï¿½te dï¿½Ivoire'),
 ('Croatia'),
 ('Cuba'),
 ('Cyprus'),
