@@ -1,11 +1,9 @@
 "use client";
 
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginForm() {
-  const router = useRouter();
-
   return (
     <Form>
       <Form.Group className="mb-3" controlId="formEmail">
@@ -24,9 +22,9 @@ export default function LoginForm() {
         />
       </Form.Group>
 
-      <Container className="text-center mt-5 px-4" fluid>
+      <Container className="text-center mt-3 px-4 px-md-0" fluid>
         <Row className="mb-3">
-          <Col>
+          <Col className="mt-3 pe-md-0" xs="12" md="5">
             <Button
               className="rounded-md shadow w-100"
               variant="mainBlue"
@@ -35,17 +33,19 @@ export default function LoginForm() {
               Sign in
             </Button>
           </Col>
-        </Row>
-        <Row>
-          <Col>
-            <Button
-              className="rounded-md shadow w-100"
-              variant="secBlue"
-              type="Button"
-              onClick={() => router.push("/registration")}
+          <Col className="mt-3" xs="12" md="7">
+            <Link
+              className="link-underline link-underline-opacity-0 text-white w-100 h-100"
+              href="/registration"
             >
-              Registration
-            </Button>
+              <Button
+                className="rounded-md shadow w-100"
+                variant="secBlue"
+                type="Button"
+              >
+                Registration
+              </Button>
+            </Link>
           </Col>
         </Row>
       </Container>

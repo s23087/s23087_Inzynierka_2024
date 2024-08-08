@@ -20,10 +20,15 @@
   --main-yellow: #faf473;
   --text-main-color: white;
   --text-main-color-hover: white;
+  --text-blue-color: #307ae9;
+  --text-black-color: #2f3032;
+  --text-main-grey-color: #d9d9d9;
+  --text-sec-grey-color: #989898;
 }
 
 html {
   height: 100%;
+  min-width: 393px;
 }
 
 body {
@@ -32,16 +37,24 @@ body {
 
 /* Font */
 
+a {
+  color: var(--text-main-color);
+}
+
 .black-text {
-  color: var(--main-black);
+  color: var(--text-black-color);
 }
 
 .grey-main-text {
-  color: var(--main-grey);
+  color: var(--text-main-grey-color);
 }
 
 .grey-sec-text {
-  color: var(--sec-grey);
+  color: var(--text-sec-grey-color);
+}
+
+.blue-main-text {
+  color: var(--text-blue-color);
 }
 
 .small-text {
@@ -64,6 +77,11 @@ body {
   color: var(--text-main-color-hover);
 }
 
+.btn-mainBlue:active {
+  background-color: var(--main-blue-hover) !important;
+  color: var(--text-main-color-hover) !important;
+}
+
 .btn-secBlue {
   background-color: var(--sec-blue);
   color: var(--text-main-color);
@@ -72,6 +90,29 @@ body {
 .btn-secBlue:hover {
   background-color: var(--sec-blue-hover);
   color: var(--text-main-color-hover);
+}
+
+.btn-secBlue:active {
+  background-color: var(--sec-blue-hover) !important;
+  color: var(--text-main-color-hover) !important;
+}
+
+.btn-as-link {
+  background-color: transparent;
+  color: var(--text-blue-color);
+  border: none !important;
+}
+
+.btn-as-link:hover {
+  background-color: transparent;
+  color: var(--text-blue-color);
+}
+
+.btn-as-link:active {
+  background-color: transparent !important;
+  color: var(--text-blue-color) !important;
+  text-decoration: underline;
+  border: none !important;
 }
 
 /* Input style */
@@ -87,4 +128,16 @@ body {
 
 .input-style::placeholder {
   color: var(--sec-grey);
+}
+
+/* Sizing */
+
+.maxFormWidth {
+  max-width: 381px;
+}
+
+/* Cursor */
+
+.cursor-pointer {
+  cursor: pointer;
 }

@@ -1,3 +1,4 @@
+import { Container, Row, Col } from "react-bootstrap";
 import Image from "next/image";
 import LoginForm from "./../components/Login_form/login_form";
 import bigLogo from "../../public/big_logo.png";
@@ -5,19 +6,19 @@ import bigLogo from "../../public/big_logo.png";
 export default function App() {
   return (
     <main className="d-flex h-100 w-100 justify-content-center align-items-center pb-5">
-      <div className="container mb-5 px-5 mx-4">
-        <div className="row mb-4">
-          <div className="col text-center">
+      <Container className="mb-5 px-5 mx-4 text-center">
+        <Row className="mb-4">
+          <Col>
             <Image src={bigLogo} alt="Logo" />
-          </div>
-        </div>
+          </Col>
+        </Row>
 
-        <div className="row mb-3">
-          <div className="col">
+        <Row className="d-flex justify-content-center">
+          <Col className="maxFormWidth">
             <LoginForm />
-          </div>
-        </div>
-      </div>
+          </Col>
+        </Row>
+      </Container>
     </main>
   );
 }

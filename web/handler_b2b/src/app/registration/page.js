@@ -1,17 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Modal,
-  Container,
-  Row,
-  Col
-} from "react-bootstrap";
+import { Modal, Container, Row, Col } from "react-bootstrap";
 import Image from "next/image";
 import CloseIcon from "../../../public/icons/close_black.png";
 import MoreIcon from "../../../public/icons/more.png";
 import BigLogo from "../../../public/big_logo.png";
-import RegistrationForm from "./../../components/registration/registration_form";
+import RegistrationChooser from "../../components/registration/registration_chooser";
 import GrayQuestionmark from "../../../public/icons/gray_questionmark.png";
 
 export default function Registration() {
@@ -37,7 +32,19 @@ export default function Registration() {
         </Row>
         <Row className="mb-3">
           <Col>
-            <RegistrationForm />
+            <RegistrationChooser />
+          </Col>
+        </Row>
+        <Row className="text-center">
+          <Col>
+            <p>
+              <a
+                className="blue-main-text link-underline link-underline-opacity-0"
+                href="/"
+              >
+                &lt;&lt; Back to login
+              </a>
+            </p>
           </Col>
         </Row>
         <Row className="mb-3">
@@ -46,14 +53,16 @@ export default function Registration() {
               <Image
                 src={GrayQuestionmark}
                 alt="Question icon"
-                className="me-2"
+                className="me-2 mt-1"
               />
-              <p
-                className="grey-sec-text small-text"
-                onClick={openUserInfo}
-                style={diffrentCursorStyle}
-              >
-                Click here to learn about differences
+              <p>
+                <a
+                  onClick={openUserInfo}
+                  className="grey-sec-text small-text link-underline link-underline-opacity-0"
+                  style={diffrentCursorStyle}
+                >
+                  Click here to learn about differences
+                </a>
               </p>
             </Container>
           </Col>
