@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Modal, Container, Row, Col } from "react-bootstrap";
+import { Modal, Container, Row, Col, Button } from "react-bootstrap";
 import Image from "next/image";
+import Link from "next/link";
 import CloseIcon from "../../../public/icons/close_black.png";
 import MoreIcon from "../../../public/icons/more.png";
 import BigLogo from "../../../public/big_logo.png";
@@ -23,8 +24,8 @@ export default function Registration() {
   const closeUserInfo = () => setShow(false);
 
   return (
-    <main className="d-flex h-100 w-100 justify-content-center align-items-center">
-      <Container className="mb-5 px-5 mx-4">
+    <main className="d-flex h-100 w-100 justify-content-center">
+      <Container className="mb-5 px-5 mx-4 logo-spacing-sm">
         <Row className="mb-4">
           <Col className="text-center">
             <Image src={BigLogo} alt="Logo" />
@@ -37,14 +38,9 @@ export default function Registration() {
         </Row>
         <Row className="text-center">
           <Col>
-            <p>
-              <a
-                className="blue-main-text link-underline link-underline-opacity-0"
-                href="/"
-              >
-                &lt;&lt; Back to login
-              </a>
-            </p>
+            <Link href="/">
+              <Button variant="as-link">&lt;&lt; Back to login</Button>
+            </Link>
           </Col>
         </Row>
         <Row className="mb-3">

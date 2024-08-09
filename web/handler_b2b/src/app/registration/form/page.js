@@ -4,15 +4,9 @@ import RegistrationForm from "../../../components/registration/registration_form
 import BigLogo from "../../../../public/big_logo.png";
 
 export default function RegistrationFormHolder() {
-  const formDistanceStyle = {
-    "margin-top": "100px",
-  };
   return (
-    <main
-      className="d-flex h-100 w-100 justify-content-center"
-      style={formDistanceStyle}
-    >
-      <Container className="px-5 mb-5">
+    <main className="d-flex h-100 w-100 justify-content-center">
+      <Container className="px-5 mb-5 logo-spacing-sm">
         <Row className="mb-4">
           <Col className="text-center">
             <Image src={BigLogo} alt="Logo" />

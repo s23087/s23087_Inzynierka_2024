@@ -5,7 +5,9 @@ export default function RegistrationChooser() {
   return (
     <Container className="text-center">
       <Container>
-        <p className="black-text fw-semibold">Choose preferred user type:</p>
+        <p className="black-text fw-semibold mb-1">
+          Choose preferred user type:
+        </p>
       </Container>
       <Container>
         <Row className="mb-4 justify-content-around">
