@@ -3,9 +3,18 @@
 import { useState, useRef } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { useSearchParams } from "next/navigation";
+import PolicyOffcanvas from "./policy_offcanvas";
 
 function RegistrationForm() {
+  // Variable that tell if user choose Org option or Individual one
   const is_org = useSearchParams().get("is_org");
+
+  // Modal variables
+  const [show, setShow] = useState(false);
+  const showModal = () => setShow(true);
+  const hideModal = () => setShow(false);
+
+  // Form change variables
   const [step, setStep] = useState(1);
   const spaceStyle = {
     "white-space": "pre",
@@ -159,14 +168,14 @@ function RegistrationForm() {
                       <Form.Check type="checkbox" id="policy_check" label="" />
                     </Col>
                     <Col className="pe-0">
-                      <p className="small-text blue-main-text text-start fw-lighter lh-sm">
+                      <Button
+                        variant="as-link"
+                        className="small-text px-0 text-start pt-0 lh-sm fw-lighter"
+                        onClick={showModal}
+                      >
                         By checking, you agree to our company&apos;s privacy
-                        terms.{" "}
-                        <a className="text-underline blue-main-text cursor-pointer">
-                          Click here
-                        </a>{" "}
-                        to read more about our policy.
-                      </p>
+                        terms. <u>Click here</u> to read more about our policy.
+                      </Button>
                     </Col>
                   </Row>
                 </Container>
@@ -194,6 +203,9 @@ function RegistrationForm() {
             </Form>
           </Col>
         </Row>
+      </Container>
+      <Container>
+        <PolicyOffcanvas show={show} hideFunction={hideModal} />
       </Container>
     </Container>
   );
