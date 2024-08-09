@@ -35,9 +35,23 @@ body {
   height: 100%;
 }
 
+/* Background */
+
+.main-blue-bg {
+  background-color: var(--main-blue);
+}
+
+.sec-blue-bg {
+  background-color: var(--sec-blue);
+}
+
 /* Font */
 
 a {
+  color: var(--text-main-color);
+}
+
+.main-text {
   color: var(--text-main-color);
 }
 
@@ -130,6 +144,21 @@ a {
   color: var(--sec-grey);
 }
 
+.input-style-search {
+  border: none;
+  background-color: var(--sec-blue);
+  color: var(--text-main-color);
+}
+
+.input-style-search:focus {
+  background-color: var(--sec-blue);
+  color: var(--text-main-color);
+}
+
+.input-style-search::placeholder {
+  color: var(--text-main-color);
+}
+
 /* Sizing */
 
 .maxFormWidth {
@@ -140,4 +169,30 @@ a {
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+/* Border */
+
+.border-top-grey {
+  border-top: solid var(--sec-grey) 1px;
+}
+
+/* Placement */
+
+.logo-spacing {
+  margin-top: 200px;
+}
+
+.logo-spacing-sm {
+  margin-top: 180px;
+}
+
+@media only screen and (max-width: 768px) {
+  .logo-spacing {
+    margin-top: 150px;
+  }
+
+  .logo-spacing-sm {
+    margin-top: 100px;
+  }
 }
