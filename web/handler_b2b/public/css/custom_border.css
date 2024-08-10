@@ -1,0 +1,9 @@
+/* Border */
+
+.border-top-grey {
+  border-top: solid var(--sec-grey) 1px;
+}
+
+.border-bottom-grey {
+  border-bottom: solid var(--sec-grey) 1px;
+}

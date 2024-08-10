@@ -1,5 +1,13 @@
 @import "~bootstrap/dist/css/bootstrap.min.css";
 
+/* Custom css imports */
+@import "../../public/css/search_bar.css";
+@import "../../public/css/custom_bg.css";
+@import "../../public/css/custom_font.css";
+@import "../../public/css/custom_button.css";
+@import "../../public/css/custom_input.css";
+@import "../../public/css/custom_border.css";
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
@@ -35,146 +43,10 @@ body {
   height: 100%;
 }
 
-/* Background */
-
-.main-blue-bg {
-  background-color: var(--main-blue);
-}
-
-.sec-blue-bg {
-  background-color: var(--sec-blue);
-}
-
-/* Font */
-
-a {
-  color: var(--text-main-color);
-}
-
-.main-text {
-  color: var(--text-main-color);
-}
-
-.black-text {
-  color: var(--text-black-color);
-}
-
-.grey-main-text {
-  color: var(--text-main-grey-color);
-}
-
-.grey-sec-text {
-  color: var(--text-sec-grey-color);
-}
-
-.blue-main-text {
-  color: var(--text-blue-color);
-}
-
-.small-text {
-  font-size: 12px;
-}
-
-/* Button variants */
-
-.btn {
-  min-height: 45px;
-}
-
-.btn-mainBlue {
-  background-color: var(--main-blue);
-  color: var(--text-main-color);
-}
-
-.btn-mainBlue:hover {
-  background-color: var(--main-blue-hover);
-  color: var(--text-main-color-hover);
-}
-
-.btn-mainBlue:active {
-  background-color: var(--main-blue-hover) !important;
-  color: var(--text-main-color-hover) !important;
-}
-
-.btn-secBlue {
-  background-color: var(--sec-blue);
-  color: var(--text-main-color);
-}
-
-.btn-secBlue:hover {
-  background-color: var(--sec-blue-hover);
-  color: var(--text-main-color-hover);
-}
-
-.btn-secBlue:active {
-  background-color: var(--sec-blue-hover) !important;
-  color: var(--text-main-color-hover) !important;
-}
-
-.btn-as-link {
-  background-color: transparent;
-  color: var(--text-blue-color);
-  border: none !important;
-}
-
-.btn-as-link:hover {
-  background-color: transparent;
-  color: var(--text-blue-color);
-}
-
-.btn-as-link:active {
-  background-color: transparent !important;
-  color: var(--text-blue-color) !important;
-  text-decoration: underline;
-  border: none !important;
-}
-
-/* Input style */
-
-.input-style {
-  background-color: var(--main-grey);
-  min-height: 45px;
-}
-
-.input-style:focus {
-  background-color: var(--main-grey);
-}
-
-.input-style::placeholder {
-  color: var(--sec-grey);
-}
-
-.input-style-search {
-  border: none;
-  background-color: var(--sec-blue);
-  color: var(--text-main-color);
-}
-
-.input-style-search:focus {
-  background-color: var(--sec-blue);
-  color: var(--text-main-color);
-}
-
-.input-style-search::placeholder {
-  color: var(--text-main-color);
-}
-
 /* Sizing */
 
 .maxFormWidth {
   max-width: 381px;
-}
-
-/* Cursor */
-
-.cursor-pointer {
-  cursor: pointer;
-}
-
-/* Border */
-
-.border-top-grey {
-  border-top: solid var(--sec-grey) 1px;
 }
 
 /* Placement */

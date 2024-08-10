@@ -1,0 +1,53 @@
+/* Button variants */
+
+.btn {
+  min-height: 45px;
+}
+
+.btn-mainBlue {
+  background-color: var(--main-blue);
+  color: var(--text-main-color);
+}
+
+.btn-mainBlue:hover {
+  background-color: var(--main-blue-hover);
+  color: var(--text-main-color-hover);
+}
+
+.btn-mainBlue:active {
+  background-color: var(--main-blue-hover) !important;
+  color: var(--text-main-color-hover) !important;
+}
+
+.btn-secBlue {
+  background-color: var(--sec-blue);
+  color: var(--text-main-color);
+}
+
+.btn-secBlue:hover {
+  background-color: var(--sec-blue-hover);
+  color: var(--text-main-color-hover);
+}
+
+.btn-secBlue:active {
+  background-color: var(--sec-blue-hover) !important;
+  color: var(--text-main-color-hover) !important;
+}
+
+.btn-as-link {
+  background-color: transparent;
+  color: var(--text-blue-color);
+  border: none !important;
+}
+
+.btn-as-link:hover {
+  background-color: transparent;
+  color: var(--text-blue-color);
+}
+
+.btn-as-link:active {
+  background-color: transparent !important;
+  color: var(--text-blue-color) !important;
+  text-decoration: underline;
+  border: none !important;
+}

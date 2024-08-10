@@ -1,0 +1,29 @@
+/* Input style */
+
+.input-style {
+  background-color: var(--main-grey);
+  min-height: 45px;
+}
+
+.input-style:focus {
+  background-color: var(--main-grey);
+}
+
+.input-style::placeholder {
+  color: var(--sec-grey);
+}
+
+.input-style-search {
+  border: none;
+  background-color: var(--sec-blue);
+  color: var(--text-main-color);
+}
+
+.input-style-search:focus {
+  background-color: var(--sec-blue);
+  color: var(--text-main-color);
+}
+
+.input-style-search::placeholder {
+  color: var(--text-main-color);
+}

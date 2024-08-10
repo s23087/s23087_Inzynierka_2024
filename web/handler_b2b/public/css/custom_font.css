@@ -1,0 +1,29 @@
+/* Font */
+
+a {
+  color: var(--text-main-color);
+}
+
+.main-text {
+  color: var(--text-main-color);
+}
+
+.black-text {
+  color: var(--text-black-color);
+}
+
+.grey-main-text {
+  color: var(--text-main-grey-color);
+}
+
+.grey-sec-text {
+  color: var(--text-sec-grey-color);
+}
+
+.blue-main-text {
+  color: var(--text-blue-color);
+}
+
+.small-text {
+  font-size: 12px;
+}
