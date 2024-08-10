@@ -1,6 +1,6 @@
 import { Container, Row, Col } from "react-bootstrap";
 import Image from "next/image";
-import RegistrationForm from "../../../components/registration/registration_form";
+import RegistrationForm from "@/components/registration/registration_form";
 import BigLogo from "../../../../public/big_logo.png";
 
 export default function RegistrationFormHolder() {
