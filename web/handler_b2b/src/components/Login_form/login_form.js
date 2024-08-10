@@ -6,6 +6,14 @@ import Link from "next/link";
 export default function LoginForm() {
   return (
     <Form>
+      <Form.Group className="mb-3" controlId="formCompanyId">
+        <Form.Control
+          className="input-style shadow-sm"
+          type="text"
+          placeholder="company id"
+        />
+      </Form.Group>
+
       <Form.Group className="mb-3" controlId="formEmail">
         <Form.Control
           className="input-style shadow-sm"
