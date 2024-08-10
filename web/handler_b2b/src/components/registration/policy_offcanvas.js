@@ -11,7 +11,7 @@ function PolicyOffcanvas({ show, hideFunction }) {
       onHide={hideFunction}
       placement="bottom"
     >
-      <Offcanvas.Header>
+      <Offcanvas.Header className="border-bottom-grey">
         <Container fluid>
           <Row>
             <Col xs="9" className="d-flex align-items-center">
