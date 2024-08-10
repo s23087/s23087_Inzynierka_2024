@@ -18,7 +18,10 @@ export default function SuccesPage() {
         <Row className="mb-4 pt-3">
           <Col className="text-center black-text">
             <h1 className="pb-4">Success!</h1>
-            <p className="fw-bolder">Your account has been created.</p>
+            <p className="fw-bolder">
+              Your account has been created. You will find your company id in
+              email.
+            </p>
             <p className="fw-bolder">You can login in now.</p>
           </Col>
         </Row>
