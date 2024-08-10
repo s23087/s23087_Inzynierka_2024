@@ -1,14 +1,12 @@
+"use client";
+
 import { Container, Form, Button, Stack, InputGroup } from "react-bootstrap";
 import Image from "next/image";
 import search_icons from "../../../public/icons/icon_search.png";
 
 export default function SearchBar() {
-  const barStyle = {
-    "border-radius": "60px",
-    "max-width": "701px",
-  };
   return (
-    <Container className="sec-blue-bg" style={barStyle}>
+    <Container className="sec-blue-bg barStyle">
       <Form>
         <Stack direction="horizontal">
           <InputGroup>
