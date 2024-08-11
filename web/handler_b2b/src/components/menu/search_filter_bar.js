@@ -15,13 +15,13 @@ function SearchFilterBar({ filter_icon_bool }) {
       direction="horizontal"
       style={barHeight}
     >
-      <Container className="w-auto ms-0 ms-md-5">
+      <Container className="w-auto ms-0 ms-xl-5">
         <FilterIcon is_active={filter_icon_bool} />
       </Container>
       <Container className="mx-auto">
         <SearchBar />
       </Container>
-      <Container className="w-auto me-0 me-md-5">
+      <Container className="w-auto me-0 me-xl-5">
         <Image src={icon_more} alt="More action" />
       </Container>
     </Stack>

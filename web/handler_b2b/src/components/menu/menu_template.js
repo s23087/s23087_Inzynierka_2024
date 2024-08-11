@@ -2,39 +2,34 @@ import PropTypes from "prop-types";
 import Image from "next/image";
 import { Stack, Container, Button } from "react-bootstrap";
 import NotificationBadge from "../smaller_components/notification_icon";
+import UserSettingWindow from "./user_setting_window";
 import small_logo from "../../../public/small_logo.png";
 import sidebar_button from "../../../public/icons/sidebar_icon.png";
-import user_settings_icon from "../../../public/icons/user_settings_icon.png";
 
-function MenuTemplate({ children, sidebar_action, user_window_action }) {
+function MenuTemplate({ children, sidebar_action, user_name }) {
   const menuSize = {
     height: "81px",
   };
   return (
     <Stack className="px-3" direction="horizontal" style={menuSize}>
-      <Container className="w-auto ms-0 ms-md-5">
+      <Container className="w-auto ms-0 ms-xl-5 me-0 me-xl-4">
         <Image src={small_logo} alt="logo" />
       </Container>
-      <Container className="mx-auto text-center text-lg-start">
+      <Container className="mx-auto ms-xl-0 text-center text-xl-start">
         {children}
       </Container>
-      <Container className="ms-auto w-auto me-0 me-md-5">
+      <Container className="ms-auto w-auto me-0 me-xl-5">
         <Button
           variant="as-link"
-          className="pe-0 position-relative py-0 d-lg-none"
+          className="pe-0 position-relative py-0 d-xl-none"
           onClick={sidebar_action}
         >
           <Image src={sidebar_button} alt="logo" />
           <NotificationBadge qty={1} />
         </Button>
-        <Button
-          variant="as-link"
-          className="pe-0 position-relative py-0 d-none d-lg-block"
-          onClick={user_window_action}
-        >
-          <Image src={user_settings_icon} alt="logo" />
-          <NotificationBadge qty={1} />
-        </Button>
+        <Container className="pe-0 position-relative py-0 d-none d-xl-block">
+          <UserSettingWindow user_name={user_name} notification_qty={1} />
+        </Container>
       </Container>
     </Stack>
   );
@@ -43,7 +38,7 @@ function MenuTemplate({ children, sidebar_action, user_window_action }) {
 MenuTemplate.PropTypes = {
   children: PropTypes.object,
   sidebar_action: PropTypes.func.isRequired,
-  user_window_action: PropTypes.func.isRequired,
+  user_name: PropTypes.string.isRequired,
 };
 
 export default MenuTemplate;

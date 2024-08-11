@@ -29,9 +29,13 @@
   --text-main-color: white;
   --text-main-color-hover: white;
   --text-blue-color: #307ae9;
+  --text-sec-blue-color: #24559e;
   --text-black-color: #2f3032;
   --text-main-grey-color: #d9d9d9;
   --text-sec-grey-color: #989898;
+  --main-bg-color: white;
+  --blue-bg-color: #307ae9;
+  --sec-blue-bg-color: #24559e;
 }
 
 html {
@@ -41,6 +45,25 @@ html {
 
 body {
   height: 100%;
+  background-color: var(--main-bg-color);
+}
+
+/* Menu toggle */
+
+.menu-toggle {
+  color: var(--main-bg-color) !important;
+}
+
+.menu-toggle:hover {
+  color: var(--main-bg-color) !important;
+}
+
+.menu-toggle:active {
+  color: var(--main-bg-color) !important;
+}
+
+.menu-toggle:focus {
+  color: var(--main-bg-color) !important;
 }
 
 /* Sizing */

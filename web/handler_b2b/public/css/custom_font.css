@@ -24,6 +24,10 @@ a {
   color: var(--text-blue-color);
 }
 
+.blue-sec-text {
+  color: var(--text-sec-blue-color);
+}
+
 .small-text {
   font-size: 12px;
 }

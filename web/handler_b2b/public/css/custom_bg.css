@@ -1,9 +1,13 @@
 /* Background */
 
+.main-bg {
+  background-color: var(--main-bg-color);
+}
+
 .main-blue-bg {
-  background-color: var(--main-blue);
+  background-color: var(--blue-bg-color);
 }
 
 .sec-blue-bg {
-  background-color: var(--sec-blue);
+  background-color: var(--sec-blue-bg-color);
 }

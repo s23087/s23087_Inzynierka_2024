@@ -1,12 +1,12 @@
 import PropTypes from "prop-types";
 
-function NotificationBadge({ qty }) {
+function NotificationBadge({ qty, top_value = "-3px", right_value = "-7px" }) {
   const spanStyle = {
     height: "22px",
     width: "22px",
     position: "absolute",
-    top: "-3px",
-    right: "-7px",
+    top: top_value,
+    right: right_value,
   };
 
   if (qty <= 0) {
@@ -25,6 +25,8 @@ function NotificationBadge({ qty }) {
 
 NotificationBadge.PropTypes = {
   qty: PropTypes.number.isRequired,
+  top_value: PropTypes.string,
+  right_value: PropTypes.string,
 };
 
 export default NotificationBadge;
