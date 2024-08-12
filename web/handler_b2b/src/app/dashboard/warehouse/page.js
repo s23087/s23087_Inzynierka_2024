@@ -9,8 +9,13 @@ import CurrencyChangeButton from "@/components/smaller_components/currency_chang
 import CustomSidebar from "@/components/menu/sidebars/sidebar";
 import Navlinks from "@/components/menu/navlinks";
 import PagationFooter from "@/components/footer/pagation_footer";
+import ItemContainer from "@/components/object_container/item_container";
 
 export default function WarehousePage() {
+  const itemSectionStyle = {
+    "margin-bottom": "66px",
+    "margin-top": "207px",
+  };
   const [sidebarShow, setSidebarShow] = useState(false);
   const showSidebar = () => setSidebarShow(true);
   const hideSidebar = () => setSidebarShow(false);
@@ -18,10 +23,22 @@ export default function WarehousePage() {
   const current_nofitication_qty = 1;
   const is_org_switch_needed = true;
   const org_view = false;
+  const tmp_item = {
+    user: "<<user>>",
+    id: "<<product id>>",
+    availability: "In warehouse",
+    partnumber: "<<product part number>>",
+    qty: 3,
+    purchase_price: "<<price>>",
+    currency_name: "PLN",
+    name: "<<product name>>",
+    source: "<<source>>",
+    EAN: "<<Ean>>",
+  };
 
   return (
     <main className="d-flex flex-column h-100">
-      <nav>
+      <nav className="fixed-top main-bg">
         <MenuTemplate sidebar_action={showSidebar} user_name="<<User name>>">
           <Stack className="ps-xl-2" direction="horizontal" gap={4}>
             <Container className="mx-auto ms-xl-2 ms-xxl-0 me-xl-5 w-auto px-xl-0 px-xxl-2">
@@ -58,9 +75,16 @@ export default function WarehousePage() {
         </CustomSidebar>
       </nav>
 
-      <section className="h-100"></section>
+      <section className="h-100">
+        <Container className="p-0" style={itemSectionStyle} fluid>
+          <ItemContainer item={tmp_item} is_org={true} selected={false} />
+          <ItemContainer item={tmp_item} is_org={false} selected={true} />
+          <ItemContainer item={tmp_item} is_org={false} selected={false} />
+          <ItemContainer item={tmp_item} is_org={true} selected={true} />
+        </Container>
+      </section>
 
-      <footer className="mt-auto w-100">
+      <footer className="fixed-bottom w-100">
         <PagationFooter
           max_instance_on_page={10}
           page_qty={20}
