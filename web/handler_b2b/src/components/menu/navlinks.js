@@ -56,8 +56,8 @@ function Navlinks({ role, active_link, notification_qty, is_sidebar }) {
     <>
       {Object.entries(role_link_dic[role.toLowerCase()]).map(([key, value]) =>
         active_link.toLowerCase() === key.toLowerCase() ? (
-          <Container className="d-flex p-0" fluid>
-            <p className="mb-0 blue-sec-text fst-italic pe-2" key={key}>
+          <Container className="d-flex p-0" fluid key={key}>
+            <p className="mb-0 blue-sec-text fst-italic pe-2">
               {key === "Notifications" || key === "Settings" ? "" : key}
             </p>
             {key === "Notifications" ? (
