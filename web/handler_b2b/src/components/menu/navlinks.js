@@ -10,7 +10,7 @@ function Navlinks({ role, active_link, notification_qty, is_sidebar }) {
       Pricelist: "/dashboard/pricelist",
       Proformas: "/dashboard/proformas",
       Clients: "/dashboard/clients",
-      Invocies: "/dashboard/invocies",
+      Invoices: "/dashboard/invoices",
       Deliveries: "/dashboard/deliveries",
       Roles: "/dashboard/roles",
       Notifications: "/dashboard/notifications",
@@ -20,7 +20,7 @@ function Navlinks({ role, active_link, notification_qty, is_sidebar }) {
       Warehouse: "/dashboard/warehouse",
       Proformas: "/dashboard/proformas",
       Clients: "/dashboard/clients",
-      Invocies: "/dashboard/invocies",
+      Invoices: "/dashboard/invoices",
       Deliveries: "/dashboard/deliveries",
       Notifications: "/dashboard/notifications",
       Settings: "/dashboard/settings",
@@ -30,7 +30,7 @@ function Navlinks({ role, active_link, notification_qty, is_sidebar }) {
       Pricelist: "/dashboard/pricelist",
       Proformas: "/dashboard/proformas",
       Clients: "/dashboard/clients",
-      Invocies: "/dashboard/invocies",
+      Invoices: "/dashboard/invoices",
       Deliveries: "/dashboard/deliveries",
       Notifications: "/dashboard/notifications",
       Settings: "/dashboard/settings",
@@ -45,7 +45,7 @@ function Navlinks({ role, active_link, notification_qty, is_sidebar }) {
       Pricelist: "/dashboard/pricelist",
       Proformas: "/dashboard/proformas",
       Clients: "/dashboard/clients",
-      Invocies: "/dashboard/invocies",
+      Invoices: "/dashboard/invocies",
       Deliveries: "/dashboard/deliveries",
       Notifications: "/dashboard/notifications",
       Settings: "/dashboard/settings",
@@ -56,9 +56,22 @@ function Navlinks({ role, active_link, notification_qty, is_sidebar }) {
     <>
       {Object.entries(role_link_dic[role.toLowerCase()]).map(([key, value]) =>
         active_link.toLowerCase() === key.toLowerCase() ? (
-          <p className="mb-0 blue-sec-text fst-italic pe-2" key={key}>
-            {key}
-          </p>
+          <>
+            <Container className="d-flex p-0" fluid>
+              <p className="mb-0 blue-sec-text fst-italic pe-2" key={key}>
+                {key === "Notifications" || key === "Settings" ? "" : key}
+              </p>
+              {key === "Notifications" ? (
+                <Container className="position-relative d-xl-none">
+                  <NotificationBadge
+                    qty={notification_qty}
+                    top_value="0.5px"
+                    right_value="0"
+                  />
+                </Container>
+              ) : null}
+            </Container>
+          </>
         ) : !is_sidebar &&
           (key === "Notifications" || key === "Settings") ? null : (
           <Container className="d-flex ps-0" key={key}>

@@ -6,7 +6,12 @@ import UserSettingWindow from "./user_setting_window";
 import small_logo from "../../../public/small_logo.png";
 import sidebar_button from "../../../public/icons/sidebar_icon.png";
 
-function MenuTemplate({ children, sidebar_action, user_name }) {
+function MenuTemplate({
+  children,
+  sidebar_action,
+  user_name,
+  user_window_active_link = "none",
+}) {
   const menuSize = {
     height: "81px",
   };
@@ -28,7 +33,11 @@ function MenuTemplate({ children, sidebar_action, user_name }) {
           <NotificationBadge qty={1} />
         </Button>
         <Container className="pe-0 position-relative py-0 d-none d-xl-block">
-          <UserSettingWindow user_name={user_name} notification_qty={1} />
+          <UserSettingWindow
+            user_name={user_name}
+            notification_qty={1}
+            active_link={user_window_active_link}
+          />
         </Container>
       </Container>
     </Stack>
@@ -39,6 +48,7 @@ MenuTemplate.PropTypes = {
   children: PropTypes.object,
   sidebar_action: PropTypes.func.isRequired,
   user_name: PropTypes.string.isRequired,
+  user_window_active_link: PropTypes.string,
 };
 
 export default MenuTemplate;

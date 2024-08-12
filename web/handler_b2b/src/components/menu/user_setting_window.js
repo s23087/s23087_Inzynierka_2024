@@ -8,7 +8,11 @@ import Link from "next/link";
 import NotificationBadge from "../smaller_components/notification_icon";
 import user_settings_icon from "../../../public/icons/user_settings_icon.png";
 
-function UserSettingWindow({ user_name, notification_qty }) {
+function UserSettingWindow({
+  user_name,
+  notification_qty,
+  active_link = "none",
+}) {
   const [showWindow, setShowWindow] = useState(false);
   const openWindow = () => setShowWindow(true);
   const closeWindow = () => setShowWindow(false);
@@ -41,19 +45,31 @@ function UserSettingWindow({ user_name, notification_qty }) {
       >
         <Stack className="pt-3" gap={3}>
           <p className="mb-2">{user_name}</p>
-          <Link
-            href="/dashboard/settings"
-            className="blue-main-text text-decoration-none"
-          >
-            Settings
-          </Link>
-          <Container className="d-flex px-0">
+          {active_link.toLowerCase() === "settings" ? (
+            <p className="mb-0 blue-sec-text text-decoration-none fst-italic">
+              Settings
+            </p>
+          ) : (
             <Link
-              href="/dashboard/notifications"
+              href="/dashboard/settings"
               className="blue-main-text text-decoration-none"
             >
-              Notifications
+              Settings
             </Link>
+          )}
+          <Container className="d-flex px-0">
+            {active_link.toLowerCase() === "notifications" ? (
+              <p className="mb-0 blue-sec-text text-decoration-none fst-italic">
+                Notifications
+              </p>
+            ) : (
+              <Link
+                href="/dashboard/notifications"
+                className="blue-main-text text-decoration-none"
+              >
+                Notifications
+              </Link>
+            )}
             <Container className="position-relative">
               <NotificationBadge
                 qty={notification_qty}
@@ -74,6 +90,7 @@ function UserSettingWindow({ user_name, notification_qty }) {
 UserSettingWindow.PropTypes = {
   user_name: PropTypes.string.isRequired,
   notification_qty: PropTypes.number.isRequired,
+  active_link: PropTypes.string,
 };
 
 export default UserSettingWindow;
