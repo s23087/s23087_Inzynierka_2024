@@ -28,12 +28,14 @@ function PagationFooter({ page_qty, max_instance_on_page, current_page }) {
       direction="horizontal"
     >
       <Container className="pe-0">
-        <span
-          className="d-flex align-items-center justify-content-center main-text sec-blue-bg"
-          style={instanceChangerStyle}
-        >
-          <p className="mb-0">{max_instance_on_page}</p>
-        </span>
+        <Button variant="white-border" className="p-0 w-100">
+          <span
+            className="d-flex align-items-center justify-content-center main-text sec-blue-bg"
+            style={instanceChangerStyle}
+          >
+            <p className="mb-0">{max_instance_on_page}</p>
+          </span>
+        </Button>
       </Container>
       <Container className="d-flex justify-content-end">
         <span
@@ -41,19 +43,19 @@ function PagationFooter({ page_qty, max_instance_on_page, current_page }) {
           style={pagationStyle}
         >
           <Stack direction="horizontal">
-            <Button variant="as-link" className="pe-0">
+            <Button variant="white-border" className="p-0">
               <Image src={left_last_page} alt="To first page" />
             </Button>
-            <Button variant="as-link" className="ps-0">
+            <Button variant="white-border" className="p-0">
               <Image src={left_page} alt="To previous page" />
             </Button>
-            <p className="mb-0">
+            <p className="mb-0 px-2">
               {current_page} ... {page_qty}
             </p>
-            <Button variant="as-link" className="pe-0">
+            <Button variant="white-border" className="p-0">
               <Image src={right_page} alt="To next page" />
             </Button>
-            <Button variant="as-link" className="ps-0">
+            <Button variant="white-border" className="p-0">
               <Image src={right_last_page} alt="To last page" />
             </Button>
           </Stack>
