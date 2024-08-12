@@ -5,9 +5,33 @@
 }
 
 .main-blue-bg {
-  background-color: var(--blue-bg-color);
+  background-color: var(--main-blue);
 }
 
 .sec-blue-bg {
-  background-color: var(--sec-blue-bg-color);
+  background-color: var(--sec-blue);
+}
+
+.main-red-bg {
+  background-color: var(--main-red);
+}
+
+.sec-red-bg {
+  background-color: var(--sec-red);
+}
+
+.main-green-bg {
+  background-color: var(--main-green);
+}
+
+.main-yellow-bg {
+  background-color: var(--main-yellow);
+}
+
+.main-grey-bg {
+  background-color: var(--main-grey);
+}
+
+.sec-grey-bg {
+  background-color: var(--sec-grey);
 }

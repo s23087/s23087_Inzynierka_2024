@@ -24,6 +24,7 @@
   --main-black: #2f3032;
   --main-red: #dd0000;
   --sec-red: #9a0000;
+  --sec-red-hover: #6b0202;
   --main-green: #22d21f;
   --main-yellow: #faf473;
   --text-main-color: white;
@@ -34,8 +35,6 @@
   --text-main-grey-color: #d9d9d9;
   --text-sec-grey-color: #989898;
   --main-bg-color: white;
-  --blue-bg-color: #307ae9;
-  --sec-blue-bg-color: #24559e;
 }
 
 html {
@@ -46,6 +45,12 @@ html {
 body {
   height: 100%;
   background-color: var(--main-bg-color);
+}
+
+/* Span elements rounded */
+
+.rounded-span {
+  border-radius: 10px;
 }
 
 /* Menu toggle */

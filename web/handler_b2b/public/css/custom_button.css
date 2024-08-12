@@ -51,3 +51,37 @@
   text-decoration: underline;
   border: none !important;
 }
+
+.btn-red {
+  background-color: var(--sec-red);
+  color: var(--text-main-color);
+}
+
+.btn-red:hover {
+  background-color: var(--sec-red-hover);
+  color: var(--text-main-color-hover);
+}
+
+.btn-red:active {
+  background-color: var(--sec-red) !important;
+  color: var(--text-main-color) !important;
+}
+
+.btn-white-border {
+  background-color: transparent;
+  color: var(--text-blue-color);
+  border: none !important;
+}
+
+.btn-white-border:hover {
+  background-color: transparent;
+  color: var(--text-blue-color);
+  border: solid var(--text-main-color) 1px !important;
+}
+
+.btn-white-border:active {
+  background-color: transparent !important;
+  color: var(--text-blue-color) !important;
+  text-decoration: underline;
+  border: none !important;
+}
