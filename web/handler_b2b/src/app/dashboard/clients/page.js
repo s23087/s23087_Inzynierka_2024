@@ -8,6 +8,7 @@ import MenuTemplate from "@/components/menu/menu_template";
 import CustomSidebar from "@/components/menu/sidebars/sidebar";
 import Navlinks from "@/components/menu/navlinks";
 import PagationFooter from "@/components/footer/pagation_footer";
+import ClientContainer from "@/components/object_container/clients_container";
 
 export default function ClientsPage() {
   const itemSectionStyle = {
@@ -21,6 +22,13 @@ export default function ClientsPage() {
   const current_nofitication_qty = 1;
   const is_org_switch_needed = true;
   const org_view = false;
+  const tmp_client = {
+    user: "<<user>>",
+    name: "<<name>>",
+    adress: "<<adress>>",
+    nip: "<<nip>>",
+    country: "<<country>>",
+  };
 
   return (
     <main className="d-flex flex-column h-100">
@@ -59,7 +67,16 @@ export default function ClientsPage() {
       </nav>
 
       <section className="h-100">
-        <Container className="p-0" style={itemSectionStyle} fluid></Container>
+        <Container className="p-0" style={itemSectionStyle} fluid>
+          <ClientContainer
+            client={tmp_client}
+            is_org={false}
+            selected={false}
+          />
+          <ClientContainer client={tmp_client} is_org={true} selected={false} />
+          <ClientContainer client={tmp_client} is_org={false} selected={true} />
+          <ClientContainer client={tmp_client} is_org={true} selected={true} />
+        </Container>
       </section>
 
       <footer className="fixed-bottom w-100">

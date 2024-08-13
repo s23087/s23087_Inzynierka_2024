@@ -8,6 +8,7 @@ import MenuTemplate from "@/components/menu/menu_template";
 import CustomSidebar from "@/components/menu/sidebars/sidebar";
 import Navlinks from "@/components/menu/navlinks";
 import PagationFooter from "@/components/footer/pagation_footer";
+import PricelistContainer from "@/components/object_container/pricelist_container";
 
 export default function PricelistPage() {
   const itemSectionStyle = {
@@ -19,7 +20,15 @@ export default function PricelistPage() {
   const hideSidebar = () => setSidebarShow(false);
   const current_role = "Admin";
   const current_nofitication_qty = 1;
-  const org_view = false;
+  const tmp_pricelist = {
+    created: "dd.mm.yyyy",
+    status: "Active",
+    name: "<<name>>",
+    item_qty: "<<Product count>>",
+    type: "<<type>>",
+    modified: "dd.mm.yyyy",
+    clients: ["client a", "client b"],
+  };
 
   return (
     <main className="d-flex flex-column h-100">
@@ -39,7 +48,7 @@ export default function PricelistPage() {
         <PagePostionBar
           site_name="Pricelist"
           with_switch={false}
-          switch_bool={org_view}
+          switch_bool={false}
         />
         <SearchFilterBar filter_icon_bool="false" />
         <CustomSidebar
@@ -58,7 +67,10 @@ export default function PricelistPage() {
       </nav>
 
       <section className="h-100">
-        <Container className="p-0" style={itemSectionStyle} fluid></Container>
+        <Container className="p-0" style={itemSectionStyle} fluid>
+          <PricelistContainer pricelist={tmp_pricelist} selected={false} />
+          <PricelistContainer pricelist={tmp_pricelist} selected={true} />
+        </Container>
       </section>
 
       <footer className="fixed-bottom w-100">
