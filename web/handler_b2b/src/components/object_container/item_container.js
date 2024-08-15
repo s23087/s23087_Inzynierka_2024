@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import Image from "next/image";
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
+import ContainerButtons from "../smaller_components/container_buttons";
 import user_small_icon from "../../../public/icons/user_small_icon.png";
 
 function ItemContainer({ item, is_org, selected }) {
@@ -17,10 +18,6 @@ function ItemContainer({ item, is_org, selected }) {
     "min-width": "159px",
     "min-height": "25px",
     "align-items": "center",
-  };
-  const buttonStyle = {
-    "min-width": "77px",
-    "max-width": "95px",
   };
   const maxContainerStyle = {
     "max-width": "450px",
@@ -151,46 +148,7 @@ function ItemContainer({ item, is_org, selected }) {
           </Row>
         </Col>
         <Col xs="12" xl="4" className="px-0 pt-3 pt-xl-2 pb-2">
-          <Container className="h-100" fluid>
-            <Row className="align-items-center justify-content-center h-100">
-              <Col className="pe-2" xs="3" sm="auto">
-                <Button
-                  variant="mainBlue"
-                  className="rounded-span w-100 p-0"
-                  style={buttonStyle}
-                >
-                  {selected ? "Deselect" : "Select"}
-                </Button>
-              </Col>
-              <Col className="px-2" xs="3" sm="auto">
-                <Button
-                  variant="red"
-                  className="rounded-span w-100"
-                  style={buttonStyle}
-                >
-                  Delete
-                </Button>
-              </Col>
-              <Col className="px-2" xs="3" sm="auto">
-                <Button
-                  variant="mainBlue"
-                  className="rounded-span w-100"
-                  style={buttonStyle}
-                >
-                  View
-                </Button>
-              </Col>
-              <Col className="ps-2" xs="3" sm="auto">
-                <Button
-                  variant="mainBlue"
-                  className="rounded-span w-100"
-                  style={buttonStyle}
-                >
-                  Modify
-                </Button>
-              </Col>
-            </Row>
-          </Container>
+          <ContainerButtons selected={selected} />
         </Col>
       </Row>
     </Container>

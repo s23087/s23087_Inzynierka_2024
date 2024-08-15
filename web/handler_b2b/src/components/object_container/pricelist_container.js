@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import { Container, Row, Col, Button } from "react-bootstrap";
+import ContainerButtons from "../smaller_components/container_buttons";
 
 function PricelistContainer({ pricelist, selected }) {
   const containerBg = {
@@ -15,10 +16,6 @@ function PricelistContainer({ pricelist, selected }) {
     "min-width": "159px",
     "min-height": "25px",
     "align-items": "center",
-  };
-  const buttonStyle = {
-    "min-width": "77px",
-    "max-width": "95px",
   };
   const actionButtonStyle = {
     height: "48px",
@@ -106,46 +103,7 @@ function PricelistContainer({ pricelist, selected }) {
           </Row>
         </Col>
         <Col xs="12" xxl="4" className="px-0 pt-3 pt-xl-3 pt-xxl-0 pb-2">
-          <Container className="h-100" fluid>
-            <Row className="align-items-center justify-content-center h-100">
-              <Col className="pe-2" xs="3" sm="auto">
-                <Button
-                  variant="mainBlue"
-                  className="rounded-span w-100 p-0"
-                  style={buttonStyle}
-                >
-                  {selected ? "Deselect" : "Select"}
-                </Button>
-              </Col>
-              <Col className="px-2" xs="3" sm="auto">
-                <Button
-                  variant="red"
-                  className="rounded-span w-100"
-                  style={buttonStyle}
-                >
-                  Delete
-                </Button>
-              </Col>
-              <Col className="px-2" xs="3" sm="auto">
-                <Button
-                  variant="mainBlue"
-                  className="rounded-span w-100"
-                  style={buttonStyle}
-                >
-                  View
-                </Button>
-              </Col>
-              <Col className="ps-2" xs="3" sm="auto">
-                <Button
-                  variant="mainBlue"
-                  className="rounded-span w-100"
-                  style={buttonStyle}
-                >
-                  Modify
-                </Button>
-              </Col>
-            </Row>
-          </Container>
+          <ContainerButtons selected={selected} />
         </Col>
       </Row>
     </Container>

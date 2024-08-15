@@ -58,7 +58,9 @@ function Navlinks({ role, active_link, notification_qty, is_sidebar }) {
         active_link.toLowerCase() === key.toLowerCase() ? (
           <Container className="d-flex p-0" fluid key={key}>
             <p className="mb-0 blue-sec-text fst-italic pe-2">
-              {key === "Notifications" || key === "Settings" ? "" : key}
+              {(key === "Notifications" || key === "Settings") && !is_sidebar
+                ? ""
+                : key}
             </p>
             {key === "Notifications" ? (
               <Container className="position-relative d-xl-none">
@@ -96,6 +98,7 @@ Navlinks.PropTypes = {
   role: PropTypes.string.isRequired, // Admin, Merchant, Accountatn, Warehouse manager, Solo
   active_link: PropTypes.string.isRequired, // Name of active link from role_link_dic
   notification_qty: PropTypes.number.isRequired,
+  is_sidebar: PropTypes.bool.isRequired,
 };
 
 export default Navlinks;

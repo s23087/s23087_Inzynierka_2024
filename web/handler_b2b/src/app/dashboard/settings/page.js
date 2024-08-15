@@ -10,7 +10,7 @@ import Navlinks from "@/components/menu/navlinks";
 export default function SettingsPage() {
   const itemSectionStyle = {
     "margin-bottom": "66px",
-    "margin-top": "207px",
+    "margin-top": "142px",
   };
   const [sidebarShow, setSidebarShow] = useState(false);
   const showSidebar = () => setSidebarShow(true);
@@ -20,7 +20,7 @@ export default function SettingsPage() {
 
   return (
     <main className="d-flex flex-column h-100">
-      <nav className="fixed-top main-bg">
+      <nav className="fixed-top main-bg border-bottom-grey">
         <MenuTemplate
           sidebar_action={showSidebar}
           user_name="<<User name>>"

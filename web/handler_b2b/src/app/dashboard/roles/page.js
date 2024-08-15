@@ -8,6 +8,7 @@ import MenuTemplate from "@/components/menu/menu_template";
 import CustomSidebar from "@/components/menu/sidebars/sidebar";
 import Navlinks from "@/components/menu/navlinks";
 import PagationFooter from "@/components/footer/pagation_footer";
+import RoleContainer from "@/components/object_container/role_container";
 
 export default function RolesPage() {
   const itemSectionStyle = {
@@ -19,6 +20,10 @@ export default function RolesPage() {
   const hideSidebar = () => setSidebarShow(false);
   const current_role = "Admin";
   const current_nofitication_qty = 1;
+  const tmp_role = {
+    user: "<<user>>",
+    role: "<<role>>",
+  };
 
   return (
     <main className="d-flex flex-column h-100">
@@ -57,7 +62,10 @@ export default function RolesPage() {
       </nav>
 
       <section className="h-100">
-        <Container className="p-0" style={itemSectionStyle} fluid></Container>
+        <Container className="p-0" style={itemSectionStyle} fluid>
+          <RoleContainer role={tmp_role} selected={false} />
+          <RoleContainer role={tmp_role} selected={true} />
+        </Container>
       </section>
 
       <footer className="fixed-bottom w-100">

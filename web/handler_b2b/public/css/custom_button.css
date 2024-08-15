@@ -67,6 +67,21 @@
   color: var(--text-main-color) !important;
 }
 
+.btn-green {
+  background-color: var(--main-green);
+  color: var(--text-main-color);
+}
+
+.btn-green:hover {
+  background-color: var(--main-green-hover);
+  color: var(--text-main-color-hover);
+}
+
+.btn-green:active {
+  background-color: var(--main-green) !important;
+  color: var(--text-main-color) !important;
+}
+
 .btn-white-border {
   background-color: transparent;
   color: var(--text-blue-color);

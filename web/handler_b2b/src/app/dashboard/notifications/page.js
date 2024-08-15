@@ -7,21 +7,28 @@ import MenuTemplate from "@/components/menu/menu_template";
 import CustomSidebar from "@/components/menu/sidebars/sidebar";
 import Navlinks from "@/components/menu/navlinks";
 import PagationFooter from "@/components/footer/pagation_footer";
+import NotificationContainer from "@/components/object_container/notification_container";
 
 export default function NotificationsPage() {
   const itemSectionStyle = {
     "margin-bottom": "66px",
-    "margin-top": "207px",
+    "margin-top": "142px",
   };
   const [sidebarShow, setSidebarShow] = useState(false);
   const showSidebar = () => setSidebarShow(true);
   const hideSidebar = () => setSidebarShow(false);
   const current_role = "Admin";
   const current_nofitication_qty = 1;
+  const tmp_notif = {
+    object: "<<object>>",
+    short_message: "<<short message>>",
+    long_message: "<<longer message>>",
+    is_read: false,
+  };
 
   return (
     <main className="d-flex flex-column h-100">
-      <nav className="fixed-top main-bg">
+      <nav className="fixed-top main-bg border-bottom-grey">
         <MenuTemplate
           sidebar_action={showSidebar}
           user_name="<<User name>>"
@@ -59,7 +66,9 @@ export default function NotificationsPage() {
       </nav>
 
       <section className="h-100">
-        <Container className="p-0" style={itemSectionStyle} fluid></Container>
+        <Container className="p-0" style={itemSectionStyle} fluid>
+          <NotificationContainer notification={tmp_notif} />
+        </Container>
       </section>
 
       <footer className="fixed-bottom w-100">
