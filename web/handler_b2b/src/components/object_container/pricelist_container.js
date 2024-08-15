@@ -4,22 +4,22 @@ import ContainerButtons from "../smaller_components/container_buttons";
 
 function PricelistContainer({ pricelist, selected }) {
   const containerBg = {
-    "background-color": "var(--sec-blue)",
+    backgroundColor: "var(--sec-blue)",
   };
   const statusBgStyle = {
-    "background-color": "var(--main-green)",
-    "min-width": "159px",
-    "min-height": "25px",
-    "align-items": "center",
+    backgroundColor: "var(--main-green)",
+    minWidth: "159px",
+    minHeight: "25px",
+    alignItems: "center",
   };
   const spanStyle = {
-    "min-width": "159px",
-    "min-height": "25px",
-    "align-items": "center",
+    minWidth: "159px",
+    minHeight: "25px",
+    alignItems: "center",
   };
   const actionButtonStyle = {
     height: "48px",
-    "max-width": "369px",
+    maxWidth: "369px",
   };
   return (
     <Container

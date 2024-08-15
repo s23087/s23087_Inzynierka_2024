@@ -9,8 +9,8 @@ import Navlinks from "@/components/menu/navlinks";
 
 export default function SettingsPage() {
   const itemSectionStyle = {
-    "margin-bottom": "66px",
-    "margin-top": "142px",
+    marginBottom: "66px",
+    marginTop: "142px",
   };
   const [sidebarShow, setSidebarShow] = useState(false);
   const showSidebar = () => setSidebarShow(true);

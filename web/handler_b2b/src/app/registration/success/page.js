@@ -5,7 +5,7 @@ import BigLogo from "../../../../public/big_logo.png";
 
 export default function SuccesPage() {
   const buttonSize = {
-    "max-width": "214px",
+    maxWidth: "214px",
   };
   return (
     <main className="d-flex h-100 w-100 justify-content-center">

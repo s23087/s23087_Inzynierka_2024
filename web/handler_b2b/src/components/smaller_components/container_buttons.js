@@ -3,8 +3,8 @@ import { Container, Row, Col, Button } from "react-bootstrap";
 
 function ContainerButtons({ selected }) {
   const buttonStyle = {
-    "min-width": "77px",
-    "max-width": "95px",
+    minWidth: "77px",
+    maxWidth: "95px",
   };
   return (
     <Container className="h-100" fluid>

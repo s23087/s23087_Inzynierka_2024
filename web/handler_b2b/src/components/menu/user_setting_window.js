@@ -19,7 +19,7 @@ function UserSettingWindow({
   const windowStyle = {
     width: "260px",
     height: "220px",
-    "border-radius": "10px",
+    borderRadius: "10px",
     display: showWindow ? "block" : "none",
   };
   const containerStyle = {

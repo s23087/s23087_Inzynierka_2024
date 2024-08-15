@@ -12,8 +12,8 @@ import PricelistContainer from "@/components/object_container/pricelist_containe
 
 export default function PricelistPage() {
   const itemSectionStyle = {
-    "margin-bottom": "66px",
-    "margin-top": "207px",
+    marginBottom: "66px",
+    marginTop: "207px",
   };
   const [sidebarShow, setSidebarShow] = useState(false);
   const showSidebar = () => setSidebarShow(true);

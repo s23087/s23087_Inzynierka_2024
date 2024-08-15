@@ -5,16 +5,16 @@ import user_small_icon from "../../../public/icons/user_small_icon.png";
 
 function RoleContainer({ role, selected }) {
   const containerBg = {
-    "background-color": "var(--sec-blue)",
+    backgroundColor: "var(--sec-blue)",
   };
   const spanStyle = {
-    "min-width": "159px",
-    "min-height": "25px",
-    "align-items": "center",
+    minWidth: "159px",
+    minHeight: "25px",
+    alignItems: "center",
   };
   const buttonStyle = {
-    "min-width": "77px",
-    "max-width": "95px",
+    minWidth: "77px",
+    maxWidth: "95px",
   };
 
   return (

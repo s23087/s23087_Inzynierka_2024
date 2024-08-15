@@ -6,12 +6,12 @@ import user_small_icon from "../../../public/icons/user_small_icon.png";
 
 function ClientContainer({ client, is_org, selected }) {
   const containerBg = {
-    "background-color": "var(--sec-blue)",
+    backgroundColor: "var(--sec-blue)",
   };
   const spanStyle = {
-    "min-width": "159px",
-    "min-height": "25px",
-    "align-items": "center",
+    minWidth: "159px",
+    minHeight: "25px",
+    alignItems: "center",
   };
   return (
     <Container

@@ -7,7 +7,7 @@ import MoreIcon from "../../../public/icons/more.png";
 function UserDiffModal({ modalShow, onHideFunction }) {
   const modalContainerStyle = {
     height: "360px",
-    "font-size": "14px",
+    fontSize: "14px",
   };
 
   return (

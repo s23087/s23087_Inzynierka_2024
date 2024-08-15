@@ -6,15 +6,15 @@ import user_small_icon from "../../../public/icons/user_small_icon.png";
 
 function ProformaContainer({ proforma, is_org, selected, boolean_value }) {
   const containerBg = {
-    "background-color": "var(--sec-blue)",
+    backgroundColor: "var(--sec-blue)",
   };
   const spanStyle = {
-    "min-width": "159px",
-    "min-height": "25px",
-    "align-items": "center",
+    minWidth: "159px",
+    minHeight: "25px",
+    alignItems: "center",
   };
   const maxContainerStyle = {
-    "max-width": "450px",
+    maxWidth: "450px",
   };
   return (
     <Container

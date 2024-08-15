@@ -13,8 +13,8 @@ import ProformaContainer from "@/components/object_container/proforma_container"
 
 export default function ProformasPage() {
   const itemSectionStyle = {
-    "margin-bottom": "66px",
-    "margin-top": "207px",
+    marginBottom: "66px",
+    marginTop: "207px",
   };
   const [sidebarShow, setSidebarShow] = useState(false);
   const showSidebar = () => setSidebarShow(true);

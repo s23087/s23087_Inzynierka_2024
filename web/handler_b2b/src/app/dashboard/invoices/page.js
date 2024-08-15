@@ -12,8 +12,8 @@ import InvoiceSwitch from "@/components/switches/invoice_switch";
 
 export default function InvoicesPage() {
   const itemSectionStyle = {
-    "margin-bottom": "66px",
-    "margin-top": "207px",
+    marginBottom: "66px",
+    marginTop: "207px",
   };
   const [sidebarShow, setSidebarShow] = useState(false);
   const showSidebar = () => setSidebarShow(true);
@@ -22,7 +22,7 @@ export default function InvoicesPage() {
   const current_nofitication_qty = 1;
   const is_org_switch_needed = true;
   const org_view = false;
-  const [document_type, setDocumentType] = useState("Yours invoice");
+  const [documentType, setDocumentType] = useState("Yours invoice");
   const changeDoc = (type) => {
     setDocumentType(type);
   };
@@ -33,7 +33,7 @@ export default function InvoicesPage() {
         <MenuTemplate sidebar_action={showSidebar} user_name="<<User name>>">
           <Stack className="ps-xl-2" direction="horizontal" gap={4}>
             <Container className="mx-auto mx-xl-2 me-xl-5 w-auto">
-              <InvoiceSwitch type={document_type} switch_action={changeDoc} />
+              <InvoiceSwitch type={documentType} switch_action={changeDoc} />
             </Container>
             <Stack className="d-none d-xl-flex" direction="horizontal" gap={4}>
               <Navlinks
@@ -46,7 +46,7 @@ export default function InvoicesPage() {
           </Stack>
         </MenuTemplate>
         <PagePostionBar
-          site_name={document_type}
+          site_name={documentType}
           with_switch={is_org_switch_needed}
           switch_bool={org_view}
         />

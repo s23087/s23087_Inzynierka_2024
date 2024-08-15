@@ -47,15 +47,11 @@ function InvoiceSwitch({ type, switch_action }) {
   const [closingBool, setClosingBool] = useState(false);
   const openSwitch = () => setClosingBool(true);
   const closeSwitch = () => setClosingBool(false);
-  const toggleStyle = {
-    width: "45px",
-  };
   return (
     <Dropdown className="mx-auto" drop="down-centered" show={closingBool}>
       <Dropdown.Toggle
-        className="p-0 d-flex overflow-x-hidden"
+        className="p-0 d-flex overflow-x-hidden toggle-style"
         variant="as-link"
-        style={toggleStyle}
         onClick={openSwitch}
       >
         {getIcon(type)}

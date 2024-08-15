@@ -12,8 +12,8 @@ import ClientContainer from "@/components/object_container/clients_container";
 
 export default function ClientsPage() {
   const itemSectionStyle = {
-    "margin-bottom": "66px",
-    "margin-top": "207px",
+    marginBottom: "66px",
+    marginTop: "207px",
   };
   const [sidebarShow, setSidebarShow] = useState(false);
   const showSidebar = () => setSidebarShow(true);

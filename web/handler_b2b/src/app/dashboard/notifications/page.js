@@ -11,8 +11,8 @@ import NotificationContainer from "@/components/object_container/notification_co
 
 export default function NotificationsPage() {
   const itemSectionStyle = {
-    "margin-bottom": "66px",
-    "margin-top": "142px",
+    marginBottom: "66px",
+    marginTop: "142px",
   };
   const [sidebarShow, setSidebarShow] = useState(false);
   const showSidebar = () => setSidebarShow(true);

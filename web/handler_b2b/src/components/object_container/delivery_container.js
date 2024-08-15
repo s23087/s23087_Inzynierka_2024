@@ -21,14 +21,14 @@ function DeliveryContainer({ delivery, is_org, selected, boolean_value }) {
       statusColorMap[delivery.status] === "var(--sec-red)"
         ? "var(--text-main-color)"
         : "var(--text-black-color)",
-    "min-width": "159px",
-    "min-height": "25px",
-    "align-items": "center",
+    minWidth: "159px",
+    minHeight: "25px",
+    alignItems: "center",
   };
   const spanStyle = {
-    "min-width": "159px",
-    "min-height": "25px",
-    "align-items": "center",
+    minWidth: "159px",
+    minHeight: "25px",
+    alignItems: "center",
   };
   return (
     <Container

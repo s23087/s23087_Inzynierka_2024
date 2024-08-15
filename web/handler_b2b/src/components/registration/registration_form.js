@@ -17,7 +17,7 @@ function RegistrationForm() {
   // Form change variables
   const [step, setStep] = useState(1);
   const spaceStyle = {
-    "white-space": "pre",
+    whiteSpace: "pre",
   };
   const hidden = {
     display: "none",

@@ -11,15 +11,15 @@ function PagationFooter({ page_qty, max_instance_on_page, current_page }) {
     height: "66px",
   };
   const instanceChangerStyle = {
-    "min-width": "54px",
-    "max-width": "114px",
+    minWidth: "54px",
+    maxWidth: "114px",
     height: "47px",
-    "border-radius": "10px",
+    borderRadius: "10px",
   };
   const pagationStyle = {
-    "min-width": "290px",
+    minWidth: "290px",
     height: "47px",
-    "border-radius": "10px",
+    borderRadius: "10px",
   };
   return (
     <Stack

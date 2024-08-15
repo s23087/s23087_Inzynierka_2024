@@ -13,8 +13,8 @@ import DeliveryContainer from "@/components/object_container/delivery_container"
 
 export default function DeliveriesPage() {
   const itemSectionStyle = {
-    "margin-bottom": "66px",
-    "margin-top": "207px",
+    marginBottom: "66px",
+    marginTop: "207px",
   };
   const [sidebarShow, setSidebarShow] = useState(false);
   const showSidebar = () => setSidebarShow(true);

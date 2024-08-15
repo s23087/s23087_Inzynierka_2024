@@ -3,23 +3,23 @@ import { Container, Row, Col, Button } from "react-bootstrap";
 
 function NotificationContainer({ notification, switch_read_action }) {
   const containerBg = {
-    "background-color": "var(--sec-blue)",
+    backgroundColor: "var(--sec-blue)",
   };
   const spanStyle = {
-    "min-width": "159px",
-    "min-height": "25px",
-    "max-width": "369px",
-    "align-items": "center",
+    minWidth: "159px",
+    minHeight: "25px",
+    maxWidth: "369px",
+    alignItems: "center",
   };
   const messageStyle = {
-    "min-width": "369px",
-    "min-height": "94px",
+    minWidth: "369px",
+    minHeight: "94px",
   };
   const buttonStyle = {
-    "min-width": "140px",
-    "max-width": "171px",
+    minWidth: "140px",
+    maxWidth: "171px",
     height: "48px",
-    "border-radius": "5px",
+    borderRadius: "5px",
   };
 
   return (
