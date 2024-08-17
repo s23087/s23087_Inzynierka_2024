@@ -1,0 +1,14 @@
+.spanStyle {
+    min-width: 159px;
+    min-height: 25px;
+    align-items: center;
+}
+
+.basicButtonStyle {
+    min-width: 77px;
+    max-width: 95px;
+}
+
+.maxContainerStyle {
+    max-width: 450px;
+}

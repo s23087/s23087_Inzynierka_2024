@@ -19,18 +19,7 @@ function CreditNoteContainer({ credit_note, is_org, selected, is_user_type }) {
       systemColorMap[credit_note.system] === "var(--sec-red)"
         ? "var(--text-main-color)"
         : "var(--text-black-color)",
-    minWidth: "159px",
-    minHeight: "25px",
-    alignItems: "center",
     justifyContent: "center",
-  };
-  const spanStyle = {
-    minWidth: "159px",
-    minHeight: "25px",
-    alignItems: "center",
-  };
-  const maxContainerStyle = {
-    maxWidth: "450px",
   };
   return (
     <Container
@@ -49,8 +38,7 @@ function CreditNoteContainer({ credit_note, is_org, selected, is_user_type }) {
                   className="me-2 mt-1"
                 />
                 <span
-                  className="main-grey-bg d-flex rounded-span px-2 w-100 my-1"
-                  style={spanStyle}
+                  className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1"
                 >
                   <p className="mb-0">{credit_note.user}</p>
                 </span>
@@ -60,8 +48,7 @@ function CreditNoteContainer({ credit_note, is_org, selected, is_user_type }) {
           <Row className="gy-2">
             <Col xs="12" className="mb-1 mb-sm-0">
               <span
-                className="main-blue-bg main-text d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-blue-bg main-text d-flex rounded-span px-2"
               >
                 <p className="mb-0">{credit_note.invoice}</p>
               </span>
@@ -70,8 +57,7 @@ function CreditNoteContainer({ credit_note, is_org, selected, is_user_type }) {
               <Row className="p-0">
                 <Col className="pe-1" xs="auto">
                   <span
-                    className="main-grey-bg d-flex rounded-span px-2"
-                    style={spanStyle}
+                    className="spanStyle main-grey-bg d-flex rounded-span px-2"
                   >
                     <p className="mb-0">Date: {credit_note.date}</p>
                   </span>
@@ -105,8 +91,7 @@ function CreditNoteContainer({ credit_note, is_org, selected, is_user_type }) {
             </Col>
             <Col xs="12">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
                 <p className="mb-0">
                   {is_user_type ? "For" : "Source"}:{" "}
@@ -115,14 +100,13 @@ function CreditNoteContainer({ credit_note, is_org, selected, is_user_type }) {
               </span>
             </Col>
             <Col className="pe-1 d-xxl-none" xs="auto">
-              <span className="d-flex rounded-span px-2" style={systemStyle}>
+              <span className="spanStyle d-flex rounded-span px-2" style={systemStyle}>
                 <p className="mb-0">{credit_note.system}</p>
               </span>
             </Col>
             <Col className="ps-1 d-xxl-none">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
                 <p className="mb-0">Due date: {credit_note.due_date}</p>
               </span>
@@ -130,7 +114,7 @@ function CreditNoteContainer({ credit_note, is_org, selected, is_user_type }) {
           </Row>
         </Col>
         <Col md="5" lg="5" xl="4" className="d-none d-md-block">
-          <Row className="h-100 mx-auto" style={maxContainerStyle}>
+          <Row className="maxContainerStyle h-100 mx-auto">
             <Col className="pe-1 mb-2 mt-auto">
               <span className="main-blue-bg d-block rounded-span px-2 pb-2 pt-1 main-text text-center">
                 <p className="mb-0">Items Quantity:</p>
@@ -149,7 +133,7 @@ function CreditNoteContainer({ credit_note, is_org, selected, is_user_type }) {
               <Row className="d-none d-xxl-flex">
                 <Col className="pe-1" xs="auto">
                   <span
-                    className="d-flex rounded-span px-2"
+                    className="spanStyle d-flex rounded-span px-2"
                     style={systemStyle}
                   >
                     <p className="mb-0">{credit_note.system}</p>
@@ -157,8 +141,7 @@ function CreditNoteContainer({ credit_note, is_org, selected, is_user_type }) {
                 </Col>
                 <Col className="ps-1">
                   <span
-                    className="main-grey-bg d-flex rounded-span px-2"
-                    style={spanStyle}
+                    className="spanStyle main-grey-bg d-flex rounded-span px-2"
                   >
                     <p className="mb-0">Due date: {credit_note.due_date}</p>
                   </span>

@@ -24,9 +24,6 @@ function RequestContainer({ request, is_org, selected }) {
       statusColorMap[request.status] === "var(--sec-red)"
         ? "var(--text-main-color)"
         : "var(--text-black-color)",
-    minWidth: "159px",
-    minHeight: "25px",
-    alignItems: "center",
   };
   const systemStyle = {
     backgroundColor: systemColorMap[request.system],
@@ -34,18 +31,7 @@ function RequestContainer({ request, is_org, selected }) {
       systemColorMap[request.system] === "var(--sec-red)"
         ? "var(--text-main-color)"
         : "var(--text-black-color)",
-    minWidth: "159px",
-    minHeight: "25px",
-    alignItems: "center",
     justifyContent: "center",
-  };
-  const spanStyle = {
-    minWidth: "159px",
-    minHeight: "25px",
-    alignItems: "center",
-  };
-  const maxContainerStyle = {
-    maxWidth: "450px",
   };
   return (
     <Container
@@ -64,8 +50,7 @@ function RequestContainer({ request, is_org, selected }) {
                   className="me-2 mt-1"
                 />
                 <span
-                  className="main-grey-bg d-flex rounded-span px-2 w-100 my-1"
-                  style={spanStyle}
+                  className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1"
                 >
                   <p className="mb-0">{request.user}</p>
                 </span>
@@ -75,8 +60,7 @@ function RequestContainer({ request, is_org, selected }) {
           <Row className="gy-2">
             <Col xs="12" className="mb-1 mb-sm-0">
               <span
-                className="main-blue-bg main-text d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-blue-bg main-text d-flex rounded-span px-2"
               >
                 <p className="mb-0">{request.document}</p>
               </span>
@@ -85,18 +69,17 @@ function RequestContainer({ request, is_org, selected }) {
               <Row className="p-0">
                 <Col className="pe-1" xs="auto">
                   <span
-                    className="main-grey-bg d-flex rounded-span px-2"
-                    style={spanStyle}
+                    className="spanStyle main-grey-bg d-flex rounded-span px-2"
                   >
                     <p className="mb-0">Date: {request.date}</p>
                   </span>
                 </Col>
                 <Col className="ps-1">
                   <span
-                    className=" d-flex rounded-span px-2"
+                    className="spanStyle d-flex rounded-span px-2"
                     style={statusStyle}
                   >
-                    <p className="mb-0">Status: {request.status}</p>
+                    <p className="mb-0">Request: {request.status}</p>
                   </span>
                 </Col>
               </Row>
@@ -125,7 +108,7 @@ function RequestContainer({ request, is_org, selected }) {
               <Row className="p-0">
                 <Col className="pe-1" xs="auto">
                   <span
-                    className="d-flex rounded-span px-2"
+                    className="spanStyle d-flex rounded-span px-2"
                     style={systemStyle}
                   >
                     <p className="mb-0">{request.system}</p>
@@ -133,8 +116,7 @@ function RequestContainer({ request, is_org, selected }) {
                 </Col>
                 <Col className="ps-1">
                   <span
-                    className="main-grey-bg d-flex rounded-span px-2"
-                    style={spanStyle}
+                    className="spanStyle main-grey-bg d-flex rounded-span px-2"
                   >
                     <p className="mb-0">Type: {request.type}</p>
                   </span>
@@ -145,8 +127,7 @@ function RequestContainer({ request, is_org, selected }) {
         </Col>
         <Col md="5" lg="5" xl="4" className="d-none d-md-block">
           <Row
-            className="h-100 mx-auto align-items-center"
-            style={maxContainerStyle}
+            className="maxContainerStyle h-100 mx-auto align-items-center"
           >
             <Col className="pe-1 mb-2">
               <span className="main-blue-bg d-block rounded-span px-2 pb-2 pt-1 main-text text-center">

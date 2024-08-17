@@ -14,14 +14,6 @@ function ItemContainer({ item, is_org, selected }) {
     minHeight: "25px",
     alignItems: "center",
   };
-  const spanStyle = {
-    minWidth: "159px",
-    minHeight: "25px",
-    alignItems: "center",
-  };
-  const maxContainerStyle = {
-    maxWidth: "450px",
-  };
   return (
     <Container
       className="py-3 black-text medium-text border-bottom-grey"
@@ -39,8 +31,7 @@ function ItemContainer({ item, is_org, selected }) {
                   className="me-2 mt-1"
                 />
                 <span
-                  className="main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1"
-                  style={spanStyle}
+                  className="spanStyle main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1"
                 >
                   <p className="mb-0">{item.user}</p>
                 </span>
@@ -50,8 +41,7 @@ function ItemContainer({ item, is_org, selected }) {
           <Row className="gy-2">
             <Col className="pe-1" xs="auto">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
                 <p className="mb-0">Id: {item.id}</p>
               </span>
@@ -63,8 +53,7 @@ function ItemContainer({ item, is_org, selected }) {
             </Col>
             <Col xs="12" className="mb-1 mb-sm-0">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
                 <p className="mb-0">P/N: {item.partnumber}</p>
               </span>
@@ -85,24 +74,21 @@ function ItemContainer({ item, is_org, selected }) {
             </Col>
             <Col xs="12">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
                 <p className="mb-0">Name: {item.name}</p>
               </span>
             </Col>
             <Col className="pe-1 d-xxl-none" xs="auto">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
                 <p className="mb-0">Source: {item.source}</p>
               </span>
             </Col>
             <Col className="ps-1 d-xxl-none">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
                 <p className="mb-0">Ean: {item.EAN}</p>
               </span>
@@ -110,7 +96,7 @@ function ItemContainer({ item, is_org, selected }) {
           </Row>
         </Col>
         <Col md="5" lg="5" xl="4" className="d-none d-md-block">
-          <Row className="h-100 mx-auto" style={maxContainerStyle}>
+          <Row className="maxContainerStyle h-100 mx-auto">
             <Col className="pe-1 mb-2 mt-auto">
               <span className="main-blue-bg d-block rounded-span px-2 pb-2 pt-1 main-text text-center">
                 <p className="mb-0">Quantity:</p>
@@ -129,16 +115,14 @@ function ItemContainer({ item, is_org, selected }) {
               <Row className="d-none d-xxl-flex">
                 <Col className="pe-1" xs="auto">
                   <span
-                    className="main-grey-bg d-flex rounded-span px-2"
-                    style={spanStyle}
+                    className="spanStyle main-grey-bg d-flex rounded-span px-2"
                   >
                     <p className="mb-0">Source: {item.source}</p>
                   </span>
                 </Col>
                 <Col className="ps-1">
                   <span
-                    className="main-grey-bg d-flex rounded-span px-2"
-                    style={spanStyle}
+                    className="spanStyle main-grey-bg d-flex rounded-span px-2"
                   >
                     <p className="mb-0">Ean: {item.EAN}</p>
                   </span>

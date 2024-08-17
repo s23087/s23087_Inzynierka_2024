@@ -8,11 +8,6 @@ function ClientContainer({ client, is_org, selected }) {
   const containerBg = {
     backgroundColor: "var(--sec-blue)",
   };
-  const spanStyle = {
-    minWidth: "159px",
-    minHeight: "25px",
-    alignItems: "center",
-  };
   return (
     <Container
       className="py-3 black-text medium-text border-bottom-grey"
@@ -30,8 +25,7 @@ function ClientContainer({ client, is_org, selected }) {
                   className="me-2 mt-1"
                 />
                 <span
-                  className="main-grey-bg d-flex rounded-span px-2 w-100 my-1"
-                  style={spanStyle}
+                  className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1"
                 >
                   <p className="mb-0">{client.user}</p>
                 </span>
@@ -41,32 +35,28 @@ function ClientContainer({ client, is_org, selected }) {
           <Row className="gy-2">
             <Col xs="12">
               <span
-                className="main-blue-bg main-text d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-blue-bg main-text d-flex rounded-span px-2"
               >
                 <p className="mb-0">Name: {client.name}</p>
               </span>
             </Col>
             <Col xs="12">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
                 <p className="mb-0">Adress: {client.adress}</p>
               </span>
             </Col>
             <Col className="pe-1" xs="auto">
               <span
-                className="main-grey-bg d-flex rounded-span px-2 d-md-none"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2 d-md-none"
               >
                 <p className="mb-0">Nip: {client.nip}</p>
               </span>
             </Col>
             <Col className="ps-1">
               <span
-                className="main-grey-bg d-flex rounded-span px-2 d-md-none"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2 d-md-none"
               >
                 <p className="mb-0">Country: {client.country}</p>
               </span>
@@ -77,14 +67,12 @@ function ClientContainer({ client, is_org, selected }) {
           <Row className="gy-2 h-100 align-items-end">
             <Col xs="12">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
                 <p className="mb-0">Nip: {client.nip}</p>
               </span>
               <span
-                className="main-grey-bg d-flex rounded-span px-2 mt-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2 mt-2"
               >
                 <p className="mb-0">Country: {client.country}</p>
               </span>

@@ -11,14 +11,6 @@ function AbstractItemContainer({ item, selected }) {
     width: "90px",
     borderRadius: "15px",
   };
-  const spanStyle = {
-    minWidth: "159px",
-    minHeight: "25px",
-    alignItems: "center",
-  };
-  const maxContainerStyle = {
-    maxWidth: "450px",
-  };
   return (
     <Container
       className="py-3 black-text medium-text border-bottom-grey"
@@ -35,8 +27,7 @@ function AbstractItemContainer({ item, selected }) {
                 className="me-2 mt-1"
               />
               <span
-                className="main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1"
-                style={spanStyle}
+                className="spanStyle main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1"
               >
                 <p className="mb-0">{item.user}</p>
               </span>
@@ -45,24 +36,21 @@ function AbstractItemContainer({ item, selected }) {
           <Row className="gy-2">
             <Col xs="12" className="mb-0">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
                 <p className="mb-0">P/N: {item.partnumber}</p>
               </span>
             </Col>
             <Col xs="12" className="mb-0">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
                 <p className="mb-0">Source: {item.source}</p>
               </span>
             </Col>
             <Col xs="12">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
                 <p className="mb-0">Ean: {item.EAN}</p>
               </span>
@@ -85,8 +73,7 @@ function AbstractItemContainer({ item, selected }) {
         </Col>
         <Col md="5" lg="5" xl="4" className="d-none d-md-block">
           <Row
-            className="h-100 mx-auto align-items-center"
-            style={maxContainerStyle}
+            className="maxContainerStyle h-100 mx-auto align-items-center"
           >
             <Col className="pe-1 mb-2">
               <span className="main-blue-bg d-block rounded-span px-2 pb-2 pt-1 main-text text-center">

@@ -7,15 +7,6 @@ function RoleContainer({ role, selected }) {
   const containerBg = {
     backgroundColor: "var(--sec-blue)",
   };
-  const spanStyle = {
-    minWidth: "159px",
-    minHeight: "25px",
-    alignItems: "center",
-  };
-  const buttonStyle = {
-    minWidth: "77px",
-    maxWidth: "95px",
-  };
 
   return (
     <Container
@@ -33,8 +24,7 @@ function RoleContainer({ role, selected }) {
                 className="me-2 mt-1"
               />
               <span
-                className="main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1"
-                style={spanStyle}
+                className="spanStyle main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1"
               >
                 <p className="mb-0">{role.user}</p>
               </span>
@@ -43,8 +33,7 @@ function RoleContainer({ role, selected }) {
           <Row className="gy-2">
             <Col xs="12" className="mb-1 mb-sm-0">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
                 <p className="mb-0">Role: {role.role}</p>
               </span>
@@ -64,8 +53,7 @@ function RoleContainer({ role, selected }) {
               <Col className="pe-2" xs="3" sm="auto">
                 <Button
                   variant="mainBlue"
-                  className="rounded-span w-100 p-0"
-                  style={buttonStyle}
+                  className="basicButtonStyle rounded-span w-100 p-0"
                 >
                   {selected ? "Deselect" : "Select"}
                 </Button>
@@ -73,8 +61,7 @@ function RoleContainer({ role, selected }) {
               <Col className="ps-2" xs="3" sm="auto">
                 <Button
                   variant="mainBlue"
-                  className="rounded-span w-100"
-                  style={buttonStyle}
+                  className="basicButtonStyle rounded-span w-100"
                 >
                   Modify
                 </Button>

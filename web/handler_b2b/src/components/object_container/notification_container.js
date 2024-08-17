@@ -5,11 +5,8 @@ function NotificationContainer({ notification, switch_read_action }) {
   const containerBg = {
     backgroundColor: "var(--sec-blue)",
   };
-  const spanStyle = {
-    minWidth: "159px",
-    minHeight: "25px",
-    maxWidth: "369px",
-    alignItems: "center",
+  const titleStyle = {
+    maxWidth: "369px"
   };
   const messageStyle = {
     minWidth: "369px",
@@ -33,8 +30,8 @@ function NotificationContainer({ notification, switch_read_action }) {
           <Row className="gy-2">
             <Col xs="12" className="mb-1 mb-sm-0">
               <span
-                className="main-blue-bg main-text d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-blue-bg main-text d-flex rounded-span px-2"
+                style={titleStyle}
               >
                 <p className="mb-0">
                   {notification.object}: {notification.short_message}

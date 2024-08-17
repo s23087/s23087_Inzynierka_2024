@@ -12,11 +12,6 @@ function PricelistContainer({ pricelist, selected }) {
     minHeight: "25px",
     alignItems: "center",
   };
-  const spanStyle = {
-    minWidth: "159px",
-    minHeight: "25px",
-    alignItems: "center",
-  };
   const actionButtonStyle = {
     height: "48px",
     maxWidth: "369px",
@@ -32,8 +27,7 @@ function PricelistContainer({ pricelist, selected }) {
           <Row className="gy-2">
             <Col className="pe-1" xs="auto">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
                 <p className="mb-0">Created: {pricelist.created}</p>
               </span>
@@ -45,24 +39,21 @@ function PricelistContainer({ pricelist, selected }) {
             </Col>
             <Col xs="12">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
                 <p className="mb-0">Name: {pricelist.name}</p>
               </span>
             </Col>
             <Col className="pe-1" xs="auto">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
                 <p className="mb-0">Type: {pricelist.type}</p>
               </span>
             </Col>
             <Col className="ps-1">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
                 <p className="mb-0">Modified: {pricelist.modified}</p>
               </span>
@@ -73,14 +64,12 @@ function PricelistContainer({ pricelist, selected }) {
           <Row className="gy-2 h-100 align-items-center">
             <Col xs="12">
               <span
-                className="main-blue-bg main-text d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-blue-bg main-text d-flex rounded-span px-2"
               >
                 <p className="mb-0">Products offered: {pricelist.item_qty}</p>
               </span>
               <span
-                className="main-grey-bg d-flex rounded-span px-2 mt-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2 mt-2"
               >
                 <p className="mb-0 text-nowrap overflow-x-hidden">
                   Clients: {pricelist.clients.join(", ")}

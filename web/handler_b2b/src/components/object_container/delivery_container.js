@@ -21,14 +21,6 @@ function DeliveryContainer({ delivery, is_org, selected, boolean_value }) {
       statusColorMap[delivery.status] === "var(--sec-red)"
         ? "var(--text-main-color)"
         : "var(--text-black-color)",
-    minWidth: "159px",
-    minHeight: "25px",
-    alignItems: "center",
-  };
-  const spanStyle = {
-    minWidth: "159px",
-    minHeight: "25px",
-    alignItems: "center",
   };
   return (
     <Container
@@ -47,8 +39,7 @@ function DeliveryContainer({ delivery, is_org, selected, boolean_value }) {
                   className="me-2 mt-1"
                 />
                 <span
-                  className="main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1"
-                  style={spanStyle}
+                  className="spanStyle main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1"
                 >
                   <p className="mb-0">{delivery.user}</p>
                 </span>
@@ -58,29 +49,26 @@ function DeliveryContainer({ delivery, is_org, selected, boolean_value }) {
           <Row className="gy-2">
             <Col className="pe-1" xs="auto">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
                 <p className="mb-0">Id: {delivery.id}</p>
               </span>
             </Col>
             <Col className="ps-1">
-              <span className=" d-flex rounded-span px-2" style={statusBgStyle}>
+              <span className="spanStyle d-flex rounded-span px-2" style={statusBgStyle}>
                 <p className="mb-0">Status: {delivery.status}</p>
               </span>
             </Col>
             <Col xs="12" className="mb-1 mb-sm-0">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
                 <p className="mb-0">Waybill: {delivery.waybill}</p>
               </span>
             </Col>
             <Col xs="12">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
-                style={spanStyle}
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
                 <p className="mb-0">Estimated delivery: {delivery.estimated}</p>
               </span>
@@ -92,8 +80,7 @@ function DeliveryContainer({ delivery, is_org, selected, boolean_value }) {
             <Row className="pe-0">
               <Col className="pe-1" xs="auto">
                 <span
-                  className="main-grey-bg d-flex rounded-span px-2"
-                  style={spanStyle}
+                  className="spanStyle main-grey-bg d-flex rounded-span px-2"
                 >
                   {boolean_value ? (
                     <p className="mb-0">For: {delivery.for}</p>
@@ -104,16 +91,14 @@ function DeliveryContainer({ delivery, is_org, selected, boolean_value }) {
               </Col>
               <Col className="ps-1 pe-0">
                 <span
-                  className="main-grey-bg d-flex rounded-span px-2"
-                  style={spanStyle}
+                  className="spanStyle main-grey-bg d-flex rounded-span px-2"
                 >
                   <p className="mb-0">Delivered: {delivery.delivered}</p>
                 </span>
               </Col>
               <Col xs="12" className="mb-1 mt-2 mb-sm-0 pe-0">
                 <span
-                  className="main-grey-bg d-flex rounded-span px-2"
-                  style={spanStyle}
+                  className="spanStyle main-grey-bg d-flex rounded-span px-2"
                 >
                   <p className="mb-0">Proforma: {delivery.proforma}</p>
                 </span>
