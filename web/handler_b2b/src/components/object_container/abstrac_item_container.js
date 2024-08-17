@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Container, Row, Col, Stack, Button } from "react-bootstrap";
 import user_small_icon from "../../../public/icons/user_small_icon.png";
 
-function AbstractItemContainer({ item, selected }) {
+function AbstractItemContainer({ abstract_item, selected }) {
   const containerBg = {
     backgroundColor: "var(--sec-blue)",
   };
@@ -29,7 +29,7 @@ function AbstractItemContainer({ item, selected }) {
               <span
                 className="spanStyle main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1"
               >
-                <p className="mb-0">{item.user}</p>
+                <p className="mb-0">{abstract_item.user}</p>
               </span>
             </Col>
           </Row>
@@ -38,34 +38,34 @@ function AbstractItemContainer({ item, selected }) {
               <span
                 className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
-                <p className="mb-0">P/N: {item.partnumber}</p>
+                <p className="mb-0">P/N: {abstract_item.partnumber}</p>
               </span>
             </Col>
             <Col xs="12" className="mb-0">
               <span
                 className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
-                <p className="mb-0">Source: {item.source}</p>
+                <p className="mb-0">Source: {abstract_item.source}</p>
               </span>
             </Col>
             <Col xs="12">
               <span
                 className="spanStyle main-grey-bg d-flex rounded-span px-2"
               >
-                <p className="mb-0">Ean: {item.EAN}</p>
+                <p className="mb-0">Ean: {abstract_item.EAN}</p>
               </span>
             </Col>
             <Col className="pe-1 mb-1 d-md-none">
               <span className="main-blue-bg d-block rounded-span px-2 pb-2 pt-1 main-text text-center">
                 <p className="mb-0">Quantity:</p>
-                <p className="mb-0">{item.qty}</p>
+                <p className="mb-0">{abstract_item.qty}</p>
               </span>
             </Col>
             <Col className="ps-1 mb-1 d-md-none">
               <span className="main-blue-bg d-block rounded-span px-2 pb-2 pt-1 main-text text-center">
                 <p className="mb-0">Purchase price:</p>
                 <p className="mb-0">
-                  {item.purchase_price} {item.currency_name}
+                  {abstract_item.purchase_price} {abstract_item.currency_name}
                 </p>
               </span>
             </Col>
@@ -78,14 +78,14 @@ function AbstractItemContainer({ item, selected }) {
             <Col className="pe-1 mb-2">
               <span className="main-blue-bg d-block rounded-span px-2 pb-2 pt-1 main-text text-center">
                 <p className="mb-0">Quantity:</p>
-                <p className="mb-0">{item.qty}</p>
+                <p className="mb-0">{abstract_item.qty}</p>
               </span>
             </Col>
             <Col className="ps-1 mb-2">
               <span className="main-blue-bg d-block rounded-span px-2 pb-2 pt-1 main-text text-center">
                 <p className="mb-0">Purchase price:</p>
                 <p className="mb-0">
-                  {item.purchase_price} {item.currency_name}
+                  {abstract_item.purchase_price} {abstract_item.currency_name}
                 </p>
               </span>
             </Col>
@@ -114,9 +114,7 @@ function AbstractItemContainer({ item, selected }) {
 }
 
 AbstractItemContainer.PropTypes = {
-  item: PropTypes.object.isRequired,
-  is_org: PropTypes.bool.isRequired,
-  selected: PropTypes.bool.isRequired,
+  abstract_item: PropTypes.object.isRequired,
 };
 
 export default AbstractItemContainer;

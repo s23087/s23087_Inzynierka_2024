@@ -8,9 +8,9 @@ import to_client_delivery_icon from "../../../public/icons/to_client_delivery_ic
 import to_user_delivery_icon from "../../../public/icons/to_user_delivery_icon.png";
 
 function DeliverySwitch({ boolean_value, switch_action }) {
-  const menuRef = useRef(null);
+  const deliverySwitchRef = useRef(null);
   const onOutside = (event) => {
-    if (menuRef.current && !menuRef.current.contains(event.target)) {
+    if (deliverySwitchRef.current && !deliverySwitchRef.current.contains(event.target)) {
       closeSwitch();
     }
   };
@@ -38,7 +38,7 @@ function DeliverySwitch({ boolean_value, switch_action }) {
           <Image src={to_user_delivery_icon} alt="delivery switch icon" />
         )}
       </Dropdown.Toggle>
-      <Dropdown.Menu ref={menuRef}>
+      <Dropdown.Menu ref={deliverySwitchRef}>
         <Stack gap={1} className="px-3 blue-main-text">
           {boolean_value ? (
             <>
