@@ -63,10 +63,6 @@ function getDocument(type, document, is_org, selected) {
 }
 
 export default function InvoicesPage() {
-  const itemSectionStyle = {
-    marginBottom: "66px",
-    marginTop: "207px",
-  };
   const [sidebarShow, setSidebarShow] = useState(false);
   const showSidebar = () => setSidebarShow(true);
   const hideSidebar = () => setSidebarShow(false);
@@ -180,7 +176,7 @@ export default function InvoicesPage() {
       </nav>
 
       <section className="h-100">
-        <Container className="p-0" style={itemSectionStyle} fluid>
+        <Container className="p-0 middleSectionPlacement" fluid>
           {getDocument("Your invoices", tmp_your_invoice, false, false)}
           {getDocument("Your invoices", tmp_your_invoice, false, true)}
           {getDocument("Your invoices", tmp_your_invoice, true, false)}

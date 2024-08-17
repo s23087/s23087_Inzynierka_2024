@@ -11,10 +11,6 @@ import PagationFooter from "@/components/footer/pagation_footer";
 import PricelistContainer from "@/components/object_container/pricelist_container";
 
 export default function PricelistPage() {
-  const itemSectionStyle = {
-    marginBottom: "66px",
-    marginTop: "207px",
-  };
   const [sidebarShow, setSidebarShow] = useState(false);
   const showSidebar = () => setSidebarShow(true);
   const hideSidebar = () => setSidebarShow(false);
@@ -67,7 +63,7 @@ export default function PricelistPage() {
       </nav>
 
       <section className="h-100">
-        <Container className="p-0" style={itemSectionStyle} fluid>
+        <Container className="p-0 middleSectionPlacement" fluid>
           <PricelistContainer pricelist={tmp_pricelist} selected={false} />
           <PricelistContainer pricelist={tmp_pricelist} selected={true} />
         </Container>

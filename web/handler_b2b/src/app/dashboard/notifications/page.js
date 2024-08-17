@@ -10,10 +10,6 @@ import PagationFooter from "@/components/footer/pagation_footer";
 import NotificationContainer from "@/components/object_container/notification_container";
 
 export default function NotificationsPage() {
-  const itemSectionStyle = {
-    marginBottom: "66px",
-    marginTop: "142px",
-  };
   const [sidebarShow, setSidebarShow] = useState(false);
   const showSidebar = () => setSidebarShow(true);
   const hideSidebar = () => setSidebarShow(false);
@@ -66,7 +62,7 @@ export default function NotificationsPage() {
       </nav>
 
       <section className="h-100">
-        <Container className="p-0" style={itemSectionStyle} fluid>
+        <Container className="p-0 middleSectionPlacement-no-footer" fluid>
           <NotificationContainer notification={tmp_notif} />
         </Container>
       </section>

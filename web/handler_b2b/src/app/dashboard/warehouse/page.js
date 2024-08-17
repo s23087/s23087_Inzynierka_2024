@@ -12,10 +12,6 @@ import PagationFooter from "@/components/footer/pagation_footer";
 import ItemContainer from "@/components/object_container/item_container";
 
 export default function WarehousePage() {
-  const itemSectionStyle = {
-    marginBottom: "66px",
-    marginTop: "207px",
-  };
   const [sidebarShow, setSidebarShow] = useState(false);
   const showSidebar = () => setSidebarShow(true);
   const hideSidebar = () => setSidebarShow(false);
@@ -76,7 +72,7 @@ export default function WarehousePage() {
       </nav>
 
       <section className="h-100">
-        <Container className="p-0" style={itemSectionStyle} fluid>
+        <Container className="p-0 middleSectionPlacement" fluid>
           <ItemContainer item={tmp_item} is_org={true} selected={false} />
           <ItemContainer item={tmp_item} is_org={false} selected={true} />
           <ItemContainer item={tmp_item} is_org={false} selected={false} />

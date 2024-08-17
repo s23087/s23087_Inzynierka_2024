@@ -12,10 +12,6 @@ import DeliverySwitch from "@/components/switches/deliveries_switch";
 import DeliveryContainer from "@/components/object_container/delivery_container";
 
 export default function DeliveriesPage() {
-  const itemSectionStyle = {
-    marginBottom: "66px",
-    marginTop: "207px",
-  };
   const [sidebarShow, setSidebarShow] = useState(false);
   const showSidebar = () => setSidebarShow(true);
   const hideSidebar = () => setSidebarShow(false);
@@ -92,7 +88,7 @@ export default function DeliveriesPage() {
       </nav>
 
       <section className="h-100">
-        <Container className="p-0" style={itemSectionStyle} fluid>
+        <Container className="p-0 middleSectionPlacement" fluid>
           {switchBool ? (
             <>
               <DeliveryContainer

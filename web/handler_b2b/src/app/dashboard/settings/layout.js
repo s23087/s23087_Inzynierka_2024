@@ -8,10 +8,6 @@ import CustomSidebar from "@/components/menu/sidebars/sidebar";
 import Navlinks from "@/components/menu/navlinks";
 
 export default function Layout({ children }) {
-  const itemSectionStyle = {
-    marginBottom: "66px",
-    marginTop: "142px",
-  };
   const [sidebarShow, setSidebarShow] = useState(false);
   const showSidebar = () => setSidebarShow(true);
   const hideSidebar = () => setSidebarShow(false);
@@ -57,7 +53,7 @@ export default function Layout({ children }) {
       </nav>
 
       <section className="h-100">
-        <Container className="p-0" style={itemSectionStyle} fluid>
+        <Container className="p-0 middleSectionPlacement-no-footer" fluid>
           {children}
         </Container>
       </section>

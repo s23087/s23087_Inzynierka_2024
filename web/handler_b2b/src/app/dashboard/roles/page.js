@@ -11,10 +11,6 @@ import PagationFooter from "@/components/footer/pagation_footer";
 import RoleContainer from "@/components/object_container/role_container";
 
 export default function RolesPage() {
-  const itemSectionStyle = {
-    marginBottom: "66px",
-    marginTop: "207px",
-  };
   const [sidebarShow, setSidebarShow] = useState(false);
   const showSidebar = () => setSidebarShow(true);
   const hideSidebar = () => setSidebarShow(false);
@@ -62,7 +58,7 @@ export default function RolesPage() {
       </nav>
 
       <section className="h-100">
-        <Container className="p-0" style={itemSectionStyle} fluid>
+        <Container className="p-0 middleSectionPlacement" fluid>
           <RoleContainer role={tmp_role} selected={false} />
           <RoleContainer role={tmp_role} selected={true} />
         </Container>

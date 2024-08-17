@@ -12,10 +12,6 @@ import ProformaSwitch from "@/components/switches/proforma_switch";
 import ProformaContainer from "@/components/object_container/proforma_container";
 
 export default function ProformasPage() {
-  const itemSectionStyle = {
-    marginBottom: "66px",
-    marginTop: "207px",
-  };
   const [sidebarShow, setSidebarShow] = useState(false);
   const showSidebar = () => setSidebarShow(true);
   const hideSidebar = () => setSidebarShow(false);
@@ -92,7 +88,7 @@ export default function ProformasPage() {
       </nav>
 
       <section className="h-100">
-        <Container className="p-0" style={itemSectionStyle} fluid>
+        <Container className="p-0 middleSectionPlacement" fluid>
           {switchBool ? (
             <>
               <ProformaContainer

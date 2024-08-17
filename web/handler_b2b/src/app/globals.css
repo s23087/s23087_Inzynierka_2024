@@ -90,6 +90,16 @@ body {
 
 /* Placement */
 
+.middleSectionPlacement {
+  margin-bottom: 66px;
+  margin-top: 207px;
+}
+
+.middleSectionPlacement-no-footer {
+  margin-bottom: 66px;
+  margin-top: 142px;
+}
+
 .logo-spacing {
   margin-top: 200px;
 }
