@@ -82,6 +82,21 @@
   color: var(--text-main-color) !important;
 }
 
+.btn-yellow {
+  background-color: var(--main-yellow);
+  color: var(--text-black-color);
+}
+
+.btn-yellow:hover {
+  background-color: var(--main-yellow-hover);
+  color: var(--text-black-color);
+}
+
+.btn-yellow:active {
+  background-color: var(--main-yellow) !important;
+  color: var(--text-black-color) !important;
+}
+
 .btn-white-border {
   background-color: transparent;
   color: var(--text-blue-color);

@@ -26,14 +26,21 @@ function getIcon(type) {
   return <Image src={yours_invoice_icon} alt="Document switch button" />;
 }
 
-function InvoiceSwitch({ type, switch_action }) {
-  const doc_type = [
-    "Yours invoice",
-    "Sales invoice",
-    "Yours credit note",
-    "Client credit note",
-    "Request",
-  ];
+function InvoiceSwitch({ type, switch_action, is_role_solo }) {
+  const doc_type = is_role_solo
+    ? [
+        "Yours invoices",
+        "Sales invoices",
+        "Yours credit notes",
+        "Client credit notes",
+      ]
+    : [
+        "Yours invoices",
+        "Sales invoices",
+        "Yours credit notes",
+        "Client credit notes",
+        "Requests",
+      ];
   const menuRef = useRef(null);
   const onOutside = (event) => {
     if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -90,6 +97,7 @@ getIcon.propTypes = {
 InvoiceSwitch.propTypes = {
   type: propTypes.bool.isRequired, // from switch statment in function 'getIcon'
   switch_action: propTypes.func.isRequired,
+  is_role_solo: propTypes.bool.isRequired,
 };
 
 export default InvoiceSwitch;

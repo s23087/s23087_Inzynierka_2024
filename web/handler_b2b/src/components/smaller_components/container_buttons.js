@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { Container, Row, Col, Button } from "react-bootstrap";
 
-function ContainerButtons({ selected }) {
+function ContainerButtons({ selected, is_request = false }) {
   const buttonStyle = {
     minWidth: "77px",
     maxWidth: "95px",
@@ -20,29 +20,29 @@ function ContainerButtons({ selected }) {
         </Col>
         <Col className="px-2" xs="3" sm="auto">
           <Button
-            variant="red"
+            variant={is_request ? "mainBlue" : "red"}
             className="rounded-span w-100"
             style={buttonStyle}
           >
-            Delete
+            {is_request ? "View" : "Delete"}
           </Button>
         </Col>
         <Col className="px-2" xs="3" sm="auto">
           <Button
-            variant="mainBlue"
-            className="rounded-span w-100"
+            variant={is_request ? "green" : "mainBlue"}
+            className="rounded-span w-100 p-0"
             style={buttonStyle}
           >
-            View
+            {is_request ? "Complete" : "View"}
           </Button>
         </Col>
         <Col className="ps-2" xs="3" sm="auto">
           <Button
-            variant="mainBlue"
+            variant={is_request ? "red" : "mainBlue"}
             className="rounded-span w-100"
             style={buttonStyle}
           >
-            Modify
+            {is_request ? "Reject" : "Modify"}
           </Button>
         </Col>
       </Row>
@@ -52,6 +52,7 @@ function ContainerButtons({ selected }) {
 
 ContainerButtons.propTypes = {
   selected: PropTypes.bool.isRequired,
+  is_request: PropTypes.bool.isRequired,
 };
 
 export default ContainerButtons;
