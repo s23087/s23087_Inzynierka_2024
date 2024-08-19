@@ -6,7 +6,7 @@ function NotificationContainer({ notification, switch_read_action }) {
     backgroundColor: "var(--sec-blue)",
   };
   const titleStyle = {
-    maxWidth: "369px"
+    maxWidth: "369px",
   };
   const messageStyle = {
     minWidth: "369px",

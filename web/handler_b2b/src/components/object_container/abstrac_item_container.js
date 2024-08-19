@@ -26,32 +26,24 @@ function AbstractItemContainer({ abstract_item, selected }) {
                 alt="user small icon"
                 className="me-2 mt-1"
               />
-              <span
-                className="spanStyle main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1"
-              >
+              <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1">
                 <p className="mb-0">{abstract_item.user}</p>
               </span>
             </Col>
           </Row>
           <Row className="gy-2">
             <Col xs="12" className="mb-0">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                 <p className="mb-0">P/N: {abstract_item.partnumber}</p>
               </span>
             </Col>
             <Col xs="12" className="mb-0">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                 <p className="mb-0">Source: {abstract_item.source}</p>
               </span>
             </Col>
             <Col xs="12">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                 <p className="mb-0">Ean: {abstract_item.EAN}</p>
               </span>
             </Col>
@@ -72,9 +64,7 @@ function AbstractItemContainer({ abstract_item, selected }) {
           </Row>
         </Col>
         <Col md="5" lg="5" xl="4" className="d-none d-md-block">
-          <Row
-            className="maxContainerStyle h-100 mx-auto align-items-center"
-          >
+          <Row className="maxContainerStyle h-100 mx-auto align-items-center">
             <Col className="pe-1 mb-2">
               <span className="main-blue-bg d-block rounded-span px-2 pb-2 pt-1 main-text text-center">
                 <p className="mb-0">Quantity:</p>

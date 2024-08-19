@@ -1,5 +1,7 @@
-using database_comunicator.dbContext;
+using database_comunicator.Data;
+using database_comunicator.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,14 +11,10 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<HandlerContext>((ServiceProvider, options) =>
-{
-    var httpContextAccessor = ServiceProvider.GetRequiredService<IHttpContextAccessor>();
-    var dbName = httpContextAccessor.HttpContext.Request.Path.Value.Split('/')[1];
-    var connection_string = builder.Configuration["ConnectionStrings:flexible"].Replace("db_name", dbName);
-    options.UseSqlServer(connection_string);
-}
-);
+builder.Configuration.AddUserSecrets<Program>(true);
+builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddDbContext<HandlerContext>();
+builder.Services.AddScoped<IRegistrationServices, RegistrationServices>();
 
 var app = builder.Build();
 

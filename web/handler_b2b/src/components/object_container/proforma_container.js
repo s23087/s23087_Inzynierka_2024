@@ -24,9 +24,7 @@ function ProformaContainer({ proforma, is_org, selected, boolean_value }) {
                   alt="user small icon"
                   className="me-2 mt-1"
                 />
-                <span
-                  className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1"
-                >
+                <span className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1">
                   <p className="mb-0">{proforma.user}</p>
                 </span>
               </Col>
@@ -34,30 +32,22 @@ function ProformaContainer({ proforma, is_org, selected, boolean_value }) {
           ) : null}
           <Row className="gy-2">
             <Col xs="12" className="mb-0">
-              <span
-                className="spanStyle main-blue-bg main-text d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2">
                 <p className="mb-0">{proforma.number}</p>
               </span>
             </Col>
             <Col className="pe-1" xs="auto">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                 <p className="mb-0">Date: {proforma.date}</p>
               </span>
             </Col>
             <Col className="ps-1">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                 <p className="mb-0">Transport: {proforma.transport}</p>
               </span>
             </Col>
             <Col xs="12">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                 {boolean_value ? (
                   <p className="mb-0">For: {proforma.for}</p>
                 ) : (
@@ -88,9 +78,7 @@ function ProformaContainer({ proforma, is_org, selected, boolean_value }) {
           </Row>
         </Col>
         <Col md="5" lg="5" xl="4" className="d-none d-md-block">
-          <Row
-            className="maxContainerStyle h-100 mx-auto align-items-center"
-          >
+          <Row className="maxContainerStyle h-100 mx-auto align-items-center">
             <Col className="pe-1 mb-2">
               <span className="main-blue-bg d-block rounded-span px-2 pb-2 pt-1 main-text text-center">
                 <p className="mb-0">Item Quantity:</p>

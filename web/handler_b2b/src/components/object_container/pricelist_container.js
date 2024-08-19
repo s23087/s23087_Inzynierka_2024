@@ -26,9 +26,7 @@ function PricelistContainer({ pricelist, selected }) {
         <Col xs="12" md="7" lg="5" xxl="3">
           <Row className="gy-2">
             <Col className="pe-1" xs="auto">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                 <p className="mb-0">Created: {pricelist.created}</p>
               </span>
             </Col>
@@ -38,23 +36,17 @@ function PricelistContainer({ pricelist, selected }) {
               </span>
             </Col>
             <Col xs="12">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                 <p className="mb-0">Name: {pricelist.name}</p>
               </span>
             </Col>
             <Col className="pe-1" xs="auto">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                 <p className="mb-0">Type: {pricelist.type}</p>
               </span>
             </Col>
             <Col className="ps-1">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                 <p className="mb-0">Modified: {pricelist.modified}</p>
               </span>
             </Col>
@@ -63,14 +55,10 @@ function PricelistContainer({ pricelist, selected }) {
         <Col xs="12" md="5" lg="4" xxl="3" className="mt-2 mt-xl-0">
           <Row className="gy-2 h-100 align-items-center">
             <Col xs="12">
-              <span
-                className="spanStyle main-blue-bg main-text d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2">
                 <p className="mb-0">Products offered: {pricelist.item_qty}</p>
               </span>
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2 mt-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2 mt-2">
                 <p className="mb-0 text-nowrap overflow-x-hidden">
                   Clients: {pricelist.clients.join(", ")}
                 </p>

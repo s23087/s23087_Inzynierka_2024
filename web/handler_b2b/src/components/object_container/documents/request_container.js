@@ -49,9 +49,7 @@ function RequestContainer({ request, is_org, selected }) {
                   alt="user small icon"
                   className="me-2 mt-1"
                 />
-                <span
-                  className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1"
-                >
+                <span className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1">
                   <p className="mb-0">{request.user}</p>
                 </span>
               </Col>
@@ -59,18 +57,14 @@ function RequestContainer({ request, is_org, selected }) {
           ) : null}
           <Row className="gy-2">
             <Col xs="12" className="mb-1 mb-sm-0">
-              <span
-                className="spanStyle main-blue-bg main-text d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2">
                 <p className="mb-0">{request.document}</p>
               </span>
             </Col>
             <Col xs="12" className="mb-1 mb-md-0 mt-1 mt-sm-2">
               <Row className="p-0">
                 <Col className="pe-1" xs="auto">
-                  <span
-                    className="spanStyle main-grey-bg d-flex rounded-span px-2"
-                  >
+                  <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                     <p className="mb-0">Date: {request.date}</p>
                   </span>
                 </Col>
@@ -115,9 +109,7 @@ function RequestContainer({ request, is_org, selected }) {
                   </span>
                 </Col>
                 <Col className="ps-1">
-                  <span
-                    className="spanStyle main-grey-bg d-flex rounded-span px-2"
-                  >
+                  <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                     <p className="mb-0">Type: {request.type}</p>
                   </span>
                 </Col>
@@ -126,9 +118,7 @@ function RequestContainer({ request, is_org, selected }) {
           </Row>
         </Col>
         <Col md="5" lg="5" xl="4" className="d-none d-md-block">
-          <Row
-            className="maxContainerStyle h-100 mx-auto align-items-center"
-          >
+          <Row className="maxContainerStyle h-100 mx-auto align-items-center">
             <Col className="pe-1 mb-2">
               <span className="main-blue-bg d-block rounded-span px-2 pb-2 pt-1 main-text text-center">
                 <p className="mb-0">Items Quantity:</p>

@@ -49,9 +49,7 @@ function InvoiceContainer({ invoice, is_org, selected, is_user_type }) {
                   alt="user small icon"
                   className="me-2 mt-1"
                 />
-                <span
-                  className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1"
-                >
+                <span className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1">
                   <p className="mb-0">{invoice.user}</p>
                 </span>
               </Col>
@@ -59,18 +57,14 @@ function InvoiceContainer({ invoice, is_org, selected, is_user_type }) {
           ) : null}
           <Row className="gy-2">
             <Col xs="12" className="mb-1 mb-sm-0">
-              <span
-                className="spanStyle main-blue-bg main-text d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2">
                 <p className="mb-0">{invoice.number}</p>
               </span>
             </Col>
             <Col xs="12" className="mb-1 mb-md-0 mt-1 mt-sm-2">
               <Row className="p-0">
                 <Col className="pe-1" xs="auto">
-                  <span
-                    className="spanStyle main-grey-bg d-flex rounded-span px-2"
-                  >
+                  <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                     <p className="mb-0">Date: {invoice.date}</p>
                   </span>
                 </Col>
@@ -105,9 +99,7 @@ function InvoiceContainer({ invoice, is_org, selected, is_user_type }) {
               </span>
             </Col>
             <Col xs="12">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                 <p className="mb-0">
                   {is_user_type ? "Source" : "Buyer"}:{" "}
                   {is_user_type ? invoice.source : invoice.buyer}
@@ -115,14 +107,15 @@ function InvoiceContainer({ invoice, is_org, selected, is_user_type }) {
               </span>
             </Col>
             <Col className="pe-1 d-xxl-none" xs="auto">
-              <span className="spanStyle d-flex rounded-span px-2" style={systemStyle}>
+              <span
+                className="spanStyle d-flex rounded-span px-2"
+                style={systemStyle}
+              >
                 <p className="mb-0">{invoice.system}</p>
               </span>
             </Col>
             <Col className="ps-1 d-xxl-none">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                 <p className="mb-0">Due date: {invoice.due_date}</p>
               </span>
             </Col>
@@ -155,9 +148,7 @@ function InvoiceContainer({ invoice, is_org, selected, is_user_type }) {
                   </span>
                 </Col>
                 <Col className="ps-1">
-                  <span
-                    className="spanStyle main-grey-bg d-flex rounded-span px-2"
-                  >
+                  <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                     <p className="mb-0">Due date: {invoice.due_date}</p>
                   </span>
                 </Col>

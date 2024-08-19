@@ -10,7 +10,10 @@ import to_user_delivery_icon from "../../../public/icons/to_user_delivery_icon.p
 function DeliverySwitch({ boolean_value, switch_action }) {
   const deliverySwitchRef = useRef(null);
   const onOutside = (event) => {
-    if (deliverySwitchRef.current && !deliverySwitchRef.current.contains(event.target)) {
+    if (
+      deliverySwitchRef.current &&
+      !deliverySwitchRef.current.contains(event.target)
+    ) {
       closeSwitch();
     }
   };

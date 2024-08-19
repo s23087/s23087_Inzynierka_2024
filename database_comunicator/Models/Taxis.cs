@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace database_comunicator.Models;
 
-public partial class Taxes
+public partial class Taxis
 {
     public int TaxesId { get; set; }
 

@@ -24,9 +24,7 @@ function ClientContainer({ client, is_org, selected }) {
                   alt="user small icon"
                   className="me-2 mt-1"
                 />
-                <span
-                  className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1"
-                >
+                <span className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1">
                   <p className="mb-0">{client.user}</p>
                 </span>
               </Col>
@@ -34,30 +32,22 @@ function ClientContainer({ client, is_org, selected }) {
           ) : null}
           <Row className="gy-2">
             <Col xs="12">
-              <span
-                className="spanStyle main-blue-bg main-text d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2">
                 <p className="mb-0">Name: {client.name}</p>
               </span>
             </Col>
             <Col xs="12">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                 <p className="mb-0">Adress: {client.adress}</p>
               </span>
             </Col>
             <Col className="pe-1" xs="auto">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2 d-md-none"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2 d-md-none">
                 <p className="mb-0">Nip: {client.nip}</p>
               </span>
             </Col>
             <Col className="ps-1">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2 d-md-none"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2 d-md-none">
                 <p className="mb-0">Country: {client.country}</p>
               </span>
             </Col>
@@ -66,14 +56,10 @@ function ClientContainer({ client, is_org, selected }) {
         <Col md="6" lg="6" xl="4" className="d-none d-md-block ps-xl-5">
           <Row className="gy-2 h-100 align-items-end">
             <Col xs="12">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                 <p className="mb-0">Nip: {client.nip}</p>
               </span>
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2 mt-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2 mt-2">
                 <p className="mb-0">Country: {client.country}</p>
               </span>
             </Col>

@@ -23,18 +23,14 @@ function RoleContainer({ role, selected }) {
                 alt="user small icon"
                 className="me-2 mt-1"
               />
-              <span
-                className="spanStyle main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1"
-              >
+              <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1">
                 <p className="mb-0">{role.user}</p>
               </span>
             </Col>
           </Row>
           <Row className="gy-2">
             <Col xs="12" className="mb-1 mb-sm-0">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                 <p className="mb-0">Role: {role.role}</p>
               </span>
             </Col>

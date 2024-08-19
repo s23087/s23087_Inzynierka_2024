@@ -1,19 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using database_comunicator.Models;
 using Microsoft.EntityFrameworkCore;
+using database_comunicator.Models;
+using System.Security.Claims;
 
-namespace database_comunicator.dbContext;
+namespace database_comunicator.Data;
 
 public partial class HandlerContext : DbContext
 {
-    public HandlerContext()
+    private readonly IConfiguration _configuration;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    public HandlerContext(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
     {
+        _configuration = configuration;
+        _httpContextAccessor = httpContextAccessor;
     }
 
-    public HandlerContext(DbContextOptions<DbContext> options)
+    public HandlerContext(DbContextOptions<HandlerContext> options, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         : base(options)
     {
+        _configuration = configuration;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public virtual DbSet<ActionLog> ActionLogs { get; set; }
@@ -88,7 +95,7 @@ public partial class HandlerContext : DbContext
 
     public virtual DbSet<SoloUser> SoloUsers { get; set; }
 
-    public virtual DbSet<Taxes> Taxes { get; set; }
+    public virtual DbSet<Taxis> Taxes { get; set; }
 
     public virtual DbSet<UserNotification> UserNotifications { get; set; }
 
@@ -97,7 +104,14 @@ public partial class HandlerContext : DbContext
     public virtual DbSet<Waybill> Waybills { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Name=ConnectionStrings:TemplateDB");
+    {
+        var dbName = _httpContextAccessor?.HttpContext?.Request.Path.ToString()
+            .Split('/')[1];
+        dbName ??= "template";
+        var defPath = _configuration["ConnectionStrings:flexible"];
+        var connectionString = defPath?.Replace("db_name", dbName);
+        optionsBuilder.UseSqlServer(connectionString);
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1072,7 +1086,7 @@ public partial class HandlerContext : DbContext
                 .HasConstraintName("Solo_User_Organization_relation");
         });
 
-        modelBuilder.Entity<Taxes>(entity =>
+        modelBuilder.Entity<Taxis>(entity =>
         {
             entity.HasKey(e => e.TaxesId).HasName("Taxes_pk");
 

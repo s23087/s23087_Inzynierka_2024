@@ -28,6 +28,10 @@ a {
   color: var(--text-sec-blue-color);
 }
 
+.red-sec-text {
+  color: var(--sec-red);
+}
+
 .small-text {
   font-size: 12px;
 }

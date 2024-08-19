@@ -30,9 +30,7 @@ function ItemContainer({ item, is_org, selected }) {
                   alt="user small icon"
                   className="me-2 mt-1"
                 />
-                <span
-                  className="spanStyle main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1"
-                >
+                <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1">
                   <p className="mb-0">{item.user}</p>
                 </span>
               </Col>
@@ -40,9 +38,7 @@ function ItemContainer({ item, is_org, selected }) {
           ) : null}
           <Row className="gy-2">
             <Col className="pe-1" xs="auto">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                 <p className="mb-0">Id: {item.id}</p>
               </span>
             </Col>
@@ -52,9 +48,7 @@ function ItemContainer({ item, is_org, selected }) {
               </span>
             </Col>
             <Col xs="12" className="mb-1 mb-sm-0">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                 <p className="mb-0">P/N: {item.partnumber}</p>
               </span>
             </Col>
@@ -73,23 +67,17 @@ function ItemContainer({ item, is_org, selected }) {
               </span>
             </Col>
             <Col xs="12">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                 <p className="mb-0">Name: {item.name}</p>
               </span>
             </Col>
             <Col className="pe-1 d-xxl-none" xs="auto">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                 <p className="mb-0">Source: {item.source}</p>
               </span>
             </Col>
             <Col className="ps-1 d-xxl-none">
-              <span
-                className="spanStyle main-grey-bg d-flex rounded-span px-2"
-              >
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                 <p className="mb-0">Ean: {item.EAN}</p>
               </span>
             </Col>
@@ -114,16 +102,12 @@ function ItemContainer({ item, is_org, selected }) {
             <Col xs="12">
               <Row className="d-none d-xxl-flex">
                 <Col className="pe-1" xs="auto">
-                  <span
-                    className="spanStyle main-grey-bg d-flex rounded-span px-2"
-                  >
+                  <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                     <p className="mb-0">Source: {item.source}</p>
                   </span>
                 </Col>
                 <Col className="ps-1">
-                  <span
-                    className="spanStyle main-grey-bg d-flex rounded-span px-2"
-                  >
+                  <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
                     <p className="mb-0">Ean: {item.EAN}</p>
                   </span>
                 </Col>
