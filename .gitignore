@@ -3,6 +3,9 @@
 ## Database dir
 database/
 
+# For the sake of Sonar for now
+db_setup/
+
 ## C#
 
 **/.classpath
