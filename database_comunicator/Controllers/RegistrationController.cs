@@ -2,6 +2,7 @@
 using database_comunicator.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 
 namespace database_comunicator.Controllers
 {
@@ -25,6 +26,35 @@ namespace database_comunicator.Controllers
             {
                 CountryName = e.CountryName
             }));
+        }
+
+        [HttpPost]
+        [Route("/template/[controller]/createDb")]
+        public async Task<IActionResult> CreateDb(string orgName)
+        {
+            bool result = await _registrationServices.CreateNewDatabase(orgName);
+
+            if (result)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
+        }
+
+        [HttpPost]
+        [Route("setupDb")]
+        public async Task<IActionResult> SetupDb()
+        {
+
+            bool result = await _registrationServices.SetupDatabase();
+
+            if (result)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
         }
     }
 }

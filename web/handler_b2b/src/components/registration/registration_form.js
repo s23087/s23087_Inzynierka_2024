@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { useSearchParams } from "next/navigation";
+import registerUser from "@/utils/registration/submit_registration";
 import CountryOptions from "@/app/api/ui/country_options";
 import validators from "@/utils/registration/registration_validator";
 import PolicyOffcanvas from "./policy_offcanvas";
@@ -98,7 +99,7 @@ function RegistrationForm() {
       <Container className="maxFormWidth">
         <Row className="mb-4 justify-content-around">
           <Col className="mt-4 text-md-end">
-            <Form id="regForm">
+            <Form id="regForm" action={registerUser}>
               {/* Step 1 */}
               <Container
                 className="px-0"
@@ -119,6 +120,7 @@ function RegistrationForm() {
                   <Form.Control
                     className="input-style shadow-sm"
                     type="email"
+                    name="email"
                     placeholder="email"
                     required
                     isInvalid={emailError}
@@ -150,6 +152,7 @@ function RegistrationForm() {
                   <Form.Control
                     className="input-style shadow-sm"
                     type="text"
+                    name="name"
                     placeholder="name"
                     required
                     isInvalid={nameError}
@@ -181,6 +184,7 @@ function RegistrationForm() {
                   <Form.Control
                     className="input-style shadow-sm"
                     type="text"
+                    name="surname"
                     placeholder="surname"
                     required
                     isInvalid={surnameError}
@@ -218,6 +222,7 @@ function RegistrationForm() {
                   <Form.Control
                     className="input-style shadow-sm"
                     type="text"
+                    name="company"
                     placeholder="company name"
                     required
                     isInvalid={companyError}
@@ -249,6 +254,7 @@ function RegistrationForm() {
                   <Form.Control
                     className="input-style shadow-sm"
                     type="text"
+                    name="nip"
                     placeholder="nip"
                     isInvalid={nipError}
                     onInput={(event) => {
@@ -470,7 +476,7 @@ function RegistrationForm() {
                       }
 
                       let form = document.getElementById("regForm");
-                      form.submit();
+                      form.requestSubmit();
                     }}
                   >
                     Create Account
