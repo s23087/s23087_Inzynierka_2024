@@ -14,7 +14,6 @@ export default function Loading() {
         <Col>
           <div
             className="spinner-grow blue-main-text"
-            role="status"
             style={spinnerStyle}
           >
             <span className="visually-hidden">Loading...</span>

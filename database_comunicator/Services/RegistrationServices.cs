@@ -28,7 +28,7 @@ namespace database_comunicator.Services
 
         public async Task<bool> CreateNewDatabase(string orgName)
         {
-            string createDbScript = File.ReadAllText(_configuration["script:createDb"]);
+            string createDbScript = await File.ReadAllTextAsync(_configuration["script:createDb"]);
 
             if (createDbScript == null)
             {
@@ -44,7 +44,7 @@ namespace database_comunicator.Services
 
         public async Task<bool> SetupDatabase()
         {
-            string setupDbScript = File.ReadAllText(_configuration["script:setupDb"]);
+            string setupDbScript = await File.ReadAllTextAsync(_configuration["script:setupDb"]);
 
             if (setupDbScript == null)
             {

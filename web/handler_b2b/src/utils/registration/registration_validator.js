@@ -6,12 +6,12 @@ function isEmail(str) {
 }
 
 function haveNoNumbers(str) {
-  const reg = new RegExp("^[a-zA-Z]+$");
+  const reg = /^[a-zA-Z]+$/;
   return reg.test(str);
 }
 
 function haveOnlyNumbers(str) {
-  const reg = new RegExp("^[0-9]+$");
+  const reg = /^[0-9]+$/;
   return reg.test(str);
 }
 

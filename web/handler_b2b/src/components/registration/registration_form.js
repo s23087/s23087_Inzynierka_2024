@@ -112,7 +112,7 @@ function RegistrationForm() {
                   <Row>
                     <p
                       className="text-start mb-0 px-3 red-sec-text small-text"
-                      style={emailError ? unhidden : hidden}
+                      style={getInputInvailidStyle()}
                     >
                       Invalid email.
                     </p>
@@ -260,12 +260,12 @@ function RegistrationForm() {
                     onInput={(event) => {
                       if (validators.haveOnlyNumbers(event.target.value)) {
                         setNipError(false);
+                      }
+
+                      if (!validators.stringIsNotEmpty(event.target.value)) {
+                        setNipError(false);
                       } else {
-                        if (!validators.stringIsNotEmpty(event.target.value)) {
-                          setNipError(false);
-                        } else {
-                          setNipError(true);
-                        }
+                        setNipError(true);
                       }
                     }}
                   />
@@ -506,6 +506,10 @@ function RegistrationForm() {
       </Container>
     </Container>
   );
+
+  function getInputInvailidStyle() {
+    return emailError ? unhidden : hidden;
+  }
 }
 
 export default RegistrationForm;
