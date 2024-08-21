@@ -112,7 +112,7 @@ function RegistrationForm() {
                   <Row>
                     <p
                       className="text-start mb-0 px-3 red-sec-text small-text"
-                      style={getInputInvailidStyle()}
+                      style={getInputInvailidStyle(emailError)}
                     >
                       Invalid email.
                     </p>
@@ -144,7 +144,7 @@ function RegistrationForm() {
                   <Row>
                     <p
                       className="text-start mb-0 px-3 red-sec-text small-text"
-                      style={nameError ? unhidden : hidden}
+                      style={getInputInvailidStyle(nameError)}
                     >
                       Must contain only letters and not be empty
                     </p>
@@ -176,7 +176,7 @@ function RegistrationForm() {
                   <Row>
                     <p
                       className="text-start mb-0 px-3 red-sec-text small-text"
-                      style={surnameError ? unhidden : hidden}
+                      style={getInputInvailidStyle(surnameError)}
                     >
                       Must contain only letters and not be empty
                     </p>
@@ -214,7 +214,7 @@ function RegistrationForm() {
                   <Row>
                     <p
                       className="text-start mb-0 px-3 red-sec-text small-text"
-                      style={companyError ? unhidden : hidden}
+                      style={getInputInvailidStyle(companyError)}
                     >
                       Max 50 letters and must not be empty
                     </p>
@@ -246,7 +246,7 @@ function RegistrationForm() {
                   <Row>
                     <p
                       className="text-start mb-0 px-3 red-sec-text small-text"
-                      style={nipError ? unhidden : hidden}
+                      style={getInputInvailidStyle(nipError)}
                     >
                       Must contain only numbers.
                     </p>
@@ -275,7 +275,7 @@ function RegistrationForm() {
                   <Row>
                     <p
                       className="text-start mb-0 px-3 red-sec-text small-text"
-                      style={streetError ? unhidden : hidden}
+                      style={getInputInvailidStyle(streetError)}
                     >
                       Max 200 letters and must not be empty.
                     </p>
@@ -306,7 +306,7 @@ function RegistrationForm() {
                   <Row>
                     <p
                       className="text-start mb-0 px-3 red-sec-text small-text"
-                      style={cityError ? unhidden : hidden}
+                      style={getInputInvailidStyle(cityError)}
                     >
                       Max 200 letters and must not be empty.
                     </p>
@@ -337,7 +337,7 @@ function RegistrationForm() {
                   <Row>
                     <p
                       className="text-start mb-0 px-3 red-sec-text small-text"
-                      style={postalError ? unhidden : hidden}
+                      style={getInputInvailidStyle(postalError)}
                     >
                       Max 25 characters and must not be empty.
                     </p>
@@ -507,8 +507,8 @@ function RegistrationForm() {
     </Container>
   );
 
-  function getInputInvailidStyle() {
-    return emailError ? unhidden : hidden;
+  function getInputInvailidStyle(errorBool) {
+    return errorBool ? unhidden : hidden;
   }
 }
 
