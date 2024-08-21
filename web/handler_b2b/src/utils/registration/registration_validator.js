@@ -11,7 +11,7 @@ function haveNoNumbers(str) {
 }
 
 function haveOnlyNumbers(str) {
-  const reg = /^[0-9]+$/;
+  const reg = /^\d+$/;
   return reg.test(str);
 }
 

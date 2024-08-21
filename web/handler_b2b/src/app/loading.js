@@ -12,10 +12,7 @@ export default function Loading() {
     >
       <Row>
         <Col>
-          <div
-            className="spinner-grow blue-main-text"
-            style={spinnerStyle}
-          >
+          <div className="spinner-grow blue-main-text" style={spinnerStyle}>
             <span className="visually-hidden">Loading...</span>
           </div>
         </Col>

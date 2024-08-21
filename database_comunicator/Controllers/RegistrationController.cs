@@ -11,9 +11,13 @@ namespace database_comunicator.Controllers
     public class RegistrationController : ControllerBase
     {
         private readonly IRegistrationServices _registrationServices;
-        public RegistrationController(IRegistrationServices registrationServices)
+        private readonly IOrganizationServices _organizationServices;
+        private readonly IUserServices _userServices;
+        public RegistrationController(IRegistrationServices registrationServices, IOrganizationServices organizationServices, IUserServices userServices)
         {
             _registrationServices = registrationServices;
+            _organizationServices = organizationServices;
+            _userServices = userServices;
         }
 
         [HttpGet]
@@ -55,6 +59,45 @@ namespace database_comunicator.Controllers
             }
 
             return BadRequest();
+        }
+        [HttpPost]
+        [Route("registerUser")]
+        public async Task<IActionResult> RegisterUser(RegisterUser newUser)
+        {
+            bool countryExist = await _organizationServices.CountryExist(newUser.Country);
+            if (!countryExist) { return BadRequest(); }
+            int countryId = await _organizationServices.GetCountryId(newUser.Country);
+            int orgId = await _organizationServices.AddOrganization(new AddOrganization
+            {
+                OrgName = newUser.OrgName,
+                Nip = newUser.Nip,
+                Street = newUser.Street,
+                City = newUser.City,
+                PostalCode = newUser.PostalCode,
+                CreditLimit = null,
+                CountryId = countryId
+            });
+
+            int roleId = -1;
+
+            if (newUser.IsOrg)
+            {
+                roleId = await _userServices.GetRoleId("Admin");
+            }
+
+            var result = await _userServices.AddUser(new AddUser
+            {
+                Email = newUser.Email,
+                Username = newUser.Username,
+                Surname = newUser.Username,
+                Password = newUser.Password,
+                OrganizationsId = orgId
+            }, roleId, newUser.IsOrg);
+
+            return result ? Ok() : BadRequest();
+
+
+
         }
     }
 }

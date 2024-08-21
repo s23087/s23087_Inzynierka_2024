@@ -15,6 +15,8 @@ builder.Configuration.AddUserSecrets<Program>(true);
 builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddDbContext<HandlerContext>();
 builder.Services.AddScoped<IRegistrationServices, RegistrationServices>();
+builder.Services.AddScoped<IOrganizationServices, OrganizationServices>();
+builder.Services.AddScoped<IUserServices, UserServices>();
 
 var app = builder.Build();
 

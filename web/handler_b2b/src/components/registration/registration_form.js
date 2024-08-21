@@ -11,6 +11,10 @@ import PolicyOffcanvas from "./policy_offcanvas";
 function RegistrationForm() {
   // Variable that tell if user choose Org option or Individual one
   const is_org = useSearchParams().get("is_org");
+  const registerUserBinded = registerUser.bind(null, is_org);
+
+  // Button loading
+  const [isLoading, setIsLoading] = useState(false);
 
   // Modal variables
   const [show, setShow] = useState(false);
@@ -99,7 +103,7 @@ function RegistrationForm() {
       <Container className="maxFormWidth">
         <Row className="mb-4 justify-content-around">
           <Col className="mt-4 text-md-end">
-            <Form id="regForm" action={registerUser}>
+            <Form id="regForm" action={registerUserBinded}>
               {/* Step 1 */}
               <Container
                 className="px-0"
@@ -260,12 +264,11 @@ function RegistrationForm() {
                     onInput={(event) => {
                       if (validators.haveOnlyNumbers(event.target.value)) {
                         setNipError(false);
-                      }
-
-                      if (!validators.stringIsNotEmpty(event.target.value)) {
-                        setNipError(false);
                       } else {
                         setNipError(true);
+                      }
+                      if (!validators.stringIsNotEmpty(event.target.value)) {
+                        setNipError(false);
                       }
                     }}
                   />
@@ -284,6 +287,7 @@ function RegistrationForm() {
                     className="input-style shadow-sm"
                     type="text"
                     placeholder="street"
+                    name="street"
                     required
                     isInvalid={streetError}
                     onInput={(event) => {
@@ -315,6 +319,7 @@ function RegistrationForm() {
                     className="input-style shadow-sm"
                     type="text"
                     placeholder="city"
+                    name="city"
                     required
                     isInvalid={cityError}
                     onInput={(event) => {
@@ -345,6 +350,7 @@ function RegistrationForm() {
                   <Form.Control
                     className="input-style shadow-sm"
                     type="text"
+                    name="postal"
                     placeholder="postal code"
                     required
                     isInvalid={postalError}
@@ -368,6 +374,7 @@ function RegistrationForm() {
                   <Form.Select
                     id="countrySelect"
                     className="input-style shadow-sm"
+                    name="country"
                   >
                     <CountryOptions />
                   </Form.Select>
@@ -391,6 +398,7 @@ function RegistrationForm() {
                   <Form.Control
                     className="input-style shadow-sm"
                     type="password"
+                    name="password"
                     placeholder="password"
                     required
                     isInvalid={passError}
@@ -476,10 +484,15 @@ function RegistrationForm() {
                       }
 
                       let form = document.getElementById("regForm");
+                      setIsLoading(true);
                       form.requestSubmit();
                     }}
                   >
-                    Create Account
+                    {isLoading ? (
+                      <div className="spinner-border main-text"></div>
+                    ) : (
+                      "Create Account"
+                    )}
                   </Button>
                 </Container>
               </Container>

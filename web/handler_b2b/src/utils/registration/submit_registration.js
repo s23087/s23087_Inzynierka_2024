@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import initDb from "./createDb";
+import createNewRegisteredUser from "./registerUser";
 
 function createFolders(dbfile, logFile) {
   const fs = require("node:fs");
@@ -28,7 +29,7 @@ function deleteFolders(dbfile, logFile) {
   }
 }
 
-async function registerUser(formData) {
+async function registerUser(is_org, formData) {
   let orgName = formData.get("company");
   let folderName = orgName.replace(/[^a-zA-Z0-9]/, "");
   folderName = folderName.replace(" ", "");
@@ -40,7 +41,15 @@ async function registerUser(formData) {
 
   if (fileCreation) {
     let creationResult = await initDb(folderName);
-    if (creationResult) {
+    if (!creationResult) {
+      redirect("failure");
+    }
+    let registerResult = await createNewRegisteredUser(
+      formData,
+      folderName,
+      is_org,
+    );
+    if (registerResult) {
       redirect("success");
     }
     deleteFolders(dbFilePath, dbLogPath);
