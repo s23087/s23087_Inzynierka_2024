@@ -46,7 +46,7 @@ namespace database_comunicator.Services
         public async Task<int> GetCountryId(string countryName)
         {
             var result = await _handlerContext.Countries.Where(e => e.CountryName == countryName).Select(e => e.CountryId).ToListAsync();
-            return result.First();
+            return result[0];
         }
     }
 }

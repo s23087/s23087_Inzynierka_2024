@@ -1,6 +1,6 @@
 ﻿namespace database_comunicator.Utils
 {
-    public class WarehouseUtils
+    public static class WarehouseUtils
     {
         public static string getItemStatus(int warQty, int outQty, bool deliveryExist)
         {

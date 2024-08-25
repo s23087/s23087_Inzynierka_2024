@@ -3,7 +3,7 @@ using System.Text;
 
 namespace database_comunicator.Utils
 {
-    public class Hasher
+    public static class Hasher
     {
         public static bool VerifyPassword(string hash, string salt, string password)
         {

@@ -123,7 +123,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                     return (
                       <SpecialInput
                         value={value}
-                        key={key}
+                        key={value}
                         deleteValue={() => {
                           eans.splice(key, 1);
                           if (rerenderVar === 1) {

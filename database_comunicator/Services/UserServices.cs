@@ -29,7 +29,7 @@ namespace database_comunicator.Services
         }
         public async Task<bool> AddUser(AddUser user, int roleId, bool isOrg)
         {
-            if ((roleId == -1) && (isOrg == true))
+            if ((roleId == -1) && (isOrg))
             {
                 return false;
             }
@@ -72,7 +72,7 @@ namespace database_comunicator.Services
                     OrgName = e.OrgUser!.Organizations.OrgName
                 }).ToListAsync();
 
-                return result.First();
+                return result[0];
             }
 
             result = await _handlerContext.AppUsers.Include(a => a.SoloUser).ThenInclude(b => b!.Organizations).Where(e => e.IdUser == userId).Select(e => new BasicInfo
@@ -82,30 +82,30 @@ namespace database_comunicator.Services
                 OrgName = e.SoloUser!.Organizations.OrgName
             }).ToListAsync();
 
-            return result.First();
+            return result[0];
         }
 
         public async Task<int> GetCountNotification(int userId)
         {
-            var result = await _handlerContext.UserNotifications.Where(e => e.UsersId == userId && e.IsRead == false).ToListAsync();
+            var result = await _handlerContext.UserNotifications.Where(e => e.UsersId == userId && e.IsRead).ToListAsync();
             return result.Count;
         }
 
         public async Task<int> GetRoleId(string roleName)
         {
             var result = await _handlerContext.UserRoles.Where(e => e.RoleName.Equals(roleName)).Select(e => e.RoleId).ToListAsync();
-            return result.First();
+            return result[0];
         }
 
         public async Task<bool> IsOrgUser(string email)
         {
             var result = await _handlerContext.AppUsers.Where(e => e.Email == email).Select(e => e.OrgUserId).ToListAsync();
-            return result.First() != null;
+            return result[0] != null;
         }
         public async Task<bool> IsOrgUser(int userId)
         {
             var result = await _handlerContext.AppUsers.Where(e => e.IdUser == userId).Select(e => e.OrgUserId).ToListAsync();
-            return result.First() != null;
+            return result[0] != null;
         }
 
         public async Task<bool> UserExist(string email)
@@ -144,7 +144,7 @@ namespace database_comunicator.Services
                 }).ToListAsync();
             }
 
-            var instance = hashes.First();
+            var instance = hashes[0];
             var passHas = instance.PassHash;
             var salt = instance.PassSalt;
             var isVerified = Hasher.VerifyPassword(passHas, salt, password);
