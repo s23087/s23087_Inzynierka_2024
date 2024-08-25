@@ -1,28 +1,74 @@
+"use client";
+
 import PropTypes from "prop-types";
 import Image from "next/image";
 import { Container, Row, Col } from "react-bootstrap";
 import ContainerButtons from "../smaller_components/container_buttons";
 import user_small_icon from "../../../public/icons/user_small_icon.png";
 
-function ItemContainer({ item, is_org, selected }) {
+function ItemContainer({
+  item,
+  currency,
+  is_org,
+  selectQtyAction,
+  unselectQtyAction,
+  selected,
+}) {
+  const getStatusColor = () => {
+    switch (item.statusName) {
+      case "In delivery":
+        return "var(--main-yellow)";
+      case "On request":
+        return "var(--sec-red)";
+      case "Unavailable":
+        return "var(--sec-grey)";
+    }
+    return "var(--main-green)";
+  };
+  let statusColor = getStatusColor();
   const containerBg = {
     backgroundColor: "var(--sec-blue)",
   };
   const statusBgStyle = {
-    backgroundColor: "var(--main-green)",
+    backgroundColor: statusColor,
+    color:
+      statusColor === "var(--sec-red)" || statusColor === "var(--sec-grey)"
+        ? "var(--text-main-color)"
+        : "var(--text-black-color)",
     minWidth: "159px",
     minHeight: "25px",
     alignItems: "center",
   };
+  const getShortEan = () => {
+    let ean = item.eans.join(", ");
+    ean = ean.substring(0, 15);
+    let index = ean.lastIndexOf(",");
+    if (index === -1) return ean;
+    return ean.substring(0, index) + "+ more";
+  };
+  const getShortUsers = () => {
+    let users = item.users.join(", ");
+    users = users.substring(0, 40);
+    let index = users.lastIndexOf(",");
+    if (index === -1) return users;
+    return users.substring(0, index) + "+ more";
+  };
+  const getShortSources = () => {
+    let sources = item.sources.join(", ");
+    sources = sources.substring(0, 15);
+    let index = sources.lastIndexOf(",");
+    if (index === -1) return sources;
+    return sources.substring(0, index) + "+ more";
+  };
   return (
     <Container
-      className="py-3 black-text medium-text border-bottom-grey"
+      className="py-3 black-text medium-text border-bottom-grey px-0 px-xl-3"
       style={selected ? containerBg : null}
       fluid
     >
-      <Row>
+      <Row className="mx-0 mx-md-3 mx-xl-3">
         <Col xs="12" md="7" lg="7" xl="4">
-          {is_org ? (
+          {is_org === "true" ? (
             <Row className="mb-2">
               <Col className="d-flex">
                 <Image
@@ -31,25 +77,29 @@ function ItemContainer({ item, is_org, selected }) {
                   className="me-2 mt-1"
                 />
                 <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1">
-                  <p className="mb-0">{item.user}</p>
+                  <p className="mb-0">
+                    {getShortUsers() === "" ? "No user" : getShortUsers()}
+                  </p>
                 </span>
               </Col>
             </Row>
-          ) : null}
+          ) : (
+            <></>
+          )}
           <Row className="gy-2">
             <Col className="pe-1" xs="auto">
               <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
-                <p className="mb-0">Id: {item.id}</p>
+                <p className="mb-0">Id: {item.itemId}</p>
               </span>
             </Col>
             <Col className="ps-1">
               <span className=" d-flex rounded-span px-2" style={statusBgStyle}>
-                <p className="mb-0">Availability: {item.availability}</p>
+                <p className="mb-0">Availability: {item.statusName}</p>
               </span>
             </Col>
             <Col xs="12" className="mb-1 mb-sm-0">
               <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
-                <p className="mb-0">P/N: {item.partnumber}</p>
+                <p className="mb-0">P/N: {item.partNumber}</p>
               </span>
             </Col>
             <Col className="pe-1 mb-1 d-md-none">
@@ -62,23 +112,26 @@ function ItemContainer({ item, is_org, selected }) {
               <span className="main-blue-bg d-block rounded-span px-2 pb-2 pt-1 main-text text-center">
                 <p className="mb-0">Purchase price:</p>
                 <p className="mb-0">
-                  {item.purchase_price} {item.currency_name}
+                  {item.purchasePrice === null ? "-" : item.purchasePrice}{" "}
+                  {currency}
                 </p>
               </span>
             </Col>
             <Col xs="12">
               <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
-                <p className="mb-0">Name: {item.name}</p>
+                <p className="mb-0">Name: {item.itemName}</p>
               </span>
             </Col>
             <Col className="pe-1 d-xxl-none" xs="auto">
               <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
-                <p className="mb-0">Source: {item.source}</p>
+                <p className="mb-0">
+                  Source: {item.sources.length === 0 ? "-" : getShortSources()}
+                </p>
               </span>
             </Col>
             <Col className="ps-1 d-xxl-none">
               <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
-                <p className="mb-0">Ean: {item.EAN}</p>
+                Ean: {getShortEan()}
               </span>
             </Col>
           </Row>
@@ -91,11 +144,12 @@ function ItemContainer({ item, is_org, selected }) {
                 <p className="mb-0">{item.qty}</p>
               </span>
             </Col>
-            <Col className="ps-1 mb-2 mt-auto">
+            <Col className="ps-1 pe-md-0 pe-xl-2 mb-2 mt-auto">
               <span className="main-blue-bg d-block rounded-span px-2 pb-2 pt-1 main-text text-center">
                 <p className="mb-0">Purchase price:</p>
                 <p className="mb-0">
-                  {item.purchase_price} {item.currency_name}
+                  {item.purchasePrice === null ? "-" : item.purchasePrice}{" "}
+                  {currency}
                 </p>
               </span>
             </Col>
@@ -103,12 +157,15 @@ function ItemContainer({ item, is_org, selected }) {
               <Row className="d-none d-xxl-flex">
                 <Col className="pe-1" xs="auto">
                   <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
-                    <p className="mb-0">Source: {item.source}</p>
+                    <p className="mb-0">
+                      Source:{" "}
+                      {item.sources.length === 0 ? "-" : getShortSources()}
+                    </p>
                   </span>
                 </Col>
                 <Col className="ps-1">
                   <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
-                    <p className="mb-0">Ean: {item.EAN}</p>
+                    Ean: {getShortEan()}
                   </span>
                 </Col>
               </Row>
@@ -116,7 +173,15 @@ function ItemContainer({ item, is_org, selected }) {
           </Row>
         </Col>
         <Col xs="12" xl="4" className="px-0 pt-3 pt-xl-2 pb-2">
-          <ContainerButtons selected={selected} />
+          <ContainerButtons
+            selected={selected}
+            selectAction={() => {
+              selectQtyAction();
+            }}
+            unselectAction={() => {
+              unselectQtyAction();
+            }}
+          />
         </Col>
       </Row>
     </Container>
@@ -125,7 +190,9 @@ function ItemContainer({ item, is_org, selected }) {
 
 ItemContainer.PropTypes = {
   item: PropTypes.object.isRequired,
+  currency: PropTypes.string.isRequired,
   is_org: PropTypes.bool.isRequired,
+  addToSelectAction: PropTypes.func.isRequired,
   selected: PropTypes.bool.isRequired,
 };
 

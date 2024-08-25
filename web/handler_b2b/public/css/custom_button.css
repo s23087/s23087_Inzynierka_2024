@@ -5,13 +5,13 @@
 }
 
 .btn-mainBlue {
-  background-color: var(--main-blue);
-  color: var(--text-main-color);
+  background-color: var(--main-blue) !important;
+  color: var(--text-main-color) !important;
 }
 
 .btn-mainBlue:hover {
-  background-color: var(--main-blue-hover);
-  color: var(--text-main-color-hover);
+  background-color: var(--main-blue-hover) !important;
+  color: var(--text-main-color-hover) !important;
 }
 
 .btn-mainBlue:active {
@@ -20,13 +20,13 @@
 }
 
 .btn-secBlue {
-  background-color: var(--sec-blue);
-  color: var(--text-main-color);
+  background-color: var(--sec-blue) !important;
+  color: var(--text-main-color) !important;
 }
 
 .btn-secBlue:hover {
-  background-color: var(--sec-blue-hover);
-  color: var(--text-main-color-hover);
+  background-color: var(--sec-blue-hover) !important;
+  color: var(--text-main-color-hover) !important;
 }
 
 .btn-secBlue:active {

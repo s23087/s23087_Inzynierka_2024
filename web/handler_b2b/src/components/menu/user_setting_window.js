@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Container, Button, Stack } from "react-bootstrap";
 import Image from "next/image";
 import Link from "next/link";
+import logout from "@/utils/auth/logout";
 import NotificationBadge from "../smaller_components/notification_icon";
 import user_settings_icon from "../../../public/icons/user_settings_icon.png";
 
@@ -78,7 +79,12 @@ function UserSettingWindow({
               />
             </Container>
           </Container>
-          <Button variant="mainBlue" style={buttonStyle} className="mt-2">
+          <Button
+            variant="mainBlue"
+            style={buttonStyle}
+            className="mt-2"
+            onClick={() => logout()}
+          >
             Log out
           </Button>
         </Stack>

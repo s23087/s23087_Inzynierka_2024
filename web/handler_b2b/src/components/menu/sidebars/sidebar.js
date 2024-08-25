@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { Button, Offcanvas, Container, Row, Col, Stack } from "react-bootstrap";
 import Image from "next/image";
+import logout from "@/utils/auth/logout";
 import close_button from "../../../../public/icons/close_black.png";
 import user_settings_icon from "../../../../public/icons/user_settings_icon.png";
 
@@ -56,7 +57,11 @@ function CustomSidebar({
               <Stack gap={4}>{children}</Stack>
             </Col>
             <Col xs="12" className="align-self-end pb-5">
-              <Button variant="mainBlue" style={buttonStyle}>
+              <Button
+                variant="mainBlue"
+                style={buttonStyle}
+                onClick={() => logout()}
+              >
                 Log out
               </Button>
             </Col>

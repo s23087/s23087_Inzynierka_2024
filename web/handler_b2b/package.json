@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "bootstrap": "^5.3.3",
+    "jose": "^5.7.0",
     "next": "14.2.5",
     "react": "^18",
     "react-bootstrap": "^2.10.4",
@@ -19,8 +20,8 @@
     "swr": "^2.2.5"
   },
   "devDependencies": {
-    "eslint": "^8",
-    "eslint-config-next": "14.2.5",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.6",
     "prettier": "^3.3.3"
   }
 }

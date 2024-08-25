@@ -4,8 +4,8 @@ import { useState, useRef } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { useSearchParams } from "next/navigation";
 import registerUser from "@/utils/registration/submit_registration";
-import CountryOptions from "@/app/api/ui/country_options";
-import validators from "@/utils/registration/registration_validator";
+import CountryOptions from "./country_options";
+import validators from "@/utils/validators/validator";
 import PolicyOffcanvas from "./policy_offcanvas";
 
 function RegistrationForm() {

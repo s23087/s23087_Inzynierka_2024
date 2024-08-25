@@ -17,6 +17,7 @@ builder.Services.AddDbContext<HandlerContext>();
 builder.Services.AddScoped<IRegistrationServices, RegistrationServices>();
 builder.Services.AddScoped<IOrganizationServices, OrganizationServices>();
 builder.Services.AddScoped<IUserServices, UserServices>();
+builder.Services.AddScoped<IItemServices, ItemServices>();
 
 var app = builder.Build();
 

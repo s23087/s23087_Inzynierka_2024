@@ -88,6 +88,18 @@ body {
   max-width: 381px;
 }
 
+.minScalableWidth {
+  min-width: 381px;
+}
+
+.maxInputWidth {
+  max-width: 666px;
+}
+
+.maxInputWidth-desc {
+  max-width: 1587px;
+}
+
 /* Placement */
 
 .middleSectionPlacement {

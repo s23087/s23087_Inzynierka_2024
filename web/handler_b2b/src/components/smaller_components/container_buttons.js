@@ -1,14 +1,20 @@
 import PropTypes from "prop-types";
 import { Container, Row, Col, Button } from "react-bootstrap";
 
-function ContainerButtons({ selected, is_request = false }) {
+function ContainerButtons({
+  selected,
+  selectAction,
+  unselectAction,
+  is_request = false,
+}) {
   return (
     <Container className="h-100" fluid>
-      <Row className="align-items-center justify-content-center h-100">
+      <Row className="align-items-center justify-content-center justify-content-xl-end h-100">
         <Col className="pe-2" xs="3" sm="auto">
           <Button
             variant="mainBlue"
             className="basicButtonStyle rounded-span w-100 p-0"
+            onClick={selected ? unselectAction : selectAction}
           >
             {selected ? "Deselect" : "Select"}
           </Button>

@@ -1109,6 +1109,7 @@ public partial class HandlerContext : DbContext
                 .HasColumnName("info");
             entity.Property(e => e.ObjectTypeId).HasColumnName("object_type_id");
             entity.Property(e => e.UsersId).HasColumnName("users_id");
+            entity.Property(e => e.IsRead).HasColumnName("is_read").HasConversion<int>();
 
             entity.HasOne(d => d.ObjectType).WithMany(p => p.UserNotifications)
                 .HasForeignKey(d => d.ObjectTypeId)

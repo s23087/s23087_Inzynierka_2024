@@ -1,5 +1,6 @@
 ﻿using database_comunicator.Data;
 using database_comunicator.Models;
+using database_comunicator.Models.DTOs;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;

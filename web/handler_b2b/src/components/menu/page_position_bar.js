@@ -12,10 +12,10 @@ function PagePostionBar({ site_name, with_switch, switch_bool }) {
       direction="horizontal"
       style={barHeight}
     >
-      <Container className="me-auto ms-0 ms-xl-5">
+      <Container className="me-auto ms-0 ms-xl-3">
         <p className="mb-0 blue-main-text">{site_name}</p>
       </Container>
-      <Container className="w-auto me-0 me-xl-5">
+      <Container className="w-auto me-0 me-xl-3">
         {with_switch === true ? <OrgSwitcher is_org={switch_bool} /> : null}
       </Container>
     </Stack>

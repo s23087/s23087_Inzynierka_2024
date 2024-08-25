@@ -1,3 +1,5 @@
+"use server";
+
 export default async function createNewRegisteredUser(formData, dbName, isOrg) {
   let nip = formData.get("nip");
   nip = nip === "" ? null : parseInt(nip);
@@ -16,7 +18,7 @@ export default async function createNewRegisteredUser(formData, dbName, isOrg) {
   };
 
   let response = await fetch(
-    `http://localhost:5226/${dbName}/Registration/registerUser`,
+    `${process.env.API_DEST}/${dbName}/Registration/registerUser`,
     {
       method: "POST",
       headers: {
