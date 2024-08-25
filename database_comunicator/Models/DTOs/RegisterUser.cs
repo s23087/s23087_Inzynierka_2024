@@ -18,6 +18,6 @@
         public string PostalCode { get; set; } = null!;
         public string Country { get; set; } = null!;
         public string Password { get; set; } = null!;
-        public bool IsOrg { get; set; }
+        public required bool IsOrg { get; set; }
     }
 }
