@@ -17,7 +17,7 @@ function OrgSwitcher({ is_org }) {
       variant="as-link"
       className="p-0"
       onClick={() => {
-        is_org = !(is_org === "true");
+        is_org = is_org !== "true";
         accessParams.set("page", 1);
         accessParams.set("isOrg", is_org);
         router.push(`${pathName}?${accessParams}`);

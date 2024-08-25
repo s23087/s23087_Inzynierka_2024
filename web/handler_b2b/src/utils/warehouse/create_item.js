@@ -8,8 +8,8 @@ export default async function createItem(eans, state, formData) {
 
   try {
     let formatedEans = [];
-    for (let index = 0; index < eans.length; index++) {
-      formatedEans.push(parseInt(eans[index]));
+    for (const ean of eans) {
+      formatedEans.push(parseInt(ean));
     }
     data = {
       itemName: formData.get("name"),

@@ -28,9 +28,5 @@ export default async function createNewRegisteredUser(formData, dbName, isOrg) {
     },
   );
 
-  if (response.ok) {
-    return true;
-  }
-
-  return false;
+  return response.ok
 }
