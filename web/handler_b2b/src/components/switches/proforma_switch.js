@@ -9,28 +9,26 @@ import clients_proformas_icon from "../../../public/icons/clients_proformas_icon
 
 function ProformaSwitch({ boolean_value, switch_action }) {
   const menuRef = useRef(null);
+  const [closingBool, setClosingBool] = useState(false);
   const onOutside = (event) => {
     if (menuRef.current && !menuRef.current.contains(event.target)) {
-      closeSwitch();
+      setClosingBool(false);
     }
   };
   useEffect(() => {
     document.addEventListener("mousedown", onOutside);
     return () => document.removeEventListener("mousedown", onOutside);
   });
-  const [closingBool, setClosingBool] = useState(false);
-  const openSwitch = () => setClosingBool(true);
-  const closeSwitch = () => setClosingBool(false);
   const buttonAction = () => {
     switch_action();
-    closeSwitch();
+    setClosingBool(false)
   };
   return (
     <Dropdown className="mx-auto" drop="down-centered" show={closingBool}>
       <Dropdown.Toggle
         className="p-0 d-flex overflow-x-hidden toggle-style"
         variant="as-link"
-        onClick={openSwitch}
+        onClick={() => setClosingBool(true)}
       >
         {boolean_value ? (
           <Image src={clients_proformas_icon} alt="proforma switch icon" />

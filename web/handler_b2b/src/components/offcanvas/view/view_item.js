@@ -101,7 +101,7 @@ function ViewItemOffcanvas({
                 {isOrg && item.users.lenght > 0 ? (
                   <Form.Select>
                     {item.users.map((user) => {
-                      <option value={user}>{user}</option>;
+                      return <option value={user}>{user}</option>;
                     })}
                   </Form.Select>
                 ) : null}

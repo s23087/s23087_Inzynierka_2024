@@ -14,7 +14,7 @@ function DeliverySwitch({ boolean_value, switch_action }) {
       deliverySwitchRef.current &&
       !deliverySwitchRef.current.contains(event.target)
     ) {
-      closeSwitch();
+      setClosingBool(false)
     }
   };
   useEffect(() => {
@@ -22,18 +22,16 @@ function DeliverySwitch({ boolean_value, switch_action }) {
     return () => document.removeEventListener("mousedown", onOutside);
   });
   const [closingBool, setClosingBool] = useState(false);
-  const openSwitch = () => setClosingBool(true);
-  const closeSwitch = () => setClosingBool(false);
   const buttonAction = () => {
     switch_action();
-    closeSwitch();
+    setClosingBool(false);
   };
   return (
     <Dropdown className="mx-auto" drop="down-centered" show={closingBool}>
       <Dropdown.Toggle
         className="p-0 d-flex overflow-x-hidden toggle-style"
         variant="as-link"
-        onClick={openSwitch}
+        onClick={()=> setClosingBool(true)}
       >
         {boolean_value ? (
           <Image src={to_client_delivery_icon} alt="delivery switch icon" />

@@ -32,24 +32,24 @@ function ItemTable({ restInfo, isOurWarehouse }) {
       <tbody>
         {isOurWarehouse
           ? Object.entries(restInfo).map((key, value) => {
-              <tr key={key}>
+              return (<tr key={key}>
                 <td>
                   <p className="mb-0">
-                    \{value.organizationName + "\\n" + value.invoiceNumber}
+                    {value.organizationName + "\n" + value.invoiceNumber}
                   </p>
                 </td>
                 <td>{value.qty}</td>
                 <td>{value.price + " " + value.currency}</td>
-              </tr>;
+              </tr>);
             })
           : Object.entries(restInfo).map((key, value) => {
-              <tr key={key}>
+              return (<tr key={key}>
                 <td>
-                  <p className="mb-0">\{value.organizationName}</p>
+                  <p className="mb-0">{value.organizationName}</p>
                 </td>
                 <td>{value.qty}</td>
                 <td>{value.price + " " + value.currency}</td>
-              </tr>;
+              </tr>);
             })}
       </tbody>
       <thead>

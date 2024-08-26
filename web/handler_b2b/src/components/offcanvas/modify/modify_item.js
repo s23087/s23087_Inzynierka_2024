@@ -78,9 +78,6 @@ function ModifyItemOffcanvas({ showOffcanvas, hideFunction, item }) {
           if (state.complete && !state.error) {
             setIsLoading(false);
             setShowSuccessToast(true);
-            let form = document.getElementById("addItemForm");
-            form.reset();
-            setEans([]);
           }
           if (state.complete && state.error) {
             setIsLoading(false);
