@@ -1,5 +1,6 @@
 "use client";
 
+import PropTypes from "prop-types";
 import {
   Container,
   Row,
@@ -14,6 +15,11 @@ import SearchFilterBar from "../menu/search_filter_bar";
 import MoreActionWindow from "../windows/more_action";
 import AddItemOffcanvas from "../offcanvas/create/create_item";
 import { useSearchParams } from "next/navigation";
+import DeleteItemWindow from "../windows/delete_item";
+import ViewItemOffcanvas from "../offcanvas/view/view_item";
+import deleteItem from "@/utils/warehouse/delete_item";
+import { useRouter } from "next/navigation";
+import ModifyItemOffcanvas from "../offcanvas/modify/modify_item";
 
 function ProductList({
   products,
@@ -22,13 +28,33 @@ function ProductList({
   productStart,
   productEnd,
 }) {
+  // View Item
+  const [showViewItem, setShowViewItem] = useState(false);
+  const [itemToView, setItemToView] = useState({
+    eans: [],
+  });
+  // Modify Item
+  const [showModifyItem, setShowModifyItem] = useState(false);
+  const [itemToModify, setItemToModify] = useState({
+    eans: [],
+  });
+  // Delete item
+  const [showDeleteItem, setShowDeleteItem] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
+  const [isErrorDelete, setIsErrorDelete] = useState(false);
+  // More action
   const [showMoreAction, setShowMoreAction] = useState(false);
   const [isShowAddItem, setShowAddItem] = useState(false);
+  // Seleted
   const [selectedQty, setSelectedQty] = useState(0);
   const [selectedKeys] = useState([]);
+  // Selected bar button
   const [isClicked, setIsClicked] = useState(false);
+  // Nav
+  const router = useRouter();
   const params = useSearchParams();
   const accessibleParams = new URLSearchParams(params);
+  // Vars and styles
   let pagation = accessibleParams.get("pagation")
     ? accessibleParams.get("pagation")
     : 10;
@@ -100,12 +126,23 @@ function ProductList({
                 selectQtyAction={() => {
                   selectedKeys.push(value.itemId);
                   setSelectedQty(selectedQty + 1);
-                  console.log(selectedKeys);
                 }}
                 unselectQtyAction={() => {
                   let index = selectedKeys.indexOf(value.itemId);
                   selectedKeys.splice(index, 1);
                   setSelectedQty(selectedQty - 1);
+                }}
+                deleteAction={() => {
+                  setItemToDelete(value.itemId);
+                  setShowDeleteItem(true);
+                }}
+                viewAction={() => {
+                  setItemToView(value);
+                  setShowViewItem(true);
+                }}
+                modifyAction={() => {
+                  setItemToModify(value);
+                  setShowModifyItem(true);
                 }}
                 selected={selectedKeys.indexOf(value.itemId) !== -1}
                 key={value.itemId}
@@ -149,8 +186,45 @@ function ProductList({
         showOffcanvas={isShowAddItem}
         hideFunction={() => setShowAddItem(false)}
       />
+      <DeleteItemWindow
+        modalShow={showDeleteItem}
+        onHideFunction={() => setShowDeleteItem(false)}
+        instanceName="item"
+        instanceId={itemToDelete}
+        deleteItemFunc={async () => {
+          let result = await deleteItem(itemToDelete);
+          console.log(result);
+          if (result) {
+            setShowDeleteItem(false);
+            router.refresh();
+          } else {
+            setIsErrorDelete(true);
+          }
+        }}
+        isError={isErrorDelete}
+      />
+      <ViewItemOffcanvas
+        showOffcanvas={showViewItem}
+        hideFunction={() => setShowViewItem(false)}
+        item={itemToView}
+        currency={currency}
+        isOrg={orgView}
+      />
+      <ModifyItemOffcanvas
+        showOffcanvas={showModifyItem}
+        hideFunction={() => setShowModifyItem(false)}
+        item={itemToModify}
+      />
     </Container>
   );
 }
+
+ProductList.PropTypes = {
+  products: PropTypes.object.isRequired,
+  orgView: PropTypes.bool.isRequired,
+  currency: PropTypes.string.isRequired,
+  productStart: PropTypes.number.isRequired,
+  productEnd: PropTypes.number.isRequired,
+};
 
 export default ProductList;

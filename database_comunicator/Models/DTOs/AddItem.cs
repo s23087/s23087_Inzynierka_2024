@@ -2,6 +2,7 @@
 {
     public class AddItem
     {
+        public int UserId { get; set; }
         public string ItemName { get; set; } = null!;
 
         public string ItemDescription { get; set; } = null!;

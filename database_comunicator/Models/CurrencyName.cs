@@ -10,4 +10,5 @@ public partial class CurrencyName
     public virtual ICollection<CurrencyValue> CurrencyValues { get; set; } = new List<CurrencyValue>();
 
     public virtual ICollection<PurchasePrice> PurchasePrices { get; set; } = new List<PurchasePrice>();
+    public virtual ICollection<OutsideItem> OutsideItems { get; set; } = new List<OutsideItem>();
 }

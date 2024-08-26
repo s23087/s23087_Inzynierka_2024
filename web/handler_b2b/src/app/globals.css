@@ -8,6 +8,7 @@
 @import "../../public/css/custom_input.css";
 @import "../../public/css/custom_border.css";
 @import "../../public/css/container_styles.css";
+@import "../../public/css/custom_tables.css";
 
 :root {
   --foreground-rgb: 0, 0, 0;
@@ -89,7 +90,7 @@ body {
 }
 
 .minScalableWidth {
-  min-width: 381px;
+  min-width: 360px;
 }
 
 .maxInputWidth {

@@ -5,6 +5,11 @@ function ContainerButtons({
   selected,
   selectAction,
   unselectAction,
+  deleteAction,
+  viewAction,
+  modifyAction,
+  completeAction,
+  rejectAction,
   is_request = false,
 }) {
   return (
@@ -23,6 +28,7 @@ function ContainerButtons({
           <Button
             variant={is_request ? "mainBlue" : "red"}
             className="basicButtonStyle rounded-span w-100"
+            onClick={is_request ? viewAction : deleteAction}
           >
             {is_request ? "View" : "Delete"}
           </Button>
@@ -31,6 +37,7 @@ function ContainerButtons({
           <Button
             variant={is_request ? "green" : "mainBlue"}
             className="basicButtonStyle rounded-span w-100 p-0"
+            onClick={is_request ? completeAction : viewAction}
           >
             {is_request ? "Complete" : "View"}
           </Button>
@@ -39,6 +46,7 @@ function ContainerButtons({
           <Button
             variant={is_request ? "red" : "mainBlue"}
             className="basicButtonStyle rounded-span w-100"
+            onClick={is_request ? rejectAction : modifyAction}
           >
             {is_request ? "Reject" : "Modify"}
           </Button>
@@ -50,6 +58,13 @@ function ContainerButtons({
 
 ContainerButtons.propTypes = {
   selected: PropTypes.bool.isRequired,
+  selectAction: PropTypes.func,
+  unselectAction: PropTypes.func,
+  deleteAction: PropTypes.func,
+  viewAction: PropTypes.func,
+  modifyAction: PropTypes.func,
+  completeAction: PropTypes.func,
+  rejectAction: PropTypes.func,
   is_request: PropTypes.bool.isRequired,
 };
 

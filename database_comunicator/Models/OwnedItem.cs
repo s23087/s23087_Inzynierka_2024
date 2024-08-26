@@ -22,4 +22,5 @@ public partial class OwnedItem
     public virtual ICollection<ProformaOwnedItem> ProformaOwnedItems { get; set; } = new List<ProformaOwnedItem>();
 
     public virtual ICollection<PurchasePrice> PurchasePrices { get; set; } = new List<PurchasePrice>();
+    public virtual ICollection<SoldItem> SoldItems { get; set; } = new List<SoldItem>();
 }

@@ -3,6 +3,7 @@
 import PropTypes from "prop-types";
 import Image from "next/image";
 import { Container, Row, Col } from "react-bootstrap";
+import getStatusColor from "@/utils/warehouse/get_status_color";
 import ContainerButtons from "../smaller_components/container_buttons";
 import user_small_icon from "../../../public/icons/user_small_icon.png";
 
@@ -12,20 +13,14 @@ function ItemContainer({
   is_org,
   selectQtyAction,
   unselectQtyAction,
+  deleteAction,
+  viewAction,
+  modifyAction,
+  completeAction,
+  rejectAction,
   selected,
 }) {
-  const getStatusColor = () => {
-    switch (item.statusName) {
-      case "In delivery":
-        return "var(--main-yellow)";
-      case "On request":
-        return "var(--sec-red)";
-      case "Unavailable":
-        return "var(--sec-grey)";
-    }
-    return "var(--main-green)";
-  };
-  let statusColor = getStatusColor();
+  let statusColor = getStatusColor(item.statusName);
   const containerBg = {
     backgroundColor: "var(--sec-blue)",
   };
@@ -181,6 +176,11 @@ function ItemContainer({
             unselectAction={() => {
               unselectQtyAction();
             }}
+            deleteAction={deleteAction}
+            viewAction={viewAction}
+            modifyAction={modifyAction}
+            completeAction={completeAction}
+            rejectAction={rejectAction}
           />
         </Col>
       </Row>
@@ -192,7 +192,13 @@ ItemContainer.PropTypes = {
   item: PropTypes.object.isRequired,
   currency: PropTypes.string.isRequired,
   is_org: PropTypes.bool.isRequired,
-  addToSelectAction: PropTypes.func.isRequired,
+  selectQtyAction: PropTypes.func,
+  unselectQtyAction: PropTypes.func,
+  deleteAction: PropTypes.func,
+  viewAction: PropTypes.func,
+  modifyAction: PropTypes.func,
+  completeAction: PropTypes.func,
+  rejectAction: PropTypes.func,
   selected: PropTypes.bool.isRequired,
 };
 

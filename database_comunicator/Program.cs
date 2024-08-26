@@ -18,6 +18,7 @@ builder.Services.AddScoped<IRegistrationServices, RegistrationServices>();
 builder.Services.AddScoped<IOrganizationServices, OrganizationServices>();
 builder.Services.AddScoped<IUserServices, UserServices>();
 builder.Services.AddScoped<IItemServices, ItemServices>();
+builder.Services.AddScoped<ILogServices, LogServices>();
 
 var app = builder.Build();
 

@@ -56,4 +56,5 @@ public partial class Invoice
     public virtual Taxis TaxesNavigation { get; set; } = null!;
 
     public virtual ICollection<Request> Requests { get; set; } = new List<Request>();
+    public virtual ICollection<SoldItem> SoldItems { get; set; } = new List<SoldItem>();
 }

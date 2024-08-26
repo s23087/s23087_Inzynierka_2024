@@ -76,6 +76,7 @@ public partial class HandlerContext : DbContext
     public virtual DbSet<OutsideItemOffer> OutsideItemOffers { get; set; }
 
     public virtual DbSet<OwnedItem> OwnedItems { get; set; }
+    public virtual DbSet<SoldItem> SoldItems { get; set; }
 
     public virtual DbSet<PaymentMethod> PaymentMethods { get; set; }
 
@@ -729,11 +730,17 @@ public partial class HandlerContext : DbContext
                 .HasColumnType("decimal(20, 2)")
                 .HasColumnName("purchase_price");
             entity.Property(e => e.Qty).HasColumnName("qty");
+            entity.Property(e => e.Curenncy).HasColumnName("currency_name");
 
             entity.HasOne(d => d.Item).WithMany(p => p.OutsideItems)
                 .HasForeignKey(d => d.ItemId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Outside_Item_Item_relation");
+
+            entity.HasOne(d => d.CurrencyName).WithMany(p => p.OutsideItems)
+                .HasForeignKey(d => d.Curenncy)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Outside_Item_Currency_relation");
 
             entity.HasOne(d => d.Organization).WithMany(p => p.OutsideItems)
                 .HasForeignKey(d => d.OrganizationId)
@@ -784,6 +791,29 @@ public partial class HandlerContext : DbContext
                 .HasForeignKey(d => new { d.OutsideItemId, d.OrganizationId })
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Outside_Item_Offer_Outside_Item_relation");
+        });
+
+        modelBuilder.Entity<SoldItem>(entity =>
+        {
+            entity.HasKey(e => new { e.OwnedItemId, e.PurchaseInvoiceId, e.SellInvoiceId }).HasName("Sold_Item_pk");
+
+            entity.ToTable("Sold_Item");
+
+            entity.Property(e => e.OwnedItemId).HasColumnName("owned_item_id");
+            entity.Property(e => e.SellInvoiceId).HasColumnName("sell_invoice_id");
+            entity.Property(e => e.PurchaseInvoiceId).HasColumnName("purchase_invoice_id");
+            entity.Property(e => e.Qty).HasColumnName("qty");
+            entity.Property(e => e.SellingPrice).HasColumnName("selling_price").HasColumnType("decimal(20,2)");
+
+            entity.HasOne(d => d.SellInvoice).WithMany(p => p.SoldItems)
+                .HasForeignKey(d => d.SellInvoiceId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Sold_items_sell_Invoice_realtion");
+
+            entity.HasOne(d => d.OwnedItemNavigation).WithMany(p => p.SoldItems)
+                .HasForeignKey(d => new { d.OwnedItemId, d.PurchaseInvoiceId })
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Sold_items_Owned_Item_realtion");
         });
 
         modelBuilder.Entity<OwnedItem>(entity =>
