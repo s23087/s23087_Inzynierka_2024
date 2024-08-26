@@ -95,19 +95,19 @@ namespace database_comunicator.Services
         public async Task<IEnumerable<GetManyItems>> GetItems(string currency)
         {
             List<GetManyItems> items = await _handlerContext.Items
-                .Include(a => a.Eans)
-                .Include(b => b.OwnedItems)
+                .Include(ent => ent.Eans)
+                .Include(ent => ent.OwnedItems)
                     .ThenInclude(c => c.Invoice)
                         .ThenInclude(h => h.Deliveries)
-                .Include(j => j.OwnedItems)
+                .Include(ent => ent.OwnedItems)
                     .ThenInclude(k => k.Invoice)
                         .ThenInclude(h => h.SellerNavigation)
-                .Include(d => d.OwnedItems)
+                .Include(ent => ent.OwnedItems)
                     .ThenInclude(e => e.PurchasePrices.Where(pur => pur.Curenncy == currency))
-                .Include(f => f.OwnedItems)
+                .Include(ent => ent.OwnedItems)
                     .ThenInclude(g => g.ItemOwners)
                         .ThenInclude(k => k.IdUserNavigation)
-                .Include(i => i.OutsideItems)
+                .Include(ent => ent.OutsideItems)
                 .Select(inst => new GetManyItems
                 {
                     Users = inst.OwnedItems.Select(e => e.ItemOwners.Select(e => e.IdUserNavigation.Username).First()),
