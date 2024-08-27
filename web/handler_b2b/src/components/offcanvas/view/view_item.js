@@ -146,10 +146,9 @@ function ViewItemOffcanvas({
                   />
                 ) : (
                   <div
-                    class="spinner-border blue-main-text text-center"
-                    role="status"
+                    className="spinner-border blue-main-text text-center"
                   >
-                    <span class="visually-hidden">Loading...</span>
+                    <span className="visually-hidden">Loading...</span>
                   </div>
                 )}
               </Container>

@@ -376,7 +376,6 @@ namespace database_comunicator.Services
                     Price = inst.PurchasePrices.Where(e => e.Curenncy.Equals(currency)).Select(e => e.PurchasePrice1).ToList()[0],
                     InvoiceNumber = inst.Invoice.InvoiceNumber
                 }).ToListAsync();
-            var desc = await GetDescription(id);
             binding.AddRange(noUserItem);
             return binding;
         }
