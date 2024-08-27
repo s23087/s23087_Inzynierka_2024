@@ -9,23 +9,33 @@ import {
   Form,
   Stack,
 } from "react-bootstrap";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useFormState } from "react-dom";
-import createItem from "@/utils/warehouse/create_item";
+import updateItem from "@/utils/warehouse/update_item";
 import SpecialInput from "@/components/smaller_components/special_input";
 import BindingInput from "@/components/smaller_components/binding_input";
 import AddEanWindow from "@/components/windows/addEan";
 import Toastes from "@/components/smaller_components/toast";
 import { useRouter } from "next/navigation";
+import getDescription from "@/utils/warehouse/get_description";
+import getBindings from "@/utils/warehouse/get_bindings";
 import CloseIcon from "../../../../public/icons/close_black.png";
 import switch_product_view from "../../../../public/icons/switch_product_view.png";
 import switch_binding_view from "../../../../public/icons/switch_binding_view.png";
 
-function ModifyItemOffcanvas({ showOffcanvas, hideFunction, item }) {
+function ModifyItemOffcanvas({
+  showOffcanvas,
+  hideFunction,
+  item,
+  curenncy,
+  isOrg,
+}) {
   const router = useRouter();
+  // View change
   const [isProductView, setIsProductView] = useState(true);
-  const [eans, setEans] = useState(item.eans);
-  const [bindings] = useState([
+  const [eans, setEans] = useState([]);
+  // Get data
+  const [bindings, setBindings] = useState([
     {
       username: "user name",
       qty: "qty",
@@ -34,18 +44,54 @@ function ModifyItemOffcanvas({ showOffcanvas, hideFunction, item }) {
       invoiceNumber: "invoice number",
     },
   ]);
+  const [description, setDescription] = useState(null);
+  useEffect(() => {
+    if (showOffcanvas && isOrg) {
+      let copyArray = [...item.eans];
+      setEans(copyArray);
+      let desc = getDescription(item.itemId);
+      desc.then((data) => setDescription(data));
+      let bindings = getBindings(item.itemId, curenncy);
+      bindings.then((data) => setBindings(data));
+    } else {
+      let copyArray = [...item.eans];
+      setEans(copyArray);
+      let desc = getDescription(item.itemId);
+      desc.then((data) => setDescription(data));
+    }
+  }, [
+    showOffcanvas,
+    curenncy,
+    item.itemId,
+    setDescription,
+    setBindings,
+    item.eans,
+    isOrg,
+  ]);
+  // Rerender Eans
   const [rerenderVar, setRerenderVar] = useState(1);
   const eanExist = (variable) => {
     return eans.findIndex((item) => item === variable) != -1;
   };
+  // Add ean window
   const [isAddEanShow, setIsAddEanShow] = useState(false);
+  // Loading bool
   const [isLoading, setIsLoading] = useState(false);
+  // Toastes
   const [showErrorToast, setShowErrorToast] = useState(false);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
-  const [state, formAction] = useFormState(createItem.bind(null, eans), {
-    error: false,
-    complete: false,
-  });
+  const [toastIsClosed, setToastIsClosed] = useState(false);
+  // Form
+  const [prevState, setPrevState] = useState({});
+  const [state, formAction] = useFormState(
+    updateItem.bind(null, eans).bind(null, prevState),
+    {
+      error: false,
+      complete: false,
+      message: "",
+    },
+  );
+  // Styles
   const maxStyle = {
     maxWidth: "393px",
   };
@@ -61,7 +107,6 @@ function ModifyItemOffcanvas({ showOffcanvas, hideFunction, item }) {
     display: "block",
     height: "81vh",
   };
-  const [toastIsClosed, setToastIsClosed] = useState(false);
   return (
     <Offcanvas
       className="h-100 minScalableWidth"
@@ -104,6 +149,7 @@ function ModifyItemOffcanvas({ showOffcanvas, hideFunction, item }) {
                     src={
                       isProductView ? switch_product_view : switch_binding_view
                     }
+                    style={isOrg ? unhidden : hidden}
                     alt="switch view"
                   />
                 </Button>
@@ -152,7 +198,7 @@ function ModifyItemOffcanvas({ showOffcanvas, hideFunction, item }) {
                   maxLength={250}
                 />
               </Form.Group>
-              <Form.Group className="mb-3" controlId="formEans">
+              <Form.Group className="mb-3" controlId="formEans" key={eans}>
                 <Stack key={rerenderVar}>
                   <Form.Label className="blue-main-text">EANs:</Form.Label>
                   {eans.map((value, key) => {
@@ -190,7 +236,11 @@ function ModifyItemOffcanvas({ showOffcanvas, hideFunction, item }) {
                   />
                 </Stack>
               </Form.Group>
-              <Form.Group className="mb-5" controlId="formDescription">
+              <Form.Group
+                className="mb-5"
+                controlId="formDescription"
+                key={description}
+              >
                 <Form.Label className="blue-main-text maxInputWidth-desc">
                   Description:
                 </Form.Label>
@@ -200,9 +250,7 @@ function ModifyItemOffcanvas({ showOffcanvas, hideFunction, item }) {
                   rows={5}
                   type="text"
                   name="description"
-                  defaultValue={
-                    item.itemDescription ? item.itemDescription : "Loading.."
-                  }
+                  defaultValue={description ? description : "Loading.."}
                   maxLength={500}
                 />
               </Form.Group>
@@ -216,7 +264,7 @@ function ModifyItemOffcanvas({ showOffcanvas, hideFunction, item }) {
             <Form>
               <Form.Group className="mb-5" controlId="formDescription">
                 <Form.Label className="blue-main-text maxInputWidth">
-                  Users: {bindings.username}
+                  Users:
                 </Form.Label>
                 {bindings.map((value) => {
                   return <BindingInput value={value} key={value} />;
@@ -226,6 +274,8 @@ function ModifyItemOffcanvas({ showOffcanvas, hideFunction, item }) {
                 variant="mainBlue"
                 className="mb-3 mt-2 ms-3 py-3 w-100"
                 style={buttonStyle}
+                disabled={bindings.length == 0}
+                key={bindings}
                 type="sumbit"
               >
                 Save
@@ -240,9 +290,14 @@ function ModifyItemOffcanvas({ showOffcanvas, hideFunction, item }) {
                   className="w-100"
                   onClick={(e) => {
                     e.preventDefault();
+                    setPrevState({
+                      itemId: item.itemId,
+                      name: item.itemName,
+                      description: description,
+                      partNumber: item.partNumber,
+                    });
                     setIsLoading(true);
                     setToastIsClosed(false);
-
                     let form = document.getElementById("modifyItemForm");
                     form.requestSubmit();
                   }}
@@ -275,7 +330,7 @@ function ModifyItemOffcanvas({ showOffcanvas, hideFunction, item }) {
 
         <Toastes.ErrorToast
           showToast={showErrorToast}
-          message="Could not create item"
+          message={state.message}
           onHideFun={() => {
             setToastIsClosed(true);
             setShowErrorToast(false);
@@ -283,7 +338,7 @@ function ModifyItemOffcanvas({ showOffcanvas, hideFunction, item }) {
         />
         <Toastes.SuccessToast
           showToast={showSuccessToast}
-          message="Item succesfuly created."
+          message="Item succesfuly updated."
           onHideFun={() => {
             setToastIsClosed(true);
             setShowSuccessToast(false);
@@ -297,6 +352,9 @@ function ModifyItemOffcanvas({ showOffcanvas, hideFunction, item }) {
 ModifyItemOffcanvas.PropTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
+  item: PropTypes.object.isRequired,
+  curenncy: PropTypes.string.isRequired,
+  isOrg: PropTypes.bool.isRequired,
 };
 
 export default ModifyItemOffcanvas;

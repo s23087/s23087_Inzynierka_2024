@@ -65,8 +65,8 @@ export default function AbstractItemsPage() {
 
       <section className="h-100">
         <Container className="p-0" style={itemSectionStyle} fluid>
-          <AbstractItemContainer item={tmp_item} selected={false} />
-          <AbstractItemContainer item={tmp_item} selected={true} />
+          <AbstractItemContainer abstract_item={tmp_item} selected={false} />
+          <AbstractItemContainer abstract_item={tmp_item} selected={true} />
         </Container>
       </section>
 

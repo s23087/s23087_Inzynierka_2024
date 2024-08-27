@@ -45,7 +45,7 @@ function InvoiceSwitch({ type, switch_action, is_role_solo }) {
   const [closingBool, setClosingBool] = useState(false);
   const onOutside = (event) => {
     if (menuRef.current && !menuRef.current.contains(event.target)) {
-      setClosingBool(false)
+      setClosingBool(false);
     }
   };
   useEffect(() => {
@@ -74,7 +74,7 @@ function InvoiceSwitch({ type, switch_action, is_role_solo }) {
                 className="p-0 text-start"
                 onClick={() => {
                   switch_action(element);
-                  setClosingBool(false)
+                  setClosingBool(false);
                 }}
                 key={element}
               >

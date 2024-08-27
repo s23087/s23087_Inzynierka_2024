@@ -14,12 +14,15 @@ namespace database_comunicator.Services
         public Task<bool> RemoveItem(int id);
         public Task<bool> ItemExist(int id);
         public Task<bool> ItemExist(string partNumber);
-        public Task<bool> EanExist(IEnumerable<int> eans);
+        public Task<bool> EanExist(IEnumerable<string> eans);
         public Task<IEnumerable<GetManyItems>> GetItems(string currency);
         public Task<IEnumerable<GetManyItems>> GetItems(string currency, string search);
         public Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId);
         public Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId, string search);
         public Task<GetRestInfo> GetRestOfItem(int id, string currency);
+        public Task<IEnumerable<GetRestInfoOrg>> GetRestOfItemOrg(int id, string currency);
+        public Task<IEnumerable<GetBinding>> GetModifyRestOfItem(int id, string currency);
+        public Task<string> GetDescription(int id);
     }
     public class ItemServices : IItemServices
     {
@@ -42,7 +45,7 @@ namespace database_comunicator.Services
 
             await _handlerContext.Eans.AddRangeAsync(newItem.Eans.Select(ean => new Ean
             {
-                Ean1 = ean,
+                EanValue = ean,
                 ItemId = item.ItemId
             }));
             await _handlerContext.SaveChangesAsync();
@@ -50,14 +53,13 @@ namespace database_comunicator.Services
             return item;
         }
 
-        public async Task<bool> EanExist(IEnumerable<int> eans)
+        public async Task<bool> EanExist(IEnumerable<string> eans)
         {
-            return await _handlerContext.Eans.Where(e => eans.Contains(e.Ean1)).AnyAsync();
+            return await _handlerContext.Eans.Where(e => eans.Contains(e.EanValue)).AnyAsync();
         }
 
         public async Task<GetRestInfo> GetRestOfItem(int id, string currency)
         {
-            var desc = await _handlerContext.Items.Where(e => e.ItemId == id).Select(e => e.ItemDescription).ToListAsync();
             var outsideItems = await _handlerContext.OutsideItems
                 .Where(e => e.ItemId == id)
                 .Include(e => e.Organization)
@@ -86,11 +88,47 @@ namespace database_comunicator.Services
 
             return new GetRestInfo
             {
-                ItemDescription = desc[0],
                 OutsideItemInfos = outsideItems,
                 OwnedItemInfos = ownedItems
             };
 
+        }
+        public async Task<IEnumerable<GetRestInfoOrg>> GetRestOfItemOrg(int id, string currency)
+        {
+            var result = await _handlerContext.AppUsers
+                .Include(e => e.ItemOwners)
+                 .ThenInclude(e => e.OwnedItem)
+                    .ThenInclude(e => e.Invoice)
+                        .ThenInclude(e => e.SellerNavigation)
+                .Include(e => e.ItemOwners)
+                 .ThenInclude(e => e.OwnedItem)
+                    .ThenInclude(e => e.PurchasePrices)
+                .Include(e => e.Os)
+                    .ThenInclude(e => e.Organization)
+                        .ThenInclude(e => e.AvailabilityStatuses)
+                .Select(instance => new GetRestInfoOrg
+                {
+                    UserId = instance.IdUser,
+                    Username = instance.Username,
+                    OutsideItemInfos = instance.Os.Select(e => new GetRestItemInfo
+                    {
+                        OrganizationName = e.Organization.OrgName,
+                        Qty = e.Qty,
+                        DaysForRealization = e.Organization.AvailabilityStatuses.Select(e => e.DaysForRealization).ToList()[0],
+                        Price = e.PurchasePrice,
+                        Curenncy = e.CurrencyName.Curenncy
+                    }).ToList(),
+                    OwnedItemInfos = instance.ItemOwners.Select(e => new GetRestItemInfo
+                    {
+                        OrganizationName = e.OwnedItem.Invoice.SellerNavigation.OrgName,
+                        InvoiceNumber = e.OwnedItem.Invoice.InvoiceNumber,
+                        Qty = e.Qty,
+                        Price = e.OwnedItem.PurchasePrices.Where(e => e.Curenncy.Equals(currency)).Select(e => e.PurchasePrice1).ToList()[0],
+                        Curenncy = currency
+                    }).ToList()
+                }).ToListAsync();
+
+            return result;
         }
         public async Task<IEnumerable<GetManyItems>> GetItems(string currency)
         {
@@ -119,7 +157,7 @@ namespace database_comunicator.Services
                             instance.OutsideItems.Select(e => e.Qty).Sum(),
                             instance.OwnedItems.Select(e => e.Invoice.Deliveries).Any()
                         ),
-                    Eans = instance.Eans.Select(e => e.Ean1),
+                    Eans = instance.Eans.Select(e => e.EanValue),
                     Qty = instance.OwnedItems.Select(e => e.Qty).Sum() + instance.OutsideItems.Select(e => e.Qty).Sum(),
                     PurchasePrice = instance.OwnedItems.Select(e => e.PurchasePrices.Select(pur => pur.PurchasePrice1).Average()).First(),
                     Sources = instance.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation.OrgName)
@@ -155,7 +193,7 @@ namespace database_comunicator.Services
                             instc.OutsideItems.Select(e => e.Qty).Sum(),
                             instc.OwnedItems.Select(e => e.Invoice.Deliveries).Any()
                         ),
-                    Eans = instc.Eans.Select(e => e.Ean1),
+                    Eans = instc.Eans.Select(e => e.EanValue),
                     Qty = instc.OwnedItems.Select(e => e.Qty).Sum() + instc.OutsideItems.Select(e => e.Qty).Sum(),
                     PurchasePrice = instc.OwnedItems.Select(e => e.PurchasePrices.Select(pur => pur.PurchasePrice1).Average()).First(),
                     Sources = instc.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation.OrgName)
@@ -188,7 +226,7 @@ namespace database_comunicator.Services
                             inst.OutsideItems.Select(e => e.Qty).Sum(),
                             inst.OwnedItems.Select(e => e.Invoice.Deliveries).Any()
                         ),
-                    Eans = inst.Eans.Select(e => e.Ean1),
+                    Eans = inst.Eans.Select(e => e.EanValue),
                     Qty = inst.OwnedItems.Select(e => e.Qty).Sum() + inst.OutsideItems.Select(e => e.Qty).Sum(),
                     PurchasePrice = inst.OwnedItems.Select(e => e.PurchasePrices.Select(pur => pur.PurchasePrice1).Average()).First(),
                     Sources = inst.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation.OrgName)
@@ -222,7 +260,7 @@ namespace database_comunicator.Services
                             obj.OutsideItems.Select(e => e.Qty).Sum(),
                             obj.OwnedItems.Select(e => e.Invoice.Deliveries).Any()
                         ),
-                    Eans = obj.Eans.Select(e => e.Ean1),
+                    Eans = obj.Eans.Select(e => e.EanValue),
                     Qty = obj.OwnedItems.Select(e => e.Qty).Sum() + obj.OutsideItems.Select(e => e.Qty).Sum(),
                     PurchasePrice = obj.OwnedItems.Select(e => e.PurchasePrices.Select(pur => pur.PurchasePrice1).Average()).First(),
                     Sources = obj.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation.OrgName)
@@ -265,15 +303,15 @@ namespace database_comunicator.Services
         {
             if (!postItem.Eans.IsNullOrEmpty())
             {
-                var toDeleteEans = await _handlerContext.Eans.Where(e => e.ItemId == postItem.Id && !postItem.Eans.Contains(e.Ean1)).ToArrayAsync();
+                var toDeleteEans = await _handlerContext.Eans.Where(e => e.ItemId == postItem.Id && !postItem.Eans.Contains(e.EanValue)).ToArrayAsync();
                 _handlerContext.Eans.RemoveRange(toDeleteEans);
-                var restEans = await _handlerContext.Eans.Where(e => e.ItemId == postItem.Id && postItem.Eans.Contains(e.Ean1)).Select(e => e.Ean1).ToArrayAsync();
+                var restEans = await _handlerContext.Eans.Where(e => e.ItemId == postItem.Id && postItem.Eans.Contains(e.EanValue)).Select(e => e.EanValue).ToArrayAsync();
                 var eanToAdd = postItem.Eans.Where(e => !restEans.Contains(e)).ToArray();
                 if (!eanToAdd.IsNullOrEmpty())
                 {
                     _handlerContext.Eans.AddRange(eanToAdd.Select(e => new Ean
                     {
-                        Ean1 = e,
+                        EanValue = e,
                         ItemId = postItem.Id
                     }));
                 }
@@ -306,6 +344,46 @@ namespace database_comunicator.Services
 
             await _handlerContext.SaveChangesAsync();
 
+        }
+        public async Task<IEnumerable<GetBinding>> GetModifyRestOfItem(int id, string currency)
+        {
+            var binding = await _handlerContext.ItemOwners
+                .Where(e => e.OwnedItemId == id)
+                .Include(e => e.IdUserNavigation)
+                .Include(e => e.OwnedItem)
+                    .ThenInclude(e => e.Invoice)
+                .Include(e => e.OwnedItem)
+                    .ThenInclude(e => e.PurchasePrices)
+                .Select(res => new GetBinding
+                {
+                    UserId = res.IdUser,
+                    Username = res.IdUserNavigation.Username,
+                    Qty = res.Qty,
+                    Price = res.OwnedItem.PurchasePrices.Where(e => e.Curenncy.Equals(currency)).Select(e => e.PurchasePrice1).ToList()[0],
+                    InvoiceNumber = res.OwnedItem.Invoice.InvoiceNumber
+
+                }).ToListAsync();
+            var noUserItem = await _handlerContext.OwnedItems
+                .Where(e => e.OwnedItemId == id)
+                .Include(e => e.Invoice)
+                .Include(e => e.PurchasePrices)
+                .Include(e => e.ItemOwners)
+                .Select(inst => new GetBinding
+                {
+                    UserId = null,
+                    Username = null,
+                    Qty = inst.Qty - inst.ItemOwners.Select(e => e.Qty).Sum(),
+                    Price = inst.PurchasePrices.Where(e => e.Curenncy.Equals(currency)).Select(e => e.PurchasePrice1).ToList()[0],
+                    InvoiceNumber = inst.Invoice.InvoiceNumber
+                }).ToListAsync();
+            var desc = await GetDescription(id);
+            binding.AddRange(noUserItem);
+            return binding;
+        }
+        public async Task<string> GetDescription(int id)
+        {
+            var result = await _handlerContext.Items.Where(e => e.ItemId == id).Select(e => e.ItemDescription).ToListAsync();
+            return result[0];
         }
     }
 }

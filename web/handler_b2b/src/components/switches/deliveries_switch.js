@@ -14,7 +14,7 @@ function DeliverySwitch({ boolean_value, switch_action }) {
       deliverySwitchRef.current &&
       !deliverySwitchRef.current.contains(event.target)
     ) {
-      setClosingBool(false)
+      setClosingBool(false);
     }
   };
   useEffect(() => {
@@ -31,7 +31,7 @@ function DeliverySwitch({ boolean_value, switch_action }) {
       <Dropdown.Toggle
         className="p-0 d-flex overflow-x-hidden toggle-style"
         variant="as-link"
-        onClick={()=> setClosingBool(true)}
+        onClick={() => setClosingBool(true)}
       >
         {boolean_value ? (
           <Image src={to_client_delivery_icon} alt="delivery switch icon" />

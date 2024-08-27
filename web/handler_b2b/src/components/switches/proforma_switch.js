@@ -21,7 +21,7 @@ function ProformaSwitch({ boolean_value, switch_action }) {
   });
   const buttonAction = () => {
     switch_action();
-    setClosingBool(false)
+    setClosingBool(false);
   };
   return (
     <Dropdown className="mx-auto" drop="down-centered" show={closingBool}>

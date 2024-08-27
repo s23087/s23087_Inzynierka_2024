@@ -16,10 +16,10 @@ function AbstractItemPostionBar({ site_name }) {
       direction="horizontal"
       style={barHeight}
     >
-      <Container className="me-auto ms-0 ms-xl-5">
+      <Container className="me-auto ms-0 ms-xl-3">
         <p className="mb-0 blue-main-text">{site_name}</p>
       </Container>
-      <Container className="w-auto me-0 me-xl-5">
+      <Container className="w-auto me-0 me-xl-3">
         <Link href="settings">
           <Button variant="mainBlue" style={buttonStyle}>
             Go back

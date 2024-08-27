@@ -5,7 +5,7 @@ namespace database_comunicator.Models;
 
 public partial class Ean
 {
-    public int Ean1 { get; set; }
+    public string EanValue { get; set; } = null!;
 
     public int ItemId { get; set; }
 

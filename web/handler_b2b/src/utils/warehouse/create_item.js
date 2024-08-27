@@ -5,24 +5,15 @@ import getUserId from "../auth/get_user_id";
 import validators from "../validators/validator";
 
 export default async function createItem(eans, state, formData) {
-  let data = {};
   const userId = await getUserId();
-  try {
-    let formatedEans = [];
-    for (const ean of eans) {
-      formatedEans.push(parseInt(ean));
-    }
-    data = {
-      userId: userId,
-      itemName: formData.get("name"),
-      itemDescription: formData.get("description"),
-      partNumber: formData.get("partNumber"),
-      eans: formatedEans,
-    };
-  } catch (error) {
-    console.log(error);
-    return { error: true, complete: true };
-  }
+  let data = {
+    userId: userId,
+    itemName: formData.get("name"),
+    itemDescription: formData.get("description"),
+    partNumber: formData.get("partNumber"),
+    eans: eans,
+  };
+
   if (
     !validators.lengthSmallerThen(data.itemName, 250) ||
     !validators.stringIsNotEmpty(data.itemName)

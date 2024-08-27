@@ -214,6 +214,8 @@ function ProductList({
         showOffcanvas={showModifyItem}
         hideFunction={() => setShowModifyItem(false)}
         item={itemToModify}
+        curenncy={currency}
+        isOrg={orgView}
       />
     </Container>
   );

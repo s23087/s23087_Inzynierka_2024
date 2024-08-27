@@ -417,11 +417,11 @@ public partial class HandlerContext : DbContext
 
         modelBuilder.Entity<Ean>(entity =>
         {
-            entity.HasKey(e => e.Ean1).HasName("EAN_pk");
+            entity.HasKey(e => e.EanValue).HasName("EAN_pk");
 
             entity.ToTable("EAN");
 
-            entity.Property(e => e.Ean1)
+            entity.Property(e => e.EanValue)
                 .ValueGeneratedNever()
                 .HasColumnName("ean");
             entity.Property(e => e.ItemId).HasColumnName("item_id");
@@ -528,7 +528,7 @@ public partial class HandlerContext : DbContext
 
         modelBuilder.Entity<ItemOwner>(entity =>
         {
-            entity.HasKey(e => new { e.IdUser, e.InvoiceId }).HasName("Item_owner_pk");
+            entity.HasKey(e => new { e.IdUser, e.InvoiceId, e.OwnedItemId }).HasName("Item_owner_pk");
 
             entity.ToTable("Item_owner");
 
@@ -628,10 +628,11 @@ public partial class HandlerContext : DbContext
 
         modelBuilder.Entity<OfferItem>(entity =>
         {
-            entity.HasKey(e => new { e.OfferId, e.IdUser, e.InvoiceId }).HasName("Offer_Item_pk");
+            entity.HasKey(e => new { e.OfferItemId }).HasName("Offer_Item_pk");
 
             entity.ToTable("Offer_Item");
 
+            entity.Property(e => e.OfferItemId).HasColumnName("offer_item_id");
             entity.Property(e => e.OfferId).HasColumnName("offer_id");
             entity.Property(e => e.IdUser).HasColumnName("id_user");
             entity.Property(e => e.InvoiceId).HasColumnName("invoice_id");
@@ -645,8 +646,8 @@ public partial class HandlerContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Offer_Items_relation");
 
-            entity.HasOne(d => d.I).WithMany(p => p.OfferItems)
-                .HasForeignKey(d => new { d.IdUser, d.InvoiceId })
+            entity.HasOne(d => d.ItemOwner).WithMany(p => p.OfferItems)
+                .HasForeignKey(d => new { d.IdUser, d.InvoiceId, d.ItemId })
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Offer_Item_Item_owner_relation");
         });

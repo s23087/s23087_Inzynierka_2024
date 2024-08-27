@@ -15,6 +15,7 @@ import {
 import getStatusColor from "@/utils/warehouse/get_status_color";
 import ItemTable from "../../tables/item_table";
 import getRestInfo from "@/utils/warehouse/get_rest_info";
+import getDescription from "@/utils/warehouse/get_description";
 import dropdown_big_down from "../../../../public/icons/dropdown_big_down.png";
 import view_outside_icon from "../../../../public/icons/view_outside_icon.png";
 import view_warehouse_icon from "../../../../public/icons/view_warehouse_icon.png";
@@ -32,10 +33,13 @@ function ViewItemOffcanvas({
     userOwnedItems: {},
     userOutsideItems: {},
   });
+  const [description, setDescription] = useState(null);
   useEffect(() => {
     if (showOffcanvas) {
       let restData = getRestInfo(currency, item.itemId);
       restData.then((data) => setRestInfo(data));
+      let desc = getDescription(item.itemId);
+      desc.then((data) => setDescription(data));
     }
   }, [showOffcanvas, currency, item.itemId]);
   const statusColorStyle = {
@@ -101,7 +105,7 @@ function ViewItemOffcanvas({
                 {isOrg && item.users.lenght > 0 ? (
                   <Form.Select>
                     {item.users.map((user) => {
-                      return <option value={user}>{user}</option>;
+                      return <option key={user} value={user}>{user}</option>;
                     })}
                   </Form.Select>
                 ) : null}
@@ -128,9 +132,7 @@ function ViewItemOffcanvas({
                 <Container className="px-1 ms-0">
                   <p className="mb-1 blue-main-text">Description:</p>
                   <p className="mb-1">
-                    {restInfo.itemDescription
-                      ? restInfo.itemDescription
-                      : "Loading.."}
+                    {description ? description : "Loading.."}
                   </p>
                 </Container>
               </Stack>

@@ -8,6 +8,6 @@
         public string ItemDescription { get; set; } = null!;
 
         public string PartNumber { get; set; } = null!;
-        public ICollection<int> Eans { get; set; } = new List<int>();
+        public ICollection<string> Eans { get; set; } = new List<string>();
     }
 }

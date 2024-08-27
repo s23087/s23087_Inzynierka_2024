@@ -9,6 +9,6 @@
         public string? ItemDescription { get; set; } = null!;
 
         public string? PartNumber { get; set; } = null!;
-        public IEnumerable<int> Eans { get; set; } = new List<int>();
+        public IEnumerable<string> Eans { get; set; } = new List<string>();
     }
 }

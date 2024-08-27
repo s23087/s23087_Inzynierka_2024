@@ -7,7 +7,7 @@
         public string ItemName { get; set; } = null!;
         public string PartNumber { get; set; } = null!;
         public string StatusName { get; set; } = null!;
-        public IEnumerable<int>? Eans { get; set; } = new List<int>();
+        public IEnumerable<string>? Eans { get; set; } = new List<string>();
         public int? Qty { get; set; } = 0;
         public decimal? PurchasePrice { get; set; } = 0;
         public IEnumerable<string>? Sources { get; set; } = new List<string>();

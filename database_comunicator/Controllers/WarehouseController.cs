@@ -66,6 +66,7 @@ namespace database_comunicator.Controllers
             var exist = await _itemServices.ItemExist(newItem.Id);
             if (!exist) return NotFound();
             var partNumberExist = newItem.PartNumber != null && await _itemServices.ItemExist(newItem.PartNumber);
+            Console.WriteLine(partNumberExist.ToString());
             if (partNumberExist) return BadRequest();
 
             await _itemServices.UpdateItem(newItem);
@@ -85,6 +86,15 @@ namespace database_comunicator.Controllers
             var exist = await _itemServices.ItemExist(itemId);
             if (!exist) return NotFound(itemId);
             var result = await _itemServices.GetRestOfItem(itemId, currency);
+            return result != null ? Ok(result) : BadRequest();
+        }
+        [HttpGet]
+        [Route("getRestOrgInfo")]
+        public async Task<IActionResult> GetRestOrgInfo(int itemId, string currency)
+        {
+            var exist = await _itemServices.ItemExist(itemId);
+            if (!exist) return NotFound(itemId);
+            var result = await _itemServices.GetRestOfItemOrg(itemId, currency);
             return result != null ? Ok(result) : BadRequest();
         }
         [HttpGet]
@@ -117,6 +127,24 @@ namespace database_comunicator.Controllers
                 result = await _itemServices.GetItems(currency);
             }
             return Ok(result);
+        }
+        [HttpGet]
+        [Route("description")]
+        public async Task<IActionResult> GetDescription(int itemId)
+        {
+            var exist = await _itemServices.ItemExist(itemId);
+            if (!exist) return NotFound(itemId);
+            var desc = await _itemServices.GetDescription(itemId);
+            return Ok(desc);
+        }
+        [HttpGet]
+        [Route("bindings")]
+        public async Task<IActionResult> GetBindings(int itemId, string currency)
+        {
+            var exist = await _itemServices.ItemExist(itemId);
+            if (!exist) return NotFound(itemId);
+            var desc = await _itemServices.GetModifyRestOfItem(itemId, currency);
+            return Ok(desc);
         }
     }
 }
