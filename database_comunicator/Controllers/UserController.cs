@@ -24,7 +24,7 @@ namespace database_comunicator.Controllers
             var verify = await _userServices.VerifyUserPassword(loginInfo.Email, loginInfo.Password);
             if (!verify) { return Unauthorized(); }
             int userId = await _userServices.GetUserId(loginInfo.Email);
-            if (verify && !isOrg)
+            if (!isOrg)
             {
                 Console.WriteLine("Solo");
                 return Ok(new SuccesLogin

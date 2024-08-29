@@ -149,7 +149,7 @@ namespace database_comunicator.Services
 
         public async Task SetOrgUserRole(int orgUserId, int roleId)
         {
-            _handlerContext.OrgUsers.Where(e => e.OrgUserId == orgUserId).ExecuteUpdate(e => e.SetProperty(s => s.RoleId, roleId));
+            await _handlerContext.OrgUsers.Where(e => e.OrgUserId == orgUserId).ExecuteUpdateAsync(e => e.SetProperty(s => s.RoleId, roleId));
             await _handlerContext.SaveChangesAsync();
         }
 
@@ -194,7 +194,7 @@ namespace database_comunicator.Services
             var salt = Hasher.GenerateSalt();
             var passHash = Hasher.CreateHashPassword(password, salt);
 
-            _handlerContext.AppUsers.Where(e => e.IdUser == userId).ExecuteUpdate(e => 
+            await _handlerContext.AppUsers.Where(e => e.IdUser == userId).ExecuteUpdateAsync(e => 
             e.SetProperty(s => s.PassHash, passHash)
             .SetProperty(s => s.PassSalt, salt)
             );
@@ -202,29 +202,38 @@ namespace database_comunicator.Services
         }
         public async Task ModifyUserData(int userId, string? email, string? username, string? surname)
         {
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
 
-            if (email is not null)
+            try
             {
-                _handlerContext.AppUsers
-                .Where(e => e.IdUser == userId)
-                .ExecuteUpdate(setters => setters.SetProperty(s => s.Email, email));
-            }
+                if (email is not null)
+                {
+                    await _handlerContext.AppUsers
+                    .Where(e => e.IdUser == userId)
+                    .ExecuteUpdateAsync(setters => setters.SetProperty(s => s.Email, email));
+                }
 
-            if (username is not null)
+                if (username is not null)
+                {
+                    await _handlerContext.AppUsers
+                    .Where(e => e.IdUser == userId)
+                    .ExecuteUpdateAsync(setters => setters.SetProperty(s => s.Username, username));
+                }
+
+                if (surname is not null)
+                {
+                    await _handlerContext.AppUsers
+                    .Where(e => e.IdUser == userId)
+                    .ExecuteUpdateAsync(setters => setters.SetProperty(s => s.Surname, surname));
+                }
+
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+            } catch (Exception ex)
             {
-                _handlerContext.AppUsers
-                .Where(e => e.IdUser == userId)
-                .ExecuteUpdate(setters => setters.SetProperty(s => s.Username, username));
+                Console.WriteLine(ex.ToString());
+                await trans.RollbackAsync();
             }
-
-            if (surname is not null)
-            {
-                _handlerContext.AppUsers
-                .Where(e => e.IdUser == userId)
-                .ExecuteUpdate(setters => setters.SetProperty(s => s.Surname, surname));
-            }
-
-            await _handlerContext.SaveChangesAsync();
         }
         public async Task<bool> SwitchToOrg(int userId, int roleId, int orgId)
         {
@@ -273,8 +282,8 @@ namespace database_comunicator.Services
         }
         public async Task ModifyUserRole(int orgUserId, int roleId)
         {
-            _handlerContext.OrgUsers.Where(e => e.OrgUserId == orgUserId)
-                .ExecuteUpdate(setters => setters.SetProperty(s => s.RoleId, roleId));
+            await _handlerContext.OrgUsers.Where(e => e.OrgUserId == orgUserId)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(s => s.RoleId, roleId));
             await _handlerContext.SaveChangesAsync();
         }
         public async Task<int?> GetOrgUserId(int userId)

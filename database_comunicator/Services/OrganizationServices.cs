@@ -204,7 +204,7 @@ namespace database_comunicator.Services
 
         public async Task SetClientAvailabilityStatus(int orgId, int statusId)
         {
-            _handlerContext.Organizations.ExecuteUpdate(setters => 
+            await _handlerContext.Organizations.ExecuteUpdateAsync(setters => 
             setters.SetProperty(s => s.AvailabilityStatusId, statusId));
             await _handlerContext.SaveChangesAsync();
         }
@@ -231,16 +231,26 @@ namespace database_comunicator.Services
         }
         public async Task SetClientUserBindings(SetUserClientBindings data)
         {
-            var current = await _handlerContext.UserClients.Where(e => e.OrganizationId == data.OrgId).Select(e => e.IdUser).ToListAsync();
-            _handlerContext.UserClients.Where(e => e.OrganizationId == data.OrgId && !data.UsersId.Contains(e.IdUser)).ExecuteDelete();
-            var withoutExisting = data.UsersId.Where(e => !current.Contains(e)).ToList();
-            var toAdd = withoutExisting.Select(e => new UserClient
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
             {
-                OrganizationId = data.OrgId,
-                IdUser = e
-            }).ToList();
-            _handlerContext.UserClients.AddRange(toAdd);
-            await _handlerContext.SaveChangesAsync();
+                var current = await _handlerContext.UserClients.Where(e => e.OrganizationId == data.OrgId).Select(e => e.IdUser).ToListAsync();
+                await _handlerContext.UserClients.Where(e => e.OrganizationId == data.OrgId && !data.UsersId.Contains(e.IdUser)).ExecuteDeleteAsync();
+                var withoutExisting = data.UsersId.Where(e => !current.Contains(e)).ToList();
+                var toAdd = withoutExisting.Select(e => new UserClient
+                {
+                    OrganizationId = data.OrgId,
+                    IdUser = e
+                }).ToList();
+                await _handlerContext.UserClients.AddRangeAsync(toAdd);
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+            } catch (Exception ex)
+            {
+                Console.Write(ex.ToString());
+                await trans.RollbackAsync();
+            }
+
         }
         public async Task<bool> OrgExist(int orgId)
         {

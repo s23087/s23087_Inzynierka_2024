@@ -2,7 +2,7 @@
 {
     public class AddAvailabilityStatus
     {
-        public string StatusName { get; set; } = null!;
-        public int DaysForRealization { get; set; }
+        public required string StatusName { get; set; } = null!;
+        public required int DaysForRealization { get; set; }
     }
 }

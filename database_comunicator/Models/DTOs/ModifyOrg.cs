@@ -15,6 +15,6 @@
 
         public int? CreditLimit { get; set; }
 
-        public int CountryId { get; set; }
+        public required int CountryId { get; set; }
     }
 }
