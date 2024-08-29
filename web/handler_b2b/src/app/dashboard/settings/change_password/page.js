@@ -2,12 +2,21 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useFormState } from "react-dom";
 import { Form, Container, Button, Stack } from "react-bootstrap";
+import ChangePassword from "@/utils/settings/change_password";
 import validators from "@/utils/validators/validator";
+import ForceLogutWindow from "@/components/windows/force_logout";
 
 export default function ChangePasswordPage() {
   const router = useRouter();
   const [isInvalid, setIsInvalid] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [state, formAction] = useFormState(ChangePassword, {
+    error: false,
+    completed: false,
+    message: "",
+  });
   const hidden = {
     display: "none",
   };
@@ -23,9 +32,15 @@ export default function ChangePasswordPage() {
   };
   return (
     <Container className="px-4 pt-4" fluid>
-      <Form className="mx-1 mx-xl-4">
+      <Form className="mx-1 mx-xl-4" id="changePassForm" action={formAction}>
         <Form.Group className="mb-3" style={maxInputWidth}>
           <Form.Label className="blue-main-text">Old Password:</Form.Label>
+          <p
+            className="text-start mb-1 red-sec-text small-text"
+            style={state.error ? unhidden : hidden}
+          >
+            {state.message}
+          </p>
           <p
             className="text-start mb-1 red-sec-text small-text"
             style={isInvalid ? unhidden : hidden}
@@ -54,13 +69,10 @@ export default function ChangePasswordPage() {
             className="input-style shadow-sm"
             type="password"
             name="newPassword"
+            id="newPassword"
             isInvalid={isInvalid}
             onInput={(e) => {
-              let oldPass = document.getElementById("oldPassword");
-              if (
-                validators.stringIsNotEmpty(e.target.value) &&
-                !validators.stringAreEqual(e.target.value, oldPass.value)
-              ) {
+              if (validators.stringIsNotEmpty(e.target.value)) {
                 setIsInvalid(false);
               } else {
                 setIsInvalid(true);
@@ -75,8 +87,31 @@ export default function ChangePasswordPage() {
             variant="mainBlue"
             type="Submit"
             style={buttonStyle}
+            onClick={(e) => {
+              e.preventDefault();
+              let oldPass = document.getElementById("oldPassword");
+              let newPass = document.getElementById("newPassword");
+              if (newPass.value === oldPass.value) {
+                setIsInvalid(true);
+                return;
+              }
+              if (
+                !validators.stringIsNotEmpty(newPass.value) ||
+                !validators.stringIsNotEmpty(oldPass.value)
+              ) {
+                setIsInvalid(true);
+                return;
+              }
+              setIsLoading(true);
+              let form = document.getElementById("changePassForm");
+              form.requestSubmit();
+            }}
           >
-            Change password
+            {isLoading && !state.error ? (
+              <div className="spinner-border main-text"></div>
+            ) : (
+              "Change password"
+            )}
           </Button>
         </Stack>
       </Form>
@@ -93,6 +128,7 @@ export default function ChangePasswordPage() {
           Go back
         </Button>
       </Stack>
+      <ForceLogutWindow modalShow={!state.error && state.completed} />
     </Container>
   );
 }

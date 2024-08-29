@@ -9,7 +9,7 @@ namespace database_comunicator.Services
 {
     public interface IItemServices
     {
-        public Task<Item> AddItem(AddItem newItem);
+        public Task<Item?> AddItem(AddItem newItem);
         public Task UpdateItem(UpdateItem postItem);
         public Task<bool> RemoveItem(int id);
         public Task<bool> ItemExist(int id);
@@ -32,25 +32,34 @@ namespace database_comunicator.Services
             _handlerContext = handlerContext;
         }
 
-        public async Task<Item> AddItem(AddItem newItem)
+        public async Task<Item?> AddItem(AddItem newItem)
         {
-            var item = new Item
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
             {
-                ItemName = newItem.ItemName,
-                ItemDescription = newItem.ItemDescription,
-                PartNumber = newItem.PartNumber
-            };
-            await _handlerContext.Items.AddAsync(item);
-            await _handlerContext.SaveChangesAsync();
+                var item = new Item
+                {
+                    ItemName = newItem.ItemName,
+                    ItemDescription = newItem.ItemDescription,
+                    PartNumber = newItem.PartNumber
+                };
+                await _handlerContext.Items.AddAsync(item);
+                await _handlerContext.SaveChangesAsync();
 
-            await _handlerContext.Eans.AddRangeAsync(newItem.Eans.Select(ean => new Ean
+                await _handlerContext.Eans.AddRangeAsync(newItem.Eans.Select(ean => new Ean
+                {
+                    EanValue = ean,
+                    ItemId = item.ItemId
+                }));
+                await _handlerContext.SaveChangesAsync();
+
+                await trans.CommitAsync();
+                return item;
+            } catch (Exception)
             {
-                EanValue = ean,
-                ItemId = item.ItemId
-            }));
-            await _handlerContext.SaveChangesAsync();
-
-            return item;
+                await trans.RollbackAsync();
+                return null;
+            }
         }
 
         public async Task<bool> EanExist(IEnumerable<string> eans)
@@ -63,12 +72,12 @@ namespace database_comunicator.Services
             var outsideItems = await _handlerContext.OutsideItems
                 .Where(e => e.ItemId == id)
                 .Include(e => e.Organization)
-                .ThenInclude(e => e.AvailabilityStatuses)
+                .ThenInclude(e => e.AvailabilityStatus)
                 .Select(e => new GetRestItemInfo
             {
                 OrganizationName = e.Organization.OrgName,
                 Qty = e.Qty,
-                DaysForRealization = e.Organization.AvailabilityStatuses.Select(e => e.DaysForRealization).ToList()[0],
+                DaysForRealization = e.Organization.AvailabilityStatus == null ? 0 : e.Organization.AvailabilityStatus.DaysForRealization,
                 Price = e.PurchasePrice,
                 Curenncy = e.CurrencyName.Curenncy
 
@@ -103,20 +112,21 @@ namespace database_comunicator.Services
                 .Include(e => e.ItemOwners)
                  .ThenInclude(e => e.OwnedItem)
                     .ThenInclude(e => e.PurchasePrices)
-                .Include(e => e.Os)
-                    .ThenInclude(e => e.Organization)
-                        .ThenInclude(e => e.AvailabilityStatuses)
+                .Include(e => e.Clients)
+                    .ThenInclude(e => e.OutsideItems)
+                .Include(e => e.Clients)
+                    .ThenInclude(e => e.AvailabilityStatus)
                 .Select(instance => new GetRestInfoOrg
                 {
                     UserId = instance.IdUser,
                     Username = instance.Username,
-                    OutsideItemInfos = instance.Os.Select(e => new GetRestItemInfo
+                    OutsideItemInfos = instance.Clients.Select(e => new GetRestItemInfo
                     {
-                        OrganizationName = e.Organization.OrgName,
-                        Qty = e.Qty,
-                        DaysForRealization = e.Organization.AvailabilityStatuses.Select(e => e.DaysForRealization).ToList()[0],
-                        Price = e.PurchasePrice,
-                        Curenncy = e.CurrencyName.Curenncy
+                        OrganizationName = e.OrgName,
+                        Qty = e.OutsideItems.Where(d => d.ItemId == id).Select(f => f.Qty).First(),
+                        DaysForRealization = e.AvailabilityStatus == null ? 0 : e.AvailabilityStatus.DaysForRealization,
+                        Price = e.OutsideItems.Where(d => d.ItemId == id).Select(f => f.PurchasePrice).First(),
+                        Curenncy = e.OutsideItems.Where(d => d.ItemId == id).Select(f => f.Curenncy).First()
                     }).ToList(),
                     OwnedItemInfos = instance.ItemOwners.Select(e => new GetRestItemInfo
                     {

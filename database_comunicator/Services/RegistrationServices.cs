@@ -9,7 +9,7 @@ namespace database_comunicator.Services
 {
     public interface IRegistrationServices
     {
-        public Task<IEnumerable<Country>> getCountriesNames();
+        public Task<IEnumerable<Country>> getCountries();
         public Task<bool> CreateNewDatabase(string orgName);
         public Task<bool> SetupDatabase();
     }
@@ -22,7 +22,7 @@ namespace database_comunicator.Services
             _handlerContext = handlerContext;
             _configuration = configuration;
         }
-        public async Task<IEnumerable<Country>> getCountriesNames()
+        public async Task<IEnumerable<Country>> getCountries()
         {
             return await _handlerContext.Countries.ToListAsync();
         }

@@ -9,7 +9,6 @@
         public string Surname { get; set; } = null!;
 
         public string Password { get; set; } = null!;
-
-        public int OrganizationsId { get; set; }
+        public string? RoleName { get; set; } = null!;
     }
 }

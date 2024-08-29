@@ -20,7 +20,7 @@ export default function Registration() {
       <Container className="mb-5 px-5 mx-4 logo-spacing-sm">
         <Row className="mb-4">
           <Col className="text-center">
-            <Image src={BigLogo} alt="Logo" />
+            <Image src={BigLogo} alt="Logo" priority={true} />
           </Col>
         </Row>
         <Row className="mb-3">

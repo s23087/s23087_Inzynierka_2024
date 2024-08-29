@@ -7,7 +7,7 @@ import getBasicInfo from "@/utils/menu/get_basic_user_info";
 import getNotificationCounter from "@/utils/menu/get_nofication_counter";
 
 export default async function Layout({ children }) {
-  const current_role = await getRole();
+  let current_role = await getRole();
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
   return (

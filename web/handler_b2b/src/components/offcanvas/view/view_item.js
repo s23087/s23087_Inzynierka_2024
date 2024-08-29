@@ -105,7 +105,11 @@ function ViewItemOffcanvas({
                 {isOrg && item.users.lenght > 0 ? (
                   <Form.Select>
                     {item.users.map((user) => {
-                      return <option key={user} value={user}>{user}</option>;
+                      return (
+                        <option key={user} value={user}>
+                          {user}
+                        </option>
+                      );
                     })}
                   </Form.Select>
                 ) : null}
@@ -145,9 +149,7 @@ function ViewItemOffcanvas({
                     isOurWarehouse={isOurWarehouseView}
                   />
                 ) : (
-                  <div
-                    className="spinner-border blue-main-text text-center"
-                  >
+                  <div className="spinner-border blue-main-text text-center">
                     <span className="visually-hidden">Loading...</span>
                   </div>
                 )}

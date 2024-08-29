@@ -33,5 +33,6 @@ public partial class AppUser
 
     public virtual ICollection<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
 
-    public virtual ICollection<OutsideItem> Os { get; set; } = new List<OutsideItem>();
+    public virtual ICollection<Organization> Clients { get; set; } = new List<Organization>();
+    public virtual ICollection<UserClient> UserClients { get; set; } = new List<UserClient>();
 }

@@ -4,6 +4,5 @@
     {
         public string StatusName { get; set; } = null!;
         public int DaysForRealization { get; set; }
-        public int OrganizationId { get; set; }
     }
 }

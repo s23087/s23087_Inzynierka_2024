@@ -10,15 +10,28 @@ namespace database_comunicator.Services
 {
     public interface IUserServices
     {
-        public Task<bool> AddUser(AddUser user, int roleId, bool isOrg);
-        public Task<int> GetRoleId(string roleName);
+        public Task<bool> AddUser(AddUser user, int orgId, int roleId, bool isOrg);
         public Task<bool> UserExist(string email);
         public Task<bool> UserExist(int userId);
         public Task<bool> IsOrgUser(string email);
         public Task<bool> IsOrgUser(int userId);
-        public Task<SuccesLogin?> VerifyUserPassword(string email, string password, bool isOrg);
+        public Task<bool> VerifyUserPassword(string email, string password);
+        public Task<bool> VerifyUserPassword(int userId, string password);
         public Task<int> GetCountNotification(int userId);
         public Task<BasicInfo> GetBasicInfo(int userId, bool isOrg);
+        public Task SetOrgUserRole(int orgUserId, int roleId);
+        public Task<IEnumerable<GetOrgUsersWithRoles>> GetOrgUsersWithRoles(int userId);
+        public Task<IEnumerable<GetOrgUsersWithRoles>> GetOrgUsersWithRoles(int userId, string search);
+        public Task ModifyPassword(int userId, string password);
+        public Task ModifyUserData(int userId, string? email, string? username, string? surname);
+        public Task<bool> SwitchToOrg(int userId, int roleId, int orgId);
+        public Task<int> GetUserId(string email);
+        public Task<string> GetUserRole(int userId);
+        public Task<bool> EmailExist(string email);
+        public Task<int> GetOrgId(int userId, bool isOrg);
+        public Task ModifyUserRole(int orgUserId, int roleId);
+        public Task<int?> GetOrgUserId(int userId);
+        public Task<string> GetUserEmail(int userId);
     }
     public class UserServices : IUserServices
     {
@@ -27,7 +40,7 @@ namespace database_comunicator.Services
         {
             _handlerContext = handlerContext;
         }
-        public async Task<bool> AddUser(AddUser user, int roleId, bool isOrg)
+        public async Task<bool> AddUser(AddUser user, int orgId, int roleId, bool isOrg)
         {
             if ((roleId == -1) && (isOrg))
             {
@@ -35,7 +48,6 @@ namespace database_comunicator.Services
             }
             var userSalt = Hasher.GenerateSalt();
             var userHashedPassword = Hasher.CreateHashPassword(user.Password, userSalt);
-            Console.WriteLine(user.OrganizationsId);
 
             var newUser = new AppUser
             {
@@ -46,16 +58,16 @@ namespace database_comunicator.Services
                 PassSalt = userSalt,
                 SoloUser = isOrg ? null : new SoloUser
                 {
-                    OrganizationsId = user.OrganizationsId,
+                    OrganizationsId = orgId,
                 },
                 OrgUser = isOrg ? new OrgUser
                 {
-                    OrganizationsId = user.OrganizationsId,
+                    OrganizationsId = orgId,
                     RoleId = roleId,
                 } : null,
             };
 
-            await _handlerContext.AppUsers.AddAsync(newUser);
+            _handlerContext.AppUsers.Add(newUser);
             await _handlerContext.SaveChangesAsync();
             return true;
         }
@@ -91,10 +103,37 @@ namespace database_comunicator.Services
             return result.Count;
         }
 
-        public async Task<int> GetRoleId(string roleName)
+        public async Task<IEnumerable<GetOrgUsersWithRoles>> GetOrgUsersWithRoles(int userId)
         {
-            var result = await _handlerContext.UserRoles.Where(e => e.RoleName.Equals(roleName)).Select(e => e.RoleId).ToListAsync();
-            return result[0];
+            return await _handlerContext.AppUsers
+                .Where(e => e.IdUser != userId && e.OrgUser != null)
+                .Include(e => e.OrgUser)
+                    .ThenInclude(e => e!.Role)
+                .Select(e => new GetOrgUsersWithRoles
+                {
+                    UserId = e.IdUser,
+                    Username = e.Username,
+                    Surname = e.Surname,
+                    RoleName = e.OrgUser!.Role.RoleName
+                }).ToListAsync();
+        }
+
+        public async Task<IEnumerable<GetOrgUsersWithRoles>> GetOrgUsersWithRoles(int userId, string search)
+        {
+            return await _handlerContext.AppUsers
+                .Where(ent => ent.IdUser != userId 
+                && (EF.Functions.FreeText(ent.Surname, search) || EF.Functions.FreeText(ent.Username, search))
+                && ent.OrgUser != null
+                )
+                .Include(ent => ent.OrgUser)
+                    .ThenInclude(ad => ad!.Role)
+                .Select(ent => new GetOrgUsersWithRoles
+                {
+                    UserId = ent.IdUser,
+                    Username = ent.Username,
+                    Surname = ent.Surname,
+                    RoleName = ent.OrgUser!.Role.RoleName
+                }).ToListAsync();
         }
 
         public async Task<bool> IsOrgUser(string email)
@@ -108,6 +147,12 @@ namespace database_comunicator.Services
             return result[0] != null;
         }
 
+        public async Task SetOrgUserRole(int orgUserId, int roleId)
+        {
+            _handlerContext.OrgUsers.Where(e => e.OrgUserId == orgUserId).ExecuteUpdate(e => e.SetProperty(s => s.RoleId, roleId));
+            await _handlerContext.SaveChangesAsync();
+        }
+
         public async Task<bool> UserExist(string email)
         {
             return await _handlerContext.AppUsers.Where(e => e.Email == email).AnyAsync();
@@ -117,47 +162,128 @@ namespace database_comunicator.Services
             return await _handlerContext.AppUsers.Where(e => e.IdUser == userId).AnyAsync();
         }
 
-        public async Task<SuccesLogin?> VerifyUserPassword(string email, string password, bool isOrg)
+        public async Task<bool> VerifyUserPassword(string email, string password)
         {
-            List<UserHash> hashes;
 
-            if (isOrg) {
-                hashes = await _handlerContext.AppUsers
-                .Include(e => e.OrgUser)
-                .ThenInclude(b => b!.Role)
-                .Where(e => e.Email == email).Select(e => new UserHash
-                {
-                    Id = e.IdUser,
-                    PassHash = e.PassHash,
-                    PassSalt = e.PassSalt,
-                    Role = e.OrgUser!.Role.RoleName
-                }).ToListAsync();
-            } else
+            var instance = await _handlerContext.AppUsers.Where(e => e.Email.Equals(email)).Select(e => new UserHash
             {
-                hashes = await _handlerContext.AppUsers
-                .Where(e => e.Email == email).Select(e => new UserHash
-                {
-                    Id = e.IdUser,
-                    PassHash = e.PassHash,
-                    PassSalt = e.PassSalt,
-                    Role = "Solo"
-                }).ToListAsync();
-            }
-
-            var instance = hashes[0];
-            var passHas = instance.PassHash;
-            var salt = instance.PassSalt;
+                PassHash = e.PassHash,
+                PassSalt = e.PassSalt
+            }).ToListAsync();
+            var passHas = instance[0].PassHash;
+            var salt = instance[0].PassSalt;
             var isVerified = Hasher.VerifyPassword(passHas, salt, password);
-            if (isVerified)
+
+            return isVerified;
+        }
+        public async Task<bool> VerifyUserPassword(int userId, string password)
+        {
+            var instance = await _handlerContext.AppUsers.Where(e => e.IdUser == userId).Select(e => new UserHash
             {
-                return new SuccesLogin
-                {
-                    Id = instance.Id,
-                    Role = instance.Role
-                };
+                PassHash = e.PassHash,
+                PassSalt = e.PassSalt
+            }).ToListAsync();
+            var passHas = instance[0].PassHash;
+            var salt = instance[0].PassSalt;
+            var isVerified = Hasher.VerifyPassword(passHas, salt, password);
+
+            return isVerified;
+        }
+        public async Task ModifyPassword(int userId, string password)
+        {
+            var salt = Hasher.GenerateSalt();
+            var passHash = Hasher.CreateHashPassword(password, salt);
+
+            _handlerContext.AppUsers.Where(e => e.IdUser == userId).ExecuteUpdate(e => 
+            e.SetProperty(s => s.PassHash, passHash)
+            .SetProperty(s => s.PassSalt, salt)
+            );
+            await _handlerContext.SaveChangesAsync();
+        }
+        public async Task ModifyUserData(int userId, string? email, string? username, string? surname)
+        {
+
+            if (email is not null)
+            {
+                _handlerContext.AppUsers
+                .Where(e => e.IdUser == userId)
+                .ExecuteUpdate(setters => setters.SetProperty(s => s.Email, email));
             }
 
-            return null;
+            if (username is not null)
+            {
+                _handlerContext.AppUsers
+                .Where(e => e.IdUser == userId)
+                .ExecuteUpdate(setters => setters.SetProperty(s => s.Username, username));
+            }
+
+            if (surname is not null)
+            {
+                _handlerContext.AppUsers
+                .Where(e => e.IdUser == userId)
+                .ExecuteUpdate(setters => setters.SetProperty(s => s.Surname, surname));
+            }
+
+            await _handlerContext.SaveChangesAsync();
+        }
+        public async Task<bool> SwitchToOrg(int userId, int roleId, int orgId)
+        {
+            var soloUserId = await _handlerContext.AppUsers.Where(e => e.IdUser == userId).Select(e => e.SoloUserId).FirstOrDefaultAsync();
+            if (soloUserId == null) return false;
+            var changedUser = new AppUser
+            {
+                IdUser = userId,
+                SoloUserId = null,
+                OrgUser = new OrgUser
+                {
+                    RoleId = roleId,
+                    OrganizationsId = orgId
+                }
+            };
+
+            _handlerContext.Update<AppUser>(changedUser);
+            _handlerContext.SoloUsers.Remove(new SoloUser { SoloUserId = (int)soloUserId, OrganizationsId = orgId });
+            await _handlerContext.SaveChangesAsync();
+            return true;
+        }
+        public async Task<int> GetUserId(string email)
+        {
+            return await _handlerContext.AppUsers.Where(e => e.Email.Equals(email)).Select(e => e.IdUser).FirstAsync();
+        }
+        public async Task<string> GetUserRole(int userId)
+        {
+            return await _handlerContext.AppUsers
+                .Where(e => e.IdUser == userId)
+                .Include(e => e.OrgUser)
+                .ThenInclude(e => e!.Role)
+                .Select(e => e.OrgUser!.Role.RoleName)
+                .FirstAsync();
+        }
+        public async Task<bool> EmailExist(string email)
+        {
+            return await _handlerContext.AppUsers.Where(e => e.Email.Equals(email)).AnyAsync();
+        }
+        public async Task<int> GetOrgId(int userId, bool isOrg)
+        {
+            if (isOrg)
+            {
+                return await _handlerContext.AppUsers.Where(e => e.IdUser == userId).Include(e => e.OrgUser).Select(e => e.OrgUser!.OrganizationsId).FirstAsync();
+            }
+            return await _handlerContext.AppUsers.Where(e => e.IdUser == userId).Include(e => e.SoloUser).Select(e => e.SoloUser!.OrganizationsId).FirstAsync();
+        }
+        public async Task ModifyUserRole(int orgUserId, int roleId)
+        {
+            _handlerContext.OrgUsers.Where(e => e.OrgUserId == orgUserId)
+                .ExecuteUpdate(setters => setters.SetProperty(s => s.RoleId, roleId));
+            await _handlerContext.SaveChangesAsync();
+        }
+        public async Task<int?> GetOrgUserId(int userId)
+        {
+            return await _handlerContext.AppUsers.Where(e => e.IdUser == userId).Select(e => e.OrgUserId).FirstAsync();
+        }
+        public async Task<string> GetUserEmail(int userId)
+        {
+            return await _handlerContext.AppUsers.Where(e => e.IdUser == userId).Select(e => e.Email).FirstAsync();
         }
     }
 }

@@ -9,7 +9,7 @@ export default function App() {
       <Container className="mb-5 px-5 mx-4 text-center logo-spacing">
         <Row className="mb-4">
           <Col>
-            <Image src={bigLogo} alt="Logo" />
+            <Image src={bigLogo} alt="Logo" priority={true} />
           </Col>
         </Row>
 

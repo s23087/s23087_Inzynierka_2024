@@ -29,7 +29,7 @@ function MenuTemplate({
     <Stack className="px-3" direction="horizontal" style={menuSize}>
       <Container className="w-auto ms-0 ms-xl-3 me-0 me-xl-4">
         <Link href={`${pathName}${finalParam}`}>
-          <Image src={small_logo} alt="logo" />
+          <Image src={small_logo} alt="logo" priority={true} />
         </Link>
       </Container>
       <Container className="mx-auto ms-xl-0 text-center text-xl-start">

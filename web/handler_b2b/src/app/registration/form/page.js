@@ -9,7 +9,7 @@ export default function RegistrationFormHolder() {
       <Container className="px-5 mb-5 logo-spacing-sm">
         <Row className="mb-4">
           <Col className="text-center">
-            <Image src={BigLogo} alt="Logo" />
+            <Image src={BigLogo} alt="Logo" priority={true} />
           </Col>
         </Row>
         <Row className="mb-4">

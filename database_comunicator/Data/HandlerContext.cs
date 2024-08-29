@@ -97,7 +97,7 @@ public partial class HandlerContext : DbContext
     public virtual DbSet<SoloUser> SoloUsers { get; set; }
 
     public virtual DbSet<Taxis> Taxes { get; set; }
-
+    public virtual DbSet<UserClient> UserClients { get; set; }
     public virtual DbSet<UserNotification> UserNotifications { get; set; }
 
     public virtual DbSet<UserRole> UserRoles { get; set; }
@@ -181,6 +181,24 @@ public partial class HandlerContext : DbContext
             entity.HasOne(d => d.SoloUser).WithMany(p => p.AppUsers)
                 .HasForeignKey(d => d.SoloUserId)
                 .HasConstraintName("User_Solo_User_relation");
+
+            entity.HasMany(d => d.Clients).WithMany(p => p.AppUsers)
+                .UsingEntity<UserClient>(
+                    l => l.HasOne(e => e.Organization).WithMany(e => e.UserClients)
+                        .HasForeignKey(e => e.OrganizationId)
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("Client_User_relation"),
+                    r => r.HasOne(e => e.AppUser).WithMany(e => e.UserClients)
+                        .HasForeignKey(e => e.IdUser)
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("User_client_relation"),
+                    j =>
+                    {
+                        j.Property(e => e.IdUser).HasColumnName("users_id");
+                        j.Property(e => e.OrganizationId).HasColumnName("organization_id");
+                        j.HasKey(e => new {e.IdUser, e.OrganizationId}).HasName("User_Client_pk");
+                        j.ToTable("User_client");
+                    });
         });
 
         modelBuilder.Entity<AvailabilityStatus>(entity =>
@@ -195,25 +213,6 @@ public partial class HandlerContext : DbContext
                 .HasMaxLength(150)
                 .IsUnicode(false)
                 .HasColumnName("status_name");
-
-            entity.HasMany(d => d.Organizations).WithMany(p => p.AvailabilityStatuses)
-                .UsingEntity<Dictionary<string, object>>(
-                    "AvailabilityStatusOrganization",
-                    r => r.HasOne<Organization>().WithMany()
-                        .HasForeignKey("OrganizationId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("Availability_Status_Organization_Organization_relation"),
-                    l => l.HasOne<AvailabilityStatus>().WithMany()
-                        .HasForeignKey("AvailabilityStatusId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("Availability_Status_Organization_Availability_Status_relation"),
-                    j =>
-                    {
-                        j.HasKey("AvailabilityStatusId", "OrganizationId").HasName("Availability_Status_Organization_pk");
-                        j.ToTable("Availability_Status_Organization");
-                        j.IndexerProperty<int>("AvailabilityStatusId").HasColumnName("availability_status_id");
-                        j.IndexerProperty<int>("OrganizationId").HasColumnName("organization_id");
-                    });
         });
 
         modelBuilder.Entity<Country>(entity =>
@@ -712,11 +711,17 @@ public partial class HandlerContext : DbContext
                 .HasMaxLength(200)
                 .IsUnicode(false)
                 .HasColumnName("street");
+            entity.Property(e => e.AvailabilityStatusId).HasColumnName("availability_status_id");
 
             entity.HasOne(d => d.Country).WithMany(p => p.Organizations)
                 .HasForeignKey(d => d.CountryId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Organization_Country_relation");
+
+            entity.HasOne(d => d.AvailabilityStatus).WithMany(p => p.Organizations)
+                .HasForeignKey(d => d.AvailabilityStatusId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Organization_Availability_Status_relation");
         });
 
         modelBuilder.Entity<OutsideItem>(entity =>
@@ -747,26 +752,6 @@ public partial class HandlerContext : DbContext
                 .HasForeignKey(d => d.OrganizationId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Outside_Item_Organization_relation");
-
-            entity.HasMany(d => d.Users).WithMany(p => p.Os)
-                .UsingEntity<Dictionary<string, object>>(
-                    "OutsideItemOwner",
-                    r => r.HasOne<AppUser>().WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("Outside_item_owner_User_relation"),
-                    l => l.HasOne<OutsideItem>().WithMany()
-                        .HasForeignKey("OutsideItemId", "OrganizationId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("Outside_item_owner_Outside_Item_relation"),
-                    j =>
-                    {
-                        j.HasKey("OutsideItemId", "UsersId", "OrganizationId").HasName("Outside_item_owner_pk");
-                        j.ToTable("Outside_item_owner");
-                        j.IndexerProperty<int>("OutsideItemId").HasColumnName("outside_item_id");
-                        j.IndexerProperty<int>("UsersId").HasColumnName("users_id");
-                        j.IndexerProperty<int>("OrganizationId").HasColumnName("organization_id");
-                    });
         });
 
         modelBuilder.Entity<OutsideItemOffer>(entity =>
@@ -788,7 +773,7 @@ public partial class HandlerContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Outside_Item_Offer_Offer_relation");
 
-            entity.HasOne(d => d.O).WithMany(p => p.OutsideItemOffers)
+            entity.HasOne(d => d.OutsideItem).WithMany(p => p.OutsideItemOffers)
                 .HasForeignKey(d => new { d.OutsideItemId, d.OrganizationId })
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Outside_Item_Offer_Outside_Item_relation");

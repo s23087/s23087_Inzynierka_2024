@@ -13,21 +13,24 @@ namespace database_comunicator.Controllers
         private readonly IRegistrationServices _registrationServices;
         private readonly IOrganizationServices _organizationServices;
         private readonly IUserServices _userServices;
-        public RegistrationController(IRegistrationServices registrationServices, IOrganizationServices organizationServices, IUserServices userServices)
+        private readonly IRolesServices _rolesServices;
+        public RegistrationController(IRegistrationServices registrationServices, IOrganizationServices organizationServices, IUserServices userServices, IRolesServices rolesServices)
         {
             _registrationServices = registrationServices;
             _organizationServices = organizationServices;
             _userServices = userServices;
+            _rolesServices = rolesServices;
         }
 
         [HttpGet]
         [Route("countries")]
         public async Task<IActionResult> GetCountries()
         {
-            var countries = await _registrationServices.getCountriesNames();
+            var countries = await _registrationServices.getCountries();
 
             return Ok(countries.Select(e => new GetCountries
             {
+                Id = e.CountryId,
                 CountryName = e.CountryName
             }));
         }
@@ -82,7 +85,7 @@ namespace database_comunicator.Controllers
 
             if (newUser.IsOrg)
             {
-                roleId = await _userServices.GetRoleId("Admin");
+                roleId = await _rolesServices.GetRoleId("Admin");
             }
 
             var result = await _userServices.AddUser(new AddUser
@@ -90,9 +93,8 @@ namespace database_comunicator.Controllers
                 Email = newUser.Email,
                 Username = newUser.Username,
                 Surname = newUser.Username,
-                Password = newUser.Password,
-                OrganizationsId = orgId
-            }, roleId, newUser.IsOrg);
+                Password = newUser.Password
+            }, orgId, roleId, newUser.IsOrg);
 
             return result ? Ok() : BadRequest();
 
