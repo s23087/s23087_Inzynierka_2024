@@ -1,97 +1,81 @@
 "use client";
 
-import PropTypes from "prop-types";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { useFormState } from "react-dom";
 import { Form, Container, Button, Stack } from "react-bootstrap";
+import AddUser from "@/utils/settings/add_user";
 import validators from "@/utils/validators/validator";
-import { useState } from "react";
-import changeUserInfo from "@/utils/settings/change_user_info";
 import Toastes from "@/components/smaller_components/toast";
+import getRoles from "@/utils/roles/get_roles";
 
-function ModifyUserForm({ email, name, surname }) {
+export default function AddUserPage() {
   const router = useRouter();
+  const [roles, setRoles] = useState({});
+  useEffect(() => {
+    const roles = getRoles();
+    roles.then((data) => setRoles(data));
+  }, []);
   const [emailError, setEmailError] = useState(false);
   const [nameError, setNameError] = useState(false);
   const [surnameError, setSurnameError] = useState(false);
-  const anyError = emailError || nameError || surnameError;
+  const [passError, setPassError] = useState(false);
+  let anyError = emailError || nameError || surnameError || passError;
   const [isLoading, setIsLoading] = useState(false);
-  const [prevState] = useState({
-    email: email,
-    name: name,
-    surname: surname,
+  const [state, formAction] = useFormState(AddUser, {
+    error: false,
+    completed: false,
+    message: "",
   });
-  const [state, formAction] = useFormState(
-    changeUserInfo.bind(null, prevState),
-    {
-      error: false,
-      completed: false,
-      message: "",
-    },
-  );
-  const buttonStyle = {
-    width: "220px",
-    height: "55px",
-  };
   const hidden = {
     display: "none",
   };
   const unhidden = {
     display: "block",
   };
+  const buttonStyle = {
+    width: "220px",
+    height: "55px",
+  };
+  const maxInputWidth = {
+    maxWidth: "519px",
+  };
   return (
     <Container className="px-4 pt-4" fluid>
-      <Form
-        className="mx-1 mx-xl-4"
-        action={formAction}
-        id="changeUserInfoForm"
-      >
-        <Form.Group className="mb-3">
-          <Form.Label className="blue-main-text h5">
-            Change your user data
-          </Form.Label>
-        </Form.Group>
-        <Form.Group className="mb-3">
+      <Form className="mx-1 mx-xl-4" id="addUserForm" action={formAction}>
+        <Form.Group className="mb-3" style={maxInputWidth}>
           <Form.Label className="blue-main-text">Email:</Form.Label>
-          <p
-            className="text-start mb-1 red-sec-text small-text"
-            style={emailError ? unhidden : hidden}
-          >
-            Is empty or not a email.
-          </p>
           <Form.Control
-            className="input-style shadow-sm maxInputWidth"
+            className="input-style shadow-sm"
             type="email"
             name="email"
-            defaultValue={email}
-            isInvalid={emailError}
             onInput={(e) => {
               if (
                 validators.lengthSmallerThen(e.target.value, 350) &&
-                validators.isEmail(e.target.value) &&
-                validators.stringIsNotEmpty(e.target.value)
+                validators.stringIsNotEmpty(e.target.value) &&
+                validators.isEmail(e.target.value)
               ) {
                 setEmailError(false);
               } else {
                 setEmailError(true);
               }
             }}
-            maxLength={350}
+            isInvalid={emailError}
+            placeholder="email"
           />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label className="blue-main-text">Name:</Form.Label>
           <p
             className="text-start mb-1 red-sec-text small-text"
-            style={nameError ? unhidden : hidden}
+            style={emailError ? unhidden : hidden}
           >
-            Is empty or lenght is greater than 250.
+            Incorrect email.
           </p>
+        </Form.Group>
+        <Form.Group className="mb-3" style={maxInputWidth}>
+          <Form.Label className="blue-main-text">Name:</Form.Label>
           <Form.Control
-            className="input-style shadow-sm maxInputWidth"
+            className="input-style shadow-sm"
             type="text"
             name="name"
-            defaultValue={name}
             isInvalid={nameError}
             onInput={(e) => {
               if (
@@ -103,26 +87,25 @@ function ModifyUserForm({ email, name, surname }) {
                 setNameError(true);
               }
             }}
-            maxLength={250}
+            placeholder="name"
           />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label className="blue-main-text">Surname:</Form.Label>
           <p
             className="text-start mb-1 red-sec-text small-text"
-            style={surnameError ? unhidden : hidden}
+            style={nameError ? unhidden : hidden}
           >
-            Is empty or lenght is greater than 200.
+            Incorrect username. Cannot be empty or excceed 250 chars.
           </p>
+        </Form.Group>
+        <Form.Group className="mb-3" style={maxInputWidth}>
+          <Form.Label className="blue-main-text">Surname:</Form.Label>
           <Form.Control
-            className="input-style shadow-sm maxInputWidth"
+            className="input-style shadow-sm"
             type="text"
             name="surname"
-            defaultValue={surname}
             isInvalid={surnameError}
             onInput={(e) => {
               if (
-                validators.lengthSmallerThen(e.target.value, 200) &&
+                validators.lengthSmallerThen(e.target.value, 250) &&
                 validators.stringIsNotEmpty(e.target.value)
               ) {
                 setSurnameError(false);
@@ -130,8 +113,49 @@ function ModifyUserForm({ email, name, surname }) {
                 setSurnameError(true);
               }
             }}
-            maxLength={200}
+            placeholder="surname"
           />
+          <p
+            className="text-start mb-1 red-sec-text small-text"
+            style={surnameError ? unhidden : hidden}
+          >
+            Incorrect surname. Cannot be empty or excceed 250 chars.
+          </p>
+        </Form.Group>
+        <Form.Group className="mb-3" style={maxInputWidth}>
+          <Form.Label className="blue-main-text">Password:</Form.Label>
+          <Form.Control
+            className="input-style shadow-sm"
+            type="password"
+            name="password"
+            placeholder="password"
+            isInvalid={passError}
+            onInput={(e) => {
+              if (validators.stringIsNotEmpty(e.target.value)) {
+                setPassError(false);
+              } else {
+                setPassError(true);
+              }
+            }}
+          />
+          <p
+            className="text-start mb-1 red-sec-text small-text"
+            style={passError ? unhidden : hidden}
+          >
+            Cannot be empty.
+          </p>
+        </Form.Group>
+        <Form.Group className="mb-3" style={maxInputWidth}>
+          <Form.Label className="blue-main-text">Role:</Form.Label>
+          <Form.Select className="input-style shadow-sm" name="role">
+            {Object.values(roles).map((value) => {
+              return (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              );
+            })}
+          </Form.Select>
         </Form.Group>
         <Stack>
           <Button
@@ -143,14 +167,14 @@ function ModifyUserForm({ email, name, surname }) {
               e.preventDefault();
               if (anyError) return;
               setIsLoading(true);
-              let form = document.getElementById("changeUserInfoForm");
+              let form = document.getElementById("addUserForm");
               form.requestSubmit();
             }}
           >
             {isLoading && !state.completed ? (
               <div className="spinner-border main-text"></div>
             ) : (
-              "Save Changes"
+              "Create user"
             )}
           </Button>
         </Stack>
@@ -161,8 +185,7 @@ function ModifyUserForm({ email, name, surname }) {
           variant="secBlue"
           type="Click"
           style={buttonStyle}
-          onClick={(e) => {
-            e.preventDefault();
+          onClick={() => {
             router.push(".");
           }}
         >
@@ -194,11 +217,3 @@ function ModifyUserForm({ email, name, surname }) {
     </Container>
   );
 }
-
-ModifyUserForm.PropTypes = {
-  email: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  surname: PropTypes.string.isRequired,
-};
-
-export default ModifyUserForm;

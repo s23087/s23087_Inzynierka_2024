@@ -1,7 +1,9 @@
 ﻿using database_comunicator.Data;
 using database_comunicator.Models;
 using database_comunicator.Models.DTOs;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Security.Cryptography;
 
 namespace database_comunicator.Services
@@ -26,6 +28,8 @@ namespace database_comunicator.Services
         public Task<bool> ManyUserExist(IEnumerable<int> users);
         public Task<bool> StatusExist(int statusId);
         public Task<IEnumerable<GetClientBindings>> GetClientBindings(int orgId);
+        public Task<bool> OrgHaveRelations(int orgId);
+        public Task DeleteOrg(int orgId);
     }
     public class OrganizationServices : IOrganizationServices
     {
@@ -102,11 +106,6 @@ namespace database_comunicator.Services
                 _handlerContext.Entry(changedOrg).Property("OrgName").IsModified = false;
             }
 
-            if (changedOrg.Nip == null)
-            {
-                _handlerContext.Entry(changedOrg).Property("Nip").IsModified = false;
-            }
-
             if (changedOrg.Street == null)
             {
                 _handlerContext.Entry(changedOrg).Property("Street").IsModified = false;
@@ -134,7 +133,8 @@ namespace database_comunicator.Services
                 {
                     ClientId = d.OrganizationId,
                     ClientName = d.OrgName,
-                    Address = d.Street + " " + d.City,
+                    Street = d.Street,
+                    City = d.City,
                     Postal = d.PostalCode,
                     Nip = d.Nip,
                     Country = d.Country.CountryName
@@ -150,7 +150,8 @@ namespace database_comunicator.Services
                 {
                     ClientId = e.OrganizationId,
                     ClientName = e.OrgName,
-                    Address = e.Street + " " + e.City,
+                    Street = e.Street,
+                    City = e.City,
                     Postal = e.PostalCode,
                     Nip = e.Nip,
                     Country = e.Country.CountryName
@@ -167,7 +168,8 @@ namespace database_comunicator.Services
                     ClientId = e.OrganizationId,
                     Users = e.AppUsers.Select(e => e.Username + " " + e.Surname).ToList(),
                     ClientName = e.OrgName,
-                    Address = e.Street + " " + e.City,
+                    Street = e.Street,
+                    City = e.City,
                     Postal = e.PostalCode,
                     Nip = e.Nip,
                     Country = e.Country.CountryName
@@ -184,7 +186,8 @@ namespace database_comunicator.Services
                     ClientId = d.OrganizationId,
                     Users = d.AppUsers.Select(e => e.Username + " " + e.Surname).ToList(),
                     ClientName = d.OrgName,
-                    Address = d.Street + " " + d.City,
+                    Street = d.Street,
+                    City = d.City,
                     Postal = d.PostalCode,
                     Nip = d.Nip,
                     Country = d.Country.CountryName
@@ -234,15 +237,22 @@ namespace database_comunicator.Services
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
             try
             {
-                var current = await _handlerContext.UserClients.Where(e => e.OrganizationId == data.OrgId).Select(e => e.IdUser).ToListAsync();
-                await _handlerContext.UserClients.Where(e => e.OrganizationId == data.OrgId && !data.UsersId.Contains(e.IdUser)).ExecuteDeleteAsync();
-                var withoutExisting = data.UsersId.Where(e => !current.Contains(e)).ToList();
-                var toAdd = withoutExisting.Select(e => new UserClient
+                var current = await _handlerContext.Organizations.Where(e => e.OrganizationId == data.OrgId).Select(e => e.AppUsers.Select(d => d.IdUser)).ToListAsync();
+                var command = $"Delete from User_Client where organization_id = {data.OrgId} and users_id not in (";
+                string lastPart = String.Join(",", data.UsersId) + ")";
+                await _handlerContext.Database.ExecuteSqlRawAsync(command + lastPart);
+                var withoutExisting = data.UsersId.Where(e => !current[0].Contains(e)).ToList();
+                var toAdd = withoutExisting.Select(e => new
                 {
                     OrganizationId = data.OrgId,
-                    IdUser = e
+                    IdUser = e,
                 }).ToList();
-                await _handlerContext.UserClients.AddRangeAsync(toAdd);
+
+                foreach (var relation in toAdd)
+                {
+                    _handlerContext.Database.ExecuteSql($"insert into User_Client (users_id, organization_id) Values ({relation.IdUser}, {relation.OrganizationId})");
+                }
+
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
             } catch (Exception ex)
@@ -258,7 +268,8 @@ namespace database_comunicator.Services
         }
         public async Task<bool> ManyUserExist(IEnumerable<int> users)
         {
-            return await _handlerContext.AppUsers.AllAsync(e => users.Contains(e.IdUser));
+            if (!users.Any()) return true;
+            return await _handlerContext.AppUsers.AnyAsync(e => users.Contains(e.IdUser));
         }
         public async Task<bool> StatusExist(int statusId)
         {
@@ -266,15 +277,28 @@ namespace database_comunicator.Services
         }
         public async Task<IEnumerable<GetClientBindings>> GetClientBindings(int orgId)
         {
-            return await _handlerContext.UserClients
-                .Where(e => e.OrganizationId == orgId)
-                .Include(e => e.AppUser)
-                .Select(e => new GetClientBindings
+            return await _handlerContext.Organizations.Where(e => e.OrganizationId == orgId).SelectMany(e => e.AppUsers).Select(e => new GetClientBindings
             {
-                UserId = e.IdUser,
-                Username = e.AppUser.Username,
-                Surname = e.AppUser.Surname
+                IdUser = e.IdUser,
+                Username = e.Username,
+                Surname = e.Surname
             }).ToListAsync();
+        }
+        public async Task<bool> OrgHaveRelations(int orgId)
+        {
+            var invoicesCheck = await _handlerContext.Invoices.Where(e => e.Buyer == orgId || e.Seller == orgId).AnyAsync();
+            var proformaCheck = await _handlerContext.Proformas.Where(e => e.Buyer == orgId || e.Seller == orgId).AnyAsync();
+            var soloUserCheck = await _handlerContext.SoloUsers.Where(e => e.OrganizationsId == orgId).AnyAsync();
+            var orgUserCheck = await _handlerContext.OrgUsers.Where(e => e.OrganizationsId == orgId).AnyAsync();
+            var offerCheck = await _handlerContext.Offers.Where(e => e.OrganizationsId == orgId).AnyAsync();
+            var outsideItemsCheck = await _handlerContext.OutsideItems.Where(e => e.OrganizationId == orgId).AnyAsync();
+            var userClientCheck = await _handlerContext.Database.ExecuteSqlAsync($"Select 1 from User_Client where organization_id = {orgId}");
+
+            return invoicesCheck || proformaCheck || soloUserCheck || orgUserCheck || offerCheck || outsideItemsCheck || userClientCheck.ToString().Contains('1'); ;
+        }
+        public async Task DeleteOrg(int orgId)
+        {
+            await _handlerContext.Organizations.Where(e => e.OrganizationId == orgId).ExecuteDeleteAsync();
         }
     }
 }

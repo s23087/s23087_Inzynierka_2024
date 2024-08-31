@@ -17,15 +17,15 @@ function OrgSwitcher({ is_org }) {
       variant="as-link"
       className="p-0"
       onClick={() => {
-        is_org = is_org !== "true";
+        is_org = is_org !== true;
         accessParams.set("page", 1);
         accessParams.set("isOrg", is_org);
         router.push(`${pathName}?${accessParams}`);
       }}
     >
       <Image
-        src={is_org === "true" ? org_switch : solo_switch}
-        alt={is_org === "true" ? "Org switch" : "Solo switch"}
+        src={is_org === true ? org_switch : solo_switch}
+        alt={is_org === true ? "Org switch" : "Solo switch"}
       />
     </Button>
   );

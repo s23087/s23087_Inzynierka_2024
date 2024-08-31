@@ -1,8 +1,13 @@
+"use client";
+
 import PropTypes from "prop-types";
 import Link from "next/link";
 import { Button } from "react-bootstrap";
+import { useState } from "react";
+import getLogs from "@/utils/settings/get_logs";
 
 function SettingMenu({ role }) {
+  const [isLoading, setIsLoading] = useState(false);
   const linkStyle = {
     minHeight: "45px",
   };
@@ -54,6 +59,21 @@ function SettingMenu({ role }) {
             variant="mainBlue"
             className="mx-auto mx-xl-0 ms-xl-1 mt-3"
             style={buttonStyle}
+            onClick={async () => {
+              setIsLoading(true);
+              const data = await getLogs();
+              let logsCSV =
+                "data:text/csv;charset=utf-8," +
+                "Action;Description;Data;Username;Surname\n" +
+                Object.values(data)
+                  .map((e) => {
+                    return Object.values(e).join(";");
+                  })
+                  .join("\n");
+              var encoded = encodeURI(logsCSV);
+              window.open(encoded);
+              setIsLoading(false);
+            }}
           >
             Download log file
           </Button>
@@ -117,8 +137,27 @@ function SettingMenu({ role }) {
             variant="mainBlue"
             className="mx-auto mx-xl-0 ms-xl-1 mt-3"
             style={buttonStyle}
+            onClick={async () => {
+              setIsLoading(true);
+              const data = await getLogs();
+              let logsCSV =
+                "data:text/csv;charset=utf-8," +
+                "Action;Description;Data;Username;Surname\n" +
+                Object.values(data)
+                  .map((e) => {
+                    return Object.values(e).join(";");
+                  })
+                  .join("\n");
+              var encoded = encodeURI(logsCSV);
+              window.open(encoded);
+              setIsLoading(false);
+            }}
           >
-            Download log file
+            {isLoading ? (
+              <div className="spinner-border main-text"></div>
+            ) : (
+              "Download log file"
+            )}
           </Button>
         </>
       );

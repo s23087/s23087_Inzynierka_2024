@@ -45,7 +45,7 @@ function Navlinks({ role, active_link, notification_qty, is_sidebar }) {
       Pricelist: "/dashboard/pricelist",
       Proformas: "/dashboard/proformas",
       Clients: "/dashboard/clients",
-      Invoices: "/dashboard/invocies",
+      Invoices: "/dashboard/invoices",
       Deliveries: "/dashboard/deliveries",
       Notifications: "/dashboard/notifications",
       Settings: "/dashboard/settings",

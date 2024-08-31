@@ -4,22 +4,25 @@ import PropTypes from "prop-types";
 import Image from "next/image";
 import { Modal, Container, Row, Col, Button } from "react-bootstrap";
 import CloseIcon from "../../../public/icons/close_black.png";
+import { useState } from "react";
 
-function DeleteItemWindow({
+function DeleteObjectWindow({
   modalShow,
   onHideFunction,
   deleteItemFunc,
   instanceName,
   instanceId,
   isError,
+  errorMessage,
 }) {
+  const [isActivated, setIsActivated] = useState(false);
   return (
     <Modal size="sm" show={modalShow} centered className="px-4">
       <Modal.Body>
         <Container>
           <Row>
             <Col>
-              <h5 className="mb-0 mt-4">Delete item</h5>
+              <h5 className="mb-0 mt-4">Delete {instanceName}</h5>
             </Col>
             <Col className="d-flex justify-content-end pe-0">
               <Button variant="as-link" className="p-0">
@@ -31,10 +34,7 @@ function DeleteItemWindow({
         <Container className="mt-4 mb-2">
           <Row>
             {isError ? (
-              <p className="text-start mb-4 red-sec-text">
-                Error: Could not delete this item. Check if invoice with this
-                item exist.
-              </p>
+              <p className="text-start mb-4 red-sec-text">{errorMessage}</p>
             ) : (
               <p className="text-start mb-4">
                 Are you sure you want to delete {instanceName} with id &apos;
@@ -49,7 +49,12 @@ function DeleteItemWindow({
                   <Button
                     variant="mainBlue"
                     className="w-100"
-                    onClick={deleteItemFunc}
+                    disabled={isActivated}
+                    onClick={async () => {
+                      setIsActivated(true);
+                      await deleteItemFunc();
+                      setIsActivated(false);
+                    }}
                   >
                     Confirm
                   </Button>
@@ -72,13 +77,14 @@ function DeleteItemWindow({
   );
 }
 
-DeleteItemWindow.PropTypes = {
+DeleteObjectWindow.PropTypes = {
   modalShow: PropTypes.bool.isRequired,
   onHideFunction: PropTypes.func.isRequired,
   deleteItemFunc: PropTypes.func.isRequired,
   instanceName: PropTypes.string.isRequired,
   instanceId: PropTypes.number.isRequired,
   isError: PropTypes.bool.isRequired,
+  errorMessage: PropTypes.string,
 };
 
-export default DeleteItemWindow;
+export default DeleteObjectWindow;

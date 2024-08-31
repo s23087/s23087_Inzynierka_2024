@@ -37,13 +37,10 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
     height: "81vh",
   };
   const [isLoading, setIsLoading] = useState(false);
-  const [showErrorToast, setShowErrorToast] = useState(false);
-  const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [state, formAction] = useFormState(createItem.bind(null, eans), {
     error: false,
-    complete: false,
+    completed: false,
   });
-  const [toastIsClosed, setToastIsClosed] = useState(false);
   return (
     <Offcanvas
       className="h-100 minScalableWidth"
@@ -51,26 +48,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
       onHide={hideFunction}
       placement="bottom"
     >
-      <Container
-        className="h-100 w-100 p-0"
-        onMouseMove={() => {
-          if (toastIsClosed) {
-            return;
-          }
-          if (state.complete && !state.error) {
-            setIsLoading(false);
-            setShowSuccessToast(true);
-            let form = document.getElementById("addItemForm");
-            form.reset();
-            setEans([]);
-          }
-          if (state.complete && state.error) {
-            setIsLoading(false);
-            setShowErrorToast(true);
-          }
-        }}
-        fluid
-      >
+      <Container className="h-100 w-100 p-0" fluid>
         <Offcanvas.Header className="border-bottom-grey px-xl-5">
           <Container className="px-3" fluid>
             <Row>
@@ -83,7 +61,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                   onClick={() => {
                     setEans([]);
                     hideFunction();
-                    if (!state.error && state.complete) {
+                    if (!state.error && state.completed) {
                       router.refresh();
                     }
                   }}
@@ -183,7 +161,6 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                       onClick={(e) => {
                         e.preventDefault();
                         setIsLoading(true);
-                        setToastIsClosed(false);
 
                         let form = document.getElementById("addItemForm");
                         form.requestSubmit();
@@ -203,7 +180,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                       onClick={() => {
                         setEans([]);
                         hideFunction();
-                        if (!state.error && state.complete) {
+                        if (!state.error && state.completed) {
                           router.refresh();
                         }
                       }}
@@ -218,19 +195,26 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
         </Offcanvas.Body>
 
         <Toastes.ErrorToast
-          showToast={showErrorToast}
+          showToast={state.completed && state.error}
           message="Could not create item"
           onHideFun={() => {
-            setToastIsClosed(true);
-            setShowErrorToast(false);
+            state.error = false;
+            state.completed = false;
+            state.message = "";
+            setIsLoading(false);
           }}
         />
         <Toastes.SuccessToast
-          showToast={showSuccessToast}
+          showToast={state.completed && !state.error}
           message="Item succesfuly created."
           onHideFun={() => {
-            setToastIsClosed(true);
-            setShowSuccessToast(false);
+            state.error = false;
+            state.completed = false;
+            state.message = "";
+            setIsLoading(false);
+            hideFunction();
+            setEans([]);
+            router.refresh();
           }}
         />
       </Container>

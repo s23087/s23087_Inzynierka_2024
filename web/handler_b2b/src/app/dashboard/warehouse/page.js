@@ -18,7 +18,8 @@ export default async function WarehousePage({ searchParams }) {
     searchParams.isOrg !== undefined ? searchParams.isOrg : false;
   const getOrgView = () => {
     return (
-      (current_role == "Admin" || current_role == "Accountant") && orgActivated
+      (current_role == "Admin" || current_role == "Accountant") &&
+      orgActivated === "true"
     );
   };
   let org_view = getOrgView();

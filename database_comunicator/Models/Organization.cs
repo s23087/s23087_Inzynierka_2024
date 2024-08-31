@@ -41,5 +41,4 @@ public partial class Organization
 
     public virtual ICollection<SoloUser> SoloUsers { get; set; } = new List<SoloUser>();
     public virtual ICollection<AppUser> AppUsers { get; set; } = new List<AppUser>();
-    public virtual ICollection<UserClient> UserClients { get; set; } = new List<UserClient>();
 }

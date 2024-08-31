@@ -17,6 +17,8 @@ export default async function createNewRegisteredUser(formData, dbName, isOrg) {
     isOrg: isOrg === "true",
   };
 
+  console.log(data);
+
   let response = await fetch(
     `${process.env.API_DEST}/${dbName}/Registration/registerUser`,
     {

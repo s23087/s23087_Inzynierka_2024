@@ -14,7 +14,7 @@ function createFolders(dbfile, logFile) {
     }
     return false;
   } catch (error) {
-    console.log(error);
+    console.log("Error:" + error);
     return false;
   }
 }
@@ -25,7 +25,7 @@ function deleteFolders(dbfile, logFile) {
     fs.rmdirSync(logFile);
     fs.rmdirSync(dbfile);
   } catch (error) {
-    console.log(error);
+    console.log("Error:" + error);
   }
 }
 

@@ -66,7 +66,6 @@ namespace database_comunicator.Controllers
             var exist = await _itemServices.ItemExist(newItem.Id);
             if (!exist) return NotFound();
             var partNumberExist = newItem.PartNumber != null && await _itemServices.ItemExist(newItem.PartNumber);
-            Console.WriteLine(partNumberExist.ToString());
             if (partNumberExist) return BadRequest();
 
             await _itemServices.UpdateItem(newItem);

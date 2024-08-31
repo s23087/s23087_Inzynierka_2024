@@ -9,44 +9,37 @@ import {
   DropdownButton,
   Button,
 } from "react-bootstrap";
-import ItemContainer from "../object_container/item_container";
+import ClientContainer from "../object_container/clients_container";
 import { useState } from "react";
 import SearchFilterBar from "../menu/search_filter_bar";
 import MoreActionWindow from "../windows/more_action";
-import AddItemOffcanvas from "../offcanvas/create/create_item";
+import AddClientOffcanvas from "../offcanvas/create/create_client";
 import { useSearchParams } from "next/navigation";
 import DeleteObjectWindow from "../windows/delete_object";
-import ViewItemOffcanvas from "../offcanvas/view/view_item";
-import deleteItem from "@/utils/warehouse/delete_item";
+import ViewClientOffcanvas from "../offcanvas/view/view_client";
+import deleteClient from "@/utils/clients/delete_client";
 import { useRouter } from "next/navigation";
-import ModifyItemOffcanvas from "../offcanvas/modify/modify_item";
+import ModifyClientOffcanvas from "../offcanvas/modify/modify_client";
 
-function ProductList({
-  products,
-  orgView,
-  currency,
-  productStart,
-  productEnd,
-}) {
+function ClientsList({ clients, orgView, clientsStart, clientsEnd }) {
   // View Item
-  const [showViewItem, setShowViewItem] = useState(false);
-  const [itemToView, setItemToView] = useState({
+  const [showViewClient, setShowViewClient] = useState(false);
+  const [clientToView, setClientToView] = useState({
     users: [],
-    eans: [],
   });
   // Modify Item
-  const [showModifyItem, setShowModifyItem] = useState(false);
-  const [itemToModify, setItemToModify] = useState({
+  const [showModifyClient, setShowModifyClient] = useState(false);
+  const [clientToModify, setClientToModify] = useState({
     users: [],
-    eans: [],
   });
   // Delete item
-  const [showDeleteItem, setShowDeleteItem] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState(null);
+  const [showDeleteClient, setShowDeleteclient] = useState(false);
+  const [clientToDelete, setItemToDelete] = useState(null);
   const [isErrorDelete, setIsErrorDelete] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   // More action
   const [showMoreAction, setShowMoreAction] = useState(false);
-  const [isShowAddItem, setShowAddItem] = useState(false);
+  const [isShowAddClient, setShowAddClient] = useState(false);
   // Seleted
   const [selectedQty, setSelectedQty] = useState(0);
   const [selectedKeys] = useState([]);
@@ -112,42 +105,41 @@ function ProductList({
         </Row>
       </Container>
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
-      {Object.keys(products).length === 0 ? (
+      {Object.keys(clients).length === 0 ? (
         <Container className="text-center" fluid>
           <p className="mt-5 pt-5 blue-main-text h2">Items not found :/</p>
         </Container>
       ) : (
-        Object.values(products)
-          .slice(productStart, productEnd)
+        Object.values(clients)
+          .slice(clientsStart, clientsEnd)
           .map((value) => {
             return (
-              <ItemContainer
-                item={value}
-                currency={currency}
+              <ClientContainer
+                key={value.clientId}
+                client={value}
                 is_org={orgView}
+                selected={selectedKeys.indexOf(value.clientId) !== -1}
                 selectQtyAction={() => {
-                  selectedKeys.push(value.itemId);
+                  selectedKeys.push(value.clientId);
                   setSelectedQty(selectedQty + 1);
                 }}
                 unselectQtyAction={() => {
-                  let index = selectedKeys.indexOf(value.itemId);
+                  let index = selectedKeys.indexOf(value.clientId);
                   selectedKeys.splice(index, 1);
                   setSelectedQty(selectedQty - 1);
                 }}
                 deleteAction={() => {
-                  setItemToDelete(value.itemId);
-                  setShowDeleteItem(true);
+                  setItemToDelete(value.clientId);
+                  setShowDeleteclient(true);
                 }}
                 viewAction={() => {
-                  setItemToView(value);
-                  setShowViewItem(true);
+                  setClientToView(value);
+                  setShowViewClient(true);
                 }}
                 modifyAction={() => {
-                  setItemToModify(value);
-                  setShowModifyItem(true);
+                  setClientToModify(value);
+                  setShowModifyClient(true);
                 }}
-                selected={selectedKeys.indexOf(value.itemId) !== -1}
-                key={value.itemId}
               />
             );
           })
@@ -155,26 +147,26 @@ function ProductList({
       <MoreActionWindow
         modalShow={showMoreAction}
         onHideFunction={() => setShowMoreAction(false)}
-        instanceName="item"
+        instanceName="client"
         addAction={() => {
           setShowMoreAction(false);
-          setShowAddItem(true);
+          setShowAddClient(true);
         }}
         selectAllOnPage={() => {
           selectedKeys.splice(0, selectedKeys.length);
           setSelectedQty(0);
           let start = page * pagation - pagation;
           let end = page * pagation;
-          Object.values(products)
+          Object.values(clients)
             .slice(start, end)
-            .forEach((e) => selectedKeys.push(e.itemId));
+            .forEach((e) => selectedKeys.push(e.clientId));
           setSelectedQty(selectedKeys.length);
           setShowMoreAction(false);
         }}
         selectAll={() => {
           selectedKeys.splice(0, selectedKeys.length);
           setSelectedQty(0);
-          Object.values(products).forEach((e) => selectedKeys.push(e.itemId));
+          Object.values(clients).forEach((e) => selectedKeys.push(e.clientId));
           setSelectedQty(selectedKeys.length);
           setShowMoreAction(false);
         }}
@@ -184,51 +176,52 @@ function ProductList({
           setShowMoreAction(false);
         }}
       />
-      <AddItemOffcanvas
-        showOffcanvas={isShowAddItem}
-        hideFunction={() => setShowAddItem(false)}
+      <AddClientOffcanvas
+        showOffcanvas={isShowAddClient}
+        hideFunction={() => setShowAddClient(false)}
       />
       <DeleteObjectWindow
-        modalShow={showDeleteItem}
-        onHideFunction={() => setShowDeleteItem(false)}
-        instanceName="item"
-        instanceId={itemToDelete}
+        modalShow={showDeleteClient}
+        onHideFunction={() => {
+          setShowDeleteclient(false);
+          setIsErrorDelete(false);
+        }}
+        instanceName="client"
+        instanceId={clientToDelete}
         deleteItemFunc={async () => {
-          let result = await deleteItem(itemToDelete);
-          if (result) {
-            setShowDeleteItem(false);
+          let result = await deleteClient(clientToDelete);
+          if (!result.error) {
+            setShowDeleteclient(false);
             router.refresh();
           } else {
+            setErrorMessage(result.message);
             setIsErrorDelete(true);
           }
         }}
         isError={isErrorDelete}
-        errorMessage="Error: Could not delete this item. Check if invoice with this item exist."
+        errorMessage={errorMessage}
       />
-      <ViewItemOffcanvas
-        showOffcanvas={showViewItem}
-        hideFunction={() => setShowViewItem(false)}
-        item={itemToView}
-        currency={currency}
+      <ModifyClientOffcanvas
+        showOffcanvas={showModifyClient}
+        hideFunction={() => setShowModifyClient(false)}
+        client={clientToModify}
         isOrg={orgView}
       />
-      <ModifyItemOffcanvas
-        showOffcanvas={showModifyItem}
-        hideFunction={() => setShowModifyItem(false)}
-        item={itemToModify}
-        curenncy={currency}
+      <ViewClientOffcanvas
+        showOffcanvas={showViewClient}
+        hideFunction={() => setShowViewClient(false)}
+        client={clientToView}
         isOrg={orgView}
       />
     </Container>
   );
 }
 
-ProductList.PropTypes = {
+ClientsList.PropTypes = {
   products: PropTypes.object.isRequired,
   orgView: PropTypes.bool.isRequired,
-  currency: PropTypes.string.isRequired,
   productStart: PropTypes.number.isRequired,
   productEnd: PropTypes.number.isRequired,
 };
 
-export default ProductList;
+export default ClientsList;

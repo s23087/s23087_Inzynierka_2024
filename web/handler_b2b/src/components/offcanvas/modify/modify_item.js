@@ -31,8 +31,15 @@ function ModifyItemOffcanvas({
   isOrg,
 }) {
   const router = useRouter();
+  const [prevState] = useState({
+    itemId: null,
+    name: null,
+    description: null,
+    partNumber: null,
+  });
   // View change
   const [isProductView, setIsProductView] = useState(true);
+  // Eans
   const [eans, setEans] = useState([]);
   // Get data
   const [bindings, setBindings] = useState([
@@ -59,15 +66,7 @@ function ModifyItemOffcanvas({
       let desc = getDescription(item.itemId);
       desc.then((data) => setDescription(data));
     }
-  }, [
-    showOffcanvas,
-    curenncy,
-    item.itemId,
-    setDescription,
-    setBindings,
-    item.eans,
-    isOrg,
-  ]);
+  }, [showOffcanvas, item.itemId, curenncy, isOrg, item.eans]);
   // Rerender Eans
   const [rerenderVar, setRerenderVar] = useState(1);
   const eanExist = (variable) => {
@@ -77,17 +76,12 @@ function ModifyItemOffcanvas({
   const [isAddEanShow, setIsAddEanShow] = useState(false);
   // Loading bool
   const [isLoading, setIsLoading] = useState(false);
-  // Toastes
-  const [showErrorToast, setShowErrorToast] = useState(false);
-  const [showSuccessToast, setShowSuccessToast] = useState(false);
-  const [toastIsClosed, setToastIsClosed] = useState(false);
   // Form
-  const [prevState, setPrevState] = useState({});
   const [state, formAction] = useFormState(
     updateItem.bind(null, eans).bind(null, prevState),
     {
       error: false,
-      complete: false,
+      completed: false,
       message: "",
     },
   );
@@ -99,13 +93,19 @@ function ModifyItemOffcanvas({
     maxWidth: "250px",
     borderRadius: "5px",
   };
+  const vhStyleHidden = {
+    height: "81vh",
+    display: "none",
+  };
+  const vhStyleUnhidden = {
+    height: "81vh",
+    display: "block",
+  };
   const hidden = {
     display: "none",
-    height: "81vh",
   };
   const unhidden = {
     display: "block",
-    height: "81vh",
   };
   return (
     <Offcanvas
@@ -117,16 +117,8 @@ function ModifyItemOffcanvas({
       <Container
         className="h-100 w-100 p-0"
         onMouseMove={() => {
-          if (toastIsClosed) {
-            return;
-          }
-          if (state.complete && !state.error) {
+          if (state.completed) {
             setIsLoading(false);
-            setShowSuccessToast(true);
-          }
-          if (state.complete && state.error) {
-            setIsLoading(false);
-            setShowErrorToast(true);
           }
         }}
         fluid
@@ -150,6 +142,7 @@ function ModifyItemOffcanvas({
                       isProductView ? switch_product_view : switch_binding_view
                     }
                     style={isOrg ? unhidden : hidden}
+                    className="h-auto w-auto"
                     alt="switch view"
                   />
                 </Button>
@@ -171,7 +164,7 @@ function ModifyItemOffcanvas({
         <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
           <Container
             className="p-0"
-            style={isProductView ? unhidden : hidden}
+            style={isProductView ? vhStyleUnhidden : vhStyleHidden}
             fluid
           >
             <Form action={formAction} id="modifyItemForm">
@@ -258,7 +251,7 @@ function ModifyItemOffcanvas({
           </Container>
           <Container
             className="p-0"
-            style={!isProductView ? unhidden : hidden}
+            style={!isProductView ? vhStyleUnhidden : vhStyleHidden}
             fluid
           >
             <Form>
@@ -290,14 +283,11 @@ function ModifyItemOffcanvas({
                   className="w-100"
                   onClick={(e) => {
                     e.preventDefault();
-                    setPrevState({
-                      itemId: item.itemId,
-                      name: item.itemName,
-                      description: description,
-                      partNumber: item.partNumber,
-                    });
                     setIsLoading(true);
-                    setToastIsClosed(false);
+                    prevState.itemId = item.itemId;
+                    prevState.name = item.itemName;
+                    prevState.description = description;
+                    prevState.partNumber = item.partNumber;
                     let form = document.getElementById("modifyItemForm");
                     form.requestSubmit();
                   }}
@@ -316,7 +306,7 @@ function ModifyItemOffcanvas({
                   onClick={() => {
                     setEans([]);
                     hideFunction();
-                    if (!state.error && state.complete) {
+                    if (!state.error && state.completed) {
                       router.refresh();
                     }
                   }}
@@ -327,23 +317,31 @@ function ModifyItemOffcanvas({
             </Row>
           </Container>
         </Offcanvas.Body>
-
-        <Toastes.ErrorToast
-          showToast={showErrorToast}
-          message={state.message}
-          onHideFun={() => {
-            setToastIsClosed(true);
-            setShowErrorToast(false);
-          }}
-        />
-        <Toastes.SuccessToast
-          showToast={showSuccessToast}
-          message="Item succesfuly updated."
-          onHideFun={() => {
-            setToastIsClosed(true);
-            setShowSuccessToast(false);
-          }}
-        />
+        <Container key={state.completed}>
+          <Toastes.ErrorToast
+            showToast={state.completed && state.error}
+            message={state.message}
+            onHideFun={() => {
+              state.error = false;
+              state.completed = false;
+              state.message = "";
+              setIsLoading(false);
+              router.refresh();
+            }}
+          />
+          <Toastes.SuccessToast
+            showToast={state.completed && !state.error}
+            message="Item successfully updated."
+            onHideFun={() => {
+              state.error = false;
+              state.completed = false;
+              state.message = "";
+              setIsLoading(false);
+              hideFunction();
+              router.refresh();
+            }}
+          />
+        </Container>
       </Container>
     </Offcanvas>
   );

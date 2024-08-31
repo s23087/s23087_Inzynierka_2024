@@ -70,5 +70,12 @@ namespace database_comunicator.Controllers
             var result = await _userServices.GetUserEmail(userId);
             return Ok(result);
         }
+        [HttpGet]
+        [Route("getUsers")]
+        public async Task<IActionResult> GetUSers()
+        {
+            var result = await _userServices.GetUsers();
+            return Ok(result);
+        }
     }
 }

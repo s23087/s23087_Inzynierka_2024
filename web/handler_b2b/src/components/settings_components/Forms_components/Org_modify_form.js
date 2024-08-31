@@ -18,7 +18,14 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
   const [postalError, setPostalError] = useState(false);
   const anyErrorActive =
     nameError || nipError || streetError || cityError || postalError;
-  const bindedFunc = modifyClient.bind(null, orgInfo.id);
+  const [prevState] = useState({
+    orgName: orgInfo.orgName,
+    street: orgInfo.street,
+    city: orgInfo.city,
+    postalCode: orgInfo.postal,
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const bindedFunc = modifyClient.bind(null, orgInfo.id).bind(null, prevState);
   const [state, formAction] = useFormState(bindedFunc, {
     error: false,
     message: "",
@@ -206,8 +213,19 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             type="Submit"
             style={buttonStyle}
             disabled={anyErrorActive}
+            onClick={(e) => {
+              e.preventDefault();
+              if (anyErrorActive) return;
+              setIsLoading(true);
+              let form = document.getElementById("UserOrgModify");
+              form.requestSubmit();
+            }}
           >
-            Save changes
+            {isLoading && !state.completed ? (
+              <div className="spinner-border main-text"></div>
+            ) : (
+              "Save Changes"
+            )}
           </Button>
         </Stack>
       </Form>
@@ -226,16 +244,24 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
         </Button>
       </Stack>
       <Toastes.ErrorToast
-        showToast={state.completed && !state.error}
+        showToast={state.completed && state.error}
         message={state.message}
         onHideFun={() => {
+          state.error = false;
+          state.completed = false;
+          state.message = "";
+          setIsLoading(false);
           router.refresh();
         }}
       />
       <Toastes.SuccessToast
-        showToast={state.completed && state.error}
+        showToast={state.completed && !state.error}
         message="You have successfuly modified org info."
         onHideFun={() => {
+          state.error = false;
+          state.completed = false;
+          state.message = "";
+          setIsLoading(false);
           router.refresh();
         }}
       />

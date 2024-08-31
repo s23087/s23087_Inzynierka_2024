@@ -97,7 +97,6 @@ public partial class HandlerContext : DbContext
     public virtual DbSet<SoloUser> SoloUsers { get; set; }
 
     public virtual DbSet<Taxis> Taxes { get; set; }
-    public virtual DbSet<UserClient> UserClients { get; set; }
     public virtual DbSet<UserNotification> UserNotifications { get; set; }
 
     public virtual DbSet<UserRole> UserRoles { get; set; }
@@ -183,21 +182,22 @@ public partial class HandlerContext : DbContext
                 .HasConstraintName("User_Solo_User_relation");
 
             entity.HasMany(d => d.Clients).WithMany(p => p.AppUsers)
-                .UsingEntity<UserClient>(
-                    l => l.HasOne(e => e.Organization).WithMany(e => e.UserClients)
-                        .HasForeignKey(e => e.OrganizationId)
+                .UsingEntity<Dictionary<string, object>>(
+                    "UserClient",
+                    r => r.HasOne<Organization>().WithMany()
+                        .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("Client_User_relation"),
-                    r => r.HasOne(e => e.AppUser).WithMany(e => e.UserClients)
-                        .HasForeignKey(e => e.IdUser)
+                    l => l.HasOne<AppUser>().WithMany()
+                        .HasForeignKey("UsersId")
                         .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("User_client_relation"),
                     j =>
                     {
-                        j.Property(e => e.IdUser).HasColumnName("users_id");
-                        j.Property(e => e.OrganizationId).HasColumnName("organization_id");
-                        j.HasKey(e => new {e.IdUser, e.OrganizationId}).HasName("User_Client_pk");
-                        j.ToTable("User_client");
+                        j.HasKey("OrganizationId", "UsersId").HasName("User_Client_pk");
+                        j.ToTable("User_Client");
+                        j.IndexerProperty<int>("OrganizationId").HasColumnName("organization_id");
+                        j.IndexerProperty<int>("UsersId").HasColumnName("users_id");
                     });
         });
 

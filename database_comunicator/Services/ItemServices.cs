@@ -113,9 +113,9 @@ namespace database_comunicator.Services
                  .ThenInclude(e => e.OwnedItem)
                     .ThenInclude(e => e.PurchasePrices)
                 .Include(e => e.Clients)
-                    .ThenInclude(e => e.OutsideItems)
+                       .ThenInclude(e => e.OutsideItems)
                 .Include(e => e.Clients)
-                    .ThenInclude(e => e.AvailabilityStatus)
+                       .ThenInclude(e => e.AvailabilityStatus)
                 .Select(instance => new GetRestInfoOrg
                 {
                     UserId = instance.IdUser,
@@ -286,7 +286,7 @@ namespace database_comunicator.Services
 
         public async Task<bool> ItemExist(string partNumber)
         {
-            return await _handlerContext.Items.Where(e => e.PartNumber.Equals(partNumber)).AnyAsync();
+            return await _handlerContext.Items.Where(e => e.PartNumber == partNumber).AnyAsync();
         }
 
         public async Task<bool> RemoveItem(int id)

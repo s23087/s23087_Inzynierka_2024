@@ -11,7 +11,7 @@ export default async function updateItem(eans, prevState, state, formData) {
   )
     return {
       error: true,
-      complete: true,
+      completed: true,
       message: "Name is empty or exceed required lenght",
     };
   if (
@@ -20,7 +20,7 @@ export default async function updateItem(eans, prevState, state, formData) {
   )
     return {
       error: true,
-      complete: true,
+      completed: true,
       message: "Description is empty or exceed required lenght",
     };
   if (
@@ -29,7 +29,7 @@ export default async function updateItem(eans, prevState, state, formData) {
   )
     return {
       error: true,
-      complete: true,
+      completed: true,
       message: "Partnumber is empty or exceed required lenght",
     };
 
@@ -62,16 +62,32 @@ export default async function updateItem(eans, prevState, state, formData) {
     },
   );
 
+  if (info.status == 400) {
+    return {
+      error: true,
+      completed: true,
+      message: "This part number exist.",
+    };
+  }
+
+  if (info.status == 404) {
+    return {
+      error: true,
+      completed: true,
+      message: "This item doesn't exist.",
+    };
+  }
+
   if (info.ok) {
     return {
       error: false,
-      complete: true,
+      completed: true,
     };
   } else {
     return {
       error: true,
-      complete: true,
-      message: "Status error: " + info.status,
+      completed: true,
+      message: "Critical error",
     };
   }
 }

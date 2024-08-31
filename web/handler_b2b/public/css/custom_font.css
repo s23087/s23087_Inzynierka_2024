@@ -32,6 +32,10 @@ a {
   color: var(--sec-red);
 }
 
+.green-main-text {
+  color: var(--main-green);
+}
+
 .small-text {
   font-size: 12px;
 }

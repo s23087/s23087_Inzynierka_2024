@@ -16,8 +16,6 @@ function ItemContainer({
   deleteAction,
   viewAction,
   modifyAction,
-  completeAction,
-  rejectAction,
   selected,
 }) {
   let statusColor = getStatusColor(item.statusName);
@@ -63,7 +61,7 @@ function ItemContainer({
     >
       <Row className="mx-0 mx-md-3 mx-xl-3">
         <Col xs="12" md="7" lg="7" xl="4">
-          {is_org === "true" ? (
+          {is_org ? (
             <Row className="mb-2">
               <Col className="d-flex">
                 <Image
@@ -179,8 +177,6 @@ function ItemContainer({
             deleteAction={deleteAction}
             viewAction={viewAction}
             modifyAction={modifyAction}
-            completeAction={completeAction}
-            rejectAction={rejectAction}
           />
         </Col>
       </Row>
@@ -197,8 +193,6 @@ ItemContainer.PropTypes = {
   deleteAction: PropTypes.func,
   viewAction: PropTypes.func,
   modifyAction: PropTypes.func,
-  completeAction: PropTypes.func,
-  rejectAction: PropTypes.func,
   selected: PropTypes.bool.isRequired,
 };
 

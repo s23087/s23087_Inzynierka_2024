@@ -49,7 +49,7 @@ namespace database_comunicator.Controllers
             }
             await _userServices.ModifyUserData(data.UserId, data.Email, data.Username, data.Surname);
             var logTypeId = await _logServices.getLogTypeId("Modify");
-            await _logServices.CreateActionLog($"User with id {data.UserId} has changed thier info.", data.UserId, logTypeId);
+            await _logServices.CreateActionLog($"User with id {data.UserId} has changed their info.", data.UserId, logTypeId);
             return Ok();
         }
         [HttpPost]
@@ -85,7 +85,9 @@ namespace database_comunicator.Controllers
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound();
             var role = await _userServices.GetUserRole(userId);
-            if (role != "Admin") return Unauthorized();
+            role ??= "Solo";
+            Console.WriteLine(role);
+            if (role != "Admin" && role != "Solo") return Unauthorized();
             var result = await _logServices.GetLogs();
             return Ok(result);
         }

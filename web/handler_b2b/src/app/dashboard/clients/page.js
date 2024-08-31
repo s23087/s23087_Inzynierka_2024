@@ -1,87 +1,66 @@
-"use client";
+"use server";
 
-import { useState } from "react";
-import { Container, Stack } from "react-bootstrap";
-import PagePostionBar from "@/components/menu/page_position_bar";
-import SearchFilterBar from "@/components/menu/search_filter_bar";
-import MenuTemplate from "@/components/menu/menu_template";
-import CustomSidebar from "@/components/menu/sidebars/sidebar";
-import Navlinks from "@/components/menu/navlinks";
-import PagationFooter from "@/components/footer/pagation_footer";
-import ClientContainer from "@/components/object_container/clients_container";
+import ClientMenu from "@/components/menu/wholeMenu/clients_menu";
+import ClientsList from "@/components/object_list/client_list";
+import WholeFooter from "@/components/footer/whole_footers/whole_footer";
+import getRole from "@/utils/auth/get_role";
+import getBasicInfo from "@/utils/menu/get_basic_user_info";
+import getNotificationCounter from "@/utils/menu/get_nofication_counter";
+import getClients from "@/utils/clients/get_clients";
+import getSearchClients from "@/utils/clients/get_clients_search";
 
-export default function ClientsPage() {
-  const [sidebarShow, setSidebarShow] = useState(false);
-  const showSidebar = () => setSidebarShow(true);
-  const hideSidebar = () => setSidebarShow(false);
-  const current_role = "Admin";
-  const current_nofitication_qty = 1;
-  const is_org_switch_needed = true;
-  const org_view = false;
-  const tmp_client = {
-    user: "<<user>>",
-    name: "<<name>>",
-    adress: "<<adress>>",
-    nip: "<<nip>>",
-    country: "<<country>>",
+export default async function ClientsPage({ searchParams }) {
+  const current_role = await getRole();
+  const userInfo = await getBasicInfo();
+  const current_nofitication_qty = await getNotificationCounter();
+  const is_org_switch_needed = current_role == "Admin";
+  let orgActivated =
+    searchParams.isOrg !== undefined ? searchParams.isOrg : false;
+  const getOrgView = () => {
+    return (
+      (current_role == "Admin" || current_role == "Accountant") &&
+      orgActivated === "true"
+    );
   };
+  let org_view = getOrgView();
+  let isSearchTrue = searchParams.searchQuery !== undefined;
+  let clients = isSearchTrue
+    ? await getSearchClients(org_view, searchParams.searchQuery)
+    : await getClients(org_view);
+  let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
+  let pageQty = Math.ceil(clients.length / maxInstanceOnPage);
+  pageQty = pageQty === 0 ? 1 : pageQty;
+  let currentPage = parseInt(searchParams.page)
+    ? parseInt(searchParams.page)
+    : 1;
+  let clientStart = currentPage * maxInstanceOnPage - maxInstanceOnPage;
+  clientStart = clientStart < 0 ? 0 : clientStart;
+  let clientEnd = clientStart + maxInstanceOnPage;
 
   return (
     <main className="d-flex flex-column h-100">
-      <nav className="fixed-top main-bg">
-        <MenuTemplate sidebar_action={showSidebar} user_name="<<User name>>">
-          <Stack className="ps-xl-2" direction="horizontal" gap={4}>
-            <Stack className="d-none d-xl-flex" direction="horizontal" gap={4}>
-              <Navlinks
-                role={current_role}
-                active_link="Clients"
-                notification_qty={current_nofitication_qty}
-                is_sidebar={false}
-              />
-            </Stack>
-          </Stack>
-        </MenuTemplate>
-        <PagePostionBar
-          site_name="Clients"
-          with_switch={is_org_switch_needed}
-          switch_bool={org_view}
-        />
-        <SearchFilterBar filter_icon_bool="false" />
-        <CustomSidebar
-          user_name="<<User name>>"
-          org_name="<<Org name>>"
-          offcanvasShow={sidebarShow}
-          onHideAction={hideSidebar}
-        >
-          <Navlinks
-            role={current_role}
-            active_link="Clients"
-            notification_qty={current_nofitication_qty}
-            is_sidebar={true}
-          />
-        </CustomSidebar>
-      </nav>
+      <ClientMenu
+        current_role={current_role}
+        current_nofitication_qty={current_nofitication_qty}
+        is_org_switch_needed={is_org_switch_needed}
+        org_view={org_view}
+        user={userInfo}
+      />
 
-      <section className="h-100">
-        <Container className="p-0 middleSectionPlacement" fluid>
-          <ClientContainer
-            client={tmp_client}
-            is_org={false}
-            selected={false}
-          />
-          <ClientContainer client={tmp_client} is_org={true} selected={false} />
-          <ClientContainer client={tmp_client} is_org={false} selected={true} />
-          <ClientContainer client={tmp_client} is_org={true} selected={true} />
-        </Container>
+      <section className="h-100 z-0">
+        <ClientsList
+          clients={clients}
+          orgView={org_view}
+          clientsEnd={clientEnd}
+          clientsStart={clientStart}
+        />
       </section>
 
-      <footer className="fixed-bottom w-100">
-        <PagationFooter
-          max_instance_on_page={10}
-          page_qty={20}
-          current_page={1}
-        />
-      </footer>
+      <WholeFooter
+        max_instance_on_page={maxInstanceOnPage}
+        page_qty={pageQty}
+        current_page={currentPage}
+      />
     </main>
   );
 }

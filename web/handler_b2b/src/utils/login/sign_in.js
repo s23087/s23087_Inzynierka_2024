@@ -29,10 +29,19 @@ export default async function signIn(state, formData) {
     body: JSON.stringify(data),
   });
 
+  console.log(response.status);
+
   if (response.ok) {
     const body = await response.json();
     await SessionManagment.createSession(body.id, body.role, dbName);
     redirect("dashboard/warehouse");
+  }
+
+  if (response.status == 500) {
+    return {
+      error: true,
+      message: "The company id is incorrect.",
+    };
   }
 
   return {

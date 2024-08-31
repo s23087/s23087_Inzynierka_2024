@@ -32,6 +32,7 @@ namespace database_comunicator.Services
         public Task ModifyUserRole(int orgUserId, int roleId);
         public Task<int?> GetOrgUserId(int userId);
         public Task<string> GetUserEmail(int userId);
+        public Task<IEnumerable<GetUsers>> GetUsers();
     }
     public class UserServices : IUserServices
     {
@@ -293,6 +294,15 @@ namespace database_comunicator.Services
         public async Task<string> GetUserEmail(int userId)
         {
             return await _handlerContext.AppUsers.Where(e => e.IdUser == userId).Select(e => e.Email).FirstAsync();
+        }
+        public async Task<IEnumerable<GetUsers>> GetUsers()
+        {
+            return await _handlerContext.AppUsers.Select(e => new GetUsers
+            {
+                IdUser = e.IdUser,
+                Username = e.Username,
+                Surname = e.Surname
+            }).ToListAsync();
         }
     }
 }

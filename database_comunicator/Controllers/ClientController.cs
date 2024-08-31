@@ -80,11 +80,11 @@ namespace database_comunicator.Controllers
         public async Task<IActionResult> SetUserClientBindings(SetUserClientBindings data, int userId)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound();
+            if (!exist) return NotFound("User do not exist.");
             var orgExist = await _organizationServices.OrgExist(data.OrgId);
-            if (!orgExist) return NotFound();
+            if (!orgExist) return NotFound("Org do not exist.");
             var usersExist = await _organizationServices.ManyUserExist(data.UsersId);
-            if (!usersExist) return NotFound();
+            if (!usersExist) return NotFound("One of user id do not exist.");
             var logTypeId = await _logServices.getLogTypeId("Modify");
             await _logServices.CreateActionLog($"User bindings for client with id {data.OrgId} has been changed by user id {userId}.", userId, logTypeId);
             await _organizationServices.SetClientUserBindings(data);
@@ -127,7 +127,7 @@ namespace database_comunicator.Controllers
             var orgId = await _organizationServices.AddOrganization(data);
             var logTypeId = await _logServices.getLogTypeId("Create");
             await _logServices.CreateActionLog($"Organization with name {data.OrgName} and id {orgId} had been added by user with id {userId}.", userId, logTypeId);
-            return Ok();
+            return Ok(orgId);
         }
         [HttpGet]
         [Route("getUserClientBindings")]
@@ -137,6 +137,19 @@ namespace database_comunicator.Controllers
             if (!orgExist) return NotFound();
             var result = await _organizationServices.GetClientBindings(orgId);
             return Ok(result);
+        }
+        [HttpDelete]
+        [Route("deleteOrg/{orgId}")]
+        public async Task<IActionResult> DeleteOrg(int orgId, int userId)
+        {
+            var exist = await _userServices.UserExist(userId);
+            if (!exist) return NotFound();
+            var relationExist = await _organizationServices.OrgHaveRelations(orgId);
+            if (relationExist) return BadRequest();
+            await _organizationServices.DeleteOrg(orgId);
+            var logTypeId = await _logServices.getLogTypeId("Delete");
+            await _logServices.CreateActionLog($"Organization with  id {orgId} had been deleted by user with id {userId}.", userId, logTypeId);
+            return Ok();
         }
 
     }
