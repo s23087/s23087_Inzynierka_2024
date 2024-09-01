@@ -11,7 +11,7 @@ function SearchFilterBar({ filter_icon_bool, moreButtonAction }) {
   };
   return (
     <Stack
-      className="main-blue-bg px-3"
+      className="main-blue-bg px-3 border-bottom-grey"
       direction="horizontal"
       style={barHeight}
     >

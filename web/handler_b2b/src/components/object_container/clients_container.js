@@ -8,8 +8,8 @@ function ClientContainer({
   client,
   is_org,
   selected,
-  selectQtyAction,
-  unselectQtyAction,
+  selectAction,
+  unselectAction,
   deleteAction,
   viewAction,
   modifyAction,
@@ -89,10 +89,10 @@ function ClientContainer({
           <ContainerButtons
             selected={selected}
             selectAction={() => {
-              selectQtyAction();
+              selectAction();
             }}
             unselectAction={() => {
-              unselectQtyAction();
+              unselectAction();
             }}
             deleteAction={deleteAction}
             viewAction={viewAction}
@@ -108,8 +108,8 @@ ClientContainer.PropTypes = {
   client: PropTypes.object.isRequired,
   is_org: PropTypes.bool.isRequired,
   selected: PropTypes.bool.isRequired,
-  selectQtyAction: PropTypes.func,
-  unselectQtyAction: PropTypes.func,
+  selectAction: PropTypes.func,
+  unselectAction: PropTypes.func,
   deleteAction: PropTypes.func,
   viewAction: PropTypes.func,
   modifyAction: PropTypes.func,

@@ -63,7 +63,17 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
       const users = getUsers();
       users.then((data) => setUsers(data));
     }
-  }, [showOffcanvas, isOrg, client.city, client.clientId, client.clientName, client.postal, client.street, restInfo.availability, statues]);
+  }, [
+    showOffcanvas,
+    isOrg,
+    client.city,
+    client.clientId,
+    client.clientName,
+    client.postal,
+    client.street,
+    restInfo.availability,
+    statues,
+  ]);
   // Errors
   const [nameError, setNameError] = useState(false);
   const [nipError, setNipError] = useState(false);

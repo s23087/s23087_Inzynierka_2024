@@ -210,6 +210,8 @@ export default function AddUserPage() {
           state.error = false;
           state.completed = false;
           state.message = "";
+          let form = document.getElementById("addUserForm");
+          form.reset();
           setIsLoading(false);
           router.refresh();
         }}

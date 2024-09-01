@@ -13,6 +13,7 @@ function MoreActionWindow({
   selectAllOnPage,
   selectAll,
   deselectAll,
+  withAdd = true,
 }) {
   return (
     <Modal size="sm" show={modalShow} centered className="px-4">
@@ -35,13 +36,15 @@ function MoreActionWindow({
         </Container>
         <Container className="mt-4 mb-2">
           <Stack gap={2}>
-            <Button
-              variant="as-link"
-              className="text-start ps-0"
-              onClick={addAction}
-            >
-              Add {instanceName}
-            </Button>
+            {withAdd ? (
+              <Button
+                variant="as-link"
+                className="text-start ps-0"
+                onClick={addAction}
+              >
+                Add {instanceName}
+              </Button>
+            ) : null}
             <Button
               variant="as-link"
               className="text-start ps-0"
@@ -74,11 +77,12 @@ MoreActionWindow.PropTypes = {
   modalShow: PropTypes.bool.isRequired,
   onHideFunction: PropTypes.func.isRequired,
   instanceName: PropTypes.string.isRequired,
-  addAction: PropTypes.func.isRequired,
+  addAction: PropTypes.func,
   selectAll: PropTypes.func.isRequired,
   selectAllOnPage: PropTypes.func.isRequired,
   deselectAll: PropTypes.func.isRequired,
   deselectAllOnPage: PropTypes.func.isRequired,
+  withAdd: PropTypes.bool,
 };
 
 export default MoreActionWindow;

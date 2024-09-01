@@ -3,7 +3,13 @@ import Image from "next/image";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import user_small_icon from "../../../public/icons/user_small_icon.png";
 
-function RoleContainer({ role, selected }) {
+function RoleContainer({
+  role,
+  selected,
+  selectAction,
+  unselectAction,
+  modifyAction,
+}) {
   const containerBg = {
     backgroundColor: "var(--sec-blue)",
   };
@@ -24,14 +30,14 @@ function RoleContainer({ role, selected }) {
                 className="me-2 mt-1"
               />
               <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1">
-                <p className="mb-0">{role.user}</p>
+                <p className="mb-0">{role.username + " " + role.surname}</p>
               </span>
             </Col>
           </Row>
           <Row className="gy-2">
             <Col xs="12" className="mb-1 mb-sm-0">
               <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
-                <p className="mb-0">Role: {role.role}</p>
+                <p className="mb-0">Role: {role.roleName}</p>
               </span>
             </Col>
           </Row>
@@ -50,6 +56,7 @@ function RoleContainer({ role, selected }) {
                 <Button
                   variant="mainBlue"
                   className="basicButtonStyle rounded-span w-100 p-0"
+                  onClick={selected ? unselectAction : selectAction}
                 >
                   {selected ? "Deselect" : "Select"}
                 </Button>
@@ -58,6 +65,7 @@ function RoleContainer({ role, selected }) {
                 <Button
                   variant="mainBlue"
                   className="basicButtonStyle rounded-span w-100"
+                  onClick={modifyAction}
                 >
                   Modify
                 </Button>
@@ -73,6 +81,9 @@ function RoleContainer({ role, selected }) {
 RoleContainer.PropTypes = {
   role: PropTypes.object.isRequired,
   selected: PropTypes.bool.isRequired,
+  selectAction: PropTypes.func,
+  unselectAction: PropTypes.func,
+  modifyAction: PropTypes.func,
 };
 
 export default RoleContainer;

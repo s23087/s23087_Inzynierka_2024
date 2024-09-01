@@ -96,7 +96,7 @@ public partial class HandlerContext : DbContext
 
     public virtual DbSet<SoloUser> SoloUsers { get; set; }
 
-    public virtual DbSet<Taxis> Taxes { get; set; }
+    public virtual DbSet<Taxes> Taxes { get; set; }
     public virtual DbSet<UserNotification> UserNotifications { get; set; }
 
     public virtual DbSet<UserRole> UserRoles { get; set; }
@@ -470,7 +470,7 @@ public partial class HandlerContext : DbContext
             entity.Property(e => e.Seller).HasColumnName("seller");
             entity.Property(e => e.Taxes).HasColumnName("taxes");
             entity.Property(e => e.TransportCost)
-                .HasColumnType("decimal(6, 2)")
+                .HasColumnType("decimal(20, 2)")
                 .HasColumnName("transport_cost");
 
             entity.HasOne(d => d.BuyerNavigation).WithMany(p => p.InvoiceBuyerNavigations)
@@ -1102,7 +1102,7 @@ public partial class HandlerContext : DbContext
                 .HasConstraintName("Solo_User_Organization_relation");
         });
 
-        modelBuilder.Entity<Taxis>(entity =>
+        modelBuilder.Entity<Taxes>(entity =>
         {
             entity.HasKey(e => e.TaxesId).HasName("Taxes_pk");
 
@@ -1126,6 +1126,11 @@ public partial class HandlerContext : DbContext
             entity.Property(e => e.ObjectTypeId).HasColumnName("object_type_id");
             entity.Property(e => e.UsersId).HasColumnName("users_id");
             entity.Property(e => e.IsRead).HasColumnName("is_read").HasConversion<int>();
+            entity.Property(e => e.Referance)
+                .IsRequired(false)
+                .HasMaxLength(300)
+                .IsUnicode(false)
+                .HasColumnName("referance");
 
             entity.HasOne(d => d.ObjectType).WithMany(p => p.UserNotifications)
                 .HasForeignKey(d => d.ObjectTypeId)

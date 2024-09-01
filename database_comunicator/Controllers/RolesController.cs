@@ -18,11 +18,18 @@ namespace database_comunicator.Controllers
         }
         [HttpGet]
         [Route("getUserRoles")]
-        public async Task<IActionResult> GetUserWithRoles(int userId)
+        public async Task<IActionResult> GetUserWithRoles(int userId, string? search)
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound();
-            var result = await _userServices.GetOrgUsersWithRoles(userId);
+            IEnumerable<GetOrgUsersWithRoles> result;
+            if (search == null)
+            {
+                result = await _userServices.GetOrgUsersWithRoles(userId);
+            } else
+            {
+                result = await _userServices.GetOrgUsersWithRoles(userId, search);
+            }
             return Ok(result);
         }
         [HttpGet]
@@ -38,14 +45,14 @@ namespace database_comunicator.Controllers
         public async Task<IActionResult> ModifyUserRole(ModifyUserRole data)
         {
             var exist = await _userServices.UserExist(data.UserId);
-            if (!exist) return NotFound();
+            if (!exist) return NotFound("User not found.");
             var roleId = await _rolesServices.GetRoleId(data.RoleName);
             var orgUserId = await _userServices.GetOrgUserId(data.ChoosenUserId);
             if (orgUserId == null)
             {
-                return NotFound();
+                return NotFound("Choosen user not found.");
             }
-            await _userServices.ModifyUserRole(roleId, (int)orgUserId);
+            await _userServices.ModifyUserRole((int)orgUserId, roleId);
             return Ok();
         }
 

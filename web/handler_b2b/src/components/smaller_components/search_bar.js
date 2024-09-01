@@ -11,7 +11,13 @@ export default function SearchBar() {
   const params = useSearchParams();
   return (
     <Container className="sec-blue-bg barStyle">
-      <Form>
+      <Form
+        onSubmit={(e) => {
+          e.preventDefault();
+          let button = document.getElementById("searchButton");
+          button.click();
+        }}
+      >
         <Stack direction="horizontal">
           <InputGroup>
             <Form.Control
@@ -24,6 +30,7 @@ export default function SearchBar() {
           <Button
             variant="as-link"
             className="ms-auto pe-0 py-0"
+            id="searchButton"
             onClick={(e) => {
               e.preventDefault();
               let variable = document.getElementById("searchInput");

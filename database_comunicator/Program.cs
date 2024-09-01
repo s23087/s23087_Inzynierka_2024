@@ -20,6 +20,8 @@ builder.Services.AddScoped<IUserServices, UserServices>();
 builder.Services.AddScoped<IItemServices, ItemServices>();
 builder.Services.AddScoped<ILogServices, LogServices>();
 builder.Services.AddScoped<IRolesServices, RolesServices>();
+builder.Services.AddScoped<IInvoiceServices, InvoiceServices>();
+builder.Services.AddScoped<INotificationServices, NotificationServices>();
 
 var app = builder.Build();
 

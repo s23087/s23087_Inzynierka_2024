@@ -8,6 +8,7 @@ import CurrencyChangeButton from "@/components/smaller_components/currency_chang
 import Navlinks from "../navlinks";
 import PagePostionBar from "../page_position_bar";
 import CustomSidebar from "../sidebars/sidebar";
+import CurrencyOffcanvas from "@/components/offcanvas/currency_offcanvas";
 
 function WarehouseMenu({
   current_role,
@@ -20,6 +21,7 @@ function WarehouseMenu({
   const [sidebarShow, setSidebarShow] = useState(false);
   const showSidebar = () => setSidebarShow(true);
   const hideSidebar = () => setSidebarShow(false);
+  const [currencyShow, setCurrencyShow] = useState(false);
   return (
     <nav className="fixed-top main-bg z-1">
       <MenuTemplate
@@ -29,7 +31,10 @@ function WarehouseMenu({
       >
         <Stack className="ps-xl-2" direction="horizontal" gap={4}>
           <Container className="mx-auto ms-xl-2 ms-xxl-0 me-xl-5 w-auto px-xl-0 px-xxl-2">
-            <CurrencyChangeButton currency={currency} />
+            <CurrencyChangeButton
+              currency={currency}
+              openCurrencyOffcanvas={() => setCurrencyShow(true)}
+            />
           </Container>
           <Stack className="d-none d-xl-flex" direction="horizontal" gap={4}>
             <Navlinks
@@ -59,6 +64,11 @@ function WarehouseMenu({
           is_sidebar={true}
         />
       </CustomSidebar>
+      <CurrencyOffcanvas
+        showOffcanvas={currencyShow}
+        hideFunction={() => setCurrencyShow(false)}
+        current_currency={currency}
+      />
     </nav>
   );
 }

@@ -9,44 +9,25 @@ import {
   DropdownButton,
   Button,
 } from "react-bootstrap";
-import ClientContainer from "../object_container/clients_container";
 import { useState } from "react";
 import SearchFilterBar from "../menu/search_filter_bar";
 import MoreActionWindow from "../windows/more_action";
-import AddClientOffcanvas from "../offcanvas/create/create_client";
 import { useSearchParams } from "next/navigation";
-import DeleteObjectWindow from "../windows/delete_object";
-import ViewClientOffcanvas from "../offcanvas/view/view_client";
-import deleteClient from "@/utils/clients/delete_client";
-import { useRouter } from "next/navigation";
-import ModifyClientOffcanvas from "../offcanvas/modify/modify_client";
+import RoleContainer from "../object_container/role_container";
+import ModifyUserRole from "../windows/modify_user_roles";
 
-function ClientsList({ clients, orgView, clientsStart, clientsEnd }) {
-  // View client
-  const [showViewClient, setShowViewClient] = useState(false);
-  const [clientToView, setClientToView] = useState({
-    users: [],
-  });
-  // Modify client
-  const [showModifyClient, setShowModifyClient] = useState(false);
-  const [clientToModify, setClientToModify] = useState({
-    users: [],
-  });
-  // Delete client
-  const [showDeleteClient, setShowDeleteclient] = useState(false);
-  const [clientToDelete, setItemToDelete] = useState(null);
-  const [isErrorDelete, setIsErrorDelete] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+function RolesList({ roles, rolesStart, rolesEnd, rolesToChoose }) {
+  // Modify role
+  const [showModifyRole, setShowModifyRole] = useState(false);
+  const [userToModify, setUserToModify] = useState({});
   // More action
   const [showMoreAction, setShowMoreAction] = useState(false);
-  const [isShowAddClient, setShowAddClient] = useState(false);
   // Seleted
   const [selectedQty, setSelectedQty] = useState(0);
   const [selectedKeys] = useState([]);
   // Selected bar button
   const [isClicked, setIsClicked] = useState(false);
   // Nav
-  const router = useRouter();
   const params = useSearchParams();
   const accessibleParams = new URLSearchParams(params);
   // Vars and styles
@@ -105,40 +86,31 @@ function ClientsList({ clients, orgView, clientsStart, clientsEnd }) {
         </Row>
       </Container>
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
-      {Object.keys(clients).length === 0 ? (
+      {Object.keys(roles).length === 0 ? (
         <Container className="text-center" fluid>
-          <p className="mt-5 pt-5 blue-main-text h2">Clients not found :/</p>
+          <p className="mt-5 pt-5 blue-main-text h2">Users not found :/</p>
         </Container>
       ) : (
-        Object.values(clients)
-          .slice(clientsStart, clientsEnd)
+        Object.values(roles)
+          .slice(rolesStart, rolesEnd)
           .map((value) => {
             return (
-              <ClientContainer
-                key={value.clientId}
-                client={value}
-                is_org={orgView}
-                selected={selectedKeys.indexOf(value.clientId) !== -1}
-                selectQtyAction={() => {
-                  selectedKeys.push(value.clientId);
+              <RoleContainer
+                key={value.userId}
+                role={value}
+                selected={selectedKeys.indexOf(value.userId) !== -1}
+                selectAction={() => {
+                  selectedKeys.push(value.userId);
                   setSelectedQty(selectedQty + 1);
                 }}
-                unselectQtyAction={() => {
-                  let index = selectedKeys.indexOf(value.clientId);
+                unselectAction={() => {
+                  let index = selectedKeys.indexOf(value.userId);
                   selectedKeys.splice(index, 1);
                   setSelectedQty(selectedQty - 1);
                 }}
-                deleteAction={() => {
-                  setItemToDelete(value.clientId);
-                  setShowDeleteclient(true);
-                }}
-                viewAction={() => {
-                  setClientToView(value);
-                  setShowViewClient(true);
-                }}
                 modifyAction={() => {
-                  setClientToModify(value);
-                  setShowModifyClient(true);
+                  setUserToModify(value);
+                  setShowModifyRole(true);
                 }}
               />
             );
@@ -147,26 +119,22 @@ function ClientsList({ clients, orgView, clientsStart, clientsEnd }) {
       <MoreActionWindow
         modalShow={showMoreAction}
         onHideFunction={() => setShowMoreAction(false)}
-        instanceName="client"
-        addAction={() => {
-          setShowMoreAction(false);
-          setShowAddClient(true);
-        }}
+        instanceName="role"
         selectAllOnPage={() => {
           selectedKeys.splice(0, selectedKeys.length);
           setSelectedQty(0);
           let start = page * pagation - pagation;
           let end = page * pagation;
-          Object.values(clients)
+          Object.values(roles)
             .slice(start, end)
-            .forEach((e) => selectedKeys.push(e.clientId));
+            .forEach((e) => selectedKeys.push(e.userId));
           setSelectedQty(selectedKeys.length);
           setShowMoreAction(false);
         }}
         selectAll={() => {
           selectedKeys.splice(0, selectedKeys.length);
           setSelectedQty(0);
-          Object.values(clients).forEach((e) => selectedKeys.push(e.clientId));
+          Object.values(roles).forEach((e) => selectedKeys.push(e.userId));
           setSelectedQty(selectedKeys.length);
           setShowMoreAction(false);
         }}
@@ -175,53 +143,24 @@ function ClientsList({ clients, orgView, clientsStart, clientsEnd }) {
           setSelectedQty(0);
           setShowMoreAction(false);
         }}
+        withAdd={false}
       />
-      <AddClientOffcanvas
-        showOffcanvas={isShowAddClient}
-        hideFunction={() => setShowAddClient(false)}
-      />
-      <DeleteObjectWindow
-        modalShow={showDeleteClient}
-        onHideFunction={() => {
-          setShowDeleteclient(false);
-          setIsErrorDelete(false);
-        }}
-        instanceName="client"
-        instanceId={clientToDelete}
-        deleteItemFunc={async () => {
-          let result = await deleteClient(clientToDelete);
-          if (!result.error) {
-            setShowDeleteclient(false);
-            router.refresh();
-          } else {
-            setErrorMessage(result.message);
-            setIsErrorDelete(true);
-          }
-        }}
-        isError={isErrorDelete}
-        errorMessage={errorMessage}
-      />
-      <ModifyClientOffcanvas
-        showOffcanvas={showModifyClient}
-        hideFunction={() => setShowModifyClient(false)}
-        client={clientToModify}
-        isOrg={orgView}
-      />
-      <ViewClientOffcanvas
-        showOffcanvas={showViewClient}
-        hideFunction={() => setShowViewClient(false)}
-        client={clientToView}
-        isOrg={orgView}
+      <ModifyUserRole
+        modalShow={showModifyRole}
+        onHideFunction={() => setShowModifyRole(false)}
+        roleList={rolesToChoose}
+        user={userToModify}
       />
     </Container>
   );
 }
 
-ClientsList.PropTypes = {
+RolesList.PropTypes = {
   products: PropTypes.object.isRequired,
   orgView: PropTypes.bool.isRequired,
   productStart: PropTypes.number.isRequired,
   productEnd: PropTypes.number.isRequired,
+  rolesToChoose: PropTypes.object.isRequired,
 };
 
-export default ClientsList;
+export default RolesList;

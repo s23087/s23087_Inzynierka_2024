@@ -8,6 +8,7 @@ import getBasicInfo from "@/utils/menu/get_basic_user_info";
 import getNotificationCounter from "@/utils/menu/get_nofication_counter";
 import getItems from "@/utils/warehouse/get_items";
 import getSearchItems from "@/utils/warehouse/get_search_items";
+import getOrgView from "@/utils/auth/get_org_view";
 
 export default async function WarehousePage({ searchParams }) {
   const current_role = await getRole();
@@ -16,14 +17,8 @@ export default async function WarehousePage({ searchParams }) {
   const is_org_switch_needed = current_role == "Admin";
   let orgActivated =
     searchParams.isOrg !== undefined ? searchParams.isOrg : false;
-  const getOrgView = () => {
-    return (
-      (current_role == "Admin" || current_role == "Accountant") &&
-      orgActivated === "true"
-    );
-  };
-  let org_view = getOrgView();
-  let currency = "PLN";
+  let org_view = getOrgView(current_role, orgActivated === "true");
+  let currency = searchParams.currency ? searchParams.currency : "PLN";
   let isSearchTrue = searchParams.searchQuery !== undefined;
   let products = isSearchTrue
     ? await getSearchItems(currency, org_view, searchParams.searchQuery)

@@ -1,9 +1,13 @@
 import PropTypes from "prop-types";
 import { Button, Container, Row, Col } from "react-bootstrap";
 
-function CurrencyChangeButton({ currency }) {
+function CurrencyChangeButton({ currency, openCurrencyOffcanvas }) {
   return (
-    <Button variant="mainBlue" className="pt-0 pb-1">
+    <Button
+      variant="mainBlue"
+      className="pt-0 pb-1"
+      onClick={openCurrencyOffcanvas}
+    >
       <Container>
         <Row>
           <Col>
@@ -22,6 +26,7 @@ function CurrencyChangeButton({ currency }) {
 
 CurrencyChangeButton.PropTypes = {
   currency: PropTypes.string.isRequired,
+  openCurrencyOffcanvas: PropTypes.func.isRequired,
 };
 
 export default CurrencyChangeButton;

@@ -1,76 +1,56 @@
-"use client";
+"use server";
 
-import { useState } from "react";
-import { Container, Stack } from "react-bootstrap";
-import PagePostionBar from "@/components/menu/page_position_bar";
-import SearchFilterBar from "@/components/menu/search_filter_bar";
-import MenuTemplate from "@/components/menu/menu_template";
-import CustomSidebar from "@/components/menu/sidebars/sidebar";
-import Navlinks from "@/components/menu/navlinks";
-import PagationFooter from "@/components/footer/pagation_footer";
-import RoleContainer from "@/components/object_container/role_container";
+import RolesMenu from "@/components/menu/wholeMenu/roles_menu";
+import WholeFooter from "@/components/footer/whole_footers/whole_footer";
+import getRole from "@/utils/auth/get_role";
+import getBasicInfo from "@/utils/menu/get_basic_user_info";
+import getNotificationCounter from "@/utils/menu/get_nofication_counter";
+import getUserRoles from "@/utils/roles/get_users_with_roles";
+import RolesList from "@/components/object_list/roles_list";
+import getRoles from "@/utils/roles/get_roles";
 
-export default function RolesPage() {
-  const [sidebarShow, setSidebarShow] = useState(false);
-  const showSidebar = () => setSidebarShow(true);
-  const hideSidebar = () => setSidebarShow(false);
-  const current_role = "Admin";
-  const current_nofitication_qty = 1;
-  const tmp_role = {
-    user: "<<user>>",
-    role: "<<role>>",
-  };
+export default async function RolesPage({ searchParams }) {
+  const current_role = await getRole();
+  const userInfo = await getBasicInfo();
+  const current_nofitication_qty = await getNotificationCounter();
+  const rolesToChoose = await getRoles();
+  let isSearchTrue =
+    searchParams.searchQuery !== undefined && searchParams.searchQuery !== "";
+  let roles = isSearchTrue
+    ? await getUserRoles(searchParams.searchQuery)
+    : await getUserRoles();
+  let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
+  let pageQty = Math.ceil(roles.length / maxInstanceOnPage);
+  pageQty = pageQty === 0 ? 1 : pageQty;
+  let currentPage = parseInt(searchParams.page)
+    ? parseInt(searchParams.page)
+    : 1;
+  let rolesStart = currentPage * maxInstanceOnPage - maxInstanceOnPage;
+  rolesStart = rolesStart < 0 ? 0 : rolesStart;
+  let rolesEnd = rolesStart + maxInstanceOnPage;
 
   return (
     <main className="d-flex flex-column h-100">
-      <nav className="fixed-top main-bg">
-        <MenuTemplate sidebar_action={showSidebar} user_name="<<User name>>">
-          <Stack className="ps-xl-2" direction="horizontal" gap={4}>
-            <Stack className="d-none d-xl-flex" direction="horizontal" gap={4}>
-              <Navlinks
-                role={current_role}
-                active_link="Roles"
-                notification_qty={current_nofitication_qty}
-                is_sidebar={false}
-              />
-            </Stack>
-          </Stack>
-        </MenuTemplate>
-        <PagePostionBar
-          site_name="Roles"
-          with_switch={false}
-          switch_bool={false}
-        />
-        <SearchFilterBar filter_icon_bool="false" />
-        <CustomSidebar
-          user_name="<<User name>>"
-          org_name="<<Org name>>"
-          offcanvasShow={sidebarShow}
-          onHideAction={hideSidebar}
-        >
-          <Navlinks
-            role={current_role}
-            active_link="Roles"
-            notification_qty={current_nofitication_qty}
-            is_sidebar={true}
-          />
-        </CustomSidebar>
-      </nav>
+      <RolesMenu
+        current_role={current_role}
+        current_nofitication_qty={current_nofitication_qty}
+        user={userInfo}
+      />
 
       <section className="h-100">
-        <Container className="p-0 middleSectionPlacement" fluid>
-          <RoleContainer role={tmp_role} selected={false} />
-          <RoleContainer role={tmp_role} selected={true} />
-        </Container>
+        <RolesList
+          roles={roles}
+          rolesStart={rolesStart}
+          rolesEnd={rolesEnd}
+          rolesToChoose={rolesToChoose}
+        />
       </section>
 
-      <footer className="fixed-bottom w-100">
-        <PagationFooter
-          max_instance_on_page={10}
-          page_qty={20}
-          current_page={1}
-        />
-      </footer>
+      <WholeFooter
+        max_instance_on_page={maxInstanceOnPage}
+        page_qty={pageQty}
+        current_page={currentPage}
+      />
     </main>
   );
 }
