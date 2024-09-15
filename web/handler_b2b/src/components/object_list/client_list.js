@@ -218,10 +218,10 @@ function ClientsList({ clients, orgView, clientsStart, clientsEnd }) {
 }
 
 ClientsList.PropTypes = {
-  products: PropTypes.object.isRequired,
+  clients: PropTypes.object.isRequired,
   orgView: PropTypes.bool.isRequired,
-  productStart: PropTypes.number.isRequired,
-  productEnd: PropTypes.number.isRequired,
+  clientsStart: PropTypes.number.isRequired,
+  clientsEnd: PropTypes.number.isRequired,
 };
 
 export default ClientsList;

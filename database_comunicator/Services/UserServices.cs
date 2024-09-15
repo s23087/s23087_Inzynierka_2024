@@ -100,8 +100,8 @@ namespace database_comunicator.Services
 
         public async Task<int> GetCountNotification(int userId)
         {
-            var result = await _handlerContext.UserNotifications.Where(e => e.UsersId == userId && e.IsRead).ToListAsync();
-            return result.Count;
+            var result = await _handlerContext.UserNotifications.Where(e => e.UsersId == userId && e.IsRead == false).CountAsync();
+            return result;
         }
 
         public async Task<IEnumerable<GetOrgUsersWithRoles>> GetOrgUsersWithRoles(int userId)

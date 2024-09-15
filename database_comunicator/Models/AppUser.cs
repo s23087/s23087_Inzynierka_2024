@@ -32,5 +32,7 @@ public partial class AppUser
     public virtual SoloUser? SoloUser { get; set; }
 
     public virtual ICollection<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
-    public virtual ICollection<Organization> Clients { get; set; } = new List<Organization>();
+
+    public virtual ICollection<Organization> Organizations { get; set; } = new List<Organization>();
+    public virtual ICollection<SellingPrice> SellingPrices { get; set; } = new List<SellingPrice>();
 }

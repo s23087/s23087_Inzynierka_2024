@@ -57,23 +57,15 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
           ) + 1,
       });
     }
+  }, [showOffcanvas]);
+  useEffect(() => {
     if (isOrg) {
       const bindings = getUserClientBindings(client.clientId);
       bindings.then((data) => setClientBindings(data));
       const users = getUsers();
       users.then((data) => setUsers(data));
     }
-  }, [
-    showOffcanvas,
-    isOrg,
-    client.city,
-    client.clientId,
-    client.clientName,
-    client.postal,
-    client.street,
-    restInfo.availability,
-    statues,
-  ]);
+  }, [isOrg]);
   // Errors
   const [nameError, setNameError] = useState(false);
   const [nipError, setNipError] = useState(false);
@@ -354,7 +346,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                 <Form.Label className="blue-main-text">Country:</Form.Label>
                 <Form.Select
                   id="countrySelect"
-                  className="input-style shadow-sm"
+                  className="input-style shadow-sm maxInputWidth"
                   name="country"
                 >
                   <option
@@ -387,7 +379,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   Availability:{" "}
                 </Form.Label>
                 <Form.Select
-                  className="input-style shadow-sm"
+                  className="input-style shadow-sm maxInputWidth"
                   name="availability"
                 >
                   <option
@@ -421,10 +413,11 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                     <Button
                       variant="mainBlue"
                       className="w-100"
-                      type="submit"
+                      type="click"
                       disabled={anyErrorActive}
                       onClick={(e) => {
                         e.preventDefault();
+                        if (anyErrorActive) return;
                         setIsLoading(true);
                         let form = document.getElementById("clientModify");
                         form.requestSubmit();

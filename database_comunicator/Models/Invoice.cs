@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using database_comunicator.Models;
 
 namespace database_comunicator.Models;
 
@@ -53,8 +54,9 @@ public partial class Invoice
 
     public virtual Organization SellerNavigation { get; set; } = null!;
 
-    public virtual Taxes TaxesNavigation { get; set; } = null!;
+    public virtual ICollection<SellingPrice> SellingPrices { get; set; } = new List<SellingPrice>();
+
+    public virtual Taxis TaxesNavigation { get; set; } = null!;
 
     public virtual ICollection<Request> Requests { get; set; } = new List<Request>();
-    public virtual ICollection<SoldItem> SoldItems { get; set; } = new List<SoldItem>();
 }

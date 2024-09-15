@@ -37,7 +37,7 @@ export default async function RolesPage({ searchParams }) {
         user={userInfo}
       />
 
-      <section className="h-100">
+      <section className="h-100 z-0">
         <RolesList
           roles={roles}
           rolesStart={rolesStart}

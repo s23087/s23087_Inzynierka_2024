@@ -179,7 +179,7 @@ export default function AddUserPage() {
           </Button>
         </Stack>
       </Form>
-      <Stack>
+      <Stack className="mx-1 mx-xl-4">
         <Button
           className="mt-3 mx-auto ms-sm-0"
           variant="secBlue"

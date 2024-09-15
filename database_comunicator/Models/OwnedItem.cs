@@ -9,10 +9,6 @@ public partial class OwnedItem
 
     public int OwnedItemId { get; set; }
 
-    public int Qty { get; set; }
-
-    public virtual ICollection<CreditNoteItem> CreditNoteItems { get; set; } = new List<CreditNoteItem>();
-
     public virtual Invoice Invoice { get; set; } = null!;
 
     public virtual ICollection<ItemOwner> ItemOwners { get; set; } = new List<ItemOwner>();
@@ -22,5 +18,4 @@ public partial class OwnedItem
     public virtual ICollection<ProformaOwnedItem> ProformaOwnedItems { get; set; } = new List<ProformaOwnedItem>();
 
     public virtual ICollection<PurchasePrice> PurchasePrices { get; set; } = new List<PurchasePrice>();
-    public virtual ICollection<SoldItem> SoldItems { get; set; } = new List<SoldItem>();
 }

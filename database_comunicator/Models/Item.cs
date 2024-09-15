@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using database_comunicator.Models;
 
 namespace database_comunicator.Models;
 
@@ -18,4 +19,6 @@ public partial class Item
     public virtual ICollection<OutsideItem> OutsideItems { get; set; } = new List<OutsideItem>();
 
     public virtual ICollection<OwnedItem> OwnedItems { get; set; } = new List<OwnedItem>();
+
+    public virtual ICollection<ProformaFutureItem> ProformaFutureItems { get; set; } = new List<ProformaFutureItem>();
 }

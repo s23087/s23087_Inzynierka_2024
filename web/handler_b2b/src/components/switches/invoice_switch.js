@@ -4,6 +4,7 @@ import propTypes from "prop-types";
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Dropdown, Stack, Button } from "react-bootstrap";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import credit_note_icon from "../../../public/icons/credit_note_icon.png";
 import request_icon from "../../../public/icons/request_icon.png";
 import sales_icon from "../../../public/icons/sales_icon.png";
@@ -12,21 +13,29 @@ import yours_invoice_icon from "../../../public/icons/yours_invoice_icon.png";
 
 function getIcon(type) {
   switch (type) {
-    case "Client credit note":
+    case "Client credit notes":
       return <Image src={credit_note_icon} alt="Document switch button" />;
-    case "Yours credit note":
+    case "Yours credit notes":
       return (
         <Image src={yours_credit_note_icon} alt="Document switch button" />
       );
-    case "Request":
+    case "Requests":
       return <Image src={request_icon} alt="Document switch button" />;
-    case "Sales invoice":
+    case "Sales invoices":
       return <Image src={sales_icon} alt="Document switch button" />;
   }
   return <Image src={yours_invoice_icon} alt="Document switch button" />;
 }
 
-function InvoiceSwitch({ type, switch_action, is_role_solo }) {
+function InvoiceSwitch({ type, is_role_solo }) {
+  const router = useRouter();
+  const pathName = usePathname();
+  const params = useSearchParams();
+  const changeDoc = (type) => {
+    const newParams = new URLSearchParams(params);
+    newParams.set("docType", type);
+    router.replace(`${pathName}?${newParams}`);
+  };
   const doc_type = is_role_solo
     ? [
         "Yours invoices",
@@ -73,7 +82,7 @@ function InvoiceSwitch({ type, switch_action, is_role_solo }) {
                 variant="as-link"
                 className="p-0 text-start"
                 onClick={() => {
-                  switch_action(element);
+                  changeDoc(element);
                   setClosingBool(false);
                 }}
                 key={element}
@@ -94,7 +103,6 @@ getIcon.propTypes = {
 
 InvoiceSwitch.propTypes = {
   type: propTypes.bool.isRequired, // from switch statment in function 'getIcon'
-  switch_action: propTypes.func.isRequired,
   is_role_solo: propTypes.bool.isRequired,
 };
 

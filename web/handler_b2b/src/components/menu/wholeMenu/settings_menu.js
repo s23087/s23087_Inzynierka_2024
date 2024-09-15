@@ -13,7 +13,7 @@ function SettingNavMenu({ current_role, current_nofitication_qty, user }) {
   const showSidebar = () => setSidebarShow(true);
   const hideSidebar = () => setSidebarShow(false);
   return (
-    <nav className="fixed-top main-bg border-bottom-grey">
+    <nav className="fixed-top main-bg z-1 border-bottom-grey">
       <MenuTemplate
         sidebar_action={showSidebar}
         user_name={user.username + " " + user.surname}

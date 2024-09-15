@@ -8,9 +8,17 @@ function FilterIcon({ is_active }) {
   return (
     <Button className="p-0" variant="as-link">
       {is_active === "true" ? (
-        <Image src={active_filter_icon} alt="Active filter icon" />
+        <Image
+          src={active_filter_icon}
+          alt="Active filter icon"
+          priority={true}
+        />
       ) : (
-        <Image src={inactive_filter_icon} alt="Inactive filter icon" />
+        <Image
+          src={inactive_filter_icon}
+          alt="Inactive filter icon"
+          priority={true}
+        />
       )}
     </Button>
   );

@@ -32,6 +32,7 @@ namespace database_comunicator.Services
                 UsersId = data.UserId,
                 Info = data.Info,
                 ObjectTypeId = typeId,
+                Referance = data.Referance,
                 IsRead = false
             };
             _handlerContext.Add<UserNotification>(newNotif);
@@ -58,7 +59,9 @@ namespace database_comunicator.Services
                     ObjectType = e.ObjectType.ObjectTypeName,
                     Referance = e.Referance,
                     IsRead = e.IsRead
-                }).ToListAsync();
+                })
+                .OrderBy(e => e.IsRead)
+                .ToListAsync();
         }
         public async Task<bool> NotifExists(int notifId)
         {

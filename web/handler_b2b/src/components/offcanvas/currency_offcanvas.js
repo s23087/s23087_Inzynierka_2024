@@ -75,7 +75,7 @@ function CurrencyOffcanvas({ showOffcanvas, hideFunction, current_currency }) {
                 onClick={() => {
                   hideFunction();
                 }}
-                className="ps-2"
+                className="ps-2 pe-0"
               >
                 <Image src={dropdown_big_down} alt="Hide" />
               </Button>
@@ -151,7 +151,7 @@ function CurrencyOffcanvas({ showOffcanvas, hideFunction, current_currency }) {
           </>
         ) : null}
         <Container
-          className="main-grey-bg py-2 fixed-bottom w-100 border-top-grey px-4 px-xl-5 mx-1 mx-xl-3"
+          className="main-grey-bg py-2 fixed-bottom w-100 border-top-grey px-4 px-xl-5"
           fluid
         >
           <Row className="mx-auto minScalableWidth grey-sec-text">

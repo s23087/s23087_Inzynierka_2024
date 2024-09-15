@@ -15,7 +15,7 @@ public partial class OutsideItemOffer
 
     public decimal SellingPrice { get; set; }
 
-    public virtual OutsideItem OutsideItem { get; set; } = null!;
+    public virtual OutsideItem O { get; set; } = null!;
 
     public virtual Offer Offer { get; set; } = null!;
 }

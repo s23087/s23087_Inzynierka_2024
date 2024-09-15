@@ -1,4 +1,4 @@
-import { Table } from "react-bootstrap";
+import { Stack, Table } from "react-bootstrap";
 
 function ItemTable({ restInfo, isOurWarehouse }) {
   if (restInfo.outsideItemInfos.length == 0 && !isOurWarehouse) {
@@ -10,14 +10,15 @@ function ItemTable({ restInfo, isOurWarehouse }) {
   let qtySum = 0;
   let avgPrice = 0;
   if (restInfo.ownedItemInfos.length > 0) {
-    restInfo.ownedItemInfos.array.forEach((element) => {
+    restInfo.ownedItemInfos.forEach((element) => {
       qtySum = qtySum + element.qty;
       avgPrice = avgPrice + element.price;
     });
-    avgPrice = avgPrice / restInfo.ownedItemInfos.length;
+    avgPrice =
+      Math.round((avgPrice / restInfo.ownedItemInfos.length) * 100) / 100;
   }
   return (
-    <Table className="text-start" bordered>
+    <Table className="text-start overflow-x-scroll align-middle" bordered>
       <thead>
         <tr>
           <th className="top-left-rounded">
@@ -29,9 +30,9 @@ function ItemTable({ restInfo, isOurWarehouse }) {
           <th className="top-right-rounded">Price</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody key={restInfo}>
         {isOurWarehouse
-          ? Object.entries(restInfo).map((key, value) => {
+          ? Object.values(restInfo.ownedItemInfos).map((value, key) => {
               return (
                 <tr key={key}>
                   <td>
@@ -39,19 +40,30 @@ function ItemTable({ restInfo, isOurWarehouse }) {
                       {value.organizationName + "\n" + value.invoiceNumber}
                     </p>
                   </td>
-                  <td>{value.qty}</td>
-                  <td>{value.price + " " + value.currency}</td>
+                  <td className="text-center">{value.qty}</td>
+                  <td className="no-wrap">
+                    <Stack direction="horizontal">
+                      <span className="me-auto">
+                        {parseFloat(
+                          Math.round(value.price * 100) / 100,
+                        ).toFixed(2)}
+                      </span>
+                      <span className="ps-2">{value.currency}</span>
+                    </Stack>
+                  </td>
                 </tr>
               );
             })
-          : Object.entries(restInfo).map((key, value) => {
+          : Object.values(restInfo.outsideItemInfos).map((value, key) => {
               return (
                 <tr key={key}>
                   <td>
                     <p className="mb-0">{value.organizationName}</p>
                   </td>
-                  <td>{value.qty}</td>
-                  <td>{value.price + " " + value.currency}</td>
+                  <td className="text-center">{value.qty}</td>
+                  <td className="no-wrap">
+                    {value.price + " " + value.currency}
+                  </td>
                 </tr>
               );
             })}
@@ -61,7 +73,7 @@ function ItemTable({ restInfo, isOurWarehouse }) {
           <th className="bottom-left-rounded">
             {isOurWarehouse ? "Sum & Avg price" : ""}
           </th>
-          <th>{isOurWarehouse ? qtySum : ""}</th>
+          <th className="text-center">{isOurWarehouse ? qtySum : ""}</th>
           <th className="bottom-right-rounded">
             {isOurWarehouse ? avgPrice : ""}
           </th>

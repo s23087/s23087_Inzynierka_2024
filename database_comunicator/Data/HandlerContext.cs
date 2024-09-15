@@ -29,6 +29,10 @@ public partial class HandlerContext : DbContext
 
     public virtual DbSet<AvailabilityStatus> AvailabilityStatuses { get; set; }
 
+    public virtual DbSet<CalculatedCreditNotePrice> CalculatedCreditNotePrices { get; set; }
+
+    public virtual DbSet<CalculatedPrice> CalculatedPrices { get; set; }
+
     public virtual DbSet<Country> Countries { get; set; }
 
     public virtual DbSet<CreditNote> CreditNotes { get; set; }
@@ -76,13 +80,14 @@ public partial class HandlerContext : DbContext
     public virtual DbSet<OutsideItemOffer> OutsideItemOffers { get; set; }
 
     public virtual DbSet<OwnedItem> OwnedItems { get; set; }
-    public virtual DbSet<SoldItem> SoldItems { get; set; }
 
     public virtual DbSet<PaymentMethod> PaymentMethods { get; set; }
 
     public virtual DbSet<PaymentStatus> PaymentStatuses { get; set; }
 
     public virtual DbSet<Proforma> Proformas { get; set; }
+
+    public virtual DbSet<ProformaFutureItem> ProformaFutureItems { get; set; }
 
     public virtual DbSet<ProformaOwnedItem> ProformaOwnedItems { get; set; }
 
@@ -94,9 +99,12 @@ public partial class HandlerContext : DbContext
 
     public virtual DbSet<RequestStatus> RequestStatuses { get; set; }
 
+    public virtual DbSet<SellingPrice> SellingPrices { get; set; }
+
     public virtual DbSet<SoloUser> SoloUsers { get; set; }
 
-    public virtual DbSet<Taxes> Taxes { get; set; }
+    public virtual DbSet<Taxis> Taxes { get; set; }
+
     public virtual DbSet<UserNotification> UserNotifications { get; set; }
 
     public virtual DbSet<UserRole> UserRoles { get; set; }
@@ -181,7 +189,7 @@ public partial class HandlerContext : DbContext
                 .HasForeignKey(d => d.SoloUserId)
                 .HasConstraintName("User_Solo_User_relation");
 
-            entity.HasMany(d => d.Clients).WithMany(p => p.AppUsers)
+            entity.HasMany(d => d.Organizations).WithMany(p => p.AppUsers)
                 .UsingEntity<Dictionary<string, object>>(
                     "UserClient",
                     r => r.HasOne<Organization>().WithMany()
@@ -191,13 +199,13 @@ public partial class HandlerContext : DbContext
                     l => l.HasOne<AppUser>().WithMany()
                         .HasForeignKey("UsersId")
                         .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("User_client_relation"),
+                        .HasConstraintName("User_Client_relation"),
                     j =>
                     {
-                        j.HasKey("OrganizationId", "UsersId").HasName("User_Client_pk");
-                        j.ToTable("User_Client");
-                        j.IndexerProperty<int>("OrganizationId").HasColumnName("organization_id");
+                        j.HasKey("UsersId", "OrganizationId").HasName("User_client_pk");
+                        j.ToTable("User_client");
                         j.IndexerProperty<int>("UsersId").HasColumnName("users_id");
+                        j.IndexerProperty<int>("OrganizationId").HasColumnName("organization_id");
                     });
         });
 
@@ -213,6 +221,64 @@ public partial class HandlerContext : DbContext
                 .HasMaxLength(150)
                 .IsUnicode(false)
                 .HasColumnName("status_name");
+        });
+
+        modelBuilder.Entity<CalculatedCreditNotePrice>(entity =>
+        {
+            entity.HasKey(e => new { e.CurrencyName, e.UpdateDate, e.CreditItemId }).HasName("Calculated_Credit_note_Price_pk");
+
+            entity.ToTable("Calculated_Credit_note_Price");
+
+            entity.Property(e => e.CurrencyName)
+                .HasMaxLength(5)
+                .IsUnicode(false)
+                .HasColumnName("currency_name");
+            entity.Property(e => e.UpdateDate)
+                .HasColumnType("datetime")
+                .HasColumnName("update_date");
+            entity.Property(e => e.CreditItemId).HasColumnName("credit_item_id");
+            entity.Property(e => e.Price)
+                .HasColumnType("decimal(20, 2)")
+                .HasColumnName("price");
+
+            entity.HasOne(d => d.CreditNoteItem).WithMany(p => p.CalculatedCreditNotePrices)
+                .HasForeignKey(d => d.CreditItemId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Calculated_Credit_note_Price_Credit_note_Items");
+
+            entity.HasOne(d => d.CurrencyValue).WithMany(p => p.CalculatedCreditNotePrices)
+                .HasForeignKey(d => new { d.UpdateDate, d.CurrencyName })
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Calculated_Credit_note_Price_Currency_Value");
+        });
+
+        modelBuilder.Entity<CalculatedPrice>(entity =>
+        {
+            entity.HasKey(e => new { e.PurchasePriceId, e.UpdateDate, e.CurrencyName }).HasName("Calculated_Price_pk");
+
+            entity.ToTable("Calculated_Price");
+
+            entity.Property(e => e.PurchasePriceId).HasColumnName("purchase_price_id");
+            entity.Property(e => e.UpdateDate)
+                .HasColumnType("datetime")
+                .HasColumnName("update_date");
+            entity.Property(e => e.CurrencyName)
+                .HasMaxLength(5)
+                .IsUnicode(false)
+                .HasColumnName("currency_name");
+            entity.Property(e => e.Price)
+                .HasColumnType("decimal(20, 2)")
+                .HasColumnName("price");
+
+            entity.HasOne(d => d.PurchasePrice).WithMany(p => p.CalculatedPrices)
+                .HasForeignKey(d => d.PurchasePriceId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Calculated_Price_Purchase_Price_relation");
+
+            entity.HasOne(d => d.CurrencyValue).WithMany(p => p.CalculatedPrices)
+                .HasForeignKey(d => new { d.UpdateDate, d.CurrencyName })
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Calculated_Price_Currency_Value_realtion");
         });
 
         modelBuilder.Entity<Country>(entity =>
@@ -238,6 +304,10 @@ public partial class HandlerContext : DbContext
             entity.Property(e => e.CreditNoteDate)
                 .HasColumnType("date")
                 .HasColumnName("credit_note_date");
+            entity.Property(e => e.CreditNoteNumber)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("credit_note_number");
             entity.Property(e => e.InSystem).HasColumnName("in_system");
             entity.Property(e => e.InvoiceId).HasColumnName("invoice_id");
             entity.Property(e => e.Note)
@@ -253,27 +323,30 @@ public partial class HandlerContext : DbContext
 
         modelBuilder.Entity<CreditNoteItem>(entity =>
         {
-            entity.HasKey(e => new { e.CreditNoteId, e.OwnedItemId, e.InvoiceId }).HasName("Credit_note_Items_pk");
+            entity.HasKey(e => e.CreditItemId).HasName("Credit_note_Items_pk");
 
             entity.ToTable("Credit_note_Items");
 
-            entity.Property(e => e.CreditNoteId).HasColumnName("credit_note_id");
-            entity.Property(e => e.OwnedItemId).HasColumnName("owned_item_id");
-            entity.Property(e => e.InvoiceId).HasColumnName("invoice_id");
-            entity.Property(e => e.Amount)
+            entity.Property(e => e.IncludeQty).HasColumnName("include_qty");
+            entity.Property(e => e.CreditItemId)
+                .HasColumnName("credit_item_id");
+            entity.Property(e => e.CreditNoteId)
+                .HasColumnName("credit_note_id");
+            entity.Property(e => e.NewPrice)
                 .HasColumnType("decimal(20, 2)")
-                .HasColumnName("amount");
+                .HasColumnName("new_price");
+            entity.Property(e => e.PurchasePriceId).HasColumnName("purchase_price_id");
             entity.Property(e => e.Qty).HasColumnName("qty");
 
-            entity.HasOne(d => d.CreditNote).WithMany(p => p.CreditNoteItems)
-                .HasForeignKey(d => d.CreditNoteId)
+            entity.HasOne(d => d.CreditNote).WithOne(p => p.CreditNoteItem)
+                .HasForeignKey<CreditNoteItem>(d => d.CreditNoteId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Credit_note_Items_Credit_note_relation");
 
-            entity.HasOne(d => d.OwnedItem).WithMany(p => p.CreditNoteItems)
-                .HasForeignKey(d => new { d.OwnedItemId, d.InvoiceId })
+            entity.HasOne(d => d.PurchasePrice).WithMany(p => p.CreditNoteItems)
+                .HasForeignKey(d => d.PurchasePriceId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("Credit_note_Items_Owned_Item_relation");
+                .HasConstraintName("Credit_note_Items_Purchase_Price_relation");
         });
 
         modelBuilder.Entity<CurrencyName>(entity =>
@@ -421,7 +494,8 @@ public partial class HandlerContext : DbContext
             entity.ToTable("EAN");
 
             entity.Property(e => e.EanValue)
-                .ValueGeneratedNever()
+                .HasMaxLength(50)
+                .IsUnicode(false)
                 .HasColumnName("ean");
             entity.Property(e => e.ItemId).HasColumnName("item_id");
 
@@ -627,14 +701,16 @@ public partial class HandlerContext : DbContext
 
         modelBuilder.Entity<OfferItem>(entity =>
         {
-            entity.HasKey(e => new { e.OfferItemId }).HasName("Offer_Item_pk");
+            entity.HasKey(e => e.OfferItemId).HasName("Offer_Item_pk");
 
             entity.ToTable("Offer_Item");
 
-            entity.Property(e => e.OfferItemId).HasColumnName("offer_item_id");
-            entity.Property(e => e.OfferId).HasColumnName("offer_id");
+            entity.Property(e => e.OfferItemId)
+                .HasColumnName("offer_item_id");
             entity.Property(e => e.IdUser).HasColumnName("id_user");
             entity.Property(e => e.InvoiceId).HasColumnName("invoice_id");
+            entity.Property(e => e.ItemId).HasColumnName("item_id");
+            entity.Property(e => e.OfferId).HasColumnName("offer_id");
             entity.Property(e => e.Qty).HasColumnName("qty");
             entity.Property(e => e.SellingPrice)
                 .HasColumnType("decimal(20, 2)")
@@ -692,6 +768,7 @@ public partial class HandlerContext : DbContext
             entity.ToTable("Organization");
 
             entity.Property(e => e.OrganizationId).HasColumnName("organization_id");
+            entity.Property(e => e.AvailabilityStatusId).HasColumnName("availability_status_id");
             entity.Property(e => e.City)
                 .HasMaxLength(200)
                 .IsUnicode(false)
@@ -711,17 +788,15 @@ public partial class HandlerContext : DbContext
                 .HasMaxLength(200)
                 .IsUnicode(false)
                 .HasColumnName("street");
-            entity.Property(e => e.AvailabilityStatusId).HasColumnName("availability_status_id");
+
+            entity.HasOne(d => d.AvailabilityStatus).WithMany(p => p.Organizations)
+                .HasForeignKey(d => d.AvailabilityStatusId)
+                .HasConstraintName("Organization_Availability_Status_relation");
 
             entity.HasOne(d => d.Country).WithMany(p => p.Organizations)
                 .HasForeignKey(d => d.CountryId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Organization_Country_relation");
-
-            entity.HasOne(d => d.AvailabilityStatus).WithMany(p => p.Organizations)
-                .HasForeignKey(d => d.AvailabilityStatusId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("Organization_Availability_Status_relation");
         });
 
         modelBuilder.Entity<OutsideItem>(entity =>
@@ -732,21 +807,24 @@ public partial class HandlerContext : DbContext
 
             entity.Property(e => e.ItemId).HasColumnName("item_id");
             entity.Property(e => e.OrganizationId).HasColumnName("organization_id");
+            entity.Property(e => e.CurrencyName)
+                .HasMaxLength(5)
+                .IsUnicode(false)
+                .HasColumnName("currency_name");
             entity.Property(e => e.PurchasePrice)
                 .HasColumnType("decimal(20, 2)")
                 .HasColumnName("purchase_price");
             entity.Property(e => e.Qty).HasColumnName("qty");
-            entity.Property(e => e.Curenncy).HasColumnName("currency_name");
+
+            entity.HasOne(d => d.CurrencyNameNavigation).WithMany(p => p.OutsideItems)
+                .HasForeignKey(d => d.CurrencyName)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Outside_Item_Currency_relation");
 
             entity.HasOne(d => d.Item).WithMany(p => p.OutsideItems)
                 .HasForeignKey(d => d.ItemId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Outside_Item_Item_relation");
-
-            entity.HasOne(d => d.CurrencyName).WithMany(p => p.OutsideItems)
-                .HasForeignKey(d => d.Curenncy)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("Outside_Item_Currency_relation");
 
             entity.HasOne(d => d.Organization).WithMany(p => p.OutsideItems)
                 .HasForeignKey(d => d.OrganizationId)
@@ -773,33 +851,10 @@ public partial class HandlerContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Outside_Item_Offer_Offer_relation");
 
-            entity.HasOne(d => d.OutsideItem).WithMany(p => p.OutsideItemOffers)
+            entity.HasOne(d => d.O).WithMany(p => p.OutsideItemOffers)
                 .HasForeignKey(d => new { d.OutsideItemId, d.OrganizationId })
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Outside_Item_Offer_Outside_Item_relation");
-        });
-
-        modelBuilder.Entity<SoldItem>(entity =>
-        {
-            entity.HasKey(e => new { e.OwnedItemId, e.PurchaseInvoiceId, e.SellInvoiceId }).HasName("Sold_Item_pk");
-
-            entity.ToTable("Sold_Item");
-
-            entity.Property(e => e.OwnedItemId).HasColumnName("owned_item_id");
-            entity.Property(e => e.SellInvoiceId).HasColumnName("sell_invoice_id");
-            entity.Property(e => e.PurchaseInvoiceId).HasColumnName("purchase_invoice_id");
-            entity.Property(e => e.Qty).HasColumnName("qty");
-            entity.Property(e => e.SellingPrice).HasColumnName("selling_price").HasColumnType("decimal(20,2)");
-
-            entity.HasOne(d => d.SellInvoice).WithMany(p => p.SoldItems)
-                .HasForeignKey(d => d.SellInvoiceId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("Sold_items_sell_Invoice_realtion");
-
-            entity.HasOne(d => d.OwnedItemNavigation).WithMany(p => p.SoldItems)
-                .HasForeignKey(d => new { d.OwnedItemId, d.PurchaseInvoiceId })
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("Sold_items_Owned_Item_realtion");
         });
 
         modelBuilder.Entity<OwnedItem>(entity =>
@@ -810,7 +865,6 @@ public partial class HandlerContext : DbContext
 
             entity.Property(e => e.OwnedItemId).HasColumnName("owned_item_id");
             entity.Property(e => e.InvoiceId).HasColumnName("invoice_id");
-            entity.Property(e => e.Qty).HasColumnName("qty");
 
             entity.HasOne(d => d.Invoice).WithMany(p => p.OwnedItems)
                 .HasForeignKey(d => d.InvoiceId)
@@ -918,14 +972,42 @@ public partial class HandlerContext : DbContext
                 .HasConstraintName("Proforma_Currency_Value");
         });
 
+        modelBuilder.Entity<ProformaFutureItem>(entity =>
+        {
+            entity.HasKey(e => e.ProformaFutureItemId).HasName("Proforma_Future_Item_pk");
+
+            entity.ToTable("Proforma_Future_Item");
+
+            entity.Property(e => e.ProformaFutureItemId)
+                .HasColumnName("proforma_future_item_id");
+            entity.Property(e => e.ItemId).HasColumnName("item_id");
+            entity.Property(e => e.ProformaId).HasColumnName("proforma_id");
+            entity.Property(e => e.PurchasePrice)
+                .HasColumnType("decimal(20, 2)")
+                .HasColumnName("purchase_price");
+            entity.Property(e => e.Qty).HasColumnName("qty");
+
+            entity.HasOne(d => d.Item).WithMany(p => p.ProformaFutureItems)
+                .HasForeignKey(d => d.ItemId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Proforma_Future_Item_Item");
+
+            entity.HasOne(d => d.Proforma).WithMany(p => p.ProformaFutureItems)
+                .HasForeignKey(d => d.ProformaId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Proforma_Future_Item_Proforma");
+        });
+
         modelBuilder.Entity<ProformaOwnedItem>(entity =>
         {
-            entity.HasKey(e => new { e.OwnedItemId, e.InvoiceId, e.ProformaId }).HasName("Proforma_Owned_Item_pk");
+            entity.HasKey(e => e.ProformaOwnedItemId).HasName("Proforma_Owned_Item_pk");
 
             entity.ToTable("Proforma_Owned_Item");
 
-            entity.Property(e => e.OwnedItemId).HasColumnName("owned_item_id");
+            entity.Property(e => e.ProformaOwnedItemId)
+                .HasColumnName("proforma_owned_item_id");
             entity.Property(e => e.InvoiceId).HasColumnName("invoice_id");
+            entity.Property(e => e.OwnedItemId).HasColumnName("owned_item_id");
             entity.Property(e => e.ProformaId).HasColumnName("proforma_id");
             entity.Property(e => e.Qty).HasColumnName("qty");
             entity.Property(e => e.SellingPrice)
@@ -945,28 +1027,17 @@ public partial class HandlerContext : DbContext
 
         modelBuilder.Entity<PurchasePrice>(entity =>
         {
-            entity.HasKey(e => new { e.PurchasePriceId, e.OwnedItemId, e.InvoiceId }).HasName("Purchase_Price_pk");
+            entity.HasKey(e => e.PurchasePriceId).HasName("Purchase_Price_pk");
 
             entity.ToTable("Purchase_Price");
 
-            entity.Property(e => e.PurchasePriceId)
-                .ValueGeneratedOnAdd()
-                .HasColumnName("purchase_price_id");
-            entity.Property(e => e.OwnedItemId).HasColumnName("owned_item_id");
+            entity.Property(e => e.PurchasePriceId).HasColumnName("purchase_price_id");
             entity.Property(e => e.InvoiceId).HasColumnName("invoice_id");
-            entity.Property(e => e.Curenncy)
-                .HasMaxLength(5)
-                .IsUnicode(false)
-                .HasColumnName("curenncy");
-            entity.Property(e => e.PriceDate).HasColumnName("price_date");
-            entity.Property(e => e.PurchasePrice1)
+            entity.Property(e => e.OwnedItemId).HasColumnName("owned_item_id");
+            entity.Property(e => e.Price)
                 .HasColumnType("decimal(20, 2)")
-                .HasColumnName("purchase_price");
-
-            entity.HasOne(d => d.CurenncyNavigation).WithMany(p => p.PurchasePrices)
-                .HasForeignKey(d => d.Curenncy)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("Purchase_Currency_Name_relation");
+                .HasColumnName("price");
+            entity.Property(e => e.Qty).HasColumnName("qty");
 
             entity.HasOne(d => d.OwnedItem).WithMany(p => p.PurchasePrices)
                 .HasForeignKey(d => new { d.OwnedItemId, d.InvoiceId })
@@ -1087,6 +1158,37 @@ public partial class HandlerContext : DbContext
                 .HasColumnName("status_name");
         });
 
+        modelBuilder.Entity<SellingPrice>(entity =>
+        {
+            entity.HasKey(e => e.SellingPriceId).HasName("Selling_Price_pk");
+
+            entity.ToTable("Selling_Price");
+
+            entity.Property(e => e.SellingPriceId).HasColumnName("selling_price_id");
+            entity.Property(e => e.IdUser).HasColumnName("id_user");
+            entity.Property(e => e.Price)
+                .HasColumnType("decimal(20, 2)")
+                .HasColumnName("price");
+            entity.Property(e => e.PurchasePriceId).HasColumnName("purchase_price_id");
+            entity.Property(e => e.Qty).HasColumnName("qty");
+            entity.Property(e => e.SellInvoiceId).HasColumnName("sell_invoice_id");
+
+            entity.HasOne(d => d.User).WithMany(p => p.SellingPrices)
+                .HasForeignKey(d => d.IdUser)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Selling_Price_App_User_relation");
+
+            entity.HasOne(d => d.PurchasePrice).WithMany(p => p.SellingPrices)
+                .HasForeignKey(d => d.PurchasePriceId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Selling_Price_Purchase_Price_relation");
+
+            entity.HasOne(d => d.SellInvoice).WithMany(p => p.SellingPrices)
+                .HasForeignKey(d => d.SellInvoiceId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Selling_Price_Invoice");
+        });
+
         modelBuilder.Entity<SoloUser>(entity =>
         {
             entity.HasKey(e => e.SoloUserId).HasName("Solo_User_pk");
@@ -1102,7 +1204,7 @@ public partial class HandlerContext : DbContext
                 .HasConstraintName("Solo_User_Organization_relation");
         });
 
-        modelBuilder.Entity<Taxes>(entity =>
+        modelBuilder.Entity<Taxis>(entity =>
         {
             entity.HasKey(e => e.TaxesId).HasName("Taxes_pk");
 
@@ -1123,14 +1225,13 @@ public partial class HandlerContext : DbContext
                 .HasMaxLength(250)
                 .IsUnicode(false)
                 .HasColumnName("info");
+            entity.Property(e => e.IsRead).HasColumnName("is_read");
             entity.Property(e => e.ObjectTypeId).HasColumnName("object_type_id");
-            entity.Property(e => e.UsersId).HasColumnName("users_id");
-            entity.Property(e => e.IsRead).HasColumnName("is_read").HasConversion<int>();
             entity.Property(e => e.Referance)
-                .IsRequired(false)
                 .HasMaxLength(300)
                 .IsUnicode(false)
                 .HasColumnName("referance");
+            entity.Property(e => e.UsersId).HasColumnName("users_id");
 
             entity.HasOne(d => d.ObjectType).WithMany(p => p.UserNotifications)
                 .HasForeignKey(d => d.ObjectTypeId)

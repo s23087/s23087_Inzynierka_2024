@@ -19,7 +19,7 @@ function ClientMenu({
   const showSidebar = () => setSidebarShow(true);
   const hideSidebar = () => setSidebarShow(false);
   return (
-    <nav className="fixed-top main-bg">
+    <nav className="fixed-top main-bg z-1">
       <MenuTemplate
         sidebar_action={showSidebar}
         user_name={user.username + " " + user.surname}

@@ -1,237 +1,88 @@
-"use client";
+"use server";
 
-import { useState } from "react";
-import { Container, Stack } from "react-bootstrap";
-import PagePostionBar from "@/components/menu/page_position_bar";
-import SearchFilterBar from "@/components/menu/search_filter_bar";
-import MenuTemplate from "@/components/menu/menu_template";
-import CustomSidebar from "@/components/menu/sidebars/sidebar";
-import Navlinks from "@/components/menu/navlinks";
-import PagationFooter from "@/components/footer/pagation_footer";
-import InvoiceSwitch from "@/components/switches/invoice_switch";
-import InvoiceContainer from "@/components/object_container/documents/yours_invoice_container";
-import CreditNoteContainer from "@/components/object_container/documents/credit_note_contianter";
-import RequestContainer from "@/components/object_container/documents/request_container";
+import InvoiceMenu from "@/components/menu/wholeMenu/invoice_menu";
+import InvoiceList from "@/components/object_list/invoice_list";
+import WholeFooter from "@/components/footer/whole_footers/whole_footer";
+import getRole from "@/utils/auth/get_role";
+import getBasicInfo from "@/utils/menu/get_basic_user_info";
+import getNotificationCounter from "@/utils/menu/get_nofication_counter";
+import getOrgView from "@/utils/auth/get_org_view";
+import getYoursInvoices from "@/utils/documents/get_yours_invoices";
+import getSearchYoursInvoices from "@/utils/documents/get_yours_invoices_search";
+import getSearchSalesInvoices from "@/utils/documents/get_sales_invoices_search";
+import getSalesInvoices from "@/utils/documents/get_sales_invoices";
 
-function getDocument(type, document, is_org, selected) {
+async function getDocuments(type, org_view, search) {
   switch (type) {
     case "Sales invoices":
-      return (
-        <InvoiceContainer
-          invoice={document}
-          is_org={is_org}
-          selected={selected}
-          is_user_type={false}
-        />
-      );
+      if (search) {
+        return await getSearchSalesInvoices(org_view, search);
+      }
+      return await getSalesInvoices(org_view, search);
     case "Yours credit notes":
-      return (
-        <CreditNoteContainer
-          credit_note={document}
-          is_org={is_org}
-          selected={selected}
-          is_user_type={true}
-        />
-      );
+      return [];
     case "Client credit notes":
-      return (
-        <CreditNoteContainer
-          credit_note={document}
-          is_org={is_org}
-          selected={selected}
-          is_user_type={false}
-        />
-      );
+      return [];
     case "Requests":
-      return (
-        <RequestContainer
-          request={document}
-          is_org={is_org}
-          selected={selected}
-        />
-      );
+      return [];
+  }
+  if (search) {
+    return await getSearchYoursInvoices(org_view, search);
   }
 
-  return (
-    <InvoiceContainer
-      invoice={document}
-      is_org={is_org}
-      selected={selected}
-      is_user_type={true}
-    />
-  );
+  return await getYoursInvoices(org_view, search);
 }
 
-export default function InvoicesPage() {
-  const [sidebarShow, setSidebarShow] = useState(false);
-  const showSidebar = () => setSidebarShow(true);
-  const hideSidebar = () => setSidebarShow(false);
-  const current_role = "Admin";
-  const current_nofitication_qty = 1;
-  const is_org_switch_needed = true;
-  const org_view = false;
-  const [documentType, setDocumentType] = useState("Yours invoices");
-  const changeDoc = (type) => {
-    setDocumentType(type);
-  };
-  const tmp_your_invoice = {
-    user: "<<user>>",
-    number: "ab-2022-02-01",
-    date: "dd.mm.yyyy",
-    status: "Paid",
-    qty: 3,
-    total_value: "200",
-    currency_name: "PLN",
-    source: "<<organization>>",
-    system: "In system",
-    due_date: "dd.mm.yyyy",
-  };
-  const tmp_client_invoice = {
-    user: "<<user>>",
-    number: "ab-2022-02-01",
-    date: "dd.mm.yyyy",
-    status: "Unpaid",
-    qty: 4,
-    total_value: "300",
-    currency_name: "PLN",
-    buyer: "<<organization>>",
-    system: "Requested",
-    due_date: "dd.mm.yyyy",
-  };
-  const tmp_your_credit_note = {
-    user: "<<user>>",
-    invoice: "ab-2022-02-01",
-    date: "dd.mm.yyyy",
-    qty: 3,
-    total_value: "-200",
-    currency_name: "PLN",
-    for: "<<organization>>",
-    system: "In system",
-    due_date: "dd.mm.yyyy",
-  };
-  const tmp_client_credit_note = {
-    user: "<<user>>",
-    invoice: "ab-2022-02-01",
-    date: "dd.mm.yyyy",
-    qty: 4,
-    total_value: "-300",
-    currency_name: "PLN",
-    source: "<<organization>>",
-    system: "Not in system",
-    due_date: "dd.mm.yyyy",
-  };
-  const tmp_request = {
-    user: "<<user>>",
-    document: "ab-2022-02-01",
-    date: "dd.mm.yyyy",
-    status: "Rejected",
-    qty: 3,
-    total_value: "-200",
-    currency_name: "PLN",
-    type: "<<type>>",
-    system: "In system",
-  };
+export default async function InvoicesPage({ searchParams }) {
+  const current_role = await getRole();
+  const userInfo = await getBasicInfo();
+  const current_nofitication_qty = await getNotificationCounter();
+  const is_org_switch_needed = current_role == "Admin";
+  let orgActivated =
+    searchParams.isOrg !== undefined ? searchParams.isOrg : false;
+  let org_view = getOrgView(current_role, orgActivated === "true");
+  let isSearchTrue = searchParams.searchQuery !== undefined;
+  let docType = searchParams.docType ? searchParams.docType : "Yours invoices";
+  let invoices = isSearchTrue
+    ? await getDocuments(docType, org_view, searchParams.searchQuery)
+    : await getDocuments(docType, org_view);
+  let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
+  let pageQty = Math.ceil(invoices.length / maxInstanceOnPage);
+  pageQty = pageQty === 0 ? 1 : pageQty;
+  let currentPage = parseInt(searchParams.page)
+    ? parseInt(searchParams.page)
+    : 1;
+  let invoiceStart = currentPage * maxInstanceOnPage - maxInstanceOnPage;
+  invoiceStart = invoiceStart < 0 ? 0 : invoiceStart;
+  let invoiceEnd = invoiceStart + maxInstanceOnPage;
 
   return (
     <main className="d-flex flex-column h-100">
-      <nav className="fixed-top main-bg">
-        <MenuTemplate sidebar_action={showSidebar} user_name="<<User name>>">
-          <Stack className="ps-xl-2" direction="horizontal" gap={4}>
-            <Container className="mx-auto mx-xl-2 me-xl-5 w-auto">
-              <InvoiceSwitch
-                type={documentType}
-                switch_action={changeDoc}
-                is_role_solo={current_role === "Solo"}
-              />
-            </Container>
-            <Stack className="d-none d-xl-flex" direction="horizontal" gap={4}>
-              <Navlinks
-                role={current_role}
-                active_link="Invoices"
-                notification_qty={current_nofitication_qty}
-                is_sidebar={false}
-              />
-            </Stack>
-          </Stack>
-        </MenuTemplate>
-        <PagePostionBar
-          site_name={documentType}
-          with_switch={is_org_switch_needed}
-          switch_bool={org_view}
-        />
-        <SearchFilterBar filter_icon_bool="false" />
-        <CustomSidebar
-          user_name="<<User name>>"
-          org_name="<<Org name>>"
-          offcanvasShow={sidebarShow}
-          onHideAction={hideSidebar}
-        >
-          <Navlinks
-            role={current_role}
-            active_link="Invoices"
-            notification_qty={current_nofitication_qty}
-            is_sidebar={true}
-          />
-        </CustomSidebar>
-      </nav>
+      <InvoiceMenu
+        type={docType}
+        current_role={current_role}
+        current_nofitication_qty={current_nofitication_qty}
+        is_org_switch_needed={is_org_switch_needed}
+        org_view={org_view}
+        user={userInfo}
+      />
 
-      <section className="h-100">
-        <Container className="p-0 middleSectionPlacement" fluid>
-          {getDocument("Your invoices", tmp_your_invoice, false, false)}
-          {getDocument("Your invoices", tmp_your_invoice, false, true)}
-          {getDocument("Your invoices", tmp_your_invoice, true, false)}
-          {getDocument("Your invoices", tmp_your_invoice, true, true)}
-          {getDocument("Sales invoices", tmp_client_invoice, false, false)}
-          {getDocument("Sales invoices", tmp_client_invoice, false, true)}
-          {getDocument("Sales invoices", tmp_client_invoice, true, false)}
-          {getDocument("Sales invoices", tmp_client_invoice, true, true)}
-          {getDocument(
-            "Yours credit notes",
-            tmp_your_credit_note,
-            false,
-            false,
-          )}
-          {getDocument("Yours credit notes", tmp_your_credit_note, false, true)}
-          {getDocument("Yours credit notes", tmp_your_credit_note, true, false)}
-          {getDocument("Yours credit notes", tmp_your_credit_note, true, true)}
-          {getDocument(
-            "Client credit notes",
-            tmp_client_credit_note,
-            false,
-            false,
-          )}
-          {getDocument(
-            "Client credit notes",
-            tmp_client_credit_note,
-            false,
-            true,
-          )}
-          {getDocument(
-            "Client credit notes",
-            tmp_client_credit_note,
-            true,
-            false,
-          )}
-          {getDocument(
-            "Client credit notes",
-            tmp_client_credit_note,
-            true,
-            true,
-          )}
-          {getDocument("Requests", tmp_request, false, false)}
-          {getDocument("Requests", tmp_request, false, true)}
-          {getDocument("Requests", tmp_request, true, false)}
-          {getDocument("Requests", tmp_request, true, true)}
-        </Container>
+      <section className="h-100 z-0">
+        <InvoiceList
+          invoices={invoices}
+          type={docType}
+          orgView={org_view}
+          invoiceStart={invoiceStart}
+          invoiceEnd={invoiceEnd}
+          role={current_role}
+        />
       </section>
 
-      <footer className="fixed-bottom w-100">
-        <PagationFooter
-          max_instance_on_page={10}
-          page_qty={20}
-          current_page={1}
-        />
-      </footer>
+      <WholeFooter
+        max_instance_on_page={maxInstanceOnPage}
+        page_qty={pageQty}
+        current_page={currentPage}
+      />
     </main>
   );
 }

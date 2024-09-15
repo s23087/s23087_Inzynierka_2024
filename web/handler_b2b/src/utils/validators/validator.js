@@ -5,6 +5,11 @@ function isEmail(str) {
   return reg.test(str);
 }
 
+function isPriceFormat(str) {
+  const reg = /^\d+(\.\d{1,2})?$/;
+  return reg.test(str);
+}
+
 function haveNoNumbers(str) {
   const reg = /^[a-zA-Z]+$/;
   return reg.test(str);
@@ -44,6 +49,7 @@ const validators = {
   isEmpty,
   stringIsNotEmpty,
   validate,
+  isPriceFormat,
 };
 
 export default validators;

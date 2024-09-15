@@ -5,5 +5,6 @@
         public int UserId { get; set; }
         public string Info { get; set; } = null!;
         public string ObjectType { get; set; } = null!;
+        public string Referance { get; set; } = null!;
     }
 }

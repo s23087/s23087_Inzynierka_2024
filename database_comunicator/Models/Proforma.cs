@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using database_comunicator.Models;
 
 namespace database_comunicator.Models;
 
@@ -43,11 +44,13 @@ public partial class Proforma
 
     public virtual PaymentMethod PaymentMethod { get; set; } = null!;
 
+    public virtual ICollection<ProformaFutureItem> ProformaFutureItems { get; set; } = new List<ProformaFutureItem>();
+
     public virtual ICollection<ProformaOwnedItem> ProformaOwnedItems { get; set; } = new List<ProformaOwnedItem>();
 
     public virtual Organization SellerNavigation { get; set; } = null!;
 
-    public virtual Taxes TaxesNavigation { get; set; } = null!;
+    public virtual Taxis TaxesNavigation { get; set; } = null!;
 
     public virtual ICollection<Request> Requests { get; set; } = new List<Request>();
 }

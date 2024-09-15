@@ -10,10 +10,12 @@ public partial class OutsideItem
     public int OrganizationId { get; set; }
 
     public decimal PurchasePrice { get; set; }
-    public string Curenncy { get; set; } = null!;
 
     public int Qty { get; set; }
-    public virtual CurrencyName CurrencyName { get; set; } = null!;
+
+    public string CurrencyName { get; set; } = null!;
+
+    public virtual CurrencyName CurrencyNameNavigation { get; set; } = null!;
 
     public virtual Item Item { get; set; } = null!;
 

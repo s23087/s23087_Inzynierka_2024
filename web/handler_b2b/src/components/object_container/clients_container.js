@@ -19,18 +19,11 @@ function ClientContainer({
   };
   const getAddress = () => {
     let tmp = client.street + " " + client.city + " " + client.postal;
-    if (tmp.length > 52) tmp = tmp.slice(0, 50) + "...";
-    return tmp;
-  };
-  const getUsers = () => {
-    if (!client.users) return "-";
-    let tmp = client.users.join(", ");
-    if (tmp.length > 52) tmp = tmp.slice(0, 50) + "...";
     return tmp;
   };
   return (
     <Container
-      className="py-3 black-text medium-text border-bottom-grey"
+      className="py-3 px-4 px-xl-5 black-text medium-text border-bottom-grey"
       style={selected ? containerBg : null}
       fluid
     >
@@ -45,7 +38,9 @@ function ClientContainer({
                   className="me-2 mt-1"
                 />
                 <span className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1">
-                  <p className="mb-0">{getUsers()}</p>
+                  <p className="mb-0 text-truncate d-block w-100">
+                    {client.users.join(", ")}
+                  </p>
                 </span>
               </Col>
             </Row>
@@ -58,7 +53,9 @@ function ClientContainer({
             </Col>
             <Col xs="12">
               <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
-                <p className="mb-0">Address: {getAddress()}</p>
+                <p className="mb-0 text-truncate d-block w-100">
+                  Address: {getAddress()}
+                </p>
               </span>
             </Col>
             <Col className="pe-1" xs="auto">
@@ -68,7 +65,9 @@ function ClientContainer({
             </Col>
             <Col className="ps-1">
               <span className="spanStyle main-grey-bg d-flex rounded-span px-2 d-md-none">
-                <p className="mb-0">Country: {client.country}</p>
+                <p className="mb-0 text-truncate d-block w-100">
+                  Country: {client.country}
+                </p>
               </span>
             </Col>
           </Row>

@@ -80,11 +80,13 @@ namespace database_comunicator.Controllers
         }
         [HttpGet]
         [Route("getRestInfo")]
-        public async Task<IActionResult> GetRestInfo(int itemId, string currency)
+        public async Task<IActionResult> GetRestInfo(int itemId, int userId, string currency)
         {
+            var userExist = await _userServices.UserExist(userId);
+            if (!userExist) return NotFound();
             var exist = await _itemServices.ItemExist(itemId);
             if (!exist) return NotFound(itemId);
-            var result = await _itemServices.GetRestOfItem(itemId, currency);
+            var result = await _itemServices.GetRestOfItem(itemId, userId, currency);
             return result != null ? Ok(result) : BadRequest();
         }
         [HttpGet]
@@ -144,6 +146,15 @@ namespace database_comunicator.Controllers
             if (!exist) return NotFound(itemId);
             var desc = await _itemServices.GetModifyRestOfItem(itemId, currency);
             return Ok(desc);
+        }
+        [HttpGet]
+        [Route("getItemOwners/{itemId}")]
+        public async Task<IActionResult> GetItemOwners(int itemId)
+        {
+            var exist = await _itemServices.ItemExist(itemId);
+            if (!exist) return NotFound(itemId);
+            var result = await _itemServices.GetItemOwners(itemId);
+            return Ok(result);
         }
     }
 }

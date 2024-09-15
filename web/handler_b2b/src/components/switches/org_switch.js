@@ -26,6 +26,7 @@ function OrgSwitcher({ is_org }) {
       <Image
         src={is_org === true ? org_switch : solo_switch}
         alt={is_org === true ? "Org switch" : "Solo switch"}
+        priority={true}
       />
     </Button>
   );

@@ -11,6 +11,7 @@ function NotificationContainer({ notification, switch_read_action }) {
   const messageStyle = {
     minWidth: "369px",
     minHeight: "94px",
+    wordBreak: "break-all",
   };
   const buttonStyle = {
     minWidth: "140px",
@@ -21,29 +22,30 @@ function NotificationContainer({ notification, switch_read_action }) {
 
   return (
     <Container
-      className="py-3 black-text medium-text border-bottom-grey"
-      style={notification.is_read ? null : containerBg}
+      className="py-3 black-text medium-text border-bottom-grey px-0 px-xl-3"
+      style={notification.isRead ? null : containerBg}
       fluid
     >
-      <Row>
+      <Row className="mx-0 mx-md-3 mx-xl-3">
         <Col xs="12" lg="6" xl="6">
-          <Row className="gy-2">
+          <Row className="gy-2 px-3 px-md-0">
             <Col xs="12" className="mb-1 mb-sm-0">
               <span
                 className="spanStyle main-blue-bg main-text d-flex rounded-span px-2"
                 style={titleStyle}
               >
                 <p className="mb-0">
-                  {notification.object}: {notification.short_message}
+                  {notification.objectType} with referance{" "}
+                  {notification.referance}
                 </p>
               </span>
             </Col>
             <Col xs="12" className="mb-1 mb-sm-0">
               <span
-                className="main-grey-bg d-flex rounded-span px-2"
+                className="main-grey-bg d-flex rounded-span px-2 overflow-y-scroll"
                 style={messageStyle}
               >
-                <p className="mb-0 mt-2">{notification.long_message}</p>
+                <p className="mb-0 mt-2 w-100">{notification.info}</p>
               </span>
             </Col>
           </Row>
@@ -55,9 +57,9 @@ function NotificationContainer({ notification, switch_read_action }) {
           xxl="4"
           className="px-0 pt-3 pt-xl-2 pb-2 offset-xxl-2"
         >
-          <Container className="h-100 px-5" fluid>
-            <Row className="align-items-center justify-content-center h-100">
-              <Col className="pe-2 text-end">
+          <Container className="h-100 ps-5" fluid>
+            <Row className="align-items-center justify-content-center justify-content-lg-end h-100">
+              <Col className="pe-2 text-end" xs="auto">
                 <Button
                   variant="mainBlue"
                   className="rounded-span w-100 p-0"
@@ -66,14 +68,14 @@ function NotificationContainer({ notification, switch_read_action }) {
                   Go to change
                 </Button>
               </Col>
-              <Col className="ps-2">
+              <Col className="ps-2" xs="auto">
                 <Button
-                  variant={notification.is_read ? "red" : "green"}
+                  variant={notification.isRead ? "red" : "green"}
                   className="rounded-span w-100"
                   onClick={switch_read_action}
                   style={buttonStyle}
                 >
-                  {notification.is_read ? "Mark as unread" : "Mark as read"}
+                  {notification.isRead ? "Mark as unread" : "Mark as read"}
                 </Button>
               </Col>
             </Row>

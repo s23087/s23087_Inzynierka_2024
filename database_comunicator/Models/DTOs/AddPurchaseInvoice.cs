@@ -1,8 +1,7 @@
 ﻿namespace database_comunicator.Models.DTOs
 {
-    public class AddInvoice
+    public class AddPurchaseInvoice
     {
-        public bool IsPurchaseInvoice { get; set; }
         public required int UserId { get; set; }
         public required string InvoiceNumber { get; set; } = null!;
         public required int Seller { get; set; }

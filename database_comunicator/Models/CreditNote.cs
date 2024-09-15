@@ -7,6 +7,8 @@ public partial class CreditNote
 {
     public int IdCreditNote { get; set; }
 
+    public string CreditNoteNumber { get; set; } = null!;
+
     public DateTime CreditNoteDate { get; set; }
 
     public bool InSystem { get; set; }
@@ -15,7 +17,7 @@ public partial class CreditNote
 
     public int InvoiceId { get; set; }
 
-    public virtual ICollection<CreditNoteItem> CreditNoteItems { get; set; } = new List<CreditNoteItem>();
+    public virtual CreditNoteItem? CreditNoteItem { get; set; }
 
     public virtual Invoice Invoice { get; set; } = null!;
 

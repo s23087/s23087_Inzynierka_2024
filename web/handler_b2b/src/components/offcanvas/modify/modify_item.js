@@ -66,7 +66,7 @@ function ModifyItemOffcanvas({
       let desc = getDescription(item.itemId);
       desc.then((data) => setDescription(data));
     }
-  }, [showOffcanvas, item.itemId, curenncy, isOrg, item.eans]);
+  }, [showOffcanvas]);
   // Rerender Eans
   const [rerenderVar, setRerenderVar] = useState(1);
   const eanExist = (variable) => {
@@ -255,7 +255,11 @@ function ModifyItemOffcanvas({
             fluid
           >
             <Form>
-              <Form.Group className="mb-5" controlId="formDescription">
+              <Form.Group
+                className="mb-5"
+                controlId="formDescription"
+                key={bindings}
+              >
                 <Form.Label className="blue-main-text maxInputWidth">
                   Users:
                 </Form.Label>
@@ -268,7 +272,6 @@ function ModifyItemOffcanvas({
                 className="mb-3 mt-2 ms-3 py-3 w-100"
                 style={buttonStyle}
                 disabled={bindings.length == 0}
-                key={bindings}
                 type="sumbit"
               >
                 Save

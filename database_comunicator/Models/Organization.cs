@@ -20,10 +20,12 @@ public partial class Organization
     public int? CreditLimit { get; set; }
 
     public int CountryId { get; set; }
+
     public int? AvailabilityStatusId { get; set; }
 
+    public virtual AvailabilityStatus? AvailabilityStatus { get; set; }
+
     public virtual Country Country { get; set; } = null!;
-    public virtual AvailabilityStatus? AvailabilityStatus { get; set; } = new AvailabilityStatus();
 
     public virtual ICollection<Invoice> InvoiceBuyerNavigations { get; set; } = new List<Invoice>();
 
@@ -40,5 +42,6 @@ public partial class Organization
     public virtual ICollection<Proforma> ProformaSellerNavigations { get; set; } = new List<Proforma>();
 
     public virtual ICollection<SoloUser> SoloUsers { get; set; } = new List<SoloUser>();
+
     public virtual ICollection<AppUser> AppUsers { get; set; } = new List<AppUser>();
 }

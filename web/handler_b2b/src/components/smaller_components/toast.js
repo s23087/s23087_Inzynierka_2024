@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 const toastStyle = {
   maxWidth: "180px",
   marginBottom: "90px",
+  whiteSpace: "pre-line",
 };
 
 function ErrorToast({ showToast, message, onHideFun }) {

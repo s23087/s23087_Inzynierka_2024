@@ -9,9 +9,9 @@ public partial class ItemOwner
 
     public int InvoiceId { get; set; }
 
-    public int Qty { get; set; }
-
     public int OwnedItemId { get; set; }
+
+    public int Qty { get; set; }
 
     public virtual AppUser IdUserNavigation { get; set; } = null!;
 

@@ -19,6 +19,7 @@ import getDescription from "@/utils/warehouse/get_description";
 import dropdown_big_down from "../../../../public/icons/dropdown_big_down.png";
 import view_outside_icon from "../../../../public/icons/view_outside_icon.png";
 import view_warehouse_icon from "../../../../public/icons/view_warehouse_icon.png";
+import getItemOwners from "@/utils/warehouse/get_item_owners";
 function ViewItemOffcanvas({
   showOffcanvas,
   hideFunction,
@@ -26,22 +27,31 @@ function ViewItemOffcanvas({
   currency,
   isOrg,
 }) {
+  const [users, setUsers] = useState([]);
+  const [choosenUser, setChoosenUser] = useState();
   const [isOurWarehouseView, setIsOurWarehouseView] = useState(true);
   const [restInfo, setRestInfo] = useState({
     outsideItemInfos: [],
     ownedItemInfos: [],
-    userOwnedItems: {},
-    userOutsideItems: {},
   });
   const [description, setDescription] = useState(null);
   useEffect(() => {
     if (showOffcanvas) {
-      let restData = getRestInfo(currency, item.itemId);
+      let restData = getRestInfo(currency, item.itemId, isOrg);
       restData.then((data) => setRestInfo(data));
       let desc = getDescription(item.itemId);
       desc.then((data) => setDescription(data));
     }
-  }, [showOffcanvas, currency, item.itemId]);
+    if (isOrg) {
+      let users = getItemOwners(item.itemId);
+      users.then((data) => {
+        setUsers(data);
+        if (data[0]) {
+          setChoosenUser(data[0].idUser);
+        }
+      });
+    }
+  }, [showOffcanvas, currency, item.itemId, isOrg]);
   const statusColorStyle = {
     color:
       getStatusColor(item.statusName) === "var(--sec-red)"
@@ -102,16 +112,24 @@ function ViewItemOffcanvas({
           <Row>
             <Col xs="12" md="6">
               <Stack className="pt-3" gap={3}>
-                {isOrg && item.users.lenght > 0 ? (
-                  <Form.Select>
-                    {item.users.map((user) => {
-                      return (
-                        <option key={user} value={user}>
-                          {user}
-                        </option>
-                      );
-                    })}
-                  </Form.Select>
+                {isOrg && item.users.length > 0 ? (
+                  <Form.Group>
+                    <Form.Label className="blue-main-text">User:</Form.Label>
+                    <Form.Select
+                      className="input-style shadow-sm"
+                      onChange={(e) => {
+                        setChoosenUser(e.target.value);
+                      }}
+                    >
+                      {Object.values(users).map((value) => {
+                        return (
+                          <option key={value.idUser} value={value.idUser}>
+                            {value.username + " " + value.surname}
+                          </option>
+                        );
+                      })}
+                    </Form.Select>
+                  </Form.Group>
                 ) : null}
                 <Container className="px-1 ms-0">
                   <p className="mb-1 blue-main-text">P/N:</p>
@@ -142,10 +160,26 @@ function ViewItemOffcanvas({
               </Stack>
             </Col>
             <Col xs="12" md="6" lg="4" className="px-0 offset-lg-2">
-              <Container className="pt-5 text-center">
+              <Container
+                className="pt-5 text-center overflow-x-scroll"
+                key={choosenUser}
+              >
                 {restInfo ? (
                   <ItemTable
-                    restInfo={restInfo}
+                    restInfo={{
+                      outsideItemInfos:
+                        isOrg && choosenUser
+                          ? restInfo.outsideItemInfos.filter(
+                              (e) => e.userId == choosenUser,
+                            )
+                          : restInfo.outsideItemInfos,
+                      ownedItemInfos:
+                        isOrg && choosenUser
+                          ? restInfo.ownedItemInfos.filter(
+                              (e) => e.userId == choosenUser,
+                            )
+                          : restInfo.ownedItemInfos,
+                    }}
                     isOurWarehouse={isOurWarehouseView}
                   />
                 ) : (

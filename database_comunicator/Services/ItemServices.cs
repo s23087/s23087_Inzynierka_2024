@@ -4,6 +4,7 @@ using database_comunicator.Models.DTOs;
 using database_comunicator.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Linq;
 
 namespace database_comunicator.Services
 {
@@ -19,10 +20,13 @@ namespace database_comunicator.Services
         public Task<IEnumerable<GetManyItems>> GetItems(string currency, string search);
         public Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId);
         public Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId, string search);
-        public Task<GetRestInfo> GetRestOfItem(int id, string currency);
-        public Task<IEnumerable<GetRestInfoOrg>> GetRestOfItemOrg(int id, string currency);
+        public Task<GetRestInfo> GetRestOfItem(int id, int userId, string currency);
+        public Task<GetRestInfo> GetRestOfItemOrg(int id, string currency);
         public Task<IEnumerable<GetBinding>> GetModifyRestOfItem(int id, string currency);
         public Task<string> GetDescription(int id);
+        public Task<IEnumerable<GetItemList>> GetItemList();
+        public Task<IEnumerable<GetSalesItemList>> GetSalesItemList(int userId, string currency);
+        public Task<IEnumerable<GetUsers>> GetItemOwners(int itemId);
     }
     public class ItemServices : IItemServices
     {
@@ -67,82 +71,153 @@ namespace database_comunicator.Services
             return await _handlerContext.Eans.Where(e => eans.Contains(e.EanValue)).AnyAsync();
         }
 
-        public async Task<GetRestInfo> GetRestOfItem(int id, string currency)
+        public async Task<GetRestInfo> GetRestOfItem(int id, int userId, string currency)
         {
-            var outsideItems = await _handlerContext.OutsideItems
-                .Where(e => e.ItemId == id)
-                .Include(e => e.Organization)
-                .ThenInclude(e => e.AvailabilityStatus)
-                .Select(e => new GetRestItemInfo
+            List<GetRestInfoOwnedItems> result;
+            if (currency == "PLN")
             {
-                OrganizationName = e.Organization.OrgName,
-                Qty = e.Qty,
-                DaysForRealization = e.Organization.AvailabilityStatus == null ? 0 : e.Organization.AvailabilityStatus.DaysForRealization,
-                Price = e.PurchasePrice,
-                Curenncy = e.CurrencyName.Curenncy
-
-            }).ToListAsync();
-            var ownedItems = await _handlerContext.OwnedItems.Where(e => e.OwnedItemId == id)
-                .Include(e => e.Invoice)
-                .ThenInclude(e => e.SellerNavigation)
-                .Include(e => e.PurchasePrices.Where(a => a.InvoiceId == e.InvoiceId && a.OwnedItemId == e.OwnedItemId))
-                .Select(e => new GetRestItemInfo
+                result = await _handlerContext.ItemOwners
+                    .Where(e => e.OwnedItemId == id && e.IdUser == userId)
+                    .Include(e => e.IdUserNavigation)
+                    .Include(e => e.OwnedItem)
+                        .ThenInclude(e => e.Invoice)
+                            .ThenInclude(e => e.SellerNavigation)
+                    .Include(e => e.OwnedItem)
+                        .ThenInclude(e => e.PurchasePrices)
+                    .Where(e => e.Qty > 0)
+                    .Select(instance => new GetRestInfoOwnedItems
+                    {
+                        UserId = instance.IdUserNavigation.IdUser,
+                        Username = instance.IdUserNavigation.Username,
+                        OrganizationName = instance.OwnedItem.Invoice.SellerNavigation.OrgName,
+                        InvoiceNumber = instance.OwnedItem.Invoice.InvoiceNumber,
+                        Qty = instance.Qty,
+                        Price = instance.OwnedItem.PurchasePrices.Select(e => e.Price).Average(),
+                        Currency = "PLN"
+                    }).ToListAsync();
+            }
+            else
+            {
+                result = await _handlerContext.ItemOwners
+                    .Where(e => e.OwnedItemId == id && e.IdUser == userId)
+                    .Include(e => e.IdUserNavigation)
+                    .Include(e => e.OwnedItem)
+                        .ThenInclude(e => e.Invoice)
+                            .ThenInclude(e => e.SellerNavigation)
+                    .Include(e => e.OwnedItem)
+                        .ThenInclude(e => e.PurchasePrices)
+                            .ThenInclude(e => e.CalculatedPrices)
+                    .Where(e => e.Qty > 0)
+                    .Select(instance => new GetRestInfoOwnedItems
+                    {
+                        UserId = instance.IdUserNavigation.IdUser,
+                        Username = instance.IdUserNavigation.Username,
+                        OrganizationName = instance.OwnedItem.Invoice.SellerNavigation.OrgName,
+                        InvoiceNumber = instance.OwnedItem.Invoice.InvoiceNumber,
+                        Qty = instance.Qty,
+                        Price = instance.OwnedItem.PurchasePrices
+                            .SelectMany(e => e.CalculatedPrices)
+                            .Where(e => e.CurrencyName == currency)
+                            .Select(e => e.Price).Average(),
+                        Currency = currency
+                    }).ToListAsync();
+            }
+            var outsideItems = await _handlerContext.OutsideItems
+                .Where(e => e.ItemId == id && e.Organization.AppUsers.Where(d => d.IdUser == userId).Any())
+                .Include(e => e.Organization)
+                    .ThenInclude(e => e.AppUsers)
+                .Select(obj => new GetRestInfoOutsideItems
                 {
-                    OrganizationName = e.Invoice.SellerNavigation.OrgName,
-                    InvoiceNumber = e.Invoice.InvoiceNumber,
-                    Qty = e.Qty,
-                    Price = e.PurchasePrices.Where(e => e.Curenncy.Equals(currency)).Select(e => e.PurchasePrice1).ToList()[0],
-                    Curenncy = currency
+                    Users = obj.Organization.AppUsers.Select(e => new KeyValuePair<int, string>(e.IdUser, e.Username)).ToList(),
+                    OrganizationName = obj.Organization.OrgName,
+                    Qty = obj.Qty,
+                    Price = obj.PurchasePrice,
+                    Curenncy = obj.CurrencyName
                 }).ToListAsync();
 
             return new GetRestInfo
             {
                 OutsideItemInfos = outsideItems,
-                OwnedItemInfos = ownedItems
+                OwnedItemInfos = result
             };
 
         }
-        public async Task<IEnumerable<GetRestInfoOrg>> GetRestOfItemOrg(int id, string currency)
+        public async Task<GetRestInfo> GetRestOfItemOrg(int id, string currency)
         {
-            var result = await _handlerContext.AppUsers
-                .Include(e => e.ItemOwners)
-                 .ThenInclude(e => e.OwnedItem)
-                    .ThenInclude(e => e.Invoice)
-                        .ThenInclude(e => e.SellerNavigation)
-                .Include(e => e.ItemOwners)
-                 .ThenInclude(e => e.OwnedItem)
-                    .ThenInclude(e => e.PurchasePrices)
-                .Include(e => e.Clients)
-                       .ThenInclude(e => e.OutsideItems)
-                .Include(e => e.Clients)
-                       .ThenInclude(e => e.AvailabilityStatus)
-                .Select(instance => new GetRestInfoOrg
+            List<GetRestInfoOwnedItems> result;
+            if (currency == "PLN")
+            {
+                result = await _handlerContext.ItemOwners
+                    .Where(e => e.OwnedItemId == id)
+                    .Include(e => e.IdUserNavigation)
+                    .Include (e => e.OwnedItem)
+                        .ThenInclude(e => e.Invoice)
+                            .ThenInclude(e => e.SellerNavigation)
+                    .Include(e => e.OwnedItem)
+                        .ThenInclude(e => e.PurchasePrices)
+                    .Where(e => e.Qty > 0)
+                    .Select(instance => new GetRestInfoOwnedItems
+                    {
+                        UserId = instance.IdUserNavigation.IdUser,
+                        Username = instance.IdUserNavigation.Username + " " + instance.IdUserNavigation.Surname,
+                        OrganizationName = instance.OwnedItem.Invoice.SellerNavigation.OrgName,
+                        InvoiceNumber = instance.OwnedItem.Invoice.InvoiceNumber,
+                        Qty = instance.Qty,
+                        Price = instance.OwnedItem.PurchasePrices.Select(e => e.Price).Average(),
+                        Currency = "PLN"
+                    }).ToListAsync();
+            } else
+            {
+                result = await _handlerContext.ItemOwners
+                    .Where(e => e.OwnedItemId == id)
+                    .Include(e => e.IdUserNavigation)
+                    .Include(e => e.OwnedItem)
+                        .ThenInclude(e => e.Invoice)
+                            .ThenInclude(e => e.SellerNavigation)
+                    .Include(e => e.OwnedItem)
+                        .ThenInclude(e => e.PurchasePrices)
+                            .ThenInclude(e => e.CalculatedPrices)
+                    .Where(e => e.Qty > 0)
+                    .Select(instance => new GetRestInfoOwnedItems
+                    {
+                        UserId = instance.IdUserNavigation.IdUser,
+                        Username = instance.IdUserNavigation.Username + " " + instance.IdUserNavigation.Surname,
+                        OrganizationName = instance.OwnedItem.Invoice.SellerNavigation.OrgName,
+                        InvoiceNumber = instance.OwnedItem.Invoice.InvoiceNumber,
+                        Qty = instance.Qty,
+                        Price = instance.OwnedItem.PurchasePrices
+                            .SelectMany(e => e.CalculatedPrices)
+                            .Where(e => e.CurrencyName == currency)
+                            .Select(e => e.Price).Average(),
+                        Currency = currency
+                    }).ToListAsync();
+            }
+            var outsideItems = await _handlerContext.OutsideItems
+                .Where(e => e.ItemId == id)
+                .Include(e => e.Organization)
+                    .ThenInclude(e => e.AppUsers)
+                .Select(obj => new GetRestInfoOutsideItems
                 {
-                    UserId = instance.IdUser,
-                    Username = instance.Username,
-                    OutsideItemInfos = instance.Clients.Select(e => new GetRestItemInfo
-                    {
-                        OrganizationName = e.OrgName,
-                        Qty = e.OutsideItems.Where(d => d.ItemId == id).Select(f => f.Qty).First(),
-                        DaysForRealization = e.AvailabilityStatus == null ? 0 : e.AvailabilityStatus.DaysForRealization,
-                        Price = e.OutsideItems.Where(d => d.ItemId == id).Select(f => f.PurchasePrice).First(),
-                        Curenncy = e.OutsideItems.Where(d => d.ItemId == id).Select(f => f.Curenncy).First()
-                    }).ToList(),
-                    OwnedItemInfos = instance.ItemOwners.Select(e => new GetRestItemInfo
-                    {
-                        OrganizationName = e.OwnedItem.Invoice.SellerNavigation.OrgName,
-                        InvoiceNumber = e.OwnedItem.Invoice.InvoiceNumber,
-                        Qty = e.Qty,
-                        Price = e.OwnedItem.PurchasePrices.Where(e => e.Curenncy.Equals(currency)).Select(e => e.PurchasePrice1).ToList()[0],
-                        Curenncy = currency
-                    }).ToList()
+                    Users = obj.Organization.AppUsers.Select(e => new KeyValuePair<int, string>(e.IdUser, e.Username)).ToList(),
+                    OrganizationName = obj.Organization.OrgName,
+                    Qty = obj.Qty,
+                    Price = obj.PurchasePrice,
+                    Curenncy = obj.CurrencyName
                 }).ToListAsync();
 
-            return result;
+            return new GetRestInfo
+            {
+                OutsideItemInfos = outsideItems,
+                OwnedItemInfos = result
+            };
         }
         public async Task<IEnumerable<GetManyItems>> GetItems(string currency)
         {
-            List<GetManyItems> items = await _handlerContext.Items
+            List<GetManyItems> items;
+
+            if (currency == "PLN")
+            {
+                items = await _handlerContext.Items
                 .Include(ent => ent.Eans)
                 .Include(ent => ent.OwnedItems)
                     .ThenInclude(c => c.Invoice)
@@ -151,131 +226,509 @@ namespace database_comunicator.Services
                     .ThenInclude(k => k.Invoice)
                         .ThenInclude(h => h.SellerNavigation)
                 .Include(ent => ent.OwnedItems)
-                    .ThenInclude(e => e.PurchasePrices.Where(pur => pur.Curenncy == currency))
+                    .ThenInclude(e => e.PurchasePrices)
+                        .ThenInclude(e => e.CalculatedPrices)
                 .Include(ent => ent.OwnedItems)
                     .ThenInclude(g => g.ItemOwners)
                         .ThenInclude(k => k.IdUserNavigation)
                 .Include(ent => ent.OutsideItems)
                 .Select(instance => new GetManyItems
                 {
-                    Users = instance.OwnedItems.Select(e => e.ItemOwners.Select(e => e.IdUserNavigation.Username).First()),
+                    Users = instance.OwnedItems.SelectMany(e => e.ItemOwners).Select(e => e.IdUserNavigation)
+                        .GroupBy(e => new { e.Username, e.Surname })
+                        .Select(e => e.Key.Username + " " + e.Key.Surname).ToList(),
                     ItemId = instance.ItemId,
                     ItemName = instance.ItemName,
                     PartNumber = instance.PartNumber,
                     StatusName = WarehouseUtils.getItemStatus(
-                            instance.OwnedItems.Select(e => e.Qty).Sum(),
+                            instance.OwnedItems
+                                .SelectMany(e => e.PurchasePrices)
+                                .Select(e => e.Qty).Sum()
+                                - instance.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.SellingPrices).Select(d => d.Qty).Sum()
+                                + instance.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.CreditNoteItems)
+                                    .Where(d => d.IncludeQty == true).Select(d => d.Qty).Sum(),
                             instance.OutsideItems.Select(e => e.Qty).Sum(),
-                            instance.OwnedItems.Select(e => e.Invoice.Deliveries).Any()
+                            instance.OwnedItems.SelectMany(e => e.Invoice.Deliveries).Any()
                         ),
                     Eans = instance.Eans.Select(e => e.EanValue),
-                    Qty = instance.OwnedItems.Select(e => e.Qty).Sum() + instance.OutsideItems.Select(e => e.Qty).Sum(),
-                    PurchasePrice = instance.OwnedItems.Select(e => e.PurchasePrices.Select(pur => pur.PurchasePrice1).Average()).First(),
-                    Sources = instance.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation.OrgName)
+                    Qty = instance.OwnedItems
+                    .SelectMany(e => e.PurchasePrices)
+                    .Select(e => e.Qty).Sum()
+                    - instance.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.SellingPrices).Select(d => d.Qty).Sum()
+                    + instance.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.CreditNoteItems).Where(d => d.IncludeQty == true).Select(d => d.Qty).Sum(),
+                    PurchasePrice = instance.OwnedItems
+                        .SelectMany(e => e.PurchasePrices)
+                        .Where(e => 
+                        e.Qty 
+                        - e.SellingPrices.Select(d => d.Qty).Sum()
+                        + e.CreditNoteItems.Where(d  => d.IncludeQty == true).Select(d => d.Qty).Sum()
+                        > 0
+                        )
+                        .Select(e => e.Price)
+                        .Union(
+                            instance.OwnedItems
+                            .SelectMany(e => e.PurchasePrices)
+                            .SelectMany(e => e.CreditNoteItems)
+                            .Where(e => e.Qty != e.PurchasePrice.Qty && e.IncludeQty == true)
+                            .Select(e => e.NewPrice)
+                        )
+                        .Average(),
+                    Sources = instance.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation).GroupBy(e => e.OrgName).Select(e => e.Key).ToList()
                 })
+                .OrderByDescending(e => e.Qty)
                 .ToListAsync();
+            } else
+            {
+                items = await _handlerContext.Items
+                .Include(ent => ent.Eans)
+                .Include(ent => ent.OwnedItems)
+                    .ThenInclude(c => c.Invoice)
+                        .ThenInclude(h => h.Deliveries)
+                .Include(ent => ent.OwnedItems)
+                    .ThenInclude(k => k.Invoice)
+                        .ThenInclude(h => h.SellerNavigation)
+                .Include(ent => ent.OwnedItems)
+                    .ThenInclude(e => e.PurchasePrices)
+                        .ThenInclude(e => e.CalculatedPrices)
+                .Include(ent => ent.OwnedItems)
+                    .ThenInclude(g => g.ItemOwners)
+                        .ThenInclude(k => k.IdUserNavigation)
+                .Include(ent => ent.OutsideItems)
+                .Select(instance => new GetManyItems
+                {
+                    Users = instance.OwnedItems
+                        .SelectMany(e => e.ItemOwners)
+                        .Select(e => e.IdUserNavigation)
+                        .GroupBy(e => new { e.Username, e.Surname })
+                        .Select(e => e.Key.Username + " " + e.Key.Surname).ToList(),
+                    ItemId = instance.ItemId,
+                    ItemName = instance.ItemName,
+                    PartNumber = instance.PartNumber,
+                    StatusName = WarehouseUtils.getItemStatus(
+                            instance.OwnedItems
+                                .SelectMany(e => e.PurchasePrices)
+                                .Select(e => e.Qty).Sum()
+                                - instance.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.SellingPrices).Select(d => d.Qty).Sum()
+                                + instance.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.CreditNoteItems)
+                                    .Where(d => d.IncludeQty == true).Select(d => d.Qty).Sum(),
+                            instance.OutsideItems.Select(e => e.Qty).Sum(),
+                            instance.OwnedItems.SelectMany(e => e.Invoice.Deliveries).Any()
+                        ),
+                    Eans = instance.Eans.Select(e => e.EanValue),
+                    Qty = instance.OwnedItems
+                        .SelectMany(e => e.PurchasePrices)
+                        .Select(e => e.Qty).Sum()
+                        - instance.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.SellingPrices).Select(d => d.Qty).Sum()
+                        + instance.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.CreditNoteItems).Where(d => d.IncludeQty == true).Select(d => d.Qty).Sum(),
+                    PurchasePrice = instance.OwnedItems
+                        .SelectMany(e => e.PurchasePrices)
+                        .Where(e =>
+                        e.Qty
+                        - e.SellingPrices.Select(d => d.Qty).Sum()
+                        + e.CreditNoteItems.Where(d => d.IncludeQty).Select(d => d.Qty).Sum()
+                        > 0
+                        ).SelectMany(e => e.CalculatedPrices)
+                        .Where(e => e.CurrencyName == currency)
+                        .Select(e => e.Price)
+                        .Union(
+                            instance.OwnedItems
+                            .SelectMany(e => e.PurchasePrices)
+                            .SelectMany(e => e.CreditNoteItems)
+                            .Where(e => e.Qty != e.PurchasePrice.Qty && e.IncludeQty == true)
+                            .SelectMany(e => e.CalculatedCreditNotePrices)
+                            .Where(e => e.CurrencyName == currency)
+                            .Select(e => e.Price)
+                        )
+                        .Average(),
+                    Sources = instance.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation).GroupBy(e => e.OrgName).Select(e => e.Key).ToList()
+                })
+                .OrderByDescending(e => e.Qty)
+                .ToListAsync();
+            }
+                
             return items;
         }
         public async Task<IEnumerable<GetManyItems>> GetItems(string currency, string search)
         {
-            List<GetManyItems> items = await _handlerContext.Items
-                .Where(j => EF.Functions.FreeText(j.PartNumber, search) || EF.Functions.FreeText(j.ItemName, search))
-                .Include(entit => entit.Eans)
-                .Include(entit => entit.OwnedItems)
-                    .ThenInclude(c => c.Invoice)
-                        .ThenInclude(h => h.Deliveries)
-                .Include(entit => entit.OwnedItems)
-                    .ThenInclude(k => k.Invoice)
-                        .ThenInclude(h => h.SellerNavigation)
-                .Include(entit => entit.OwnedItems)
-                    .ThenInclude(e => e.PurchasePrices.Where(pur => pur.Curenncy == currency))
-                .Include(entit => entit.OwnedItems)
-                    .ThenInclude(g => g.ItemOwners)
-                        .ThenInclude(k => k.IdUserNavigation)
-                .Include(entit => entit.OutsideItems)
-                .Select(instc => new GetManyItems
-                {
-                    Users = instc.OwnedItems.Select(e => e.ItemOwners.Select(e => e.IdUserNavigation.Username).First()),
-                    ItemId = instc.ItemId,
-                    ItemName = instc.ItemName,
-                    PartNumber = instc.PartNumber,
-                    StatusName = WarehouseUtils.getItemStatus(
-                            instc.OwnedItems.Select(e => e.Qty).Sum(),
-                            instc.OutsideItems.Select(e => e.Qty).Sum(),
-                            instc.OwnedItems.Select(e => e.Invoice.Deliveries).Any()
-                        ),
-                    Eans = instc.Eans.Select(e => e.EanValue),
-                    Qty = instc.OwnedItems.Select(e => e.Qty).Sum() + instc.OutsideItems.Select(e => e.Qty).Sum(),
-                    PurchasePrice = instc.OwnedItems.Select(e => e.PurchasePrices.Select(pur => pur.PurchasePrice1).Average()).First(),
-                    Sources = instc.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation.OrgName)
-                })
-                .ToListAsync();
+            List<GetManyItems> items;
+            if (currency == "PLN")
+            {
+                items = await _handlerContext.Items
+                    .Where(j => EF.Functions.FreeText(j.PartNumber, search) || EF.Functions.FreeText(j.ItemName, search))
+                    .Include(entit => entit.Eans)
+                    .Include(entit => entit.OwnedItems)
+                        .ThenInclude(c => c.Invoice)
+                            .ThenInclude(h => h.Deliveries)
+                    .Include(entit => entit.OwnedItems)
+                        .ThenInclude(k => k.Invoice)
+                            .ThenInclude(h => h.SellerNavigation)
+                    .Include(entit => entit.OwnedItems)
+                        .ThenInclude(e => e.PurchasePrices)
+                            .ThenInclude(e => e.CalculatedPrices)
+                    .Include(entit => entit.OwnedItems)
+                        .ThenInclude(g => g.ItemOwners)
+                            .ThenInclude(k => k.IdUserNavigation)
+                    .Include(entit => entit.OutsideItems)
+                    .Select(instc => new GetManyItems
+                    {
+                        Users = instc.OwnedItems.SelectMany(e => e.ItemOwners).Select(e => e.IdUserNavigation)
+                        .GroupBy(e => new {e.Username, e.Surname})
+                        .Select(e => e.Key.Username + " " + e.Key.Surname).ToList(),
+                        ItemId = instc.ItemId,
+                        ItemName = instc.ItemName,
+                        PartNumber = instc.PartNumber,
+                        StatusName = WarehouseUtils.getItemStatus(
+                                instc.OwnedItems
+                                    .SelectMany(e => e.PurchasePrices)
+                                    .Select(e =>
+                                        e.Qty
+                                        - e.SellingPrices.Select(d => d.Qty).Sum()
+                                        + e.CreditNoteItems.Where(d => d.IncludeQty == true).Select(d => d.Qty).Sum()
+                                    )
+                                    .Sum(),
+                                instc.OutsideItems.Select(e => e.Qty).Sum(),
+                                instc.OwnedItems.SelectMany(e => e.Invoice.Deliveries).Any()
+                            ),
+                        Eans = instc.Eans.Select(e => e.EanValue),
+                        Qty = instc.OwnedItems
+                            .SelectMany(e => e.PurchasePrices)
+                            .Select(e =>
+                                e.Qty
+                                - e.SellingPrices.Select(d => d.Qty).Sum()
+                                + e.CreditNoteItems.Where(d => d.IncludeQty == true).Select(d => d.Qty).Sum()
+                            )
+                            .Sum(),
+                        PurchasePrice = instc.OwnedItems
+                            .SelectMany(e => e.PurchasePrices)
+                            .Where(e =>
+                            e.Qty
+                            - e.SellingPrices.Select(d => d.Qty).Sum()
+                            + e.CreditNoteItems.Where(d => d.IncludeQty == true).Select(d => d.Qty).Sum()
+                            > 0
+                            ).SelectMany(e => e.CalculatedPrices)
+                            .Where(e => e.CurrencyName == currency)
+                            .Select(e => e.Price)
+                            .Union(
+                                instc.OwnedItems
+                                .SelectMany(e => e.PurchasePrices)
+                                .SelectMany(e => e.CreditNoteItems)
+                                .Where(e => e.Qty != e.PurchasePrice.Qty && e.IncludeQty == true)
+                                .SelectMany(e => e.CalculatedCreditNotePrices)
+                                .Where(e => e.CurrencyName == currency)
+                                .Select(e => e.Price)
+                            )
+                            .Average(),
+                        Sources = instc.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation).GroupBy(e => e.OrgName).Select(e => e.Key).ToList()
+                    })
+                    .OrderByDescending(e => e.Qty)
+                    .ToListAsync();
+            } else
+            {
+                items = await _handlerContext.Items
+                    .Where(j => EF.Functions.FreeText(j.PartNumber, search) || EF.Functions.FreeText(j.ItemName, search))
+                    .Include(entit => entit.Eans)
+                    .Include(entit => entit.OwnedItems)
+                        .ThenInclude(c => c.Invoice)
+                            .ThenInclude(h => h.Deliveries)
+                    .Include(entit => entit.OwnedItems)
+                        .ThenInclude(k => k.Invoice)
+                            .ThenInclude(h => h.SellerNavigation)
+                    .Include(entit => entit.OwnedItems)
+                        .ThenInclude(e => e.PurchasePrices)
+                            .ThenInclude(e => e.CalculatedPrices)
+                    .Include(entit => entit.OwnedItems)
+                        .ThenInclude(g => g.ItemOwners)
+                            .ThenInclude(k => k.IdUserNavigation)
+                    .Include(entit => entit.OutsideItems)
+                    .Select(instc => new GetManyItems
+                    {
+                        Users = instc.OwnedItems.SelectMany(e => e.ItemOwners).Select(e => e.IdUserNavigation)
+                        .GroupBy(e => new { e.Username, e.Surname })
+                        .Select(e => e.Key.Username + " " + e.Key.Surname).ToList(),
+                        ItemId = instc.ItemId,
+                        ItemName = instc.ItemName,
+                        PartNumber = instc.PartNumber,
+                        StatusName = WarehouseUtils.getItemStatus(
+                                instc.OwnedItems
+                                    .SelectMany(e => e.PurchasePrices)
+                                    .Select(e =>
+                                        e.Qty
+                                        - e.SellingPrices.Select(d => d.Qty).Sum()
+                                        + e.CreditNoteItems.Where(d => d.IncludeQty == true).Select(d => d.Qty).Sum()
+                                    )
+                                    .Sum(),
+                                instc.OutsideItems.Select(e => e.Qty).Sum(),
+                                instc.OwnedItems.SelectMany(e => e.Invoice.Deliveries).Any()
+                            ),
+                        Eans = instc.Eans.Select(e => e.EanValue),
+                        Qty = instc.OwnedItems
+                            .SelectMany(e => e.PurchasePrices)
+                            .Select(e =>
+                                e.Qty
+                                - e.SellingPrices.Select(d => d.Qty).Sum()
+                                + e.CreditNoteItems.Where(d => d.IncludeQty == true).Select(d => d.Qty).Sum()
+                            )
+                            .Sum(),
+                        PurchasePrice = instc.OwnedItems
+                            .SelectMany(e => e.PurchasePrices)
+                            .Where(e =>
+                            e.Qty
+                            - e.SellingPrices.Select(d => d.Qty).Sum()
+                            + e.CreditNoteItems.Select(d => d.Qty).Sum()
+                            + e.CreditNoteItems.Where(d => d.Qty > 0 && e.SellingPrices.Select(f => f.SellInvoiceId).Contains(d.CreditNote.InvoiceId)).Select(d => d.Qty).Sum()
+                            > 0
+                            ).SelectMany(e => e.CalculatedPrices)
+                            .Where(e => e.CurrencyName == currency)
+                            .Select(e => e.Price)
+                            .Union(
+                                instc.OwnedItems
+                                .SelectMany(e => e.PurchasePrices)
+                                .SelectMany(e => e.CreditNoteItems)
+                                .Where(e => e.Qty != e.PurchasePrice.Qty && e.IncludeQty == true)
+                                .SelectMany(e => e.CalculatedCreditNotePrices)
+                                .Where(e => e.CurrencyName == currency)
+                                .Select(e => e.Price)
+                            )
+                            .Average(),
+                        Sources = instc.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation).GroupBy(e => e.OrgName).Select(e => e.Key).ToList()
+                    })
+                    .OrderByDescending(e => e.Qty)
+                    .ToListAsync();
+            }
             return items;
         }
         public async Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId)
         {
-            List<GetManyItems> items = await _handlerContext.Items
-                .Include(tmp => tmp.Eans)
-                .Include(tmp => tmp.OwnedItems)
-                    .ThenInclude(c => c.Invoice)
-                        .ThenInclude(h => h.Deliveries)
-                .Include(tmp => tmp.OwnedItems)
-                    .ThenInclude(k => k.Invoice)
-                        .ThenInclude(h => h.SellerNavigation)
-                .Include(tmp => tmp.OwnedItems)
-                    .ThenInclude(e => e.PurchasePrices.Where(pur => pur.Curenncy == currency))
-                .Include(tmp => tmp.OwnedItems)
-                    .ThenInclude(g => g.ItemOwners.Where(own => own.IdUser == userId))
-                .Include(tmp => tmp.OutsideItems)
-                .Select(inst => new GetManyItems
-                {
-                    ItemId = inst.ItemId,
-                    ItemName = inst.ItemName,
-                    PartNumber = inst.PartNumber,
-                    StatusName = WarehouseUtils.getItemStatus(
-                            inst.OwnedItems.Select(e => e.Qty).Sum(),
-                            inst.OutsideItems.Select(e => e.Qty).Sum(),
-                            inst.OwnedItems.Select(e => e.Invoice.Deliveries).Any()
-                        ),
-                    Eans = inst.Eans.Select(e => e.EanValue),
-                    Qty = inst.OwnedItems.Select(e => e.Qty).Sum() + inst.OutsideItems.Select(e => e.Qty).Sum(),
-                    PurchasePrice = inst.OwnedItems.Select(e => e.PurchasePrices.Select(pur => pur.PurchasePrice1).Average()).First(),
-                    Sources = inst.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation.OrgName)
-                })
-                .ToListAsync();
+            List<GetManyItems> items;
+            if (currency == "PLN")
+            {
+                items = await _handlerContext.Items
+                    .Include(tmp => tmp.Eans)
+                    .Include(tmp => tmp.OwnedItems)
+                        .ThenInclude(c => c.Invoice)
+                            .ThenInclude(h => h.Deliveries)
+                    .Include(tmp => tmp.OwnedItems)
+                        .ThenInclude(k => k.Invoice)
+                            .ThenInclude(h => h.SellerNavigation)
+                    .Include(tmp => tmp.OwnedItems)
+                        .ThenInclude(e => e.PurchasePrices)
+                            .ThenInclude(e => e.CalculatedPrices)
+                    .Include(tmp => tmp.OwnedItems)
+                        .ThenInclude(g => g.ItemOwners)
+                    .Include(tmp => tmp.OutsideItems)
+                    .Select(inst => new GetManyItems
+                    {
+                        ItemId = inst.ItemId,
+                        ItemName = inst.ItemName,
+                        PartNumber = inst.PartNumber,
+                        StatusName = WarehouseUtils.getItemStatus(
+                                inst.OwnedItems.SelectMany(e => e.ItemOwners).Where(e => e.IdUser == userId).Select(e => e.Qty).Sum(),
+                                inst.OutsideItems.Select(e => e.Qty).Sum(),
+                                inst.OwnedItems.Where(e => e.ItemOwners.Select(e => e.IdUser).Contains(userId)).SelectMany(e => e.Invoice.Deliveries).Any()
+                            ),
+                        Eans = inst.Eans.Select(e => e.EanValue),
+                        Qty = inst.OwnedItems
+                            .SelectMany(e => e.ItemOwners)
+                            .Where(e => e.IdUser == userId)
+                            .Select(e => e.Qty).Sum(),
+                        PurchasePrice = inst.OwnedItems
+                            .SelectMany(e => e.PurchasePrices)
+                            .Where(e =>
+                            e.Qty
+                            - e.SellingPrices.Select(d => d.Qty).Sum()
+                            + e.CreditNoteItems.Select(d => d.Qty).Sum()
+                            + e.CreditNoteItems.Where(d => d.Qty > 0 && e.SellingPrices.Select(f => f.SellInvoiceId).Contains(d.CreditNote.InvoiceId)).Select(d => d.Qty).Sum()
+                            > 0
+                            )
+                            .Select(e => e.Price)
+                            .Union(
+                                inst.OwnedItems
+                                .SelectMany(e => e.PurchasePrices)
+                                .SelectMany(e => e.CreditNoteItems)
+                                .Where(e => e.Qty != e.PurchasePrice.Qty && e.IncludeQty == true)
+                                .Select(e => e.NewPrice)
+                            )
+                            .Average(),
+                        Sources = inst.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation).GroupBy(e => e.OrgName).Select(e => e.Key).ToList()
+                    })
+                    .OrderByDescending(e => e.Qty)
+                    .ToListAsync();
+            } else
+            {
+                items = await _handlerContext.Items
+                    .Include(tmp => tmp.Eans)
+                    .Include(tmp => tmp.OwnedItems)
+                        .ThenInclude(c => c.Invoice)
+                            .ThenInclude(h => h.Deliveries)
+                    .Include(tmp => tmp.OwnedItems)
+                        .ThenInclude(k => k.Invoice)
+                            .ThenInclude(h => h.SellerNavigation)
+                    .Include(tmp => tmp.OwnedItems)
+                        .ThenInclude(e => e.PurchasePrices)
+                            .ThenInclude(e => e.CalculatedPrices)
+                    .Include(tmp => tmp.OutsideItems)
+                    .Select(inst => new GetManyItems
+                    {
+                        ItemId = inst.ItemId,
+                        ItemName = inst.ItemName,
+                        PartNumber = inst.PartNumber,
+                        StatusName = WarehouseUtils.getItemStatus(
+                                inst.OwnedItems.SelectMany(e => e.ItemOwners).Where(e => e.IdUser == userId).Select(e => e.Qty).Sum(),
+                                inst.OutsideItems.Select(e => e.Qty).Sum(),
+                                inst.OwnedItems.Where(e => e.ItemOwners.Select(e => e.IdUser).Contains(userId)).SelectMany(e => e.Invoice.Deliveries).Any()
+                            ),
+                        Eans = inst.Eans.Select(e => e.EanValue),
+                        Qty = inst.OwnedItems
+                            .SelectMany(e => e.ItemOwners)
+                            .Where(e => e.IdUser == userId)
+                            .Select(e => e.Qty).Sum(),
+                        PurchasePrice = inst.OwnedItems
+                            .SelectMany(e => e.PurchasePrices)
+                            .Where(e =>
+                            e.Qty
+                            - e.SellingPrices.Select(d => d.Qty).Sum()
+                            + e.CreditNoteItems.Select(d => d.Qty).Sum()
+                            + e.CreditNoteItems.Where(d => d.Qty > 0 && e.SellingPrices.Select(f => f.SellInvoiceId).Contains(d.CreditNote.InvoiceId)).Select(d => d.Qty).Sum()
+                            > 0
+                            ).SelectMany(e => e.CalculatedPrices)
+                            .Where(e => e.CurrencyName == currency)
+                            .Select(e => e.Price)
+                            .Union(
+                                inst.OwnedItems
+                                .SelectMany(e => e.PurchasePrices)
+                                .SelectMany(e => e.CreditNoteItems)
+                                .Where(e => e.Qty != e.PurchasePrice.Qty && e.IncludeQty == true)
+                                .SelectMany(e => e.CalculatedCreditNotePrices)
+                                .Where(e => e.CurrencyName == currency)
+                                .Select(e => e.Price)
+                            )
+                            .Average(),
+                        Sources = inst.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation).GroupBy(e => e.OrgName).Select(e => e.Key).ToList()
+                    })
+                    .OrderByDescending(e => e.Qty)
+                    .ToListAsync();
+            }
             return items;
         }
         public async Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId, string search)
         {
-            List<GetManyItems> items = await _handlerContext.Items
-                .Where(j => EF.Functions.FreeText(j.PartNumber, search) || EF.Functions.FreeText(j.ItemName, search))
-                .Include(tab => tab.Eans)
-                .Include(tab => tab.OwnedItems)
-                    .ThenInclude(c => c.Invoice)
-                        .ThenInclude(h => h.Deliveries)
-                .Include(tab => tab.OwnedItems)
-                    .ThenInclude(k => k.Invoice)
-                        .ThenInclude(h => h.SellerNavigation)
-                .Include(tab => tab.OwnedItems)
-                    .ThenInclude(e => e.PurchasePrices.Where(pur => pur.Curenncy == currency))
-                .Include(tab => tab.OwnedItems)
-                    .ThenInclude(g => g.ItemOwners.Where(own => own.IdUser == userId))
-                .Include(tab => tab.OutsideItems)
-                .Select(obj => new GetManyItems
-                {
-                    ItemId = obj.ItemId,
-                    ItemName = obj.ItemName,
-                    PartNumber = obj.PartNumber,
-                    StatusName = WarehouseUtils.getItemStatus(
-                            obj.OwnedItems.Select(e => e.Qty).Sum(),
-                            obj.OutsideItems.Select(e => e.Qty).Sum(),
-                            obj.OwnedItems.Select(e => e.Invoice.Deliveries).Any()
-                        ),
-                    Eans = obj.Eans.Select(e => e.EanValue),
-                    Qty = obj.OwnedItems.Select(e => e.Qty).Sum() + obj.OutsideItems.Select(e => e.Qty).Sum(),
-                    PurchasePrice = obj.OwnedItems.Select(e => e.PurchasePrices.Select(pur => pur.PurchasePrice1).Average()).First(),
-                    Sources = obj.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation.OrgName)
-                })
-                .ToListAsync();
+            List<GetManyItems> items;
+            if (currency == "PLN")
+            {
+                items = await _handlerContext.Items
+                    .Where(j => EF.Functions.FreeText(j.PartNumber, search) || EF.Functions.FreeText(j.ItemName, search))
+                    .Include(tab => tab.Eans)
+                    .Include(tab => tab.OwnedItems)
+                        .ThenInclude(c => c.Invoice)
+                            .ThenInclude(h => h.Deliveries)
+                    .Include(tab => tab.OwnedItems)
+                        .ThenInclude(k => k.Invoice)
+                            .ThenInclude(h => h.SellerNavigation)
+                    .Include(tab => tab.OwnedItems)
+                        .ThenInclude(e => e.PurchasePrices)
+                            .ThenInclude(e => e.CalculatedPrices)
+                    .Include(tab => tab.OwnedItems)
+                        .ThenInclude(g => g.ItemOwners.Where(own => own.IdUser == userId))
+                    .Include(tab => tab.OutsideItems)
+                    .Select(obj => new GetManyItems
+                    {
+                        ItemId = obj.ItemId,
+                        ItemName = obj.ItemName,
+                        PartNumber = obj.PartNumber,
+                        StatusName = WarehouseUtils.getItemStatus(
+                                obj.OwnedItems.SelectMany(e => e.ItemOwners).Where(e => e.IdUser == userId).Select(e => e.Qty).Sum(),
+                                obj.OutsideItems.Select(e => e.Qty).Sum(),
+                                obj.OwnedItems.SelectMany(e => e.Invoice.Deliveries).Any()
+                            ),
+                        Eans = obj.Eans.Select(e => e.EanValue),
+                        Qty = obj.OwnedItems
+                            .SelectMany(e => e.ItemOwners)
+                            .Where(e => e.IdUser == userId)
+                            .Select(e => e.Qty).Sum(),
+                        PurchasePrice = obj.OwnedItems
+                            .SelectMany(e => e.PurchasePrices)
+                            .Where(e =>
+                            e.Qty
+                            - e.SellingPrices.Select(d => d.Qty).Sum()
+                            + e.CreditNoteItems.Select(d => d.Qty).Sum()
+                            + e.CreditNoteItems.Where(d => d.Qty > 0 && e.SellingPrices.Select(f => f.SellInvoiceId).Contains(d.CreditNote.InvoiceId)).Select(d => d.Qty).Sum()
+                            > 0
+                            ).SelectMany(e => e.CalculatedPrices)
+                            .Where(e => e.CurrencyName == currency)
+                            .Select(e => e.Price)
+                            .Union(
+                                obj.OwnedItems
+                                .SelectMany(e => e.PurchasePrices)
+                                .SelectMany(e => e.CreditNoteItems)
+                                .Where(e => e.Qty != e.PurchasePrice.Qty && e.IncludeQty == true)
+                                .SelectMany(e => e.CalculatedCreditNotePrices)
+                                .Where(e => e.CurrencyName == currency)
+                                .Select(e => e.Price)
+                            )
+                            .Average(),
+                        Sources = obj.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation).GroupBy(e => e.OrgName).Select(e => e.Key).ToList()
+                    })
+                    .OrderByDescending(e => e.Qty)
+                    .ToListAsync();
+            } else
+            {
+                items = await _handlerContext.Items
+                    .Where(j => EF.Functions.FreeText(j.PartNumber, search) || EF.Functions.FreeText(j.ItemName, search))
+                    .Include(tab => tab.Eans)
+                    .Include(tab => tab.OwnedItems)
+                        .ThenInclude(c => c.Invoice)
+                            .ThenInclude(h => h.Deliveries)
+                    .Include(tab => tab.OwnedItems)
+                        .ThenInclude(k => k.Invoice)
+                            .ThenInclude(h => h.SellerNavigation)
+                    .Include(tab => tab.OwnedItems)
+                        .ThenInclude(e => e.PurchasePrices)
+                            .ThenInclude(e => e.CalculatedPrices)
+                    .Include(tab => tab.OwnedItems)
+                        .ThenInclude(g => g.ItemOwners.Where(own => own.IdUser == userId))
+                    .Include(tab => tab.OutsideItems)
+                    .Select(obj => new GetManyItems
+                    {
+                        ItemId = obj.ItemId,
+                        ItemName = obj.ItemName,
+                        PartNumber = obj.PartNumber,
+                        StatusName = WarehouseUtils.getItemStatus(
+                                obj.OwnedItems.SelectMany(e => e.ItemOwners).Where(e => e.IdUser == userId).Select(e => e.Qty).Sum(),
+                                obj.OutsideItems.Select(e => e.Qty).Sum(),
+                                obj.OwnedItems.Where(e => e.ItemOwners.Select(e => e.IdUser).Contains(userId)).SelectMany(e => e.Invoice.Deliveries).Any()
+                            ),
+                        Eans = obj.Eans.Select(e => e.EanValue),
+                        Qty = obj.OwnedItems
+                            .SelectMany(e => e.ItemOwners)
+                            .Where(e => e.IdUser == userId)
+                            .Select(e => e.Qty).Sum(),
+                        PurchasePrice = obj.OwnedItems
+                            .SelectMany(e => e.PurchasePrices)
+                            .Where(e =>
+                            e.Qty
+                            - e.SellingPrices.Select(d => d.Qty).Sum()
+                            + e.CreditNoteItems.Select(d => d.Qty).Sum()
+                            + e.CreditNoteItems.Where(d => d.Qty > 0 && e.SellingPrices.Select(f => f.SellInvoiceId).Contains(d.CreditNote.InvoiceId)).Select(d => d.Qty).Sum()
+                            > 0
+                            ).SelectMany(e => e.CalculatedPrices)
+                            .Where(e => e.CurrencyName == currency)
+                            .Select(e => e.Price)
+                            .Union(
+                                obj.OwnedItems
+                                .SelectMany(e => e.PurchasePrices)
+                                .SelectMany(e => e.CreditNoteItems)
+                                .Where(e => e.Qty != e.PurchasePrice.Qty && e.IncludeQty == true)
+                                .SelectMany(e => e.CalculatedCreditNotePrices)
+                                .Where(e => e.CurrencyName == currency)
+                                .Select(e => e.Price)
+                            )
+                            .Average(),
+                        Sources = obj.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation).GroupBy(e => e.OrgName).Select(e => e.Key).ToList()
+                    })
+                    .OrderByDescending(e => e.Qty)
+                    .ToListAsync();
+            }
+
             return items;
         }
 
@@ -357,7 +810,11 @@ namespace database_comunicator.Services
         }
         public async Task<IEnumerable<GetBinding>> GetModifyRestOfItem(int id, string currency)
         {
-            var binding = await _handlerContext.ItemOwners
+            List<GetBinding> binding;
+            List<GetBinding> noUserItem;
+            if (currency == "PLN")
+            {
+                binding = await _handlerContext.ItemOwners
                 .Where(e => e.OwnedItemId == id)
                 .Include(e => e.IdUserNavigation)
                 .Include(e => e.OwnedItem)
@@ -367,13 +824,15 @@ namespace database_comunicator.Services
                 .Select(res => new GetBinding
                 {
                     UserId = res.IdUser,
-                    Username = res.IdUserNavigation.Username,
+                    Username = res.IdUserNavigation.Username + " " + res.IdUserNavigation.Surname,
                     Qty = res.Qty,
-                    Price = res.OwnedItem.PurchasePrices.Where(e => e.Curenncy.Equals(currency)).Select(e => e.PurchasePrice1).ToList()[0],
+                    Price = res.OwnedItem.PurchasePrices.Select(e => e.Price).Average(),
+                    Currency = currency,
                     InvoiceNumber = res.OwnedItem.Invoice.InvoiceNumber
 
                 }).ToListAsync();
-            var noUserItem = await _handlerContext.OwnedItems
+
+                noUserItem = await _handlerContext.OwnedItems
                 .Where(e => e.OwnedItemId == id)
                 .Include(e => e.Invoice)
                 .Include(e => e.PurchasePrices)
@@ -382,10 +841,63 @@ namespace database_comunicator.Services
                 {
                     UserId = null,
                     Username = null,
-                    Qty = inst.Qty - inst.ItemOwners.Select(e => e.Qty).Sum(),
-                    Price = inst.PurchasePrices.Where(e => e.Curenncy.Equals(currency)).Select(e => e.PurchasePrice1).ToList()[0],
+                    Qty = inst.PurchasePrices.Select(e => e.Qty).Sum() 
+                        - inst.PurchasePrices.SelectMany(e => e.SellingPrices).Select(e => e.Qty).Sum()
+                        + inst.PurchasePrices.SelectMany(e => e.CreditNoteItems).Where(e => e.Qty < 0).Select(e => e.Qty).Sum()
+                        + inst.PurchasePrices.SelectMany(e => e.CreditNoteItems)
+                            .Where(e => e.Qty > 0 && inst.PurchasePrices
+                                .SelectMany(f => f.SellingPrices).Select(f => f.SellInvoiceId).Contains(e.CreditNote.InvoiceId)).Select(e => e.Qty).Sum()
+                        - inst.ItemOwners.Select(e => e.Qty).Sum(),
+                    Price = inst.PurchasePrices.Select(e => e.Price).Average(),
+                    Currency = currency,
                     InvoiceNumber = inst.Invoice.InvoiceNumber
-                }).ToListAsync();
+                })
+                .Where(e => e.Qty > 0)
+                .ToListAsync();
+            } else
+            {
+                binding = await _handlerContext.ItemOwners
+                    .Where(e => e.OwnedItemId == id)
+                    .Include(e => e.IdUserNavigation)
+                    .Include(e => e.OwnedItem)
+                        .ThenInclude(e => e.Invoice)
+                    .Include(e => e.OwnedItem)
+                        .ThenInclude(e => e.PurchasePrices)
+                    .Select(res => new GetBinding
+                    {
+                        UserId = res.IdUser,
+                        Username = res.IdUserNavigation.Username + " " + res.IdUserNavigation.Surname,
+                        Qty = res.Qty,
+                        Price = res.OwnedItem.PurchasePrices.SelectMany(e => e.CalculatedPrices).Where(e => e.CurrencyName == currency).Select(e => e.Price).Average(),
+                        Currency = currency,
+                        InvoiceNumber = res.OwnedItem.Invoice.InvoiceNumber
+
+                    }).ToListAsync();
+
+                noUserItem = await _handlerContext.OwnedItems
+                    .Where(e => e.OwnedItemId == id)
+                    .Include(e => e.Invoice)
+                    .Include(e => e.PurchasePrices)
+                    .Include(e => e.ItemOwners)
+                    .Select(inst => new GetBinding
+                    {
+                        UserId = null,
+                        Username = null,
+                        Qty = inst.PurchasePrices.Select(e => e.Qty).Sum()
+                        - inst.PurchasePrices.SelectMany(e => e.SellingPrices).Select(e => e.Qty).Sum()
+                        + inst.PurchasePrices.SelectMany(e => e.CreditNoteItems).Where(e => e.Qty < 0).Select(e => e.Qty).Sum()
+                        + inst.PurchasePrices.SelectMany(e => e.CreditNoteItems)
+                            .Where(e => e.Qty > 0 && inst.PurchasePrices
+                                .SelectMany(f => f.SellingPrices).Select(f => f.SellInvoiceId).Contains(e.CreditNote.InvoiceId)).Select(e => e.Qty).Sum()
+                        - inst.ItemOwners.Select(e => e.Qty).Sum(),
+                        Price = inst.PurchasePrices.SelectMany(e => e.CalculatedPrices).Where(e => e.CurrencyName == currency).Select(e => e.Price).Average(),
+                        Currency = currency,
+                        InvoiceNumber = inst.Invoice.InvoiceNumber
+                    })
+                    .Where(e => e.Qty > 0)
+                    .ToListAsync();
+            }
+
             binding.AddRange(noUserItem);
             return binding;
         }
@@ -393,6 +905,85 @@ namespace database_comunicator.Services
         {
             var result = await _handlerContext.Items.Where(e => e.ItemId == id).Select(e => e.ItemDescription).ToListAsync();
             return result[0];
+        }
+        public async Task<IEnumerable<GetItemList>> GetItemList()
+        {
+            return await _handlerContext.Items
+                .Select(e => new GetItemList
+                {
+                    Id = e.ItemId,
+                    Partnumber = e.PartNumber,
+                    Name = e.ItemName
+                }).ToListAsync();
+        }
+        public async Task<IEnumerable<GetSalesItemList>> GetSalesItemList(int userId, string currency)
+        {
+            if (currency == "PLN")
+            {
+                return await _handlerContext.PurchasePrices
+                        .Include(e => e.OwnedItem)
+                            .ThenInclude(e => e.Invoice)
+                        .Include(e => e.OwnedItem)
+                            .ThenInclude(e => e.ItemOwners)
+                        .Where(e => e.OwnedItem.ItemOwners.Where(d => d.IdUser == userId).Any())
+                        .Join(
+                            _handlerContext.Items,
+                            price => price.OwnedItemId,
+                            item => item.ItemId,
+                            (price, item) => new GetSalesItemList
+                            {
+                                ItemId = price.OwnedItemId,
+                                PriceId = price.PurchasePriceId,
+                                InvoiceId = price.InvoiceId,
+                                InvoiceNumber = price.OwnedItem.Invoice.InvoiceNumber,
+                                Partnumber = item.PartNumber,
+                                Name = item.ItemName,
+                                Qty = price.Qty - price.SellingPrices.Select(d => d.Qty).Sum() + 
+                                price.CreditNoteItems.Where(d => d.IncludeQty == true).Select(d => d.Qty).Sum(),
+                                Price = price.Price
+                            }
+                        ).ToListAsync();
+            }
+            return await _handlerContext.PurchasePrices
+                        .Include(e => e.OwnedItem)
+                            .ThenInclude(e => e.Invoice)
+                        .Include(e => e.OwnedItem)
+                            .ThenInclude(e => e.ItemOwners)
+                        .Include(e => e.CalculatedPrices)
+                        .Where(e => e.OwnedItem.ItemOwners.Where(d => d.IdUser == userId).Any())
+                        .Join(
+                            _handlerContext.Items,
+                            price => price.OwnedItemId,
+                            item => item.ItemId,
+                            (price, item) => new GetSalesItemList
+                            {
+                                ItemId = price.OwnedItemId,
+                                PriceId = price.PurchasePriceId,
+                                InvoiceId = price.InvoiceId,
+                                InvoiceNumber = price.OwnedItem.Invoice.InvoiceNumber,
+                                Partnumber = item.PartNumber,
+                                Name = item.ItemName,
+                                Qty = price.Qty - price.SellingPrices.Select(d => d.Qty).Sum() +
+                                price.CreditNoteItems.Where(d => d.IncludeQty == true).Select(d => d.Qty).Sum(),
+                                Price = price.CalculatedPrices.Where(d => d.CurrencyName == currency).Select(d => d.Price).First()
+                            }
+                        ).ToListAsync();
+        }
+        public async Task<IEnumerable<GetUsers>> GetItemOwners(int itemId)
+        {
+            return await _handlerContext.AppUsers
+                .Where(e => 
+                    e.ItemOwners.Where(d => d.OwnedItemId == itemId && d.Qty > 0).Any()
+                    ||
+                    e.Organizations.SelectMany(d => d.OutsideItems).Where(d => d.ItemId == itemId).Any()
+                )
+                .Select(e => new GetUsers
+                {
+                    IdUser = e.IdUser,
+                    Surname = e.Surname,
+                    Username = e.Username
+                })
+                .ToListAsync();
         }
     }
 }

@@ -254,7 +254,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                 <Form.Label className="blue-main-text">Country:</Form.Label>
                 <Form.Select
                   id="countrySelect"
-                  className="input-style shadow-sm"
+                  className="input-style shadow-sm maxInputWidth"
                   name="country"
                 >
                   {Object.values(countries).map((value) => {
@@ -271,7 +271,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   Availability:
                 </Form.Label>
                 <Form.Select
-                  className="input-style shadow-sm"
+                  className="input-style shadow-sm maxInputWidth"
                   name="availability"
                 >
                   {Object.values(statues).map((value) => {

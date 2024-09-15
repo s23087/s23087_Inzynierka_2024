@@ -36,6 +36,10 @@ a {
   color: var(--main-green);
 }
 
+.warning-text {
+  color: var(--warning-color);
+}
+
 .small-text {
   font-size: 12px;
 }
@@ -46,4 +50,8 @@ a {
 
 .big-text {
   font-size: 20px;
+}
+
+.no-wrap {
+  white-space: nowrap;
 }

@@ -7,17 +7,19 @@ public partial class PurchasePrice
 {
     public int PurchasePriceId { get; set; }
 
+    public int Qty { get; set; }
+
+    public decimal Price { get; set; }
+
     public int OwnedItemId { get; set; }
 
     public int InvoiceId { get; set; }
 
-    public int PriceDate { get; set; }
+    public virtual ICollection<CalculatedPrice> CalculatedPrices { get; set; } = new List<CalculatedPrice>();
 
-    public string Curenncy { get; set; } = null!;
-
-    public decimal PurchasePrice1 { get; set; }
-
-    public virtual CurrencyName CurenncyNavigation { get; set; } = null!;
+    public virtual ICollection<CreditNoteItem> CreditNoteItems { get; set; } = new List<CreditNoteItem>();
 
     public virtual OwnedItem OwnedItem { get; set; } = null!;
+
+    public virtual ICollection<SellingPrice> SellingPrices { get; set; } = new List<SellingPrice>();
 }

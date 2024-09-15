@@ -37,21 +37,21 @@ function ItemContainer({
     ean = ean.substring(0, 15);
     let index = ean.lastIndexOf(",");
     if (index === -1) return ean;
-    return ean.substring(0, index) + "+ more";
+    return ean.substring(0, index) + " ...";
   };
   const getShortUsers = () => {
     let users = item.users.join(", ");
     users = users.substring(0, 40);
     let index = users.lastIndexOf(",");
     if (index === -1) return users;
-    return users.substring(0, index) + "+ more";
+    return users.substring(0, index) + " ...";
   };
   const getShortSources = () => {
     let sources = item.sources.join(", ");
     sources = sources.substring(0, 15);
     let index = sources.lastIndexOf(",");
     if (index === -1) return sources;
-    return sources.substring(0, index) + "+ more";
+    return sources.substring(0, index) + " ...";
   };
   return (
     <Container
@@ -105,14 +105,18 @@ function ItemContainer({
               <span className="main-blue-bg d-block rounded-span px-2 pb-2 pt-1 main-text text-center">
                 <p className="mb-0">Purchase price:</p>
                 <p className="mb-0">
-                  {item.purchasePrice === null ? "-" : item.purchasePrice}{" "}
+                  {item.purchasePrice === null
+                    ? "-"
+                    : Math.round(item.purchasePrice * 100) / 100}{" "}
                   {currency}
                 </p>
               </span>
             </Col>
             <Col xs="12">
               <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
-                <p className="mb-0">Name: {item.itemName}</p>
+                <p className="mb-0 text-truncate d-block w-100">
+                  Name: {item.itemName}
+                </p>
               </span>
             </Col>
             <Col className="pe-1 d-xxl-none" xs="auto">
@@ -141,7 +145,9 @@ function ItemContainer({
               <span className="main-blue-bg d-block rounded-span px-2 pb-2 pt-1 main-text text-center">
                 <p className="mb-0">Purchase price:</p>
                 <p className="mb-0">
-                  {item.purchasePrice === null ? "-" : item.purchasePrice}{" "}
+                  {item.purchasePrice === null
+                    ? "-"
+                    : Math.round(item.purchasePrice * 100) / 100}{" "}
                   {currency}
                 </p>
               </span>

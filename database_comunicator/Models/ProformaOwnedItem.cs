@@ -5,6 +5,8 @@ namespace database_comunicator.Models;
 
 public partial class ProformaOwnedItem
 {
+    public int ProformaOwnedItemId { get; set; }
+
     public int ProformaId { get; set; }
 
     public int OwnedItemId { get; set; }
