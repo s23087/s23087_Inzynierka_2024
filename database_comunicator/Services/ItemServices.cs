@@ -975,7 +975,7 @@ namespace database_comunicator.Services
                 .Where(e => 
                     e.ItemOwners.Where(d => d.OwnedItemId == itemId && d.Qty > 0).Any()
                     ||
-                    e.Organizations.SelectMany(d => d.OutsideItems).Where(d => d.ItemId == itemId).Any()
+                    e.Clients.SelectMany(d => d.OutsideItems).Where(d => d.ItemId == itemId).Any()
                 )
                 .Select(e => new GetUsers
                 {

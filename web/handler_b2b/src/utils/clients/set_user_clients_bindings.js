@@ -21,9 +21,6 @@ export default async function setUserClientBindings(orgId, userIds) {
     },
   );
 
-  console.log(data);
-  console.log(info.status);
-
   if (info.ok) {
     return {
       ok: true,

@@ -21,7 +21,7 @@ namespace database_comunicator.Services
         public Task<IEnumerable<GetOrgClient>> GetOrgClients(int userOrgId, string search);
         public Task<GetClientRestInfo> GetClientsRestInfo(int orgId);
         public Task SetClientAvailabilityStatus(int orgId, int statusId);
-        public Task SetClientUserBindings(SetUserClientBindings data);
+        public Task<bool> SetClientUserBindings(SetUserClientBindings data);
         public Task AddAvailabilityStatus(AddAvailabilityStatus data);
         public Task<IEnumerable<GetAvailabilityStatuses>> GetAvailabilityStatuses();
         public Task<bool> OrgExist(int orgId);
@@ -232,16 +232,22 @@ namespace database_comunicator.Services
                 Days = e.DaysForRealization
             }).ToListAsync();
         }
-        public async Task SetClientUserBindings(SetUserClientBindings data)
+        public async Task<bool> SetClientUserBindings(SetUserClientBindings data)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
             try
             {
-                var current = await _handlerContext.Organizations.Where(e => e.OrganizationId == data.OrgId).Select(e => e.AppUsers.Select(d => d.IdUser)).ToListAsync();
-                var command = $"Delete from User_Client where organization_id = {data.OrgId} and users_id not in (";
-                string lastPart = String.Join(",", data.UsersId) + ")";
-                await _handlerContext.Database.ExecuteSqlRawAsync(command + lastPart);
-                var withoutExisting = data.UsersId.Where(e => !current[0].Contains(e)).ToList();
+                var current = await _handlerContext.Organizations
+                    .Where(e => e.OrganizationId == data.OrgId)
+                    .SelectMany(e => e.AppUsers)
+                    .Select(e => e.IdUser).ToListAsync();
+                var deletedUsers = current.Where(e => !data.UsersId.Contains(e)).ToList();
+                foreach (var user in deletedUsers)
+                {
+                    _handlerContext.Database.ExecuteSql($"Delete from User_client where organization_id = {data.OrgId} and users_id={user}");
+                }
+                await _handlerContext.SaveChangesAsync();
+                var withoutExisting = data.UsersId.Where(e => !current.Contains(e)).ToList();
                 var toAdd = withoutExisting.Select(e => new
                 {
                     OrganizationId = data.OrgId,
@@ -250,15 +256,17 @@ namespace database_comunicator.Services
 
                 foreach (var relation in toAdd)
                 {
-                    _handlerContext.Database.ExecuteSql($"insert into User_Client (users_id, organization_id) Values ({relation.IdUser}, {relation.OrganizationId})");
+                    _handlerContext.Database.ExecuteSql($"insert into User_client (users_id, organization_id) Values ({relation.IdUser}, {relation.OrganizationId})");
                 }
 
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
+                return true;
             } catch (Exception ex)
             {
                 Console.Write(ex.ToString());
                 await trans.RollbackAsync();
+                return false;
             }
 
         }

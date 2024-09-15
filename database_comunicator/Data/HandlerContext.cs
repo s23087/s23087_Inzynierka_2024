@@ -189,7 +189,7 @@ public partial class HandlerContext : DbContext
                 .HasForeignKey(d => d.SoloUserId)
                 .HasConstraintName("User_Solo_User_relation");
 
-            entity.HasMany(d => d.Organizations).WithMany(p => p.AppUsers)
+            entity.HasMany(d => d.Clients).WithMany(p => p.AppUsers)
                 .UsingEntity<Dictionary<string, object>>(
                     "UserClient",
                     r => r.HasOne<Organization>().WithMany()

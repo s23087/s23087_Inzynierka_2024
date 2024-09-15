@@ -39,7 +39,7 @@ function ClientContainer({
                 />
                 <span className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1">
                   <p className="mb-0 text-truncate d-block w-100">
-                    {client.users.join(", ")}
+                    {client.users.length > 0 ? client.users.join(", ") : "-"}
                   </p>
                 </span>
               </Col>

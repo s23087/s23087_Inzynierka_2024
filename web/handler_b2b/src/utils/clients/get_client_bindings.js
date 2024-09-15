@@ -13,5 +13,5 @@ export default async function getUserClientBindings(orgId) {
     return await info.json();
   }
 
-  return {};
+  return [];
 }

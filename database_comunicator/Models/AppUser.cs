@@ -33,6 +33,10 @@ public partial class AppUser
 
     public virtual ICollection<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
 
-    public virtual ICollection<Organization> Organizations { get; set; } = new List<Organization>();
+    public virtual ICollection<Organization> Clients { get; set; } = new List<Organization>();
+    public void DeleteClient(int orgId) => Clients.Remove(new Organization
+    {
+        OrganizationId = orgId
+    });
     public virtual ICollection<SellingPrice> SellingPrices { get; set; } = new List<SellingPrice>();
 }

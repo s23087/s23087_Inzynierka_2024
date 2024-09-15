@@ -87,8 +87,8 @@ namespace database_comunicator.Controllers
             if (!usersExist) return NotFound("One of user id do not exist.");
             var logTypeId = await _logServices.getLogTypeId("Modify");
             await _logServices.CreateActionLog($"User bindings for client with id {data.OrgId} has been changed by user id {userId}.", userId, logTypeId);
-            await _organizationServices.SetClientUserBindings(data);
-            return Ok();
+            var result = await _organizationServices.SetClientUserBindings(data);
+            return result ? Ok() : new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
         [HttpPost]
         [Route("setAvailabilityStatusesToClient")]

@@ -59,13 +59,13 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
     }
   }, [showOffcanvas]);
   useEffect(() => {
-    if (isOrg) {
+    if (isBindingView) {
       const bindings = getUserClientBindings(client.clientId);
       bindings.then((data) => setClientBindings(data));
       const users = getUsers();
       users.then((data) => setUsers(data));
     }
-  }, [isOrg]);
+  }, [isBindingView]);
   // Errors
   const [nameError, setNameError] = useState(false);
   const [nipError, setNipError] = useState(false);
@@ -494,11 +494,11 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
               <Button
                 variant="mainBlue"
                 onClick={() => {
+                  setBindingFailure(false);
+                  setBindingSuccess(false);
                   let inputVal = document.getElementById("userSelect").value;
                   if (inputVal == "") return;
                   setBindingMessage("");
-                  setBindingFailure(false);
-                  setBindingSuccess(false);
                   clientBindings.push(
                     Object.values(users).filter(
                       (e) => e.idUser === parseInt(inputVal),
@@ -511,7 +511,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                 Add
               </Button>
             </InputGroup>
-            <ul key={bindingChanged}>
+            <ul key={[bindingChanged, clientBindings]}>
               {Object.values(users)
                 .filter(
                   (e) =>
