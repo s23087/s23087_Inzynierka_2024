@@ -154,12 +154,12 @@ namespace database_comunicator.Controllers
             if (!exist) return NotFound("User not found.");
             var orgExist = await _organizationServices.OrgExist(data.Seller);
             if (!orgExist) return NotFound("Seller not found.");
-            foreach (var item in data.InvoiceItems)
+            foreach (var itemId in data.InvoiceItems.Select(e => e.ItemId))
             {
-                var itemExist = await _itemServices.ItemExist(item.ItemId);
+                var itemExist = await _itemServices.ItemExist(itemId);
                 if (!itemExist)
                 {
-                    return NotFound($"Item with id {item.ItemId} do not exist,");
+                    return NotFound($"Item with id {itemId} do not exist,");
                 }
             }
             var invoiceId = await _invoicesService.AddPurchaseInvoice(data);
@@ -187,12 +187,12 @@ namespace database_comunicator.Controllers
             if (!exist) return NotFound("User not found.");
             var orgExist = await _organizationServices.OrgExist(data.Buyer);
             if (!orgExist) return NotFound("Buyer not found.");
-            foreach (var item in data.InvoiceItems)
+            foreach (var itemId in data.InvoiceItems.Select(e => e.ItemId))
             {
-                var itemExist = await _itemServices.ItemExist(item.ItemId);
+                var itemExist = await _itemServices.ItemExist(itemId);
                 if (!itemExist)
                 {
-                    return NotFound($"Item with id {item.ItemId} do not exist,");
+                    return NotFound($"Item with id {itemId} do not exist,");
                 }
             }
             var invoiceId = await _invoicesService.AddSalesInvoice(data);

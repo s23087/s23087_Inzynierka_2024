@@ -33,11 +33,12 @@ function InvoiceContainer({
         ? "var(--text-main-color)"
         : "var(--text-black-color)",
   };
+  const systemColorBool = invoice.inSystem ? "In system" : "Not in system";
   const systemStyle = {
     backgroundColor:
-      systemColorMap[invoice.inSystem ? "In system" : "Not in system"],
+      systemColorMap[systemColorBool],
     color:
-      systemColorMap[invoice.inSystem ? "In System" : "Not in system"] ===
+      systemColorMap[systemColorBool] ===
       "var(--sec-red)"
         ? "var(--text-main-color)"
         : "var(--text-black-color)",

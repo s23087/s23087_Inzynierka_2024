@@ -162,6 +162,7 @@ function ModifyItemOffcanvas({
                 <Button
                   variant="as-link"
                   onClick={() => {
+                    resetErrors()
                     hideFunction();
                   }}
                   className="ps-2"
@@ -328,6 +329,7 @@ function ModifyItemOffcanvas({
                   variant="red"
                   className="w-100"
                   onClick={() => {
+                    resetErrors()
                     setEans([]);
                     hideFunction();
                     if (!state.error && state.completed) {
@@ -346,10 +348,7 @@ function ModifyItemOffcanvas({
             showToast={state.completed && state.error}
             message={state.message}
             onHideFun={() => {
-              state.error = false;
-              state.completed = false;
-              state.message = "";
-              setIsLoading(false);
+              resetState();
               router.refresh();
             }}
           />
@@ -357,10 +356,7 @@ function ModifyItemOffcanvas({
             showToast={state.completed && !state.error}
             message="Item successfully updated."
             onHideFun={() => {
-              state.error = false;
-              state.completed = false;
-              state.message = "";
-              setIsLoading(false);
+              resetState();
               hideFunction();
               router.refresh();
             }}
@@ -369,6 +365,13 @@ function ModifyItemOffcanvas({
       </Container>
     </Offcanvas>
   );
+
+  function resetState() {
+    state.error = false;
+    state.completed = false;
+    state.message = "";
+    setIsLoading(false);
+  }
 }
 
 ModifyItemOffcanvas.PropTypes = {

@@ -2,9 +2,9 @@
 {
     public class CreateNotification
     {
-        public int UserId { get; set; }
-        public string Info { get; set; } = null!;
-        public string ObjectType { get; set; } = null!;
-        public string Referance { get; set; } = null!;
+        public required int UserId { get; set; }
+        public required string Info { get; set; }
+        public required string ObjectType { get; set; }
+        public required string Referance { get; set; }
     }
 }

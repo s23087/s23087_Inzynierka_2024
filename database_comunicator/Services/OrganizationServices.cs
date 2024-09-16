@@ -244,7 +244,7 @@ namespace database_comunicator.Services
                 var deletedUsers = current.Where(e => !data.UsersId.Contains(e)).ToList();
                 foreach (var user in deletedUsers)
                 {
-                    _handlerContext.Database.ExecuteSql($"Delete from User_client where organization_id = {data.OrgId} and users_id={user}");
+                    await _handlerContext.Database.ExecuteSqlAsync($"Delete from User_client where organization_id = {data.OrgId} and users_id={user}");
                 }
                 await _handlerContext.SaveChangesAsync();
                 var withoutExisting = data.UsersId.Where(e => !current.Contains(e)).ToList();
@@ -256,7 +256,7 @@ namespace database_comunicator.Services
 
                 foreach (var relation in toAdd)
                 {
-                    _handlerContext.Database.ExecuteSql($"insert into User_client (users_id, organization_id) Values ({relation.IdUser}, {relation.OrganizationId})");
+                    await _handlerContext.Database.ExecuteSqlAsync($"insert into User_client (users_id, organization_id) Values ({relation.IdUser}, {relation.OrganizationId})");
                 }
 
                 await _handlerContext.SaveChangesAsync();
@@ -302,7 +302,7 @@ namespace database_comunicator.Services
             var outsideItemsCheck = await _handlerContext.OutsideItems.Where(e => e.OrganizationId == orgId).AnyAsync();
             var userClientCheck = await _handlerContext.Database.ExecuteSqlAsync($"Select 1 from User_Client where organization_id = {orgId}");
 
-            return invoicesCheck || proformaCheck || soloUserCheck || orgUserCheck || offerCheck || outsideItemsCheck || userClientCheck.ToString().Contains('1'); ;
+            return invoicesCheck || proformaCheck || soloUserCheck || orgUserCheck || offerCheck || outsideItemsCheck || userClientCheck.ToString().Contains('1');
         }
         public async Task DeleteOrg(int orgId)
         {

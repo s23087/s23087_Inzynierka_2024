@@ -52,7 +52,7 @@ function SettingMenu({ role }) {
           return Object.values(e).join(";");
         })
         .join("\n");
-    var encoded = encodeURI(logsCSV);
+    let encoded = encodeURI(logsCSV);
     window.open(encoded);
     setIsLoading(false);
   }

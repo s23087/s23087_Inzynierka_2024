@@ -100,7 +100,7 @@ namespace database_comunicator.Services
 
         public async Task<int> GetCountNotification(int userId)
         {
-            var result = await _handlerContext.UserNotifications.Where(e => e.UsersId == userId && e.IsRead == false).CountAsync();
+            var result = await _handlerContext.UserNotifications.Where(e => e.UsersId == userId && !e.IsRead).CountAsync();
             return result;
         }
 

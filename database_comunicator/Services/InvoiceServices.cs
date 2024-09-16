@@ -15,12 +15,12 @@ namespace database_comunicator.Services
         public Task<int> AddPurchaseInvoice(AddPurchaseInvoice data);
         public Task<int> AddSalesInvoice(AddSalesInvoice data);
         public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices();
-        public Task<IEnumerable<GetInvoices>> GetSalesInvocies();
         public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string search);
-        public Task<IEnumerable<GetInvoices>> GetSalesInvocies(string search);
         public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId);
-        public Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId);
         public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string search);
+        public Task<IEnumerable<GetInvoices>> GetSalesInvocies();
+        public Task<IEnumerable<GetInvoices>> GetSalesInvocies(string search);
+        public Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId);
         public Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId, string search);
         public Task<IEnumerable<GetInvoicesList>> GetPurchaseInvoicesList();
         public Task<IEnumerable<GetInvoicesList>> GetSalesInvoicesList();
@@ -89,7 +89,7 @@ namespace database_comunicator.Services
         }
         public async Task<int> AddPurchaseInvoice(AddPurchaseInvoice data)
         {
-            var plnData = new DateTime(2024,9,3);
+            var plnData = new DateTime(2024,9,3,0,0,0,DateTimeKind.Utc);
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
             try
             {
@@ -197,7 +197,7 @@ namespace database_comunicator.Services
         }
         public async Task<int> AddSalesInvoice(AddSalesInvoice data)
         {
-            var plnData = new DateTime(2024, 9, 3);
+            var plnData = new DateTime(2024, 9, 3, 0,0,0,DateTimeKind.Utc);
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
             try
             {
@@ -249,7 +249,7 @@ namespace database_comunicator.Services
 
                 foreach (var item in data.InvoiceItems)
                 {
-                    _handlerContext.ItemOwners.Where(e => e.IdUser == data.UserId && e.InvoiceId == item.BuyInvoiceId && e.OwnedItemId == item.ItemId).ExecuteUpdate(setters => 
+                    await _handlerContext.ItemOwners.Where(e => e.IdUser == data.UserId && e.InvoiceId == item.BuyInvoiceId && e.OwnedItemId == item.ItemId).ExecuteUpdateAsync(setters => 
                         setters.SetProperty(s => s.Qty, s => s.Qty - item.Qty)
                     );
                 }
@@ -275,7 +275,7 @@ namespace database_comunicator.Services
                 .Include(e => e.OwnedItems)
                     .ThenInclude(e => e.ItemOwners)
                         .ThenInclude(e => e.IdUserNavigation)
-                .Where(e => e.SellingPrices.Count() == 0)
+                .Where(e => !e.SellingPrices.Any())
                 .Select(inv => new GetInvoices
                 {
                     Users = inv.OwnedItems.SelectMany(d => d.ItemOwners)
@@ -298,7 +298,7 @@ namespace database_comunicator.Services
             var result = await _handlerContext.Invoices
                 .Include(e => e.BuyerNavigation)
                 .Include(e => e.PaymentsStatus)
-                .Where(e => e.SellingPrices.Count() > 0)
+                .Where(e => e.SellingPrices.Any())
                 .Select(obj => new GetInvoices
                 {
                     InvoiceId = obj.InvoiceId,
@@ -324,7 +324,7 @@ namespace database_comunicator.Services
                     .ThenInclude(e => e.ItemOwners)
                         .ThenInclude(e => e.IdUserNavigation)
                 .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))
-                .Where(e => e.SellingPrices.Count() == 0)
+                .Where(e => !e.SellingPrices.Any())
                 .Select(ent => new GetInvoices
                 {
                     Users = ent.OwnedItems.SelectMany(d => d.ItemOwners)
@@ -348,7 +348,7 @@ namespace database_comunicator.Services
                 .Include(e => e.BuyerNavigation)
                 .Include(e => e.PaymentsStatus)
                 .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))
-                .Where(e => e.SellingPrices.Count() > 0)
+                .Where(e => e.SellingPrices.Any())
                 .Select(inst => new GetInvoices
                 {
                     InvoiceId = inst.InvoiceId,
@@ -371,7 +371,7 @@ namespace database_comunicator.Services
                     .ThenInclude(e => e.ItemOwners)
                 .Include(e => e.OwnedItems)
                 .ThenInclude(e => e.PurchasePrices)
-                .Where(e => e.SellingPrices.Count() == 0 && e.OwnedItems.SelectMany(d => d.ItemOwners).Where(d => d.IdUser == userId).Any())
+                .Where(e => !e.SellingPrices.Any() && e.OwnedItems.SelectMany(d => d.ItemOwners).Any(d => d.IdUser == userId))
                 .Select(instc => new GetInvoices
                 {
                     InvoiceId = instc.InvoiceId,
@@ -392,7 +392,7 @@ namespace database_comunicator.Services
                 .Include(e => e.PaymentsStatus)
                 .Include(e => e.SellingPrices)
                     .ThenInclude(e => e.PurchasePrice)
-                .Where(e => e.SellingPrices.Count() > 0)
+                .Where(e => e.SellingPrices.Any())
                 .Where(e => e.SellingPrices.Select(e => e.PurchasePrice).Select(d => d.OwnedItem).SelectMany(d => d.ItemOwners).Where(d => d.IdUser == userId).Any())
                 .Select(entity => new GetInvoices
                 {
@@ -416,7 +416,7 @@ namespace database_comunicator.Services
                     .ThenInclude(e => e.ItemOwners)
                 .Include(e => e.OwnedItems)
                 .ThenInclude(e => e.PurchasePrices)
-                .Where(e => e.SellingPrices.Count() == 0 && e.OwnedItems.SelectMany(d => d.ItemOwners).Where(d => d.IdUser == userId).Any())
+                .Where(e => !e.SellingPrices.Any() && e.OwnedItems.SelectMany(d => d.ItemOwners).Any(d => d.IdUser == userId))
                 .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))
                 .Select(objs => new GetInvoices
                 {
@@ -439,8 +439,8 @@ namespace database_comunicator.Services
                 .Include(e => e.SellingPrices)
                         .ThenInclude(e => e.PurchasePrice)
                 .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))
-                .Where(e => e.SellingPrices.Count() > 0)
-                .Where(e => e.SellingPrices.Select(e => e.PurchasePrice).Select(d => d.OwnedItem).SelectMany(d => d.ItemOwners).Where(d => d.IdUser == userId).Any())
+                .Where(e => e.SellingPrices.Any())
+                .Where(e => e.SellingPrices.Select(e => e.PurchasePrice).Select(d => d.OwnedItem).SelectMany(d => d.ItemOwners).Any(d => d.IdUser == userId))
                 .Select(en => new GetInvoices
                 {
                     InvoiceId = en.InvoiceId,
@@ -458,7 +458,7 @@ namespace database_comunicator.Services
         {
             return await _handlerContext.Invoices
                 .Include(e => e.OwnedItems)
-                .Where(e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Count() > 0)
+                .Where(e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Any())
                 .Select(e => new GetInvoicesList
                 {
                     InvoiceId = e.InvoiceId,
@@ -468,7 +468,7 @@ namespace database_comunicator.Services
         public async Task<IEnumerable<GetInvoicesList>> GetSalesInvoicesList()
         {
             return await _handlerContext.Invoices
-                .Where(e => e.SellingPrices.Count() > 0)
+                .Where(e => e.SellingPrices.Any())
                 .Select(e => new GetInvoicesList
                 {
                     InvoiceId = e.InvoiceId,
@@ -538,15 +538,15 @@ namespace database_comunicator.Services
                 }).ToListAsync();
                 foreach (var price in sellingPrices)
                 {
-                    _handlerContext.ItemOwners.Where(e => e.InvoiceId == price.InvoiceId && e.IdUser == price.IdUser && e.OwnedItemId == price.OwnedItemId)
-                        .ExecuteUpdate(setters => setters.SetProperty(s => s.Qty, s => s.Qty + price.Qty));
+                    await _handlerContext.ItemOwners.Where(e => e.InvoiceId == price.InvoiceId && e.IdUser == price.IdUser && e.OwnedItemId == price.OwnedItemId)
+                        .ExecuteUpdateAsync(setters => setters.SetProperty(s => s.Qty, s => s.Qty + price.Qty));
                 }
-                _handlerContext.PurchasePrices.Where(e => e.InvoiceId == invoiceId).SelectMany(e => e.CalculatedPrices).ExecuteDelete();
-                _handlerContext.PurchasePrices.Where(e => e.InvoiceId == invoiceId).ExecuteDelete();
-                _handlerContext.ItemOwners.Where(e => e.InvoiceId == invoiceId).ExecuteDelete();
-                _handlerContext.OwnedItems.Where(e => e.InvoiceId == invoiceId).ExecuteDelete();
-                _handlerContext.SellingPrices.Where(e => e.SellInvoiceId == invoiceId).ExecuteDelete();
-                _handlerContext.Invoices.Where(e => e.InvoiceId == invoiceId).ExecuteDelete();
+                await _handlerContext.PurchasePrices.Where(e => e.InvoiceId == invoiceId).SelectMany(e => e.CalculatedPrices).ExecuteDeleteAsync();
+                await _handlerContext.PurchasePrices.Where(e => e.InvoiceId == invoiceId).ExecuteDeleteAsync();
+                await _handlerContext.ItemOwners.Where(e => e.InvoiceId == invoiceId).ExecuteDeleteAsync();
+                await _handlerContext.OwnedItems.Where(e => e.InvoiceId == invoiceId).ExecuteDeleteAsync();
+                await _handlerContext.SellingPrices.Where(e => e.SellInvoiceId == invoiceId).ExecuteDeleteAsync();
+                await _handlerContext.Invoices.Where(e => e.InvoiceId == invoiceId).ExecuteDeleteAsync();
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;

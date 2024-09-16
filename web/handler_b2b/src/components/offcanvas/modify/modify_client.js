@@ -491,7 +491,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
               className="mb-3 mt-2 ms-3 py-3 w-100"
               style={buttonStyle}
               onClick={async () => {
-                var ids = [];
+                let ids = [];
                 Object.values(clientBindings).forEach((e) =>
                   ids.push(e.idUser),
                 );
