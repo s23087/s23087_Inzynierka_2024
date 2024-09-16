@@ -276,21 +276,21 @@ namespace database_comunicator.Services
                     .ThenInclude(e => e.ItemOwners)
                         .ThenInclude(e => e.IdUserNavigation)
                 .Where(e => e.SellingPrices.Count() == 0)
-                .Select(e => new GetInvoices
+                .Select(inv => new GetInvoices
                 {
-                    Users = e.OwnedItems.SelectMany(d => d.ItemOwners)
+                    Users = inv.OwnedItems.SelectMany(d => d.ItemOwners)
                         .Select(d => d.IdUserNavigation)
                         .GroupBy(d => new { d.IdUser, d.Username, d.Surname })
                         .Select(d => d.Key.Username + " " + d.Key.Surname).ToList(),
-                    InvoiceId = e.InvoiceId,
-                    InvoiceNumber = e.InvoiceNumber,
-                    ClientName = e.SellerNavigation.OrgName,
-                    InvoiceDate = e.InvoiceDate,
-                    DueDate = e.DueDate,
-                    PaymentStatus = e.PaymentsStatus.StatusName,
-                    InSystem = e.InSystem,
-                    Qty = e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum(),
-                    Price = e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price * d.Qty).Sum(),
+                    InvoiceId = inv.InvoiceId,
+                    InvoiceNumber = inv.InvoiceNumber,
+                    ClientName = inv.SellerNavigation.OrgName,
+                    InvoiceDate = inv.InvoiceDate,
+                    DueDate = inv.DueDate,
+                    PaymentStatus = inv.PaymentsStatus.StatusName,
+                    InSystem = inv.InSystem,
+                    Qty = inv.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum(),
+                    Price = inv.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price * d.Qty).Sum(),
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoices>> GetSalesInvocies()
@@ -299,17 +299,17 @@ namespace database_comunicator.Services
                 .Include(e => e.BuyerNavigation)
                 .Include(e => e.PaymentsStatus)
                 .Where(e => e.SellingPrices.Count() > 0)
-                .Select(e => new GetInvoices
+                .Select(obj => new GetInvoices
                 {
-                    InvoiceId = e.InvoiceId,
-                    InvoiceNumber = e.InvoiceNumber,
-                    ClientName = e.BuyerNavigation.OrgName,
-                    InvoiceDate = e.InvoiceDate,
-                    DueDate = e.DueDate,
-                    PaymentStatus = e.PaymentsStatus.StatusName,
-                    InSystem = e.InSystem,
-                    Qty = e.SellingPrices.Select(d => d.Qty).Sum(),
-                    Price = e.SellingPrices.Select(d => d.Price * d.Qty).Sum(),
+                    InvoiceId = obj.InvoiceId,
+                    InvoiceNumber = obj.InvoiceNumber,
+                    ClientName = obj.BuyerNavigation.OrgName,
+                    InvoiceDate = obj.InvoiceDate,
+                    DueDate = obj.DueDate,
+                    PaymentStatus = obj.PaymentsStatus.StatusName,
+                    InSystem = obj.InSystem,
+                    Qty = obj.SellingPrices.Select(d => d.Qty).Sum(),
+                    Price = obj.SellingPrices.Select(d => d.Price * d.Qty).Sum(),
                 }).ToListAsync();
             return result;
         }
@@ -325,21 +325,21 @@ namespace database_comunicator.Services
                         .ThenInclude(e => e.IdUserNavigation)
                 .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))
                 .Where(e => e.SellingPrices.Count() == 0)
-                .Select(e => new GetInvoices
+                .Select(ent => new GetInvoices
                 {
-                    Users = e.OwnedItems.SelectMany(d => d.ItemOwners)
+                    Users = ent.OwnedItems.SelectMany(d => d.ItemOwners)
                         .Select(d => d.IdUserNavigation)
                         .GroupBy(d => new { d.IdUser, d.Username, d.Surname })
                         .Select(d => d.Key.Username + " " + d.Key.Surname).ToList(),
-                    InvoiceId = e.InvoiceId,
-                    InvoiceNumber = e.InvoiceNumber,
-                    ClientName = e.SellerNavigation.OrgName,
-                    InvoiceDate = e.InvoiceDate,
-                    DueDate = e.DueDate,
-                    PaymentStatus = e.PaymentsStatus.StatusName,
-                    InSystem = e.InSystem,
-                    Qty = e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum(),
-                    Price = e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price * d.Qty).Sum(),
+                    InvoiceId = ent.InvoiceId,
+                    InvoiceNumber = ent.InvoiceNumber,
+                    ClientName = ent.SellerNavigation.OrgName,
+                    InvoiceDate = ent.InvoiceDate,
+                    DueDate = ent.DueDate,
+                    PaymentStatus = ent.PaymentsStatus.StatusName,
+                    InSystem = ent.InSystem,
+                    Qty = ent.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum(),
+                    Price = ent.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price * d.Qty).Sum(),
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoices>> GetSalesInvocies(string search)
@@ -349,17 +349,17 @@ namespace database_comunicator.Services
                 .Include(e => e.PaymentsStatus)
                 .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))
                 .Where(e => e.SellingPrices.Count() > 0)
-                .Select(e => new GetInvoices
+                .Select(inst => new GetInvoices
                 {
-                    InvoiceId = e.InvoiceId,
-                    InvoiceNumber = e.InvoiceNumber,
-                    ClientName = e.BuyerNavigation.OrgName,
-                    InvoiceDate = e.InvoiceDate,
-                    DueDate = e.DueDate,
-                    PaymentStatus = e.PaymentsStatus.StatusName,
-                    InSystem = e.InSystem,
-                    Qty = e.SellingPrices.Select(d => d.Qty).Sum(),
-                    Price = e.SellingPrices.Select(d => d.Price * d.Qty).Sum(),
+                    InvoiceId = inst.InvoiceId,
+                    InvoiceNumber = inst.InvoiceNumber,
+                    ClientName = inst.BuyerNavigation.OrgName,
+                    InvoiceDate = inst.InvoiceDate,
+                    DueDate = inst.DueDate,
+                    PaymentStatus = inst.PaymentsStatus.StatusName,
+                    InSystem = inst.InSystem,
+                    Qty = inst.SellingPrices.Select(d => d.Qty).Sum(),
+                    Price = inst.SellingPrices.Select(d => d.Price * d.Qty).Sum(),
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId)
@@ -372,17 +372,17 @@ namespace database_comunicator.Services
                 .Include(e => e.OwnedItems)
                 .ThenInclude(e => e.PurchasePrices)
                 .Where(e => e.SellingPrices.Count() == 0 && e.OwnedItems.SelectMany(d => d.ItemOwners).Where(d => d.IdUser == userId).Any())
-                .Select(e => new GetInvoices
+                .Select(instc => new GetInvoices
                 {
-                    InvoiceId = e.InvoiceId,
-                    InvoiceNumber = e.InvoiceNumber,
-                    ClientName = e.SellerNavigation.OrgName,
-                    InvoiceDate = e.InvoiceDate,
-                    DueDate = e.DueDate,
-                    PaymentStatus = e.PaymentsStatus.StatusName,
-                    InSystem = e.InSystem,
-                    Qty = e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum(),
-                    Price = e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price * d.Qty).Sum(),
+                    InvoiceId = instc.InvoiceId,
+                    InvoiceNumber = instc.InvoiceNumber,
+                    ClientName = instc.SellerNavigation.OrgName,
+                    InvoiceDate = instc.InvoiceDate,
+                    DueDate = instc.DueDate,
+                    PaymentStatus = instc.PaymentsStatus.StatusName,
+                    InSystem = instc.InSystem,
+                    Qty = instc.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum(),
+                    Price = instc.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price * d.Qty).Sum(),
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId)
@@ -394,17 +394,17 @@ namespace database_comunicator.Services
                     .ThenInclude(e => e.PurchasePrice)
                 .Where(e => e.SellingPrices.Count() > 0)
                 .Where(e => e.SellingPrices.Select(e => e.PurchasePrice).Select(d => d.OwnedItem).SelectMany(d => d.ItemOwners).Where(d => d.IdUser == userId).Any())
-                .Select(e => new GetInvoices
+                .Select(entity => new GetInvoices
                 {
-                    InvoiceId = e.InvoiceId,
-                    InvoiceNumber = e.InvoiceNumber,
-                    ClientName = e.SellerNavigation.OrgName,
-                    InvoiceDate = e.InvoiceDate,
-                    DueDate = e.DueDate,
-                    PaymentStatus = e.PaymentsStatus.StatusName,
-                    InSystem = e.InSystem,
-                    Qty = e.SellingPrices.Select(d => d.Qty).Sum(),
-                    Price = e.SellingPrices.Select(d => d.Price * d.Qty).Sum(),
+                    InvoiceId = entity.InvoiceId,
+                    InvoiceNumber = entity.InvoiceNumber,
+                    ClientName = entity.SellerNavigation.OrgName,
+                    InvoiceDate = entity.InvoiceDate,
+                    DueDate = entity.DueDate,
+                    PaymentStatus = entity.PaymentsStatus.StatusName,
+                    InSystem = entity.InSystem,
+                    Qty = entity.SellingPrices.Select(d => d.Qty).Sum(),
+                    Price = entity.SellingPrices.Select(d => d.Price * d.Qty).Sum(),
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string search)
@@ -418,17 +418,17 @@ namespace database_comunicator.Services
                 .ThenInclude(e => e.PurchasePrices)
                 .Where(e => e.SellingPrices.Count() == 0 && e.OwnedItems.SelectMany(d => d.ItemOwners).Where(d => d.IdUser == userId).Any())
                 .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))
-                .Select(e => new GetInvoices
+                .Select(objs => new GetInvoices
                 {
-                    InvoiceId = e.InvoiceId,
-                    InvoiceNumber = e.InvoiceNumber,
-                    ClientName = e.SellerNavigation.OrgName,
-                    InvoiceDate = e.InvoiceDate,
-                    DueDate = e.DueDate,
-                    PaymentStatus = e.PaymentsStatus.StatusName,
-                    InSystem = e.InSystem,
-                    Qty = e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum(),
-                    Price = e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price * d.Qty).Sum(),
+                    InvoiceId = objs.InvoiceId,
+                    InvoiceNumber = objs.InvoiceNumber,
+                    ClientName = objs.SellerNavigation.OrgName,
+                    InvoiceDate = objs.InvoiceDate,
+                    DueDate = objs.DueDate,
+                    PaymentStatus = objs.PaymentsStatus.StatusName,
+                    InSystem = objs.InSystem,
+                    Qty = objs.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum(),
+                    Price = objs.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price * d.Qty).Sum(),
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId, string search)
@@ -441,17 +441,17 @@ namespace database_comunicator.Services
                 .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))
                 .Where(e => e.SellingPrices.Count() > 0)
                 .Where(e => e.SellingPrices.Select(e => e.PurchasePrice).Select(d => d.OwnedItem).SelectMany(d => d.ItemOwners).Where(d => d.IdUser == userId).Any())
-                .Select(e => new GetInvoices
+                .Select(en => new GetInvoices
                 {
-                    InvoiceId = e.InvoiceId,
-                    InvoiceNumber = e.InvoiceNumber,
-                    ClientName = e.SellerNavigation.OrgName,
-                    InvoiceDate = e.InvoiceDate,
-                    DueDate = e.DueDate,
-                    PaymentStatus = e.PaymentsStatus.StatusName,
-                    InSystem = e.InSystem,
-                    Qty = e.SellingPrices.Select(d => d.Qty).Sum(),
-                    Price = e.SellingPrices.Select(d => d.Price * d.Qty).Sum(),
+                    InvoiceId = en.InvoiceId,
+                    InvoiceNumber = en.InvoiceNumber,
+                    ClientName = en.SellerNavigation.OrgName,
+                    InvoiceDate = en.InvoiceDate,
+                    DueDate = en.DueDate,
+                    PaymentStatus = en.PaymentsStatus.StatusName,
+                    InSystem = en.InSystem,
+                    Qty = en.SellingPrices.Select(d => d.Qty).Sum(),
+                    Price = en.SellingPrices.Select(d => d.Price * d.Qty).Sum(),
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoicesList>> GetPurchaseInvoicesList()
