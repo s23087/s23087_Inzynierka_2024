@@ -16,6 +16,7 @@ import deleteItem from "@/utils/warehouse/delete_item";
 import { useRouter } from "next/navigation";
 import ModifyItemOffcanvas from "../offcanvas/modify/modify_item";
 import SelectComponent from "../smaller_components/select_compontent";
+import getPagationInfo from "@/utils/flexible/get_page_info";
 
 function ProductList({
   products,
@@ -45,16 +46,11 @@ function ProductList({
   const [isShowAddItem, setShowAddItem] = useState(false);
   // Seleted
   const [selectedQty, setSelectedQty] = useState(0);
-  const [selectedKeys] = useState([]);
+  const [selectedProducts] = useState([]);
   // Nav
   const router = useRouter();
   const params = useSearchParams();
-  const accessibleParams = new URLSearchParams(params);
-  // Vars and styles
-  let pagation = accessibleParams.get("pagation")
-    ? accessibleParams.get("pagation")
-    : 10;
-  let page = accessibleParams.get("page") ? accessibleParams.get("page") : 1;
+  // Styles
   const containerMargin = {
     height: "67px",
   };
@@ -85,12 +81,12 @@ function ProductList({
                 currency={currency}
                 is_org={orgView}
                 selectQtyAction={() => {
-                  selectedKeys.push(value.itemId);
+                  selectedProducts.push(value.itemId);
                   setSelectedQty(selectedQty + 1);
                 }}
                 unselectQtyAction={() => {
-                  let index = selectedKeys.indexOf(value.itemId);
-                  selectedKeys.splice(index, 1);
+                  let index = selectedProducts.indexOf(value.itemId);
+                  selectedProducts.splice(index, 1);
                   setSelectedQty(selectedQty - 1);
                 }}
                 deleteAction={() => {
@@ -105,7 +101,7 @@ function ProductList({
                   setItemToModify(value);
                   setShowModifyItem(true);
                 }}
-                selected={selectedKeys.indexOf(value.itemId) !== -1}
+                selected={selectedProducts.indexOf(value.itemId) !== -1}
                 key={value.itemId}
               />
             );
@@ -120,25 +116,24 @@ function ProductList({
           setShowAddItem(true);
         }}
         selectAllOnPage={() => {
-          selectedKeys.splice(0, selectedKeys.length);
+          selectedProducts.splice(0, selectedProducts.length);
           setSelectedQty(0);
-          let start = page * pagation - pagation;
-          let end = page * pagation;
+          let pagationInfo = getPagationInfo(params)
           Object.values(products)
-            .slice(start, end)
-            .forEach((e) => selectedKeys.push(e.itemId));
-          setSelectedQty(selectedKeys.length);
+            .slice(pagationInfo.start, pagationInfo.end)
+            .forEach((e) => selectedProducts.push(e.itemId));
+          setSelectedQty(selectedProducts.length);
           setShowMoreAction(false);
         }}
         selectAll={() => {
-          selectedKeys.splice(0, selectedKeys.length);
+          selectedProducts.splice(0, selectedProducts.length);
           setSelectedQty(0);
-          Object.values(products).forEach((e) => selectedKeys.push(e.itemId));
-          setSelectedQty(selectedKeys.length);
+          Object.values(products).forEach((e) => selectedProducts.push(e.itemId));
+          setSelectedQty(selectedProducts.length);
           setShowMoreAction(false);
         }}
         deselectAll={() => {
-          selectedKeys.splice(0, selectedKeys.length);
+          selectedProducts.splice(0, selectedProducts.length);
           setSelectedQty(0);
           setShowMoreAction(false);
         }}

@@ -11,6 +11,7 @@ import { useSearchParams } from "next/navigation";
 import RoleContainer from "../object_container/role_container";
 import ModifyUserRole from "../windows/modify_user_roles";
 import SelectComponent from "../smaller_components/select_compontent";
+import getPagationInfo from "@/utils/flexible/get_page_info";
 
 function RolesList({ roles, rolesStart, rolesEnd, rolesToChoose }) {
   // Modify role
@@ -20,15 +21,10 @@ function RolesList({ roles, rolesStart, rolesEnd, rolesToChoose }) {
   const [showMoreAction, setShowMoreAction] = useState(false);
   // Seleted
   const [selectedQty, setSelectedQty] = useState(0);
-  const [selectedKeys] = useState([]);
+  const [selectedRoles] = useState([]);
   // Nav
   const params = useSearchParams();
-  const accessibleParams = new URLSearchParams(params);
-  // Vars and styles
-  let pagation = accessibleParams.get("pagation")
-    ? accessibleParams.get("pagation")
-    : 10;
-  let page = accessibleParams.get("page") ? accessibleParams.get("page") : 1;
+  // Styles
   const containerMargin = {
     height: "67px",
   };
@@ -57,14 +53,14 @@ function RolesList({ roles, rolesStart, rolesEnd, rolesToChoose }) {
               <RoleContainer
                 key={value.userId}
                 role={value}
-                selected={selectedKeys.indexOf(value.userId) !== -1}
+                selected={selectedRoles.indexOf(value.userId) !== -1}
                 selectAction={() => {
-                  selectedKeys.push(value.userId);
+                  selectedRoles.push(value.userId);
                   setSelectedQty(selectedQty + 1);
                 }}
                 unselectAction={() => {
-                  let index = selectedKeys.indexOf(value.userId);
-                  selectedKeys.splice(index, 1);
+                  let index = selectedRoles.indexOf(value.userId);
+                  selectedRoles.splice(index, 1);
                   setSelectedQty(selectedQty - 1);
                 }}
                 modifyAction={() => {
@@ -80,25 +76,24 @@ function RolesList({ roles, rolesStart, rolesEnd, rolesToChoose }) {
         onHideFunction={() => setShowMoreAction(false)}
         instanceName="role"
         selectAllOnPage={() => {
-          selectedKeys.splice(0, selectedKeys.length);
+          selectedRoles.splice(0, selectedRoles.length);
           setSelectedQty(0);
-          let start = page * pagation - pagation;
-          let end = page * pagation;
+          let pagationInfo = getPagationInfo(params)
           Object.values(roles)
-            .slice(start, end)
-            .forEach((e) => selectedKeys.push(e.userId));
-          setSelectedQty(selectedKeys.length);
+            .slice(pagationInfo.start, pagationInfo.end)
+            .forEach((e) => selectedRoles.push(e.userId));
+          setSelectedQty(selectedRoles.length);
           setShowMoreAction(false);
         }}
         selectAll={() => {
-          selectedKeys.splice(0, selectedKeys.length);
+          selectedRoles.splice(0, selectedRoles.length);
           setSelectedQty(0);
-          Object.values(roles).forEach((e) => selectedKeys.push(e.userId));
-          setSelectedQty(selectedKeys.length);
+          Object.values(roles).forEach((e) => selectedRoles.push(e.userId));
+          setSelectedQty(selectedRoles.length);
           setShowMoreAction(false);
         }}
         deselectAll={() => {
-          selectedKeys.splice(0, selectedKeys.length);
+          selectedRoles.splice(0, selectedRoles.length);
           setSelectedQty(0);
           setShowMoreAction(false);
         }}

@@ -16,6 +16,7 @@ import deleteClient from "@/utils/clients/delete_client";
 import { useRouter } from "next/navigation";
 import ModifyClientOffcanvas from "../offcanvas/modify/modify_client";
 import SelectComponent from "../smaller_components/select_compontent";
+import getPagationInfo from "@/utils/flexible/get_page_info";
 
 function ClientsList({ clients, orgView, clientsStart, clientsEnd }) {
   // View client
@@ -38,16 +39,10 @@ function ClientsList({ clients, orgView, clientsStart, clientsEnd }) {
   const [isShowAddClient, setShowAddClient] = useState(false);
   // Seleted
   const [selectedQty, setSelectedQty] = useState(0);
-  const [selectedKeys] = useState([]);
+  const [selectedClients] = useState([]);
   // Nav
   const router = useRouter();
   const params = useSearchParams();
-  const accessibleParams = new URLSearchParams(params);
-  // Vars and styles
-  let pagation = accessibleParams.get("pagation")
-    ? accessibleParams.get("pagation")
-    : 10;
-  let page = accessibleParams.get("page") ? accessibleParams.get("page") : 1;
   const containerMargin = {
     height: "67px",
   };
@@ -77,14 +72,14 @@ function ClientsList({ clients, orgView, clientsStart, clientsEnd }) {
                 key={value.clientId}
                 client={value}
                 is_org={orgView}
-                selected={selectedKeys.indexOf(value.clientId) !== -1}
+                selected={selectedClients.indexOf(value.clientId) !== -1}
                 selectAction={() => {
-                  selectedKeys.push(value.clientId);
+                  selectedClients.push(value.clientId);
                   setSelectedQty(selectedQty + 1);
                 }}
                 unselectAction={() => {
-                  let index = selectedKeys.indexOf(value.clientId);
-                  selectedKeys.splice(index, 1);
+                  let index = selectedClients.indexOf(value.clientId);
+                  selectedClients.splice(index, 1);
                   setSelectedQty(selectedQty - 1);
                 }}
                 deleteAction={() => {
@@ -112,25 +107,24 @@ function ClientsList({ clients, orgView, clientsStart, clientsEnd }) {
           setShowAddClient(true);
         }}
         selectAllOnPage={() => {
-          selectedKeys.splice(0, selectedKeys.length);
+          selectedClients.splice(0, selectedClients.length);
           setSelectedQty(0);
-          let start = page * pagation - pagation;
-          let end = page * pagation;
+          let pagationInfo = getPagationInfo(params)
           Object.values(clients)
-            .slice(start, end)
-            .forEach((e) => selectedKeys.push(e.clientId));
-          setSelectedQty(selectedKeys.length);
+            .slice(pagationInfo.start, pagationInfo.end)
+            .forEach((e) => selectedClients.push(e.clientId));
+          setSelectedQty(selectedClients.length);
           setShowMoreAction(false);
         }}
         selectAll={() => {
-          selectedKeys.splice(0, selectedKeys.length);
+          selectedClients.splice(0, selectedClients.length);
           setSelectedQty(0);
-          Object.values(clients).forEach((e) => selectedKeys.push(e.clientId));
-          setSelectedQty(selectedKeys.length);
+          Object.values(clients).forEach((e) => selectedClients.push(e.clientId));
+          setSelectedQty(selectedClients.length);
           setShowMoreAction(false);
         }}
         deselectAll={() => {
-          selectedKeys.splice(0, selectedKeys.length);
+          selectedClients.splice(0, selectedClients.length);
           setSelectedQty(0);
           setShowMoreAction(false);
         }}

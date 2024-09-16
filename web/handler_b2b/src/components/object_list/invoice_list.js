@@ -18,6 +18,7 @@ import RequestContainer from "../object_container/documents/request_container";
 import AddInvoiceOffcanvas from "../offcanvas/create/documents/create_invoice";
 import deleteInvoice from "@/utils/documents/delete_invoice";
 import SelectComponent from "../smaller_components/select_compontent";
+import getPagationInfo from "@/utils/flexible/get_page_info";
 
 function getDocument(
   type,
@@ -112,21 +113,15 @@ function InvoiceList({
   const [isShowAddInvoice, setShowAddInvoice] = useState(false);
   // Seleted
   const [selectedQty, setSelectedQty] = useState(0);
-  const [selectedKeys] = useState([]);
+  const [selectedInvoices] = useState([]);
   // Nav
   const router = useRouter();
   const params = useSearchParams();
-  const accessibleParams = new URLSearchParams(params);
   // Type change
   useEffect(() => {
     setSelectedQty(0);
-    selectedKeys.shift(0, selectedKeys.length);
+    selectedInvoices.shift(0, selectedInvoices.length);
   }, [type]);
-  // Vars and styles
-  let pagation = accessibleParams.get("pagation")
-    ? accessibleParams.get("pagation")
-    : 10;
-  let page = accessibleParams.get("page") ? accessibleParams.get("page") : 1;
   const containerMargin = {
     height: "67px",
   };
@@ -155,16 +150,16 @@ function InvoiceList({
               type,
               value,
               orgView,
-              selectedKeys.indexOf(value.invoiceId) !== -1,
+              selectedInvoices.indexOf(value.invoiceId) !== -1,
               () => {
                 // Select
-                selectedKeys.push(value.invoiceId);
+                selectedInvoices.push(value.invoiceId);
                 setSelectedQty(selectedQty + 1);
               },
               () => {
                 // Unselect
-                let index = selectedKeys.indexOf(value.invoiceId);
-                selectedKeys.splice(index, 1);
+                let index = selectedInvoices.indexOf(value.invoiceId);
+                selectedInvoices.splice(index, 1);
                 setSelectedQty(selectedQty - 1);
               },
               () => {
@@ -199,27 +194,26 @@ function InvoiceList({
           }
         }}
         selectAllOnPage={() => {
-          selectedKeys.splice(0, selectedKeys.length);
+          selectedInvoices.splice(0, selectedInvoices.length);
           setSelectedQty(0);
-          let start = page * pagation - pagation;
-          let end = page * pagation;
+          let pagationInfo = getPagationInfo(params)
           Object.values(invoices)
-            .slice(start, end)
-            .forEach((e) => selectedKeys.push(e.invoiceId));
-          setSelectedQty(selectedKeys.length);
+            .slice(pagationInfo.start, pagationInfo.end)
+            .forEach((e) => selectedInvoices.push(e.invoiceId));
+          setSelectedQty(selectedInvoices.length);
           setShowMoreAction(false);
         }}
         selectAll={() => {
-          selectedKeys.splice(0, selectedKeys.length);
+          selectedInvoices.splice(0, selectedInvoices.length);
           setSelectedQty(0);
           Object.values(invoices).forEach((e) =>
-            selectedKeys.push(e.invoiceId),
+            selectedInvoices.push(e.invoiceId),
           );
-          setSelectedQty(selectedKeys.length);
+          setSelectedQty(selectedInvoices.length);
           setShowMoreAction(false);
         }}
         deselectAll={() => {
-          selectedKeys.splice(0, selectedKeys.length);
+          selectedInvoices.splice(0, selectedInvoices.length);
           setSelectedQty(0);
           setShowMoreAction(false);
         }}
