@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-export default function getPagationInfo(params){
+export default function getPagationInfo(params) {
   const accessibleParams = new URLSearchParams(params);
   let pagation = accessibleParams.get("pagation")
     ? accessibleParams.get("pagation")
@@ -9,5 +9,5 @@ export default function getPagationInfo(params){
   return {
     start: page * pagation - pagation,
     end: page * pagation,
-  }
+  };
 }

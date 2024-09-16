@@ -1,9 +1,7 @@
 "use client";
 
 import PropTypes from "prop-types";
-import {
-  Container,
-} from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import ItemContainer from "../object_container/item_container";
 import { useState } from "react";
 import SearchFilterBar from "../menu/search_filter_bar";
@@ -118,7 +116,7 @@ function ProductList({
         selectAllOnPage={() => {
           selectedProducts.splice(0, selectedProducts.length);
           setSelectedQty(0);
-          let pagationInfo = getPagationInfo(params)
+          let pagationInfo = getPagationInfo(params);
           Object.values(products)
             .slice(pagationInfo.start, pagationInfo.end)
             .forEach((e) => selectedProducts.push(e.itemId));
@@ -128,7 +126,9 @@ function ProductList({
         selectAll={() => {
           selectedProducts.splice(0, selectedProducts.length);
           setSelectedQty(0);
-          Object.values(products).forEach((e) => selectedProducts.push(e.itemId));
+          Object.values(products).forEach((e) =>
+            selectedProducts.push(e.itemId),
+          );
           setSelectedQty(selectedProducts.length);
           setShowMoreAction(false);
         }}

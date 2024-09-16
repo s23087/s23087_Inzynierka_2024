@@ -1,9 +1,7 @@
 "use client";
 
 import PropTypes from "prop-types";
-import {
-  Container
-} from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import { useState } from "react";
 import SearchFilterBar from "../menu/search_filter_bar";
 import MoreActionWindow from "../windows/more_action";
@@ -78,7 +76,7 @@ function RolesList({ roles, rolesStart, rolesEnd, rolesToChoose }) {
         selectAllOnPage={() => {
           selectedRoles.splice(0, selectedRoles.length);
           setSelectedQty(0);
-          let pagationInfo = getPagationInfo(params)
+          let pagationInfo = getPagationInfo(params);
           Object.values(roles)
             .slice(pagationInfo.start, pagationInfo.end)
             .forEach((e) => selectedRoles.push(e.userId));

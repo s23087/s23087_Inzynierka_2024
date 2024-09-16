@@ -44,14 +44,14 @@ function ModifyItemOffcanvas({
   // Eans
   const [eans, setEans] = useState([]);
   // Errors
-  const [partnumberError, setPartnumberError] = useState(false)
-  const [nameError, setNameError] = useState(false)
-  const isErrorActive = () => partnumberError || nameError
+  const [partnumberError, setPartnumberError] = useState(false);
+  const [nameError, setNameError] = useState(false);
+  const isErrorActive = () => partnumberError || nameError;
   const resetErrors = () => {
-    setPartnumberError(false)
-    setNameError(false)
-  }
-  const errorActive = isErrorActive()
+    setPartnumberError(false);
+    setNameError(false);
+  };
+  const errorActive = isErrorActive();
   // Get data
   const [bindings, setBindings] = useState([
     {
@@ -162,7 +162,7 @@ function ModifyItemOffcanvas({
                 <Button
                   variant="as-link"
                   onClick={() => {
-                    resetErrors()
+                    resetErrors();
                     hideFunction();
                   }}
                   className="ps-2"
@@ -180,18 +180,23 @@ function ModifyItemOffcanvas({
             fluid
           >
             <Form action={formAction} id="modifyItemForm">
-              <Form.Group
-                className="mb-3 maxInputWidth"
-              >
+              <Form.Group className="mb-3 maxInputWidth">
                 <Form.Label className="blue-main-text">P/N:</Form.Label>
-                <ErrorMessage message="Cannot be empty or excceed 150 chars." messageStatus={partnumberError} />
+                <ErrorMessage
+                  message="Cannot be empty or excceed 150 chars."
+                  messageStatus={partnumberError}
+                />
                 <Form.Control
                   className="input-style shadow-sm"
                   type="text"
                   name="partNumber"
                   isInvalid={partnumberError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(e.target.value, setPartnumberError, 150)
+                    StringValidtor.normalStringValidtor(
+                      e.target.value,
+                      setPartnumberError,
+                      150,
+                    );
                   }}
                   defaultValue={item.partNumber}
                   maxLength={150}
@@ -199,14 +204,21 @@ function ModifyItemOffcanvas({
               </Form.Group>
               <Form.Group className="mb-3 maxInputWidth">
                 <Form.Label className="blue-main-text">Name:</Form.Label>
-                <ErrorMessage message="Cannot be empty or excceed 250 chars." messageStatus={nameError} />
+                <ErrorMessage
+                  message="Cannot be empty or excceed 250 chars."
+                  messageStatus={nameError}
+                />
                 <Form.Control
                   className="input-style shadow-sm"
                   type="text"
                   name="name"
                   isInvalid={nameError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(e.target.value, setNameError, 250)
+                    StringValidtor.normalStringValidtor(
+                      e.target.value,
+                      setNameError,
+                      250,
+                    );
                   }}
                   defaultValue={item.itemName}
                   maxLength={250}
@@ -250,10 +262,7 @@ function ModifyItemOffcanvas({
                   />
                 </Stack>
               </Form.Group>
-              <Form.Group
-                className="mb-5"
-                key={description}
-              >
+              <Form.Group className="mb-5" key={description}>
                 <Form.Label className="blue-main-text maxInputWidth-desc">
                   Description:
                 </Form.Label>
@@ -329,7 +338,7 @@ function ModifyItemOffcanvas({
                   variant="red"
                   className="w-100"
                   onClick={() => {
-                    resetErrors()
+                    resetErrors();
                     setEans([]);
                     hideFunction();
                     if (!state.error && state.completed) {

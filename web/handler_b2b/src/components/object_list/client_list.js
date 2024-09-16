@@ -1,9 +1,7 @@
 "use client";
 
 import PropTypes from "prop-types";
-import {
-  Container
-} from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import ClientContainer from "../object_container/clients_container";
 import { useState } from "react";
 import SearchFilterBar from "../menu/search_filter_bar";
@@ -109,7 +107,7 @@ function ClientsList({ clients, orgView, clientsStart, clientsEnd }) {
         selectAllOnPage={() => {
           selectedClients.splice(0, selectedClients.length);
           setSelectedQty(0);
-          let pagationInfo = getPagationInfo(params)
+          let pagationInfo = getPagationInfo(params);
           Object.values(clients)
             .slice(pagationInfo.start, pagationInfo.end)
             .forEach((e) => selectedClients.push(e.clientId));
@@ -119,7 +117,9 @@ function ClientsList({ clients, orgView, clientsStart, clientsEnd }) {
         selectAll={() => {
           selectedClients.splice(0, selectedClients.length);
           setSelectedQty(0);
-          Object.values(clients).forEach((e) => selectedClients.push(e.clientId));
+          Object.values(clients).forEach((e) =>
+            selectedClients.push(e.clientId),
+          );
           setSelectedQty(selectedClients.length);
           setShowMoreAction(false);
         }}

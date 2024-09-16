@@ -1,56 +1,56 @@
 import validators from "../validator";
 
-function normalStringValidtor(string, setter, maxLenght){
-    if (
-        validators.lengthSmallerThen(string, maxLenght) &&
-        validators.stringIsNotEmpty(string)
-      ) {
-        setter(false);
-      } else {
-        setter(true);
-      }
+function normalStringValidtor(string, setter, maxLenght) {
+  if (
+    validators.lengthSmallerThen(string, maxLenght) &&
+    validators.stringIsNotEmpty(string)
+  ) {
+    setter(false);
+  } else {
+    setter(true);
+  }
 }
 
-function onlyNumberStringValidtor(string, setter, maxLenght){
+function onlyNumberStringValidtor(string, setter, maxLenght) {
   if (
-      validators.lengthSmallerThen(string, maxLenght) &&
-      validators.stringIsNotEmpty(string) &&
-      validators.haveOnlyNumbers(string)
-    ) {
-      setter(false);
-    } else {
-      setter(true);
-    }
+    validators.lengthSmallerThen(string, maxLenght) &&
+    validators.stringIsNotEmpty(string) &&
+    validators.haveOnlyNumbers(string)
+  ) {
+    setter(false);
+  } else {
+    setter(true);
+  }
 }
 
-function emptyNumberStringValidtor(string, setter, maxLenght){
+function emptyNumberStringValidtor(string, setter, maxLenght) {
   if (
-      validators.lengthSmallerThen(string, maxLenght) &&
-      validators.haveOnlyNumbers(string)
-    ) {
-      setter(false);
-    } else {
-      setter(true);
-    }
+    validators.lengthSmallerThen(string, maxLenght) &&
+    validators.haveOnlyNumbers(string)
+  ) {
+    setter(false);
+  } else {
+    setter(true);
+  }
 }
 
-function emailValidator(string, setter, maxLenght){
+function emailValidator(string, setter, maxLenght) {
   if (
-      validators.lengthSmallerThen(string, maxLenght) &&
-      validators.isEmail(string) &&
-      validators.stringIsNotEmpty(string)
-    ) {
-      setter(false);
-    } else {
-      setter(true);
-    }
+    validators.lengthSmallerThen(string, maxLenght) &&
+    validators.isEmail(string) &&
+    validators.stringIsNotEmpty(string)
+  ) {
+    setter(false);
+  } else {
+    setter(true);
+  }
 }
 
 const StringValidtor = {
   normalStringValidtor,
   onlyNumberStringValidtor,
   emptyNumberStringValidtor,
-  emailValidator
-}
+  emailValidator,
+};
 
-export default StringValidtor
+export default StringValidtor;

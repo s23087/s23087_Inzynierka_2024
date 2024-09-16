@@ -36,16 +36,21 @@ function AddProductWindow({ modalShow, onHideFunction, addFunction }) {
     display: "block",
   };
   return (
-    <Modal size="md" show={modalShow} centered className="px-4 minScalableWidth">
+    <Modal
+      size="md"
+      show={modalShow}
+      centered
+      className="px-4 minScalableWidth"
+    >
       <Modal.Body>
         <Container>
           <Row>
             <Col>
               <h5 className="mb-0 mt-3">Add Product</h5>
             </Col>
-            <SuccesFadeAway 
-             showSuccess={showSuccess}
-             setShowSuccess={setShowSuccess}
+            <SuccesFadeAway
+              showSuccess={showSuccess}
+              setShowSuccess={setShowSuccess}
             />
           </Row>
         </Container>

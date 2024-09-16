@@ -30,14 +30,14 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
   };
   const [isAddEanShow, setIsAddEanShow] = useState(false);
   // Errors
-  const [partnumberError, setPartnumberError] = useState(false)
-  const [nameError, setNameError] = useState(false)
-  const isErrorActive = () => partnumberError || nameError
+  const [partnumberError, setPartnumberError] = useState(false);
+  const [nameError, setNameError] = useState(false);
+  const isErrorActive = () => partnumberError || nameError;
   const resetErrors = () => {
-    setPartnumberError(false)
-    setNameError(false)
-  }
-  const errorActive = isErrorActive()
+    setPartnumberError(false);
+    setNameError(false);
+  };
+  const errorActive = isErrorActive();
   // Styles
   const maxStyle = {
     maxWidth: "393px",
@@ -91,11 +91,12 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
         <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
           <Container className="p-0" style={vhStyle} fluid>
             <Form action={formAction} id="addItemForm">
-              <Form.Group
-                className="mb-3 maxInputWidth"
-              >
+              <Form.Group className="mb-3 maxInputWidth">
                 <Form.Label className="blue-main-text">P/N:</Form.Label>
-                <ErrorMessage message="Cannot be empty or excceed 150 chars." messageStatus={partnumberError} />
+                <ErrorMessage
+                  message="Cannot be empty or excceed 150 chars."
+                  messageStatus={partnumberError}
+                />
                 <Form.Control
                   className="input-style shadow-sm"
                   type="text"
@@ -103,7 +104,11 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                   id="partnumber"
                   isInvalid={partnumberError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(e.target.value, setPartnumberError, 150)
+                    StringValidtor.normalStringValidtor(
+                      e.target.value,
+                      setPartnumberError,
+                      150,
+                    );
                   }}
                   placeholder="part number"
                   maxLength={150}
@@ -111,7 +116,10 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
               </Form.Group>
               <Form.Group className="mb-3 maxInputWidth">
                 <Form.Label className="blue-main-text">Name:</Form.Label>
-                <ErrorMessage message="Cannot be empty or excceed 250 chars." messageStatus={nameError} />
+                <ErrorMessage
+                  message="Cannot be empty or excceed 250 chars."
+                  messageStatus={nameError}
+                />
                 <Form.Control
                   className="input-style shadow-sm"
                   type="text"
@@ -119,7 +127,11 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                   id="name"
                   isInvalid={nameError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(e.target.value, setNameError, 250)
+                    StringValidtor.normalStringValidtor(
+                      e.target.value,
+                      setNameError,
+                      250,
+                    );
                   }}
                   placeholder="name"
                   maxLength={250}
@@ -187,11 +199,20 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                       disabled={errorActive}
                       onClick={(e) => {
                         e.preventDefault();
-                        let partnumber = document.getElementById("partnumber").value
-                        let name = document.getElementById("name").value
-                        StringValidtor.normalStringValidtor(partnumber, setPartnumberError,150)
-                        StringValidtor.normalStringValidtor(name, setNameError,250)
-                        if (partnumber === "" || name === "") return
+                        let partnumber =
+                          document.getElementById("partnumber").value;
+                        let name = document.getElementById("name").value;
+                        StringValidtor.normalStringValidtor(
+                          partnumber,
+                          setPartnumberError,
+                          150,
+                        );
+                        StringValidtor.normalStringValidtor(
+                          name,
+                          setNameError,
+                          250,
+                        );
+                        if (partnumber === "" || name === "") return;
                         if (errorActive) return;
                         setIsLoading(true);
                         let addForm = document.getElementById("addItemForm");
@@ -231,7 +252,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
           showToast={state.completed && state.error}
           message="Could not create item"
           onHideFun={() => {
-            resetState()
+            resetState();
           }}
         />
         <Toastes.SuccessToast

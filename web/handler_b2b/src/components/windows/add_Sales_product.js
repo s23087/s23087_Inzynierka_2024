@@ -11,7 +11,7 @@ import {
   Stack,
 } from "react-bootstrap";
 import validators from "@/utils/validators/validator";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import getItemsList from "@/utils/documents/get_products";
 import SuccesFadeAway from "../smaller_components/succes_fade_away";
 
@@ -31,7 +31,7 @@ function AddSaleProductWindow({
       const products = getItemsList(userId, currency);
       products.then((data) => setProducts(data));
     }
-  }, [modalShow]);
+  }, [modalShow, addedProductsQty, userId, currency]);
   // Errors
   const [salesPriceError, setSalesPriceError] = useState(false);
   const [qtyError, setQtyError] = useState(false);
@@ -52,9 +52,9 @@ function AddSaleProductWindow({
             <Col>
               <h5 className="mb-0 mt-3">Add Product</h5>
             </Col>
-            <SuccesFadeAway 
-             showSuccess={showSuccess}
-             setShowSuccess={setShowSuccess}
+            <SuccesFadeAway
+              showSuccess={showSuccess}
+              setShowSuccess={setShowSuccess}
             />
           </Row>
         </Container>

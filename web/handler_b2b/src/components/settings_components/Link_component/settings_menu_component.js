@@ -45,7 +45,8 @@ function SettingMenu({ role }) {
   async function getLogFile() {
     setIsLoading(true);
     const data = await getLogs();
-    let logsCSV = "data:text/csv;charset=utf-8," +
+    let logsCSV =
+      "data:text/csv;charset=utf-8," +
       "Action;Description;Data;Username;Surname\n" +
       Object.values(data)
         .map((e) => {
@@ -74,7 +75,7 @@ function SettingMenu({ role }) {
             className="mx-auto mx-xl-0 ms-xl-1 mt-3"
             style={buttonStyle}
             onClick={async () => {
-              await getLogFile()
+              await getLogFile();
             }}
           >
             Download log file

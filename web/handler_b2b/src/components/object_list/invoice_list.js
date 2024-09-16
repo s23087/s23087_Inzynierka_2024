@@ -1,9 +1,7 @@
 "use client";
 
 import PropTypes from "prop-types";
-import {
-  Container
-} from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import SearchFilterBar from "../menu/search_filter_bar";
 import MoreActionWindow from "../windows/more_action";
@@ -196,7 +194,7 @@ function InvoiceList({
         selectAllOnPage={() => {
           selectedInvoices.splice(0, selectedInvoices.length);
           setSelectedQty(0);
-          let pagationInfo = getPagationInfo(params)
+          let pagationInfo = getPagationInfo(params);
           Object.values(invoices)
             .slice(pagationInfo.start, pagationInfo.end)
             .forEach((e) => selectedInvoices.push(e.invoiceId));

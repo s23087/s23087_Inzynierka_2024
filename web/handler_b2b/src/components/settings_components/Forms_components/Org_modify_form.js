@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 import { useRouter } from "next/navigation";
 import { useFormState } from "react-dom";
 import { Form, Container, Button, Stack } from "react-bootstrap";
-import validators from "@/utils/validators/validator";
 import { useState } from "react";
 import modifyClient from "@/utils/flexible/modify_client";
 import Toastes from "@/components/smaller_components/toast";
@@ -65,7 +64,11 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             defaultValue={orgInfo.orgName}
             isInvalid={orgNameError}
             onInput={(e) => {
-              StringValidtor.normalStringValidtor(e.target.value, setOrgNameError, 50)
+              StringValidtor.normalStringValidtor(
+                e.target.value,
+                setOrgNameError,
+                50,
+              );
             }}
             maxLength={50}
           />
@@ -85,7 +88,11 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             defaultValue={orgInfo.nip}
             isInvalid={nipMyError}
             onInput={(e) => {
-              StringValidtor.emptyNumberStringValidtor(e.target.value, setMyNipError, 15)
+              StringValidtor.emptyNumberStringValidtor(
+                e.target.value,
+                setMyNipError,
+                15,
+              );
             }}
             maxLength={15}
           />
@@ -105,7 +112,11 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             defaultValue={orgInfo.street}
             isInvalid={streetError}
             onInput={(e) => {
-              StringValidtor.normalStringValidtor(e.target.value, setStreetError, 200)
+              StringValidtor.normalStringValidtor(
+                e.target.value,
+                setStreetError,
+                200,
+              );
             }}
             maxLength={200}
           />
@@ -125,7 +136,11 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             defaultValue={orgInfo.city}
             isInvalid={cityError}
             onInput={(e) => {
-              StringValidtor.normalStringValidtor(e.target.value, setCityError, 200)
+              StringValidtor.normalStringValidtor(
+                e.target.value,
+                setCityError,
+                200,
+              );
             }}
             maxLength={200}
           />
@@ -145,7 +160,11 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             defaultValue={orgInfo.postalCode}
             isInvalid={postalError}
             onInput={(e) => {
-              StringValidtor.normalStringValidtor(e.target.value, setPostalError, 25)
+              StringValidtor.normalStringValidtor(
+                e.target.value,
+                setPostalError,
+                25,
+              );
             }}
             maxLength={25}
           />

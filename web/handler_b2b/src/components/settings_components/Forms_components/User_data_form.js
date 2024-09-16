@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 import { useRouter } from "next/navigation";
 import { useFormState } from "react-dom";
 import { Form, Container, Button, Stack } from "react-bootstrap";
-import validators from "@/utils/validators/validator";
 import { useState } from "react";
 import changeUserInfo from "@/utils/settings/change_user_info";
 import Toastes from "@/components/smaller_components/toast";
@@ -67,7 +66,7 @@ function ModifyUserForm({ email, name, surname }) {
             defaultValue={email}
             isInvalid={emailError}
             onInput={(e) => {
-              StringValidtor.emailValidator(e.target.value, setEmailError, 350)
+              StringValidtor.emailValidator(e.target.value, setEmailError, 350);
             }}
             maxLength={350}
           />
@@ -87,7 +86,11 @@ function ModifyUserForm({ email, name, surname }) {
             defaultValue={name}
             isInvalid={nameError}
             onInput={(e) => {
-              StringValidtor.normalStringValidtor(e.target.value, setNameError, 250)
+              StringValidtor.normalStringValidtor(
+                e.target.value,
+                setNameError,
+                250,
+              );
             }}
             maxLength={250}
           />
@@ -107,7 +110,11 @@ function ModifyUserForm({ email, name, surname }) {
             defaultValue={surname}
             isInvalid={surnameError}
             onInput={(e) => {
-              StringValidtor.normalStringValidtor(e.target.value, setSurnameError, 200)
+              StringValidtor.normalStringValidtor(
+                e.target.value,
+                setSurnameError,
+                200,
+              );
             }}
             maxLength={200}
           />

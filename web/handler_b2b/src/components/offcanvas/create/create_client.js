@@ -34,16 +34,23 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
   const [clientPostalError, setClientPostalError] = useState(false);
   const [creditError, setCreditError] = useState(false);
   const setErrorsFalse = () => {
-    setClientNameError(false)
-    setClientNipError(false)
-    setClientStreetError(false)
-    setClientCityError(false)
-    setClientPostalError(false)
-    setCreditError(false)
-  }
-  const getIsErrorActive = () =>{
-    return clientNameError || nipClientError || clientStreetError || cityClientError || clientPostalError || creditError;
-  }
+    setClientNameError(false);
+    setClientNipError(false);
+    setClientStreetError(false);
+    setClientCityError(false);
+    setClientPostalError(false);
+    setCreditError(false);
+  };
+  const getIsErrorActive = () => {
+    return (
+      clientNameError ||
+      nipClientError ||
+      clientStreetError ||
+      cityClientError ||
+      clientPostalError ||
+      creditError
+    );
+  };
   const anyErrorActive = getIsErrorActive();
   // Add status
   const [showAddStatus, setShowAddStatus] = useState(false);
@@ -81,7 +88,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   variant="as-link"
                   onClick={() => {
                     hideFunction();
-                    setErrorsFalse()
+                    setErrorsFalse();
                     if (!state.error && state.complete) {
                       router.refresh();
                     }
@@ -103,7 +110,10 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
             >
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Name:</Form.Label>
-                <ErrorMessage message="Is empty or lenght is greater than 50." messageStatus={clientNameError}/>
+                <ErrorMessage
+                  message="Is empty or lenght is greater than 50."
+                  messageStatus={clientNameError}
+                />
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -111,14 +121,21 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="name"
                   isInvalid={clientNameError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(e.target.value, setClientNameError, 50)
+                    StringValidtor.normalStringValidtor(
+                      e.target.value,
+                      setClientNameError,
+                      50,
+                    );
                   }}
                   maxLength={50}
                 />
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Nip:</Form.Label>
-                <ErrorMessage message="Not a number or lenght is greater than 15." messageStatus={nipClientError}/>
+                <ErrorMessage
+                  message="Not a number or lenght is greater than 15."
+                  messageStatus={nipClientError}
+                />
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -126,14 +143,21 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="nip"
                   isInvalid={nipClientError}
                   onInput={(e) => {
-                    StringValidtor.emptyNumberStringValidtor(e.target.value, setClientNipError, 15)
+                    StringValidtor.emptyNumberStringValidtor(
+                      e.target.value,
+                      setClientNipError,
+                      15,
+                    );
                   }}
                   maxLength={15}
                 />
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Street:</Form.Label>
-                <ErrorMessage message="Is empty or lenght is greater than 200." messageStatus={clientStreetError}/>
+                <ErrorMessage
+                  message="Is empty or lenght is greater than 200."
+                  messageStatus={clientStreetError}
+                />
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -141,14 +165,21 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="street"
                   isInvalid={clientStreetError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(e.target.value, setClientStreetError, 200)
+                    StringValidtor.normalStringValidtor(
+                      e.target.value,
+                      setClientStreetError,
+                      200,
+                    );
                   }}
                   maxLength={200}
                 />
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">City:</Form.Label>
-                <ErrorMessage message="Is empty or lenght is greater than 200." messageStatus={cityClientError}/>
+                <ErrorMessage
+                  message="Is empty or lenght is greater than 200."
+                  messageStatus={cityClientError}
+                />
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -156,14 +187,21 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="city"
                   isInvalid={cityClientError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(e.target.value, setClientCityError, 200)
+                    StringValidtor.normalStringValidtor(
+                      e.target.value,
+                      setClientCityError,
+                      200,
+                    );
                   }}
                   maxLength={200}
                 />
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Postal code:</Form.Label>
-                <ErrorMessage message="Is empty or lenght is greater than 25." messageStatus={clientPostalError}/>
+                <ErrorMessage
+                  message="Is empty or lenght is greater than 25."
+                  messageStatus={clientPostalError}
+                />
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -171,7 +209,11 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="postal code"
                   isInvalid={clientPostalError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(e.target.value, setClientPostalError, 25)
+                    StringValidtor.normalStringValidtor(
+                      e.target.value,
+                      setClientPostalError,
+                      25,
+                    );
                   }}
                   maxLength={25}
                 />
@@ -180,7 +222,10 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                 <Form.Label className="blue-main-text">
                   Credit Limit:
                 </Form.Label>
-                <ErrorMessage message="Must be a number or lenght is greater than 25." messageStatus={creditError}/>
+                <ErrorMessage
+                  message="Must be a number or lenght is greater than 25."
+                  messageStatus={creditError}
+                />
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -188,7 +233,11 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="credit limit"
                   isInvalid={creditError}
                   onInput={(e) => {
-                    StringValidtor.emptyNumberStringValidtor(e.target.value, setCreditError, 25)
+                    StringValidtor.emptyNumberStringValidtor(
+                      e.target.value,
+                      setCreditError,
+                      25,
+                    );
                   }}
                   maxLength={25}
                 />
@@ -255,7 +304,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                       className="w-100"
                       onClick={() => {
                         hideFunction();
-                        setErrorsFalse()
+                        setErrorsFalse();
                         if (!state.error && state.completed) {
                           router.refresh();
                         }

@@ -2,7 +2,6 @@
 
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
-import getCurrencyValueByDate from "../flexible/get_choosen_currency_value";
 import validators from "../validators/validator";
 
 export default async function CreateSalesInvoice(

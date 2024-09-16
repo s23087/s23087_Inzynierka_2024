@@ -211,7 +211,10 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                 <Form.Label className="blue-main-text">
                   Invoice Number:
                 </Form.Label>
-                <ErrorMessage message="Is empty, not a number or lenght is greater than 40." messageStatus={invoiceError} />
+                <ErrorMessage
+                  message="Is empty, not a number or lenght is greater than 40."
+                  messageStatus={invoiceError}
+                />
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -265,7 +268,10 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                           setInvoiceDate(e.target.value);
                         }}
                       />
-                      <ErrorMessage message="Date excceed today's date." messageStatus={dateError} />
+                      <ErrorMessage
+                        message="Date excceed today's date."
+                        messageStatus={dateError}
+                      />
                     </Form.Group>
                   </Col>
                   <Col xs="6" sm="4">
@@ -364,7 +370,10 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                   <Form.Label className="blue-main-text">
                     Currency Exchange
                   </Form.Label>
-                  <ErrorMessage message={currencyList.message} messageStatus={currencyList.error} />
+                  <ErrorMessage
+                    message={currencyList.message}
+                    messageStatus={currencyList.error}
+                  />
                   <Form.Select
                     className="input-style shadow-sm maxInputWidth"
                     type="text"
@@ -387,7 +396,10 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                 <Form.Label className="blue-main-text">
                   Transport cost:
                 </Form.Label>
-                <ErrorMessage message="Is empty or is not a number." messageStatus={transportError} />
+                <ErrorMessage
+                  message="Is empty or is not a number."
+                  messageStatus={transportError}
+                />
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -512,7 +524,10 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
               </Form.Group>
               <Form.Group className="mb-4 maxInputWidth">
                 <Form.Label className="blue-main-text">Document:</Form.Label>
-                <ErrorMessage message="Must be a pdf file or not empty." messageStatus={documentError} />
+                <ErrorMessage
+                  message="Must be a pdf file or not empty."
+                  messageStatus={documentError}
+                />
                 <Form.Control
                   type="file"
                   accept=".pdf"
