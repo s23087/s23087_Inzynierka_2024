@@ -2,12 +2,7 @@
 
 import PropTypes from "prop-types";
 import {
-  Container,
-  Row,
-  Col,
-  Dropdown,
-  DropdownButton,
-  Button,
+  Container
 } from "react-bootstrap";
 import ClientContainer from "../object_container/clients_container";
 import { useState } from "react";
@@ -20,6 +15,7 @@ import ViewClientOffcanvas from "../offcanvas/view/view_client";
 import deleteClient from "@/utils/clients/delete_client";
 import { useRouter } from "next/navigation";
 import ModifyClientOffcanvas from "../offcanvas/modify/modify_client";
+import SelectComponent from "../smaller_components/select_compontent";
 
 function ClientsList({ clients, orgView, clientsStart, clientsEnd }) {
   // View client
@@ -43,8 +39,6 @@ function ClientsList({ clients, orgView, clientsStart, clientsEnd }) {
   // Seleted
   const [selectedQty, setSelectedQty] = useState(0);
   const [selectedKeys] = useState([]);
-  // Selected bar button
-  const [isClicked, setIsClicked] = useState(false);
   // Nav
   const router = useRouter();
   const params = useSearchParams();
@@ -54,14 +48,6 @@ function ClientsList({ clients, orgView, clientsStart, clientsEnd }) {
     ? accessibleParams.get("pagation")
     : 10;
   let page = accessibleParams.get("page") ? accessibleParams.get("page") : 1;
-  const containerStyle = {
-    height: "67px",
-    display: selectedQty > 0 ? "block" : "none",
-  };
-  const buttonStyle = {
-    width: "154px",
-    height: "48px",
-  };
   const containerMargin = {
     height: "67px",
   };
@@ -76,34 +62,7 @@ function ClientsList({ clients, orgView, clientsStart, clientsEnd }) {
           moreButtonAction={() => setShowMoreAction(true)}
         />
       </Container>
-      <Container
-        className="border-bottom-grey fixed-top middleSectionPlacement main-bg minScalableWidth"
-        style={containerStyle}
-        fluid
-      >
-        <Row className="h-100 px-xl-3 mx-1 align-items-center">
-          <Col>
-            <span className="blue-main-text">Selected: {selectedQty}</span>
-          </Col>
-          <Col>
-            <DropdownButton
-              className="ms-auto text-end"
-              title="Mass action"
-              variant={isClicked ? "secBlue" : "mainBlue"}
-              style={buttonStyle}
-              drop="start"
-              onClick={() => {
-                setIsClicked(isClicked ? false : true);
-              }}
-              bsPrefix="w-100 btn"
-            >
-              <Dropdown.Item>
-                <Button variant="as-link">Change attribute</Button>
-              </Dropdown.Item>
-            </DropdownButton>
-          </Col>
-        </Row>
-      </Container>
+      <SelectComponent selectedQty={selectedQty} />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
       {Object.keys(clients).length === 0 ? (
         <Container className="text-center" fluid>
@@ -119,11 +78,11 @@ function ClientsList({ clients, orgView, clientsStart, clientsEnd }) {
                 client={value}
                 is_org={orgView}
                 selected={selectedKeys.indexOf(value.clientId) !== -1}
-                selectQtyAction={() => {
+                selectAction={() => {
                   selectedKeys.push(value.clientId);
                   setSelectedQty(selectedQty + 1);
                 }}
-                unselectQtyAction={() => {
+                unselectAction={() => {
                   let index = selectedKeys.indexOf(value.clientId);
                   selectedKeys.splice(index, 1);
                   setSelectedQty(selectedQty - 1);

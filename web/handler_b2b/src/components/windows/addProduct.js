@@ -13,6 +13,7 @@ import {
 import validators from "@/utils/validators/validator";
 import { useEffect, useState } from "react";
 import getItemsList from "@/utils/documents/get_products";
+import SuccesFadeAway from "../smaller_components/succes_fade_away";
 
 function AddProductWindow({ modalShow, onHideFunction, addFunction }) {
   const [products, setProducts] = useState([]);
@@ -22,17 +23,12 @@ function AddProductWindow({ modalShow, onHideFunction, addFunction }) {
       products.then((data) => setProducts(data));
     }
   }, [modalShow]);
+  // Error
   const [priceError, setPriceError] = useState(false);
   const [qtyError, setQtyError] = useState(false);
+  // succes var
   const [showSuccess, setShowSuccess] = useState(false);
-  const transition = {
-    opacity: 0,
-    transition: "all 250ms linear 1.5s",
-  };
-  const beforeTransition = {
-    opacity: 100,
-    transition: "all 200ms linear 0s",
-  };
+  // Styles
   const hidden = {
     display: "none",
   };
@@ -47,15 +43,10 @@ function AddProductWindow({ modalShow, onHideFunction, addFunction }) {
             <Col>
               <h5 className="mb-0 mt-3">Add Product</h5>
             </Col>
-            <Col className="text-end">
-              <p
-                className="mb-0 mt-3 green-main-text"
-                style={showSuccess ? beforeTransition : transition}
-                onTransitionEnd={() => setShowSuccess(false)}
-              >
-                Success!
-              </p>
-            </Col>
+            <SuccesFadeAway 
+             showSuccess={showSuccess}
+             setShowSuccess={setShowSuccess}
+            />
           </Row>
         </Container>
         <Container className="mt-3 mb-2">

@@ -290,7 +290,7 @@ namespace database_comunicator.Services
                     PaymentStatus = e.PaymentsStatus.StatusName,
                     InSystem = e.InSystem,
                     Qty = e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum(),
-                    Price = e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price).Sum(),
+                    Price = e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price * d.Qty).Sum(),
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoices>> GetSalesInvocies()
@@ -309,10 +309,8 @@ namespace database_comunicator.Services
                     PaymentStatus = e.PaymentsStatus.StatusName,
                     InSystem = e.InSystem,
                     Qty = e.SellingPrices.Select(d => d.Qty).Sum(),
-                    Price = e.SellingPrices.Select(d => d.Price).Sum(),
+                    Price = e.SellingPrices.Select(d => d.Price * d.Qty).Sum(),
                 }).ToListAsync();
-
-            Console.WriteLine(result.Select(e => e.Qty).Sum());
             return result;
         }
         public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string search)
@@ -341,7 +339,7 @@ namespace database_comunicator.Services
                     PaymentStatus = e.PaymentsStatus.StatusName,
                     InSystem = e.InSystem,
                     Qty = e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum(),
-                    Price = e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price).Sum(),
+                    Price = e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price * d.Qty).Sum(),
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoices>> GetSalesInvocies(string search)
@@ -361,7 +359,7 @@ namespace database_comunicator.Services
                     PaymentStatus = e.PaymentsStatus.StatusName,
                     InSystem = e.InSystem,
                     Qty = e.SellingPrices.Select(d => d.Qty).Sum(),
-                    Price = e.SellingPrices.Select(d => d.Price).Sum(),
+                    Price = e.SellingPrices.Select(d => d.Price * d.Qty).Sum(),
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId)
@@ -384,7 +382,7 @@ namespace database_comunicator.Services
                     PaymentStatus = e.PaymentsStatus.StatusName,
                     InSystem = e.InSystem,
                     Qty = e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum(),
-                    Price = e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price).Sum(),
+                    Price = e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price * d.Qty).Sum(),
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId)
@@ -406,7 +404,7 @@ namespace database_comunicator.Services
                     PaymentStatus = e.PaymentsStatus.StatusName,
                     InSystem = e.InSystem,
                     Qty = e.SellingPrices.Select(d => d.Qty).Sum(),
-                    Price = e.SellingPrices.Select(d => d.Price).Sum(),
+                    Price = e.SellingPrices.Select(d => d.Price * d.Qty).Sum(),
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string search)
@@ -430,7 +428,7 @@ namespace database_comunicator.Services
                     PaymentStatus = e.PaymentsStatus.StatusName,
                     InSystem = e.InSystem,
                     Qty = e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum(),
-                    Price = e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price).Sum(),
+                    Price = e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price * d.Qty).Sum(),
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId, string search)
@@ -453,7 +451,7 @@ namespace database_comunicator.Services
                     PaymentStatus = e.PaymentsStatus.StatusName,
                     InSystem = e.InSystem,
                     Qty = e.SellingPrices.Select(d => d.Qty).Sum(),
-                    Price = e.SellingPrices.Select(d => d.Price).Sum(),
+                    Price = e.SellingPrices.Select(d => d.Price * d.Qty).Sum(),
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoicesList>> GetPurchaseInvoicesList()

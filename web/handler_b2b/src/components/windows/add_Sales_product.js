@@ -13,6 +13,7 @@ import {
 import validators from "@/utils/validators/validator";
 import { useEffect, useRef, useState } from "react";
 import getItemsList from "@/utils/documents/get_products";
+import SuccesFadeAway from "../smaller_components/succes_fade_away";
 
 function AddSaleProductWindow({
   modalShow,
@@ -32,19 +33,11 @@ function AddSaleProductWindow({
     }
   }, [modalShow]);
   // Errors
-  const [priceError, setPriceError] = useState(false);
+  const [salesPriceError, setSalesPriceError] = useState(false);
   const [qtyError, setQtyError] = useState(false);
   // Misc
   const [showSuccess, setShowSuccess] = useState(false);
   // styles
-  const transition = {
-    opacity: 0,
-    transition: "all 250ms linear 1.5s",
-  };
-  const beforeTransition = {
-    opacity: 100,
-    transition: "all 200ms linear 0s",
-  };
   const hidden = {
     display: "none",
   };
@@ -59,15 +52,10 @@ function AddSaleProductWindow({
             <Col>
               <h5 className="mb-0 mt-3">Add Product</h5>
             </Col>
-            <Col className="text-end">
-              <p
-                className="mb-0 mt-3 green-main-text"
-                style={showSuccess ? beforeTransition : transition}
-                onTransitionEnd={() => setShowSuccess(false)}
-              >
-                Success!
-              </p>
-            </Col>
+            <SuccesFadeAway 
+             showSuccess={showSuccess}
+             setShowSuccess={setShowSuccess}
+            />
           </Row>
         </Container>
         <Container className="mt-3 mb-2">
@@ -131,7 +119,7 @@ function AddSaleProductWindow({
             <Form.Label className="blue-main-text">Price:</Form.Label>
             <p
               className="text-start mb-1 red-sec-text small-text"
-              style={priceError ? unhidden : hidden}
+              style={salesPriceError ? unhidden : hidden}
             >
               Is empty or is not a number.
             </p>
@@ -145,15 +133,15 @@ function AddSaleProductWindow({
                   ? products[currentProduct].price
                   : "Choose product"
               }
-              isInvalid={priceError}
+              isInvalid={salesPriceError}
               onInput={(e) => {
                 if (
                   validators.isPriceFormat(e.target.value) &&
                   validators.stringIsNotEmpty(e.target.value)
                 ) {
-                  setPriceError(false);
+                  setSalesPriceError(false);
                 } else {
-                  setPriceError(true);
+                  setSalesPriceError(true);
                 }
               }}
             />
@@ -165,18 +153,18 @@ function AddSaleProductWindow({
               onClick={() => {
                 setShowSuccess(false);
                 if (products.filter((e) => e.qty > 0).length <= 0) return;
-                if (priceError || qtyError) {
+                if (salesPriceError || qtyError) {
                   return;
                 }
                 let productKey = document.getElementById("product").value;
                 let qty = document.getElementById("qty").value;
                 let price = document.getElementById("price").value;
                 if (!price && !qty) {
-                  setPriceError(true);
+                  setSalesPriceError(true);
                   setQtyError(true);
                   return;
                 } else {
-                  setPriceError(false);
+                  setSalesPriceError(false);
                   setQtyError(false);
                 }
                 if (!qty) {
@@ -186,10 +174,10 @@ function AddSaleProductWindow({
                   setQtyError(false);
                 }
                 if (!price) {
-                  setPriceError(true);
+                  setSalesPriceError(true);
                   return;
                 } else {
-                  setPriceError(false);
+                  setSalesPriceError(false);
                 }
 
                 let wholeProduct = products[productKey];
