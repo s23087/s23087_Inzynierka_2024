@@ -504,7 +504,6 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                       (e) => e.idUser === parseInt(inputVal),
                     )[0],
                   );
-                  setClientBindings(clientBindings);
                   setBindingChanged(!bindingChanged);
                 }}
               >

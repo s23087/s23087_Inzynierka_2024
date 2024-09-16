@@ -12,34 +12,34 @@ export default async function CreatePurchaseInvoice(
   state,
   formData,
 ) {
-  let message = "Error:";
-  let invoice = formData.get("invoice");
+  let errorMessage = "Error:";
+  let invoiceNumber = formData.get("invoice");
   if (
-    !validators.lengthSmallerThen(invoice, 40) ||
-    !validators.stringIsNotEmpty(invoice)
+    !validators.lengthSmallerThen(invoiceNumber, 40) ||
+    !validators.stringIsNotEmpty(invoiceNumber)
   )
-    message += "\nInvoice must not be empty.";
+    errorMessage += "\nInvoice must not be empty.";
   let transport = formData.get("transport");
   if (
     !validators.isPriceFormat(transport) ||
     !validators.stringIsNotEmpty(transport)
   )
-    message += "\nTransport cost must not be empty and must be decimal.";
-  if (products.length <= 0) message += "\nInvoice must have products.";
-  if (!file) message += "\nDocument must not be empty.";
+    errorMessage += "\nTransport cost must not be empty and must be decimal.";
+  if (products.length <= 0) errorMessage += "\nInvoice must have products.";
+  if (!file) errorMessage += "\nDocument must not be empty.";
 
-  if (message.length > 6)
+  if (errorMessage.length > 6)
     return {
       error: true,
       completed: true,
-      message: message,
+      message: errorMessage,
     };
 
   const dbName = await getDbName();
   let choosenUser = formData.get("user");
-  let org = formData.get("org");
-  let date = formData.get("date").replaceAll("-", "_");
-  let fileName = `../../database/${dbName}/documents/${invoice.replaceAll("/", "")}_${choosenUser}${orgs.userOrgId}${org}_${date}.pdf`;
+  let seller = formData.get("org");
+  let invoiceDate = formData.get("date").replaceAll("-", "_");
+  let fileName = `../../database/${dbName}/documents/${invoiceNumber.replaceAll("/", "")}_${choosenUser}${orgs.userOrgId}${seller}_${invoiceDate}.pdf`;
   let transformProducts = [];
   products.forEach((element) => {
     transformProducts.push({
@@ -80,10 +80,10 @@ export default async function CreatePurchaseInvoice(
     };
   }
 
-  let invoiceData = {
+  let purchaseInvoiceData = {
     userId: parseInt(formData.get("user")),
-    invoiceNumber: invoice,
-    seller: parseInt(org),
+    invoiceNumber: invoiceNumber,
+    seller: parseInt(seller),
     buyer: orgs.userOrgId,
     invoiceDate: formData.get("date"),
     dueDate: formData.get("dueDate"),
@@ -113,9 +113,9 @@ export default async function CreatePurchaseInvoice(
         message: "That document already exist.",
       };
     }
-    let arrayBuffer = await file.get("file").arrayBuffer();
-    let buffer = new Uint8Array(arrayBuffer);
-    fs.writeFileSync(fileName, buffer);
+    let buffArray = await file.get("file").arrayBuffer();
+    let buff = new Uint8Array(buffArray);
+    fs.writeFileSync(fileName, buff);
   } catch (error) {
     console.log(error);
     return {
@@ -130,7 +130,7 @@ export default async function CreatePurchaseInvoice(
     `${process.env.API_DEST}/${dbName}/Invoices/addPurchaseInvoice?userId=${userId}`,
     {
       method: "POST",
-      body: JSON.stringify(invoiceData),
+      body: JSON.stringify(purchaseInvoiceData),
       headers: {
         "Content-Type": "application/json",
       },
@@ -141,7 +141,7 @@ export default async function CreatePurchaseInvoice(
     return {
       error: false,
       completed: true,
-      message: "Success!",
+      message: "Success! You had created purchase invoice.",
     };
   } else {
     try {

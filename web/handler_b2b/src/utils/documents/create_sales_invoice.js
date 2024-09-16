@@ -115,7 +115,7 @@ export default async function CreateSalesInvoice(
     return {
       error: false,
       completed: true,
-      message: "Success!",
+      message: "Success! You had created sales invoice.",
     };
   } else {
     try {

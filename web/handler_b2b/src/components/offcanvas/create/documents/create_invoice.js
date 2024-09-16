@@ -499,7 +499,6 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                         value={value}
                         deleteValue={() => {
                           products.splice(key, 1);
-                          setProducts(products);
                           setResetSeed(!resetSeed);
                         }}
                       />
@@ -616,7 +615,6 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
           onHideFunction={() => setShowProductWindow(false)}
           addFunction={(val) => {
             products.push(val);
-            setProducts(products);
           }}
         />
         <AddSaleProductWindow
@@ -624,7 +622,6 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
           onHideFunction={() => setShowSalesProductWindow(false)}
           addFunction={(val) => {
             products.push(val);
-            setProducts(products);
           }}
           userId={choosenUser}
           currency={choosenCurrency}
