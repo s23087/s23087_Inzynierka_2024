@@ -8,52 +8,41 @@ export default async function modifyClient(orgId, prevState, state, formData) {
   const userId = await getUserId();
   let nip = formData.get("nip");
   let credit = formData.get("credit");
+  let messageError = "Errors:"
 
   if (!orgId)
-    return {
-      error: true,
-      completed: true,
-      message: "Critical error: Org Id not found",
-    };
+    messageError += "\n Org Id not found"
   if (
     !validators.lengthSmallerThen(formData.get("name"), 50) ||
     !validators.stringIsNotEmpty(formData.get("name"))
   )
-    return {
-      error: true,
-      completed: true,
-      message: "Error: Org name is empty or length exceed 50 chars.",
-    };
+    messageError += "\n Org name is empty or length exceed 50 chars."
 
   if (
     !validators.lengthSmallerThen(formData.get("street"), 200) ||
     !validators.stringIsNotEmpty(formData.get("street"))
   )
-    return {
-      error: true,
-      completed: true,
-      message: "Error: Street is empty or length exceed 200 chars.",
-    };
+    messageError += "\n Street is empty or length exceed 200 chars."
 
   if (
     !validators.lengthSmallerThen(formData.get("city"), 200) ||
     !validators.stringIsNotEmpty(formData.get("city"))
   )
-    return {
-      error: true,
-      completed: true,
-      message: "Error: City is empty or length exceed 200 chars.",
-    };
+    messageError += "\n City is empty or length exceed 200 chars."
 
   if (
     !validators.lengthSmallerThen(formData.get("postal"), 200) ||
     !validators.stringIsNotEmpty(formData.get("postal"))
   )
+    messageError += "\n Postal code is empty or length exceed 25 chars."
+
+  if (messageError.length > 7){
     return {
       error: true,
       completed: true,
-      message: "Error: Postal code is empty or length exceed 25 chars.",
+      message: messageError,
     };
+  }
 
   let data = {
     orgId: orgId,

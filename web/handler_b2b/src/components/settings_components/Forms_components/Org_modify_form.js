@@ -189,7 +189,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
           <Form.Label className="blue-main-text">Country:</Form.Label>
           <Form.Select
             id="countrySelect"
-            className="input-style shadow-sm"
+            className="input-style shadow-sm maxInputWidth"
             name="country"
           >
             <option key={orgInfo.countryId} value={orgInfo.countryId}>
@@ -229,7 +229,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
           </Button>
         </Stack>
       </Form>
-      <Stack>
+      <Stack className="ms-sm-1 ms-xl-4">
         <Button
           className="mt-3 mx-auto ms-sm-0"
           variant="secBlue"

@@ -42,6 +42,20 @@ function SettingMenu({ role }) {
     "Change org data": "settings/change_organization",
     "Switch to org": "settings/switch_model",
   };
+  async function getLogFile() {
+    setIsLoading(true);
+    const data = await getLogs();
+    let logsCSV = "data:text/csv;charset=utf-8," +
+      "Action;Description;Data;Username;Surname\n" +
+      Object.values(data)
+        .map((e) => {
+          return Object.values(e).join(";");
+        })
+        .join("\n");
+    var encoded = encodeURI(logsCSV);
+    window.open(encoded);
+    setIsLoading(false);
+  }
   switch (role) {
     case "Admin":
       return (
@@ -60,19 +74,7 @@ function SettingMenu({ role }) {
             className="mx-auto mx-xl-0 ms-xl-1 mt-3"
             style={buttonStyle}
             onClick={async () => {
-              setIsLoading(true);
-              const data = await getLogs();
-              let logsCSV =
-                "data:text/csv;charset=utf-8," +
-                "Action;Description;Data;Username;Surname\n" +
-                Object.values(data)
-                  .map((e) => {
-                    return Object.values(e).join(";");
-                  })
-                  .join("\n");
-              var encoded = encodeURI(logsCSV);
-              window.open(encoded);
-              setIsLoading(false);
+              await getLogFile()
             }}
           >
             Download log file
@@ -138,19 +140,7 @@ function SettingMenu({ role }) {
             className="mx-auto mx-xl-0 ms-xl-1 mt-3"
             style={buttonStyle}
             onClick={async () => {
-              setIsLoading(true);
-              const data = await getLogs();
-              let logsCSV =
-                "data:text/csv;charset=utf-8," +
-                "Action;Description;Data;Username;Surname\n" +
-                Object.values(data)
-                  .map((e) => {
-                    return Object.values(e).join(";");
-                  })
-                  .join("\n");
-              var encoded = encodeURI(logsCSV);
-              window.open(encoded);
-              setIsLoading(false);
+              await getLogFile();
             }}
           >
             {isLoading ? (
