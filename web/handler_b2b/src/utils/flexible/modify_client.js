@@ -11,30 +11,30 @@ export default async function modifyClient(orgId, prevState, state, formData) {
   let messageError = "Errors:"
 
   if (!orgId)
-    messageError += "\n Org Id not found"
+    messageError += "\nOrg Id not found"
   if (
     !validators.lengthSmallerThen(formData.get("name"), 50) ||
     !validators.stringIsNotEmpty(formData.get("name"))
   )
-    messageError += "\n Org name is empty or length exceed 50 chars."
+    messageError += "\nOrg name is empty or length exceed 50 chars."
 
   if (
     !validators.lengthSmallerThen(formData.get("street"), 200) ||
     !validators.stringIsNotEmpty(formData.get("street"))
   )
-    messageError += "\n Street is empty or length exceed 200 chars."
+    messageError += "\nStreet is empty or length exceed 200 chars."
 
   if (
     !validators.lengthSmallerThen(formData.get("city"), 200) ||
     !validators.stringIsNotEmpty(formData.get("city"))
   )
-    messageError += "\n City is empty or length exceed 200 chars."
+    messageError += "\nCity is empty or length exceed 200 chars."
 
   if (
     !validators.lengthSmallerThen(formData.get("postal"), 200) ||
     !validators.stringIsNotEmpty(formData.get("postal"))
   )
-    messageError += "\n Postal code is empty or length exceed 25 chars."
+    messageError += "\nPostal code is empty or length exceed 25 chars."
 
   if (messageError.length > 7){
     return {

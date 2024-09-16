@@ -16,7 +16,7 @@ import { useFormState } from "react-dom";
 import modifyClient from "@/utils/flexible/modify_client";
 import Toastes from "@/components/smaller_components/toast";
 import { useRouter } from "next/navigation";
-import validators from "@/utils/validators/validator";
+import ErrorMessage from "@/components/smaller_components/error_message";
 import getRestClientInfo from "@/utils/clients/get_rest_info";
 import getCountries from "@/utils/flexible/get_countries";
 import getAvailabilityStatuses from "@/utils/clients/get_availability_statuses";
@@ -195,12 +195,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
             >
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Name:</Form.Label>
-                <p
-                  className="text-start mb-1 red-sec-text small-text"
-                  style={nameError ? unhidden : hidden}
-                >
-                  Is empty or lenght is greater than 50.
-                </p>
+                <ErrorMessage message="Is empty or lenght is greater than 50." messageStatus={nameError}/>
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -215,12 +210,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Nip:</Form.Label>
-                <p
-                  className="text-start mb-1 red-sec-text small-text"
-                  style={nipError ? unhidden : hidden}
-                >
-                  Is empty, not a number or lenght is greater than 12.
-                </p>
+                <ErrorMessage message="Is empty, not a number or lenght is greater than 15." messageStatus={nipError}/>
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -235,12 +225,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Street:</Form.Label>
-                <p
-                  className="text-start mb-1 red-sec-text small-text"
-                  style={streetError ? unhidden : hidden}
-                >
-                  Is empty or lenght is greater than 200.
-                </p>
+                <ErrorMessage message="Is empty or lenght is greater than 200." messageStatus={streetError}/>
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -255,12 +240,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">City:</Form.Label>
-                <p
-                  className="text-start mb-1 red-sec-text small-text"
-                  style={cityError ? unhidden : hidden}
-                >
-                  Is empty or lenght is greater than 200.
-                </p>
+                <ErrorMessage message="Is empty or lenght is greater than 200." messageStatus={cityError}/>
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -275,12 +255,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Postal code:</Form.Label>
-                <p
-                  className="text-start mb-1 red-sec-text small-text"
-                  style={postalError ? unhidden : hidden}
-                >
-                  Is empty or lenght is greater than 25.
-                </p>
+                <ErrorMessage message="Is empty or lenght is greater than 25." messageStatus={postalError}/>
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -297,12 +272,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                 <Form.Label className="blue-main-text">
                   Credit Limit:
                 </Form.Label>
-                <p
-                  className="text-start mb-1 red-sec-text small-text"
-                  style={creditError ? unhidden : hidden}
-                >
-                  Is empty or lenght is greater than 25.
-                </p>
+                <ErrorMessage message="Is empty or lenght is greater than 25." messageStatus={creditError}/>
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -550,10 +520,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
           showToast={state.completed && state.error}
           message={state.message}
           onHideFun={() => {
-            state.error = false;
-            state.completed = false;
-            state.message = "";
-            setIsLoading(false);
+            resetState();
             router.refresh();
           }}
         />
@@ -561,10 +528,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
           showToast={state.completed && !state.error}
           message={state.message}
           onHideFun={() => {
-            state.error = false;
-            state.completed = false;
-            state.message = "";
-            setIsLoading(false);
+            resetState();
             hideFunction();
             router.refresh();
           }}
@@ -572,6 +536,13 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
       </Container>
     </Offcanvas>
   );
+
+  function resetState() {
+    state.error = false;
+    state.completed = false;
+    state.message = "";
+    setIsLoading(false);
+  }
 }
 
 ModifyClientOffcanvas.PropTypes = {

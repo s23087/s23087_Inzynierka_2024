@@ -5,33 +5,32 @@ import getUserId from "../auth/get_user_id";
 import validators from "../validators/validator";
 
 export default async function updateItem(eans, prevState, state, formData) {
+  let message = "Error:"
   if (
     !validators.lengthSmallerThen(formData.get("name"), 250) ||
     !validators.stringIsNotEmpty(formData.get("name"))
   )
-    return {
-      error: true,
-      completed: true,
-      message: "Name is empty or exceed required lenght",
-    };
+    message += "\nName is empty or exceed required lenght"
+  
   if (
     !validators.lengthSmallerThen(formData.get("description"), 500) ||
     !validators.stringIsNotEmpty(formData.get("description"))
   )
-    return {
-      error: true,
-      completed: true,
-      message: "Description is empty or exceed required lenght",
-    };
+    message += "\nDescription is empty or exceed required lenght"
+
   if (
     !validators.lengthSmallerThen(formData.get("partNumber"), 150) ||
     !validators.stringIsNotEmpty(formData.get("partNumber"))
   )
+    message += "\nPartnumber is empty or exceed required lenght"
+
+  if (message.length > 6) {
     return {
       error: true,
       completed: true,
-      message: "Partnumber is empty or exceed required lenght",
+      message: message,
     };
+  }
 
   const userId = await getUserId();
   let data = {

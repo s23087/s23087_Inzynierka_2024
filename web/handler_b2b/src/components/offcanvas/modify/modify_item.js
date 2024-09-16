@@ -22,6 +22,8 @@ import getBindings from "@/utils/warehouse/get_bindings";
 import CloseIcon from "../../../../public/icons/close_black.png";
 import switch_product_view from "../../../../public/icons/switch_product_view.png";
 import switch_binding_view from "../../../../public/icons/switch_binding_view.png";
+import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import ErrorMessage from "@/components/smaller_components/error_message";
 
 function ModifyItemOffcanvas({
   showOffcanvas,
@@ -41,6 +43,15 @@ function ModifyItemOffcanvas({
   const [isProductView, setIsProductView] = useState(true);
   // Eans
   const [eans, setEans] = useState([]);
+  // Errors
+  const [partnumberError, setPartnumberError] = useState(false)
+  const [nameError, setNameError] = useState(false)
+  const isErrorActive = () => partnumberError || nameError
+  const resetErrors = () => {
+    setPartnumberError(false)
+    setNameError(false)
+  }
+  const errorActive = isErrorActive()
   // Get data
   const [bindings, setBindings] = useState([
     {
@@ -68,7 +79,7 @@ function ModifyItemOffcanvas({
     }
   }, [showOffcanvas]);
   // Rerender Eans
-  const [rerenderVar, setRerenderVar] = useState(1);
+  const [seedChange, setRerenderVar] = useState(1);
   const eanExist = (variable) => {
     return eans.findIndex((item) => item === variable) != -1;
   };
@@ -170,42 +181,51 @@ function ModifyItemOffcanvas({
             <Form action={formAction} id="modifyItemForm">
               <Form.Group
                 className="mb-3 maxInputWidth"
-                controlId="formPartNumber"
               >
                 <Form.Label className="blue-main-text">P/N:</Form.Label>
+                <ErrorMessage message="Cannot be empty or excceed 150 chars." messageStatus={partnumberError} />
                 <Form.Control
                   className="input-style shadow-sm"
                   type="text"
                   name="partNumber"
+                  isInvalid={partnumberError}
+                  onInput={(e) => {
+                    StringValidtor.normalStringValidtor(e.target.value, setPartnumberError, 150)
+                  }}
                   defaultValue={item.partNumber}
                   maxLength={150}
                 />
               </Form.Group>
-              <Form.Group className="mb-3 maxInputWidth" controlId="formName">
+              <Form.Group className="mb-3 maxInputWidth">
                 <Form.Label className="blue-main-text">Name:</Form.Label>
+                <ErrorMessage message="Cannot be empty or excceed 250 chars." messageStatus={nameError} />
                 <Form.Control
                   className="input-style shadow-sm"
                   type="text"
                   name="name"
+                  isInvalid={nameError}
+                  onInput={(e) => {
+                    StringValidtor.normalStringValidtor(e.target.value, setNameError, 250)
+                  }}
                   defaultValue={item.itemName}
                   maxLength={250}
                 />
               </Form.Group>
-              <Form.Group className="mb-3" controlId="formEans" key={eans}>
-                <Stack key={rerenderVar}>
+              <Form.Group className="mb-3" key={eans}>
+                <Stack key={seedChange}>
                   <Form.Label className="blue-main-text">EANs:</Form.Label>
-                  {eans.map((value, key) => {
+                  {eans.map((val, key) => {
                     return (
                       <SpecialInput
-                        value={value}
-                        key={value}
+                        value={val}
+                        key={val}
                         deleteValue={() => {
                           eans.splice(key, 1);
-                          if (rerenderVar === 1) {
-                            setRerenderVar(rerenderVar + 1);
+                          if (seedChange === 1) {
+                            setRerenderVar(seedChange + 1);
                           }
-                          if (rerenderVar > 1) {
-                            setRerenderVar(rerenderVar - 1);
+                          if (seedChange > 1) {
+                            setRerenderVar(seedChange - 1);
                           }
                         }}
                         modifyValue={(variable) => (eans[key] = variable)}
@@ -231,7 +251,6 @@ function ModifyItemOffcanvas({
               </Form.Group>
               <Form.Group
                 className="mb-5"
-                controlId="formDescription"
                 key={description}
               >
                 <Form.Label className="blue-main-text maxInputWidth-desc">
@@ -284,8 +303,10 @@ function ModifyItemOffcanvas({
                 <Button
                   variant="mainBlue"
                   className="w-100"
+                  disabled={errorActive}
                   onClick={(e) => {
                     e.preventDefault();
+                    if (errorActive) return;
                     setIsLoading(true);
                     prevState.itemId = item.itemId;
                     prevState.name = item.itemName;

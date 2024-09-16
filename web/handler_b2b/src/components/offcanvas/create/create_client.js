@@ -7,11 +7,11 @@ import { useFormState } from "react-dom";
 import createClient from "@/utils/clients/create_client";
 import Toastes from "@/components/smaller_components/toast";
 import { useRouter } from "next/navigation";
-import validators from "@/utils/validators/validator";
 import getCountries from "@/utils/flexible/get_countries";
 import getAvailabilityStatuses from "@/utils/clients/get_availability_statuses";
 import AddAvailabilityStatusWindow from "@/components/windows/addStatus";
 import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import ErrorMessage from "@/components/smaller_components/error_message";
 
 function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
   const router = useRouter();
@@ -62,12 +62,6 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
   const vhStyle = {
     height: "81vh",
   };
-  const hidden = {
-    display: "none",
-  };
-  const unhidden = {
-    display: "block",
-  };
   return (
     <Offcanvas
       className="h-100 minScalableWidth"
@@ -109,12 +103,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
             >
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Name:</Form.Label>
-                <p
-                  className="text-start mb-1 red-sec-text small-text"
-                  style={clientNameError ? unhidden : hidden}
-                >
-                  Is empty or lenght is greater than 50.
-                </p>
+                <ErrorMessage message="Is empty or lenght is greater than 50." messageStatus={clientNameError}/>
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -129,12 +118,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Nip:</Form.Label>
-                <p
-                  className="text-start mb-1 red-sec-text small-text"
-                  style={nipClientError ? unhidden : hidden}
-                >
-                  Not a number or lenght is greater than 15.
-                </p>
+                <ErrorMessage message="Not a number or lenght is greater than 15." messageStatus={nipClientError}/>
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -149,12 +133,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Street:</Form.Label>
-                <p
-                  className="text-start mb-1 red-sec-text small-text"
-                  style={clientStreetError ? unhidden : hidden}
-                >
-                  Is empty or lenght is greater than 200.
-                </p>
+                <ErrorMessage message="Is empty or lenght is greater than 200." messageStatus={clientStreetError}/>
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -169,12 +148,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">City:</Form.Label>
-                <p
-                  className="text-start mb-1 red-sec-text small-text"
-                  style={cityClientError ? unhidden : hidden}
-                >
-                  Is empty or lenght is greater than 200.
-                </p>
+                <ErrorMessage message="Is empty or lenght is greater than 200." messageStatus={cityClientError}/>
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -189,12 +163,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
               </Form.Group>
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Postal code:</Form.Label>
-                <p
-                  className="text-start mb-1 red-sec-text small-text"
-                  style={clientPostalError ? unhidden : hidden}
-                >
-                  Is empty or lenght is greater than 25.
-                </p>
+                <ErrorMessage message="Is empty or lenght is greater than 25." messageStatus={clientPostalError}/>
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -211,12 +180,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                 <Form.Label className="blue-main-text">
                   Credit Limit:
                 </Form.Label>
-                <p
-                  className="text-start mb-1 red-sec-text small-text"
-                  style={creditError ? unhidden : hidden}
-                >
-                  Must be a number or lenght is greater than 25.
-                </p>
+                <ErrorMessage message="Must be a number or lenght is greater than 25." messageStatus={creditError}/>
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"

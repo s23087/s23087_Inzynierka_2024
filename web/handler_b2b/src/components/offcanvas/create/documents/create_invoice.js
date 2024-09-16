@@ -18,6 +18,7 @@ import CreatePurchaseInvoice from "@/utils/documents/create_purchase_invoice";
 import getCurrencyValuesList from "@/utils/flexible/get_currency_values_list";
 import AddSaleProductWindow from "@/components/windows/add_Sales_product";
 import CreateSalesInvoice from "@/utils/documents/create_sales_invoice";
+import ErrorMessage from "@/components/smaller_components/error_message";
 
 function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
   const router = useRouter();
@@ -210,12 +211,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                 <Form.Label className="blue-main-text">
                   Invoice Number:
                 </Form.Label>
-                <p
-                  className="text-start mb-1 red-sec-text small-text"
-                  style={invoiceError ? unhidden : hidden}
-                >
-                  Is empty, not a number or lenght is greater than 40.
-                </p>
+                <ErrorMessage message="Is empty, not a number or lenght is greater than 40." messageStatus={invoiceError} />
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -269,12 +265,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                           setInvoiceDate(e.target.value);
                         }}
                       />
-                      <p
-                        className="text-start mb-1 red-sec-text small-text"
-                        style={dateError ? unhidden : hidden}
-                      >
-                        Date excceed today's date.
-                      </p>
+                      <ErrorMessage message="Date excceed today's date." messageStatus={dateError} />
                     </Form.Group>
                   </Col>
                   <Col xs="6" sm="4">
@@ -373,12 +364,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                   <Form.Label className="blue-main-text">
                     Currency Exchange
                   </Form.Label>
-                  <p
-                    className="text-start mb-1 red-sec-text small-text"
-                    style={currencyList.error ? unhidden : hidden}
-                  >
-                    {currencyList.message}
-                  </p>
+                  <ErrorMessage message={currencyList.message} messageStatus={currencyList.error} />
                   <Form.Select
                     className="input-style shadow-sm maxInputWidth"
                     type="text"
@@ -401,12 +387,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                 <Form.Label className="blue-main-text">
                   Transport cost:
                 </Form.Label>
-                <p
-                  className="text-start mb-1 red-sec-text small-text"
-                  style={transportError ? unhidden : hidden}
-                >
-                  Is empty or is not a number.
-                </p>
+                <ErrorMessage message="Is empty or is not a number." messageStatus={transportError} />
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -531,12 +512,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
               </Form.Group>
               <Form.Group className="mb-4 maxInputWidth">
                 <Form.Label className="blue-main-text">Document:</Form.Label>
-                <p
-                  className="text-start mb-1 red-sec-text small-text"
-                  style={documentError ? unhidden : hidden}
-                >
-                  Must be a pdf file or not empty.
-                </p>
+                <ErrorMessage message="Must be a pdf file or not empty." messageStatus={documentError} />
                 <Form.Control
                   type="file"
                   accept=".pdf"
@@ -631,20 +607,14 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
           showToast={state.completed && state.error}
           message={state.message}
           onHideFun={() => {
-            state.error = false;
-            state.completed = false;
-            state.message = "";
-            setIsLoading(false);
+            resetState();
           }}
         />
         <Toastes.SuccessToast
           showToast={state.completed && !state.error}
           message={state.message}
           onHideFun={() => {
-            state.error = false;
-            state.completed = false;
-            state.message = "";
-            setIsLoading(false);
+            resetState();
             document.getElementById("invoiceForm").reset();
             setProducts([]);
             hideFunction();
@@ -654,6 +624,13 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
       </Container>
     </Offcanvas>
   );
+
+  function resetState() {
+    state.error = false;
+    state.completed = false;
+    state.message = "";
+    setIsLoading(false);
+  }
 }
 
 AddInvoiceOffcanvas.PropTypes = {
