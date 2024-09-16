@@ -8,6 +8,7 @@ import validators from "@/utils/validators/validator";
 import { useState } from "react";
 import changeUserInfo from "@/utils/settings/change_user_info";
 import Toastes from "@/components/smaller_components/toast";
+import StringValidtor from "@/utils/validators/form_validator/stringValidator";
 
 function ModifyUserForm({ email, name, surname }) {
   const router = useRouter();
@@ -66,15 +67,7 @@ function ModifyUserForm({ email, name, surname }) {
             defaultValue={email}
             isInvalid={emailError}
             onInput={(e) => {
-              if (
-                validators.lengthSmallerThen(e.target.value, 350) &&
-                validators.isEmail(e.target.value) &&
-                validators.stringIsNotEmpty(e.target.value)
-              ) {
-                setEmailError(false);
-              } else {
-                setEmailError(true);
-              }
+              StringValidtor.emailValidator(e.target.value, setEmailError, 350)
             }}
             maxLength={350}
           />
@@ -94,14 +87,7 @@ function ModifyUserForm({ email, name, surname }) {
             defaultValue={name}
             isInvalid={nameError}
             onInput={(e) => {
-              if (
-                validators.lengthSmallerThen(e.target.value, 250) &&
-                validators.stringIsNotEmpty(e.target.value)
-              ) {
-                setNameError(false);
-              } else {
-                setNameError(true);
-              }
+              StringValidtor.normalStringValidtor(e.target.value, setNameError, 250)
             }}
             maxLength={250}
           />
@@ -121,14 +107,7 @@ function ModifyUserForm({ email, name, surname }) {
             defaultValue={surname}
             isInvalid={surnameError}
             onInput={(e) => {
-              if (
-                validators.lengthSmallerThen(e.target.value, 200) &&
-                validators.stringIsNotEmpty(e.target.value)
-              ) {
-                setSurnameError(false);
-              } else {
-                setSurnameError(true);
-              }
+              StringValidtor.normalStringValidtor(e.target.value, setSurnameError, 200)
             }}
             maxLength={200}
           />
@@ -155,7 +134,7 @@ function ModifyUserForm({ email, name, surname }) {
           </Button>
         </Stack>
       </Form>
-      <Stack>
+      <Stack className="px-1 px-xl-4">
         <Button
           className="mt-3 mx-auto ms-sm-0"
           variant="secBlue"
@@ -169,8 +148,8 @@ function ModifyUserForm({ email, name, surname }) {
           Go back
         </Button>
       </Stack>
-      <Toastes.ErrorToast
-        showToast={state.completed && state.error}
+      <Toastes.SuccessToast
+        showToast={state.completed && !state.error}
         message={state.message}
         onHideFun={() => {
           state.error = false;
@@ -180,8 +159,8 @@ function ModifyUserForm({ email, name, surname }) {
           router.refresh();
         }}
       />
-      <Toastes.SuccessToast
-        showToast={state.completed && !state.error}
+      <Toastes.ErrorToast
+        showToast={state.completed && state.error}
         message={state.message}
         onHideFun={() => {
           state.error = false;

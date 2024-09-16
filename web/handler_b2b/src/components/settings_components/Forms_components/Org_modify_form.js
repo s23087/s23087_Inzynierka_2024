@@ -8,16 +8,17 @@ import validators from "@/utils/validators/validator";
 import { useState } from "react";
 import modifyClient from "@/utils/flexible/modify_client";
 import Toastes from "@/components/smaller_components/toast";
+import StringValidtor from "@/utils/validators/form_validator/stringValidator";
 
 function ModifyUserOrgForm({ orgInfo, countries }) {
   const router = useRouter();
-  const [nameError, setNameError] = useState(false);
-  const [nipError, setNipError] = useState(false);
+  const [orgNameError, setOrgNameError] = useState(false);
+  const [nipMyError, setMyNipError] = useState(false);
   const [streetError, setStreetError] = useState(false);
   const [cityError, setCityError] = useState(false);
   const [postalError, setPostalError] = useState(false);
   const anyErrorActive =
-    nameError || nipError || streetError || cityError || postalError;
+    orgNameError || nipMyError || streetError || cityError || postalError;
   const [prevState] = useState({
     orgName: orgInfo.orgName,
     street: orgInfo.street,
@@ -53,7 +54,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
           <Form.Label className="blue-main-text">Name:</Form.Label>
           <p
             className="text-start mb-1 red-sec-text small-text"
-            style={nameError ? unhidden : hidden}
+            style={orgNameError ? unhidden : hidden}
           >
             Is empty or lenght is greater than 50.
           </p>
@@ -62,16 +63,9 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             type="text"
             name="name"
             defaultValue={orgInfo.orgName}
-            isInvalid={nameError}
+            isInvalid={orgNameError}
             onInput={(e) => {
-              if (
-                validators.lengthSmallerThen(e.target.value, 50) &&
-                validators.stringIsNotEmpty(e.target.value)
-              ) {
-                setNameError(false);
-              } else {
-                setNameError(true);
-              }
+              StringValidtor.normalStringValidtor(e.target.value, setOrgNameError, 50)
             }}
             maxLength={50}
           />
@@ -80,7 +74,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
           <Form.Label className="blue-main-text">Nip:</Form.Label>
           <p
             className="text-start mb-1 red-sec-text small-text"
-            style={nipError ? unhidden : hidden}
+            style={nipMyError ? unhidden : hidden}
           >
             Is empty, not a number or lenght is greater than 15.
           </p>
@@ -89,17 +83,9 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             type="text"
             name="nip"
             defaultValue={orgInfo.nip}
-            isInvalid={nipError}
+            isInvalid={nipMyError}
             onInput={(e) => {
-              if (
-                validators.lengthSmallerThen(e.target.value, 12) &&
-                validators.stringIsNotEmpty(e.target.value) &&
-                validators.haveOnlyNumbers(e.target.value)
-              ) {
-                setNipError(false);
-              } else {
-                setNipError(true);
-              }
+              StringValidtor.emptyNumberStringValidtor(e.target.value, setMyNipError, 15)
             }}
             maxLength={15}
           />
@@ -119,14 +105,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             defaultValue={orgInfo.street}
             isInvalid={streetError}
             onInput={(e) => {
-              if (
-                validators.lengthSmallerThen(e.target.value, 200) &&
-                validators.stringIsNotEmpty(e.target.value)
-              ) {
-                setStreetError(false);
-              } else {
-                setStreetError(true);
-              }
+              StringValidtor.normalStringValidtor(e.target.value, setStreetError, 200)
             }}
             maxLength={200}
           />
@@ -146,14 +125,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             defaultValue={orgInfo.city}
             isInvalid={cityError}
             onInput={(e) => {
-              if (
-                validators.lengthSmallerThen(e.target.value, 200) &&
-                validators.stringIsNotEmpty(e.target.value)
-              ) {
-                setCityError(false);
-              } else {
-                setCityError(true);
-              }
+              StringValidtor.normalStringValidtor(e.target.value, setCityError, 200)
             }}
             maxLength={200}
           />
@@ -173,14 +145,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             defaultValue={orgInfo.postalCode}
             isInvalid={postalError}
             onInput={(e) => {
-              if (
-                validators.lengthSmallerThen(e.target.value, 25) &&
-                validators.stringIsNotEmpty(e.target.value)
-              ) {
-                setPostalError(false);
-              } else {
-                setPostalError(true);
-              }
+              StringValidtor.normalStringValidtor(e.target.value, setPostalError, 25)
             }}
             maxLength={25}
           />
@@ -247,10 +212,10 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
         showToast={state.completed && state.error}
         message={state.message}
         onHideFun={() => {
-          state.error = false;
-          state.completed = false;
-          state.message = "";
           setIsLoading(false);
+          state.error = false;
+          state.message = "";
+          state.completed = false;
           router.refresh();
         }}
       />

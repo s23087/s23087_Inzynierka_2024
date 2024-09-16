@@ -25,6 +25,7 @@ import switch_binding_view from "../../../../public/icons/switch_binding_view.pn
 import getUserClientBindings from "@/utils/clients/get_client_bindings";
 import getUsers from "@/utils/flexible/get_users";
 import setUserClientBindings from "@/utils/clients/set_user_clients_bindings";
+import StringValidtor from "@/utils/validators/form_validator/stringValidator";
 
 function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
   const router = useRouter();
@@ -72,8 +73,19 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
   const [streetError, setStreetError] = useState(false);
   const [cityError, setCityError] = useState(false);
   const [postalError, setPostalError] = useState(false);
-  const anyErrorActive =
-    nameError || nipError || streetError || cityError || postalError;
+  const [creditError, setCreditError] = useState(false);
+  const resetErrors = () => {
+    setNameError(false)
+    setNipError(false)
+    setStreetError(false)
+    setCityError(false)
+    setPostalError(false)
+    setCreditError(false)
+  }
+  const getIsErrorActive = () => {
+    return nameError || nipError || streetError || cityError || postalError || creditError;
+  }
+  const anyErrorActive = getIsErrorActive();
   // Loading
   const [isLoading, setIsLoading] = useState(false);
   const [isBindingLoading, setIsBindingLoading] = useState(false);
@@ -160,6 +172,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                     setBindingMessage("");
                     setBindingFailure(false);
                     setBindingSuccess(false);
+                    resetErrors();
                   }}
                   className="pe-0"
                 >
@@ -195,14 +208,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   defaultValue={client.clientName}
                   isInvalid={nameError}
                   onInput={(e) => {
-                    if (
-                      validators.lengthSmallerThen(e.target.value, 50) &&
-                      validators.stringIsNotEmpty(e.target.value)
-                    ) {
-                      setNameError(false);
-                    } else {
-                      setNameError(true);
-                    }
+                    StringValidtor.normalStringValidtor(e.target.value, setNameError, 50)
                   }}
                   maxLength={50}
                 />
@@ -222,15 +228,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   defaultValue={client.nip}
                   isInvalid={nipError}
                   onInput={(e) => {
-                    if (
-                      (validators.lengthSmallerThen(e.target.value, 12) &&
-                        validators.haveOnlyNumbers(e.target.value)) ||
-                      !validators.stringIsNotEmpty(e.target.value)
-                    ) {
-                      setNipError(false);
-                    } else {
-                      setNipError(true);
-                    }
+                    StringValidtor.emptyNumberStringValidtor(e.target.value, setNipError, 15)
                   }}
                   maxLength={15}
                 />
@@ -250,14 +248,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   defaultValue={client.street}
                   isInvalid={streetError}
                   onInput={(e) => {
-                    if (
-                      validators.lengthSmallerThen(e.target.value, 200) &&
-                      validators.stringIsNotEmpty(e.target.value)
-                    ) {
-                      setStreetError(false);
-                    } else {
-                      setStreetError(true);
-                    }
+                    StringValidtor.normalStringValidtor(e.target.value, setStreetError, 200)
                   }}
                   maxLength={200}
                 />
@@ -277,14 +268,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   defaultValue={client.city}
                   isInvalid={cityError}
                   onInput={(e) => {
-                    if (
-                      validators.lengthSmallerThen(e.target.value, 200) &&
-                      validators.stringIsNotEmpty(e.target.value)
-                    ) {
-                      setCityError(false);
-                    } else {
-                      setCityError(true);
-                    }
+                    StringValidtor.normalStringValidtor(e.target.value, setCityError, 200)
                   }}
                   maxLength={200}
                 />
@@ -304,14 +288,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   defaultValue={client.postal}
                   isInvalid={postalError}
                   onInput={(e) => {
-                    if (
-                      validators.lengthSmallerThen(e.target.value, 25) &&
-                      validators.stringIsNotEmpty(e.target.value)
-                    ) {
-                      setPostalError(false);
-                    } else {
-                      setPostalError(true);
-                    }
+                    StringValidtor.onlyNumberStringValidtor(e.target.value, setPostalError, 25)
                   }}
                   maxLength={25}
                 />
@@ -322,7 +299,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                 </Form.Label>
                 <p
                   className="text-start mb-1 red-sec-text small-text"
-                  style={postalError ? unhidden : hidden}
+                  style={creditError ? unhidden : hidden}
                 >
                   Is empty or lenght is greater than 25.
                 </p>
@@ -331,18 +308,14 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   type="text"
                   name="credit"
                   defaultValue={restInfo.creditLimit}
-                  isInvalid={postalError}
+                  isInvalid={creditError}
                   onInput={(e) => {
-                    if (validators.haveOnlyNumbers(e.target.value)) {
-                      setPostalError(false);
-                    } else {
-                      setPostalError(true);
-                    }
+                    StringValidtor.emptyNumberStringValidtor(e.target.value, setCreditError, 25)
                   }}
                   maxLength={25}
                 />
               </Form.Group>
-              <Form.Group className="mb-4">
+              <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Country:</Form.Label>
                 <Form.Select
                   id="countrySelect"
@@ -443,6 +416,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                           router.refresh();
                         }
                         setIsBindingView(false);
+                        resetErrors();
                       }}
                     >
                       Cancel
