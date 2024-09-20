@@ -27,6 +27,7 @@ namespace database_comunicator.Services
         public Task<IEnumerable<GetItemList>> GetItemList();
         public Task<IEnumerable<GetSalesItemList>> GetSalesItemList(int userId, string currency);
         public Task<IEnumerable<GetUsers>> GetItemOwners(int itemId);
+        public Task<bool> ChangeBindings(IEnumerable<ModifyBinding> data);
     }
     public class ItemServices : IItemServices
     {
@@ -811,7 +812,6 @@ namespace database_comunicator.Services
         public async Task<IEnumerable<GetBinding>> GetModifyRestOfItem(int id, string currency)
         {
             List<GetBinding> binding;
-            List<GetBinding> noUserItem;
             if (currency == "PLN")
             {
                 binding = await _handlerContext.ItemOwners
@@ -828,32 +828,11 @@ namespace database_comunicator.Services
                     Qty = res.Qty,
                     Price = res.OwnedItem.PurchasePrices.Select(e => e.Price).Average(),
                     Currency = currency,
-                    InvoiceNumber = res.OwnedItem.Invoice.InvoiceNumber
+                    InvoiceNumber = res.OwnedItem.Invoice.InvoiceNumber,
+                    InvoiceId = res.OwnedItem.InvoiceId
 
                 }).ToListAsync();
 
-                noUserItem = await _handlerContext.OwnedItems
-                .Where(e => e.OwnedItemId == id)
-                .Include(e => e.Invoice)
-                .Include(e => e.PurchasePrices)
-                .Include(e => e.ItemOwners)
-                .Select(inst => new GetBinding
-                {
-                    UserId = null,
-                    Username = null,
-                    Qty = inst.PurchasePrices.Select(e => e.Qty).Sum() 
-                        - inst.PurchasePrices.SelectMany(e => e.SellingPrices).Select(e => e.Qty).Sum()
-                        + inst.PurchasePrices.SelectMany(e => e.CreditNoteItems).Where(e => e.Qty < 0).Select(e => e.Qty).Sum()
-                        + inst.PurchasePrices.SelectMany(e => e.CreditNoteItems)
-                            .Where(e => e.Qty > 0 && inst.PurchasePrices
-                                .SelectMany(f => f.SellingPrices).Select(f => f.SellInvoiceId).Contains(e.CreditNote.InvoiceId)).Select(e => e.Qty).Sum()
-                        - inst.ItemOwners.Select(e => e.Qty).Sum(),
-                    Price = inst.PurchasePrices.Select(e => e.Price).Average(),
-                    Currency = currency,
-                    InvoiceNumber = inst.Invoice.InvoiceNumber
-                })
-                .Where(e => e.Qty > 0)
-                .ToListAsync();
             } else
             {
                 binding = await _handlerContext.ItemOwners
@@ -870,35 +849,11 @@ namespace database_comunicator.Services
                         Qty = res.Qty,
                         Price = res.OwnedItem.PurchasePrices.SelectMany(e => e.CalculatedPrices).Where(e => e.CurrencyName == currency).Select(e => e.Price).Average(),
                         Currency = currency,
-                        InvoiceNumber = res.OwnedItem.Invoice.InvoiceNumber
-
+                        InvoiceNumber = res.OwnedItem.Invoice.InvoiceNumber,
+                        InvoiceId = res.OwnedItem.InvoiceId
                     }).ToListAsync();
 
-                noUserItem = await _handlerContext.OwnedItems
-                    .Where(e => e.OwnedItemId == id)
-                    .Include(e => e.Invoice)
-                    .Include(e => e.PurchasePrices)
-                    .Include(e => e.ItemOwners)
-                    .Select(inst => new GetBinding
-                    {
-                        UserId = null,
-                        Username = null,
-                        Qty = inst.PurchasePrices.Select(e => e.Qty).Sum()
-                        - inst.PurchasePrices.SelectMany(e => e.SellingPrices).Select(e => e.Qty).Sum()
-                        + inst.PurchasePrices.SelectMany(e => e.CreditNoteItems).Where(e => e.Qty < 0).Select(e => e.Qty).Sum()
-                        + inst.PurchasePrices.SelectMany(e => e.CreditNoteItems)
-                            .Where(e => e.Qty > 0 && inst.PurchasePrices
-                                .SelectMany(f => f.SellingPrices).Select(f => f.SellInvoiceId).Contains(e.CreditNote.InvoiceId)).Select(e => e.Qty).Sum()
-                        - inst.ItemOwners.Select(e => e.Qty).Sum(),
-                        Price = inst.PurchasePrices.SelectMany(e => e.CalculatedPrices).Where(e => e.CurrencyName == currency).Select(e => e.Price).Average(),
-                        Currency = currency,
-                        InvoiceNumber = inst.Invoice.InvoiceNumber
-                    })
-                    .Where(e => e.Qty > 0)
-                    .ToListAsync();
             }
-
-            binding.AddRange(noUserItem);
             return binding;
         }
         public async Task<string> GetDescription(int id)
@@ -984,6 +939,55 @@ namespace database_comunicator.Services
                     Username = e.Username
                 })
                 .ToListAsync();
+        }
+        public async Task<bool> ChangeBindings(IEnumerable<ModifyBinding> data)
+        {
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
+            {
+                var groupedData = data.GroupBy(e => new { e.InvoiceId, e.ItemId, e.UserId }).Select(e => new
+                {
+                    e.Key.ItemId,
+                    e.Key.InvoiceId,
+                    e.Key.UserId,
+                    toAdd = e.Sum(x => x.Qty)
+                }).ToList();
+
+                foreach (var group in groupedData)
+                {
+                    if (group.toAdd == 0)
+                    {
+                        continue;
+                    }
+                    var exist = await _handlerContext.ItemOwners.AnyAsync(x => x.InvoiceId == group.InvoiceId && x.OwnedItemId == group.ItemId && x.IdUser == group.UserId);
+                    if (exist)
+                    {
+                        await _handlerContext.ItemOwners
+                            .Where(x => x.InvoiceId == group.InvoiceId && x.OwnedItemId == group.ItemId && x.IdUser == group.UserId)
+                            .ExecuteUpdateAsync(setters => 
+                                setters.SetProperty(s => s.Qty, s => s.Qty + group.toAdd)
+                            );
+                    } else
+                    {
+                        await _handlerContext.AddAsync<ItemOwner>(new ItemOwner
+                        {
+                            IdUser = group.UserId,
+                            InvoiceId = group.InvoiceId,
+                            OwnedItemId = group.ItemId,
+                            Qty = group.toAdd
+                        });
+                    }
+                }
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+                return true;
+            } catch (Exception ex)
+            {
+                Console.Write(ex.ToString());
+                await trans.RollbackAsync();
+                return false;
+            }
+
         }
     }
 }

@@ -338,8 +338,8 @@ public partial class HandlerContext : DbContext
             entity.Property(e => e.PurchasePriceId).HasColumnName("purchase_price_id");
             entity.Property(e => e.Qty).HasColumnName("qty");
 
-            entity.HasOne(d => d.CreditNote).WithOne(p => p.CreditNoteItem)
-                .HasForeignKey<CreditNoteItem>(d => d.CreditNoteId)
+            entity.HasOne(d => d.CreditNote).WithMany(p => p.CreditNoteItems)
+                .HasForeignKey(d => d.CreditNoteId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Credit_note_Items_Credit_note_relation");
 

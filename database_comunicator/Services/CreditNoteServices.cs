@@ -8,6 +8,10 @@ namespace database_comunicator.Services
     public interface ICreditNoteServices
     {
         public Task AddYoursCreditNote(AddCreditNote data);
+        public Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes);
+        public Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string search);
+        public Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, int userId);
+        public Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string search, int userId);
     }
     public class CreditNoteServices : ICreditNoteServices
     {
@@ -110,6 +114,93 @@ namespace database_comunicator.Services
                 Console.WriteLine(ex.ToString());
                 await trans.RollbackAsync();
             }
+        }
+        public async Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes)
+        {
+            return await _handlerContext.CreditNotes
+                .Where(e => yourCreditNotes ? e.Invoice.OwnedItems.Any() : e.Invoice.SellingPrices.Any())
+                .Select(e => new GetCreditNote
+                {
+                    CreditNoteId = e.IdCreditNote,
+                    InvoiceNumber = e.Invoice.InvoiceNumber,
+                    Date = e.CreditNoteDate,
+                    Qty = e.CreditNoteItems.Sum(d => d.Qty),
+                    Total = e.CreditNoteItems.Sum(d => d.NewPrice),
+                    ClientName = yourCreditNotes ? e.Invoice.SellerNavigation.OrgName : e.Invoice.BuyerNavigation.OrgName,
+                    InSystem = e.InSystem
+                }).ToListAsync();
+        }
+        public async Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string search)
+        {
+            return await _handlerContext.CreditNotes
+                .Where(e => yourCreditNotes ? e.Invoice.OwnedItems.Any() : e.Invoice.SellingPrices.Any())
+                .Where(e => e.Invoice.InvoiceNumber.ToLower().Contains(search.ToLower()) 
+                    || 
+                    (yourCreditNotes ? 
+                        e.Invoice.SellerNavigation.OrgName.ToLower().Contains(search.ToLower())
+                        :
+                        e.Invoice.BuyerNavigation.OrgName.ToLower().Contains(search.ToLower())
+                    )
+                )
+                .Select(obj => new GetCreditNote
+                {
+                    CreditNoteId = obj.IdCreditNote,
+                    InvoiceNumber = obj.Invoice.InvoiceNumber,
+                    Date = obj.CreditNoteDate,
+                    Qty = obj.CreditNoteItems.Sum(e => e.Qty),
+                    Total = obj.CreditNoteItems.Sum(e => e.NewPrice),
+                    ClientName = yourCreditNotes ? obj.Invoice.SellerNavigation.OrgName : obj.Invoice.BuyerNavigation.OrgName,
+                    InSystem = obj.InSystem
+                }).ToListAsync();
+        }
+        public async Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, int userId)
+        {
+            return await _handlerContext.CreditNotes
+                .Where(e => yourCreditNotes ? 
+                    e.Invoice.OwnedItems.SelectMany(e => e.ItemOwners).Any(x => x.IdUser == userId) 
+                    : 
+                    e.Invoice.SellingPrices.Any(x => x.IdUser == userId)
+                 )
+                .Where(e => yourCreditNotes ? e.Invoice.OwnedItems.Any() : e.Invoice.SellingPrices.Any())
+                .Select(inst => new GetCreditNote
+                {
+                    CreditNoteId = inst.IdCreditNote,
+                    InvoiceNumber = inst.Invoice.InvoiceNumber,
+                    Date = inst.CreditNoteDate,
+                    Qty = inst.CreditNoteItems.Sum(e => e.Qty),
+                    Total = inst.CreditNoteItems.Sum(e => e.NewPrice),
+                    ClientName = yourCreditNotes ? inst.Invoice.SellerNavigation.OrgName : inst.Invoice.BuyerNavigation.OrgName,
+                    InSystem = inst.InSystem
+                }).ToListAsync();
+        }
+        public async Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string search, int userId)
+        {
+            return await _handlerContext.CreditNotes
+                .Where(e => yourCreditNotes ?
+                    e.Invoice.OwnedItems.SelectMany(e => e.ItemOwners).Any(x => x.IdUser == userId)
+                    :
+                    e.Invoice.SellingPrices.Any(x => x.IdUser == userId)
+                 )
+                .Where(e => yourCreditNotes ? e.Invoice.OwnedItems.Any() : e.Invoice.SellingPrices.Any())
+                .Where(e => e.Invoice.InvoiceNumber.ToLower().Contains(search.ToLower())
+                    ||
+                    (yourCreditNotes ?
+                        e.Invoice.SellerNavigation.OrgName.ToLower().Contains(search.ToLower())
+                        :
+                        e.Invoice.BuyerNavigation.OrgName.ToLower().Contains(search.ToLower())
+                    )
+                )
+                .Select(ent => new GetCreditNote
+                {
+                    CreditNoteId = ent.IdCreditNote,
+                    InvoiceNumber = ent.Invoice.InvoiceNumber,
+                    Date = ent.CreditNoteDate,
+                    Qty = ent.CreditNoteItems.Sum(e => e.Qty),
+                    Total = ent.CreditNoteItems.Sum(e => e.NewPrice),
+                    ClientName = yourCreditNotes ? ent.Invoice.SellerNavigation.OrgName : ent.Invoice.BuyerNavigation.OrgName,
+                    InSystem = ent.InSystem
+                }).ToListAsync();
+
         }
     }
 }

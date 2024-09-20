@@ -17,7 +17,7 @@ public partial class CreditNote
 
     public int InvoiceId { get; set; }
 
-    public virtual CreditNoteItem? CreditNoteItem { get; set; }
+    public virtual IEnumerable<CreditNoteItem> CreditNoteItems { get; set; } = new List<CreditNoteItem>();
 
     public virtual Invoice Invoice { get; set; } = null!;
 

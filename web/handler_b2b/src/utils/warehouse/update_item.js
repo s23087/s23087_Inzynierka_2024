@@ -81,6 +81,7 @@ export default async function updateItem(eans, prevState, state, formData) {
     return {
       error: false,
       completed: true,
+      message: "Success! Item has been modified."
     };
   } else {
     return {

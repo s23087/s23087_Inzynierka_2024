@@ -4,15 +4,10 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import { Modal, Container, Row, Col, Form, Button } from "react-bootstrap";
 import validators from "@/utils/validators/validator";
+import ErrorMessage from "../smaller_components/error_message";
 
 function AddEanWindow({ modalShow, onHideFunction, addAction, eanExistFun }) {
   const [isInvalid, setIsInvalid] = useState(false);
-  const hidden = {
-    display: "none",
-  };
-  const unhidden = {
-    display: "block",
-  };
   const [newEan, setNewEan] = useState("");
   return (
     <Modal size="sm" show={modalShow} centered className="px-4">
@@ -26,12 +21,7 @@ function AddEanWindow({ modalShow, onHideFunction, addAction, eanExistFun }) {
         </Container>
         <Container className="mt-4 mb-2">
           <Row>
-            <p
-              className="text-start mb-0 px-3 red-sec-text small-text"
-              style={isInvalid ? unhidden : hidden}
-            >
-              Ean already exist or have letters or empty
-            </p>
+            <ErrorMessage message="Ean already exist or have letters or empty" messageStatus={isInvalid} />
           </Row>
           <Form.Group className="mb-4">
             <Form.Control

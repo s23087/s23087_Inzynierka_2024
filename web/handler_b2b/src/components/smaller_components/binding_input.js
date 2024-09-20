@@ -2,9 +2,8 @@ import PropTypes from "prop-types";
 import { Button, InputGroup, Form } from "react-bootstrap";
 import Image from "next/image";
 import pen_icon from "../../../public/icons/pen_icon.png";
-import close_white from "../../../public/icons/close_white.png";
 
-function BindingInput({ value, deleteValue, modifyValue }) {
+function BindingInput({ value, modifyAction }) {
   let bindingValue =
     value.username +
     "\nQty: " +
@@ -30,10 +29,7 @@ function BindingInput({ value, deleteValue, modifyValue }) {
         disabled
         style={inputStyle}
       />
-      <Button variant="red" className="p-0" onClick={deleteValue}>
-        <Image src={close_white} alt="close" />
-      </Button>
-      <Button className="p-0" onClick={modifyValue}>
+      <Button className="p-0" onClick={modifyAction}>
         <Image src={pen_icon} alt="modify" />
       </Button>
     </InputGroup>
@@ -43,7 +39,7 @@ function BindingInput({ value, deleteValue, modifyValue }) {
 BindingInput.PropTypes = {
   value: PropTypes.string.isRequired,
   deleteValue: PropTypes.func.isRequired,
-  modifyValue: PropTypes.func.isRequired,
+  modifyAction: PropTypes.func.isRequired,
 };
 
 export default BindingInput;

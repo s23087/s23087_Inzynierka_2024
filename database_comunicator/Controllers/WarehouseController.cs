@@ -14,11 +14,13 @@ namespace database_comunicator.Controllers
         private readonly IUserServices _userServices;
         private readonly IItemServices _itemServices;
         private readonly ILogServices _logServices;
-        public WarehouseController(IUserServices userServices, IItemServices itemServices, ILogServices logServices)
+        private readonly INotificationServices _notificationServices;
+        public WarehouseController(IUserServices userServices, IItemServices itemServices, ILogServices logServices, INotificationServices notificationServices)
         {
             _itemServices = itemServices;
             _userServices = userServices;
             _logServices = logServices;
+            _notificationServices = notificationServices;
         }
 
         [HttpPost]
@@ -155,6 +157,33 @@ namespace database_comunicator.Controllers
             if (!exist) return NotFound(itemId);
             var result = await _itemServices.GetItemOwners(itemId);
             return Ok(result);
+        }
+        [HttpPost]
+        [Route("changeBindings")]
+        public async Task<IActionResult> ChangeBindings(ChangeBindings data)
+        {
+            var userExist = await _userServices.UserExist(data.UserId);
+            if (!userExist) return NotFound();
+            var result = await _itemServices.ChangeBindings(data.Bindings);
+            if (!result) return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            var logId = await _logServices.getLogTypeId("Modify");
+            var desc = $"The bindings for item with id {data.Bindings.Select(e => e.ItemId).First()} has been modified, by user with id {data.UserId}.";
+            await _logServices.CreateActionLog(desc, data.UserId, logId);
+            foreach (var user in data.Bindings.GroupBy(e => e.UserId).Select(e => e.Key))
+            {
+                if (user == data.UserId)
+                {
+                    continue;
+                }
+                await _notificationServices.CreateNotification(new CreateNotification
+                {
+                    UserId = user,
+                    Info = $"The item with id {data.Bindings.Select(e => e.ItemId).First()} has been binded to you.",
+                    ObjectType = "Item",
+                    Referance = $"{data.Bindings.Select(e => e.ItemId).First()}"
+                });
+            }
+            return Ok();
         }
     }
 }

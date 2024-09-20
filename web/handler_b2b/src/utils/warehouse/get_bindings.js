@@ -13,5 +13,5 @@ export default async function getBindings(itemId, currency) {
     return await desc.json();
   }
 
-  return {};
+  return [];
 }

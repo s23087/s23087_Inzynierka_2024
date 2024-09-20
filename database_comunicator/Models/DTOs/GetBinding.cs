@@ -8,5 +8,6 @@
         public decimal Price { get; set; }
         public string Currency { get; set; } = null!;
         public string InvoiceNumber { get; set; } = null!;
+        public int InvoiceId { get; set; }
     }
 }
