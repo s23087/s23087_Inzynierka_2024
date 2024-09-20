@@ -32,6 +32,10 @@ namespace database_comunicator.Services
         public Task<IEnumerable<int>> GetInvoiceUser(int invoiceId);
         public Task<string> GetInvoiceNumber(int invoiceId);
         public Task<string?> GetInvoicePath(int invoiceId);
+        public Task<GetRestInvoice> GetRestPurchaseInvoice(int invoiceId);
+        public Task<GetRestInvoice> GetRestSalesInvoice(int invoiceId);
+        public Task<GetRestModifyInvoice> GetRestModifyInvoice(int invoiceId);
+        public Task<bool> ModifyInvoice(ModifyInvoice data);
     }
     public class InvoiceServices : IInvoiceServices
     {
@@ -268,13 +272,6 @@ namespace database_comunicator.Services
         public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices()
         {
             return await _handlerContext.Invoices
-                .Include(e => e.SellerNavigation)
-                .Include(e => e.PaymentsStatus)
-                .Include(e => e.OwnedItems)
-                    .ThenInclude(e => e.PurchasePrices)
-                .Include(e => e.OwnedItems)
-                    .ThenInclude(e => e.ItemOwners)
-                        .ThenInclude(e => e.IdUserNavigation)
                 .Where(e => !e.SellingPrices.Any())
                 .Select(inv => new GetInvoices
                 {
@@ -290,17 +287,17 @@ namespace database_comunicator.Services
                     PaymentStatus = inv.PaymentsStatus.StatusName,
                     InSystem = inv.InSystem,
                     Qty = inv.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum(),
-                    Price = inv.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price * d.Qty).Sum(),
+                    Price = inv.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price * d.Qty).Sum()
+                    + (inv.CurrencyName == "PLN" ? inv.TransportCost : inv.TransportCost * inv.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoices>> GetSalesInvocies()
         {
             var result = await _handlerContext.Invoices
-                .Include(e => e.BuyerNavigation)
-                .Include(e => e.PaymentsStatus)
                 .Where(e => e.SellingPrices.Any())
                 .Select(obj => new GetInvoices
                 {
+                    Users = obj.SellingPrices.Select(e => e.User).GroupBy(e => new {e.IdUser, e.Username, e.Surname}).Select(e => e.Key.Username + " " + e.Key.Surname).ToList(),
                     InvoiceId = obj.InvoiceId,
                     InvoiceNumber = obj.InvoiceNumber,
                     ClientName = obj.BuyerNavigation.OrgName,
@@ -309,7 +306,7 @@ namespace database_comunicator.Services
                     PaymentStatus = obj.PaymentsStatus.StatusName,
                     InSystem = obj.InSystem,
                     Qty = obj.SellingPrices.Select(d => d.Qty).Sum(),
-                    Price = obj.SellingPrices.Select(d => d.Price * d.Qty).Sum(),
+                    Price = obj.SellingPrices.Select(d => d.Price * d.Qty).Sum() + obj.TransportCost,
                 }).ToListAsync();
             return result;
         }
@@ -339,7 +336,8 @@ namespace database_comunicator.Services
                     PaymentStatus = ent.PaymentsStatus.StatusName,
                     InSystem = ent.InSystem,
                     Qty = ent.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum(),
-                    Price = ent.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price * d.Qty).Sum(),
+                    Price = ent.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price * d.Qty).Sum()
+                    + (ent.CurrencyName == "PLN" ? ent.TransportCost : ent.TransportCost * ent.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoices>> GetSalesInvocies(string search)
@@ -351,6 +349,7 @@ namespace database_comunicator.Services
                 .Where(e => e.SellingPrices.Any())
                 .Select(inst => new GetInvoices
                 {
+                    Users = inst.SellingPrices.Select(e => e.User).GroupBy(e => new { e.IdUser, e.Username, e.Surname }).Select(e => e.Key.Username + " " + e.Key.Surname).ToList(),
                     InvoiceId = inst.InvoiceId,
                     InvoiceNumber = inst.InvoiceNumber,
                     ClientName = inst.BuyerNavigation.OrgName,
@@ -359,7 +358,7 @@ namespace database_comunicator.Services
                     PaymentStatus = inst.PaymentsStatus.StatusName,
                     InSystem = inst.InSystem,
                     Qty = inst.SellingPrices.Select(d => d.Qty).Sum(),
-                    Price = inst.SellingPrices.Select(d => d.Price * d.Qty).Sum(),
+                    Price = inst.SellingPrices.Select(d => d.Price * d.Qty).Sum() + inst.TransportCost,
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId)
@@ -382,7 +381,8 @@ namespace database_comunicator.Services
                     PaymentStatus = instc.PaymentsStatus.StatusName,
                     InSystem = instc.InSystem,
                     Qty = instc.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum(),
-                    Price = instc.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price * d.Qty).Sum(),
+                    Price = instc.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price * d.Qty).Sum()
+                    + (instc.CurrencyName == "PLN" ? instc.TransportCost : instc.TransportCost * instc.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId)
@@ -404,7 +404,7 @@ namespace database_comunicator.Services
                     PaymentStatus = entity.PaymentsStatus.StatusName,
                     InSystem = entity.InSystem,
                     Qty = entity.SellingPrices.Select(d => d.Qty).Sum(),
-                    Price = entity.SellingPrices.Select(d => d.Price * d.Qty).Sum(),
+                    Price = entity.SellingPrices.Select(d => d.Price * d.Qty).Sum() + entity.TransportCost,
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string search)
@@ -428,7 +428,8 @@ namespace database_comunicator.Services
                     PaymentStatus = objs.PaymentsStatus.StatusName,
                     InSystem = objs.InSystem,
                     Qty = objs.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum(),
-                    Price = objs.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price * d.Qty).Sum(),
+                    Price = objs.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Price * d.Qty).Sum()
+                    + (objs.CurrencyName == "PLN" ? objs.TransportCost : objs.TransportCost * objs.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId, string search)
@@ -451,7 +452,7 @@ namespace database_comunicator.Services
                     PaymentStatus = en.PaymentsStatus.StatusName,
                     InSystem = en.InSystem,
                     Qty = en.SellingPrices.Select(d => d.Qty).Sum(),
-                    Price = en.SellingPrices.Select(d => d.Price * d.Qty).Sum(),
+                    Price = en.SellingPrices.Select(d => d.Price * d.Qty).Sum() + en.TransportCost,
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoicesList>> GetPurchaseInvoicesList()
@@ -565,7 +566,15 @@ namespace database_comunicator.Services
         }
         public async Task<IEnumerable<int>> GetInvoiceUser(int invoiceId)
         {
-            return await _handlerContext.ItemOwners.Where(e => e.InvoiceId == invoiceId).GroupBy(e => e.IdUser).Select(e => e.Key).ToListAsync();
+            return await _handlerContext.ItemOwners.Where(e => e.InvoiceId == invoiceId)
+                .GroupBy(e => e.IdUser)
+                .Select(e => e.Key)
+                .Union(
+                    _handlerContext.SellingPrices
+                    .Where(d => d.PurchasePrice.InvoiceId == invoiceId)
+                    .GroupBy(d => d.IdUser)
+                    .Select(d => d.Key)
+                ).ToListAsync();
         }
         public async Task<string> GetInvoiceNumber(int invoiceId)
         {
@@ -574,6 +583,183 @@ namespace database_comunicator.Services
         public async Task<string?> GetInvoicePath(int invoiceId)
         {
             return await _handlerContext.Invoices.Where(e => e.InvoiceId == invoiceId).Select(e => e.InvoiceFilePath).FirstAsync();
+        }
+        public async Task<GetRestInvoice> GetRestPurchaseInvoice(int invoiceId)
+        {
+            var invoiceInfo = await _handlerContext.Invoices
+                .Where(e => e.InvoiceId == invoiceId)
+                .Select(e => new GetRestInvoice
+                {
+                    Tax = e.TaxesNavigation.TaxValue,
+                    CurrencyValue = e.Currency.CurrencyValue1,
+                    CurrencyName = e.CurrencyName,
+                    CurrencyDate = e.CurrencyValueDate,
+                    TransportCost = e.TransportCost,
+                    PaymentType = e.PaymentMethod.MethodName,
+                    Note = e.Note,
+                    Path = e.InvoiceFilePath
+                }
+                ).FirstAsync();
+            var itemsInfo = new List<GetInvoiceItemsForTable>();
+
+            if (invoiceInfo.CurrencyName == "PLN")
+            {
+                itemsInfo = await _handlerContext.PurchasePrices
+                .Where(e => e.InvoiceId == invoiceId)
+                .Join(
+                    _handlerContext.Items,
+                    price => price.OwnedItemId,
+                    item => item.ItemId,
+                    (price, item) => new GetInvoiceItemsForTable
+                    {
+                        Partnumber = item.PartNumber,
+                        ItemName = item.ItemName,
+                        Users = price.OwnedItem.ItemOwners.Select(d => d.IdUserNavigation.Username + " " + d.IdUserNavigation.Surname).ToList(),
+                        Qty = price.Qty,
+                        Price = price.Price
+                    }
+                ).ToListAsync();
+            } else
+            {
+                itemsInfo = await _handlerContext.PurchasePrices
+                .Where(e => e.InvoiceId == invoiceId)
+                .Join(
+                    _handlerContext.Items,
+                    price => price.OwnedItemId,
+                    item => item.ItemId,
+                    (price, item) => new GetInvoiceItemsForTable
+                    {
+                        Partnumber = item.PartNumber,
+                        ItemName = item.ItemName,
+                        Users = price.OwnedItem.ItemOwners.Select(d => d.IdUserNavigation.Username + " " + d.IdUserNavigation.Surname).ToList(),
+                        Qty = price.Qty,
+                        Price = price.CalculatedPrices.Where(d => d.CurrencyName == invoiceInfo.CurrencyName).Select(d => d.Price).First()
+                    }
+                ).ToListAsync();
+            }
+
+            invoiceInfo.Items = itemsInfo;
+
+            return invoiceInfo;
+        }
+        public async Task<GetRestInvoice> GetRestSalesInvoice(int invoiceId)
+        {
+            var invoiceInfo = await _handlerContext.Invoices
+                .Where(e => e.InvoiceId == invoiceId)
+                .Select(e => new GetRestInvoice
+                {
+                    Tax = e.TaxesNavigation.TaxValue,
+                    CurrencyValue = e.Currency.CurrencyValue1,
+                    CurrencyName = e.CurrencyName,
+                    CurrencyDate = e.CurrencyValueDate,
+                    TransportCost = e.TransportCost,
+                    PaymentType = e.PaymentMethod.MethodName,
+                    Note = e.Note,
+                    Path = e.InvoiceFilePath
+                }
+                ).FirstAsync();
+            var itemsInfo = await _handlerContext.SellingPrices
+                .Where(e => e.SellInvoiceId == invoiceId)
+                .Join(
+                    _handlerContext.Items,
+                    price => price.PurchasePrice.OwnedItemId,
+                    item => item.ItemId,
+                    (price, item) => new GetInvoiceItemsForTable
+                    {
+                        Partnumber = item.PartNumber,
+                        ItemName = item.ItemName,
+                        Users = price.PurchasePrice.OwnedItem.ItemOwners.Select(d => d.IdUserNavigation.Username + " " + d.IdUserNavigation.Surname).ToList(),
+                        Qty = price.Qty,
+                        Price = price.Price
+                    }
+                ).ToListAsync();
+
+            invoiceInfo.Items = itemsInfo;
+
+            return invoiceInfo;
+        }
+        public async Task<GetRestModifyInvoice> GetRestModifyInvoice(int invoiceId)
+        {
+            return await _handlerContext.Invoices
+                .Where(e => e.InvoiceId == invoiceId)
+                .Select(e => new GetRestModifyInvoice
+                {
+                    Transport = e.TransportCost,
+                    PaymentMethod = e.PaymentMethod.MethodName,
+                    Note = e.Note
+                }).FirstAsync();
+        }
+        public async Task<bool> ModifyInvoice(ModifyInvoice data)
+        {
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
+            {
+                if (data.PaymentMethod != null)
+                {
+                    await _handlerContext.Invoices.Where(e => e.InvoiceId == data.InvoiceId).ExecuteUpdateAsync(setter =>
+                        setter.SetProperty(s => s.PaymentMethodId, data.PaymentMethod)
+                    );
+                }
+                if (data.PaymentStatus != null)
+                {
+                    await _handlerContext.Invoices.Where(e => e.InvoiceId == data.InvoiceId).ExecuteUpdateAsync(setter =>
+                        setter.SetProperty(s => s.PaymentsStatusId, data.PaymentStatus)
+                    );
+                }
+                if (data.TransportCost != null)
+                {
+                    await _handlerContext.Invoices.Where(e => e.InvoiceId == data.InvoiceId).ExecuteUpdateAsync(setter =>
+                        setter.SetProperty(s => s.TransportCost, data.TransportCost)
+                    );
+                }
+                if (data.InSystem != null)
+                {
+                    await _handlerContext.Invoices.Where(e => e.InvoiceId == data.InvoiceId).ExecuteUpdateAsync(setter =>
+                        setter.SetProperty(s => s.InSystem, data.InSystem)
+                    );
+                }
+                if (data.Note != null)
+                {
+                    await _handlerContext.Invoices.Where(e => e.InvoiceId == data.InvoiceId).ExecuteUpdateAsync(setter =>
+                        setter.SetProperty(s => s.Note, data.Note)
+                    );
+                }
+                if (data.InvoiceNumber != null)
+                {
+                    await _handlerContext.Invoices.Where(e => e.InvoiceId == data.InvoiceId).ExecuteUpdateAsync(setter =>
+                        setter.SetProperty(s => s.InvoiceNumber, data.InvoiceNumber)
+                    );
+                }
+                if (data.Path != null)
+                {
+                    await _handlerContext.Invoices.Where(e => e.InvoiceId == data.InvoiceId).ExecuteUpdateAsync(setter =>
+                        setter.SetProperty(s => s.InvoiceFilePath, data.Path)
+                    );
+                }
+                if (data.ClientId != null)
+                {
+                    if (data.IsYourInvoice)
+                    {
+                        await _handlerContext.Invoices.Where(e => e.InvoiceId == data.InvoiceId).ExecuteUpdateAsync(setter =>
+                        setter.SetProperty(s => s.Seller, data.ClientId)
+                        );
+                    } else
+                    {
+                        await _handlerContext.Invoices.Where(e => e.InvoiceId == data.InvoiceId).ExecuteUpdateAsync(setter =>
+                        setter.SetProperty(s => s.Buyer, data.ClientId)
+                        );
+                    }
+                }
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+                return true;
+            } catch (Exception ex)
+            {
+                Console.Write(ex.ToString());
+                await trans.RollbackAsync();
+                return false;
+            }
+
         }
     }
 }

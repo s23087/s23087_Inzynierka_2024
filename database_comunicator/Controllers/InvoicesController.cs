@@ -272,5 +272,65 @@ namespace database_comunicator.Controllers
             var result = await _invoicesService.GetInvoicePath(invoiceId);
             return Ok(result);
         }
+        [HttpGet]
+        [Route("rest/purchase/{invoiceId}")]
+        public async Task<IActionResult> GetRestPurchaseInvoice(int invoiceId)
+        {
+            var invoiceExist = await _invoicesService.InvoiceExist(invoiceId);
+            if (!invoiceExist) return NotFound("Invoice not found.");
+            var result = await _invoicesService.GetRestPurchaseInvoice(invoiceId);
+            return Ok(result);
+        }
+        [HttpGet]
+        [Route("rest/sales/{invoiceId}")]
+        public async Task<IActionResult> GetRestSalesInvoice(int invoiceId)
+        {
+            var invoiceExist = await _invoicesService.InvoiceExist(invoiceId);
+            if (!invoiceExist) return NotFound("Invoice not found.");
+            var result = await _invoicesService.GetRestSalesInvoice(invoiceId);
+            return Ok(result);
+        }
+        [HttpGet]
+        [Route("rest/modify/{invoiceId}")]
+        public async Task<IActionResult> GetRestModifyInvoice(int invoiceId)
+        {
+            var invoiceExist = await _invoicesService.InvoiceExist(invoiceId);
+            if (!invoiceExist) return NotFound("Invoice not found.");
+            var result = await _invoicesService.GetRestModifyInvoice(invoiceId);
+            return Ok(result);
+        }
+        [HttpPost]
+        [Route("modify/{userId}")]
+        public async Task<IActionResult> GetRestModifyInvoice(ModifyInvoice data, int userId)
+        {
+            var exist = await _userServices.UserExist(userId);
+            if (!exist) return NotFound("User not found.");
+            var invoiceExist = await _invoicesService.InvoiceExist(data.InvoiceId);
+            if (!invoiceExist) return NotFound("Invoice not found.");
+            var result = await _invoicesService.ModifyInvoice(data);
+            if (result)
+            {
+                var invoiceUsers = await _invoicesService.GetInvoiceUser(data.InvoiceId);
+                var invoiceNumber = await _invoicesService.GetInvoiceNumber(data.InvoiceId);
+                var logId = await _logServices.getLogTypeId("Modify");
+                var desc = $"User with id {userId} has modify the invoice {invoiceNumber}.";
+                await _logServices.CreateActionLog(desc, userId, logId);
+                foreach (var user in invoiceUsers)
+                {
+                    if (user == userId)
+                    {
+                        continue;
+                    }
+                    await _notificationServices.CreateNotification(new CreateNotification
+                    {
+                        UserId = user,
+                        Info = $"The invoice with number {invoiceNumber} has been deleted.",
+                        ObjectType = "Invoice",
+                        Referance = $"{data.InvoiceId}"
+                    });
+                }
+            }
+            return result ? Ok() : new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
     }
 }

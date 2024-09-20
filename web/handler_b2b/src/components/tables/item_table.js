@@ -1,10 +1,10 @@
 import { Stack, Table } from "react-bootstrap";
 
 function ItemTable({ restInfo, isOurWarehouse }) {
-  if (restInfo.outsideItemInfos.length == 0 && !isOurWarehouse) {
+  if (restInfo.outsideItemInfos.length === 0 && !isOurWarehouse) {
     return <></>;
   }
-  if (restInfo.ownedItemInfos.length == 0 && isOurWarehouse) {
+  if (restInfo.ownedItemInfos.length === 0 && isOurWarehouse) {
     return <></>;
   }
   let qtySum = 0;

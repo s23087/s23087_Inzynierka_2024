@@ -15,5 +15,7 @@ export default async function getOrgsList() {
     return await info.json();
   }
 
-  return {};
+  return {
+    restOrgs: [],
+  };
 }

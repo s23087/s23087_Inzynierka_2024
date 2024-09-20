@@ -55,3 +55,7 @@ a {
 .no-wrap {
   white-space: nowrap;
 }
+
+.break-spaces {
+  white-space: break-spaces;
+}

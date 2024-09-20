@@ -46,11 +46,20 @@ function emailValidator(string, setter, maxLenght) {
   }
 }
 
+function decimalValidator(string, setter) {
+  if (validators.isPriceFormat(string) && validators.stringIsNotEmpty(string)) {
+    setter(false);
+  } else {
+    setter(true);
+  }
+}
+
 const StringValidtor = {
   normalStringValidtor,
   onlyNumberStringValidtor,
   emptyNumberStringValidtor,
   emailValidator,
+  decimalValidator,
 };
 
 export default StringValidtor;

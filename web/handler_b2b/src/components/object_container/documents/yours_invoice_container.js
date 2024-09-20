@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import Image from "next/image";
+import getInvoiceStatusColor from "@/utils/documents/get_invoice_status_color";
 import { Container, Row, Col } from "react-bootstrap";
 import ContainerButtons from "@/components/smaller_components/container_buttons";
 import user_small_icon from "../../../../public/icons/user_small_icon.png";
@@ -12,34 +13,27 @@ function InvoiceContainer({
   selectAction,
   unselectAction,
   deleteAction,
+  viewAction,
+  modifyAction,
 }) {
-  const statusColorMap = {
-    Paid: "var(--main-green)",
-    Unpaid: "var(--main-yellow)",
-    "Due to": "var(--sec-red)",
-  };
-  const systemColorMap = {
-    "In system": "var(--main-green)",
-    Requested: "var(--main-yellow)",
-    "Not in system": "var(--sec-red)",
-  };
   const containerBg = {
     backgroundColor: "var(--sec-blue)",
   };
+  let statusColor = getInvoiceStatusColor(invoice.paymentStatus);
+  let systemStatusColor = invoice.inSystem
+    ? getInvoiceStatusColor("In system")
+    : getInvoiceStatusColor("Not in system");
+  const getTextColor = (bgColor) =>
+    bgColor === "var(--sec-red)"
+      ? "var(--text-main-color)"
+      : "var(--text-black-color)";
   const statusStyle = {
-    backgroundColor: statusColorMap[invoice.paymentStatus],
-    color:
-      statusColorMap[invoice.status] === "var(--sec-red)"
-        ? "var(--text-main-color)"
-        : "var(--text-black-color)",
+    backgroundColor: statusColor,
+    color: getTextColor(statusColor),
   };
-  const systemColorBool = invoice.inSystem ? "In system" : "Not in system";
   const systemStyle = {
-    backgroundColor: systemColorMap[systemColorBool],
-    color:
-      systemColorMap[systemColorBool] === "var(--sec-red)"
-        ? "var(--text-main-color)"
-        : "var(--text-black-color)",
+    backgroundColor: systemStatusColor,
+    color: getTextColor(systemStatusColor),
     justifyContent: "center",
   };
   return (
@@ -60,7 +54,7 @@ function InvoiceContainer({
                 />
                 <span className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1">
                   <p className="mb-0 text-truncate d-block w-100">
-                    {invoice.users.join(", ")}
+                    {invoice.users.length > 0 ? invoice.users.join(", ") : "-"}
                   </p>
                 </span>
               </Col>
@@ -178,6 +172,8 @@ function InvoiceContainer({
             selectAction={selectAction}
             unselectAction={unselectAction}
             deleteAction={deleteAction}
+            viewAction={viewAction}
+            modifyAction={modifyAction}
           />
         </Col>
       </Row>
@@ -193,6 +189,8 @@ InvoiceContainer.PropTypes = {
   selectAction: PropTypes.func.isRequired,
   unselectAction: PropTypes.func.isRequired,
   deleteAction: PropTypes.func.isRequired,
+  viewAction: PropTypes.func.isRequired,
+  modifyAction: PropTypes.func.isRequired,
 };
 
 export default InvoiceContainer;

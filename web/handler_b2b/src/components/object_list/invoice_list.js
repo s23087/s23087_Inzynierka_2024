@@ -7,9 +7,7 @@ import SearchFilterBar from "../menu/search_filter_bar";
 import MoreActionWindow from "../windows/more_action";
 import { useSearchParams } from "next/navigation";
 import DeleteObjectWindow from "../windows/delete_object";
-import ViewClientOffcanvas from "../offcanvas/view/view_client";
 import { useRouter } from "next/navigation";
-import ModifyClientOffcanvas from "../offcanvas/modify/modify_client";
 import InvoiceContainer from "../object_container/documents/yours_invoice_container";
 import CreditNoteContainer from "../object_container/documents/credit_note_contianter";
 import RequestContainer from "../object_container/documents/request_container";
@@ -17,6 +15,8 @@ import AddInvoiceOffcanvas from "../offcanvas/create/documents/create_invoice";
 import deleteInvoice from "@/utils/documents/delete_invoice";
 import SelectComponent from "../smaller_components/select_compontent";
 import getPagationInfo from "@/utils/flexible/get_page_info";
+import ViewInvoiceOffcanvas from "../offcanvas/view/view_invoice";
+import ModifyInvoiceOffcanvas from "../offcanvas/modify/documents/modify_invoice";
 
 function getDocument(
   type,
@@ -26,6 +26,8 @@ function getDocument(
   selectAction,
   unselectAction,
   deleteAction,
+  viewAction,
+  modifyAction,
 ) {
   switch (type) {
     case "Sales invoices":
@@ -39,6 +41,8 @@ function getDocument(
           selectAction={selectAction}
           unselectAction={unselectAction}
           deleteAction={deleteAction}
+          viewAction={viewAction}
+          modifyAction={modifyAction}
         />
       );
     case "Yours credit notes":
@@ -79,6 +83,8 @@ function getDocument(
       selectAction={selectAction}
       unselectAction={unselectAction}
       deleteAction={deleteAction}
+      viewAction={viewAction}
+      modifyAction={modifyAction}
     />
   );
 }
@@ -91,17 +97,21 @@ function InvoiceList({
   invoiceEnd,
   role,
 }) {
-  // View client
-  const [showViewClient, setShowViewClient] = useState(false);
-  const [clientToView, setClientToView] = useState({
-    users: [],
+  // View invoice
+  const [showViewInvoice, setShowViewInvoice] = useState(false);
+  const [invoiceToView, setInvoiceToView] = useState({
+    invoiceDate: "",
+    dueDate: "",
+    clientName: "",
+    inSystem: false,
+    paymentStatus: "",
   });
-  // Modify client
-  const [showModifyClient, setShowModifyClient] = useState(false);
-  const [clientToModify, setClientToModify] = useState({
-    users: [],
+  // Modify invoice
+  const [showModifyInvoice, setShowModifyInvoice] = useState(false);
+  const [invoiceToModify, setInvoiceToModify] = useState({
+    invoiceNumber: "",
   });
-  // Delete client
+  // Delete invoice
   const [showDeleteInvoice, setShowDeleteInvoice] = useState(false);
   const [invoiceToDelete, setInvoiceToDelete] = useState(null);
   const [isErrorDelete, setIsErrorDelete] = useState(false);
@@ -161,24 +171,21 @@ function InvoiceList({
                 setSelectedQty(selectedQty - 1);
               },
               () => {
+                // Delete
                 setInvoiceToDelete(value.invoiceId);
                 setShowDeleteInvoice(true);
               },
+              () => {
+                // View
+                setInvoiceToView(value);
+                setShowViewInvoice(true);
+              },
+              () => {
+                // Modify
+                setInvoiceToModify(value);
+                setShowModifyInvoice(true);
+              },
             );
-            //   <ClientContainer
-            //     key={value.clientId}
-            //     client={value}
-            //     is_org={orgView}
-            //     selected={selectedKeys.indexOf(value.clientId) !== -1}
-            //     viewAction={() => {
-            //       setClientToView(value);
-            //       setShowViewClient(true);
-            //     }}
-            //     modifyAction={() => {
-            //       setClientToModify(value);
-            //       setShowModifyClient(true);
-            //     }}
-            //   />
           })
       )}
       <MoreActionWindow
@@ -242,17 +249,17 @@ function InvoiceList({
         isError={isErrorDelete}
         errorMessage={errorMessage}
       />
-      <ModifyClientOffcanvas
-        showOffcanvas={showModifyClient}
-        hideFunction={() => setShowModifyClient(false)}
-        client={clientToModify}
-        isOrg={orgView}
+      <ModifyInvoiceOffcanvas
+        showOffcanvas={showModifyInvoice}
+        hideFunction={() => setShowModifyInvoice(false)}
+        isYourInvoice={type === "Yours invoices"}
+        invoice={invoiceToModify}
       />
-      <ViewClientOffcanvas
-        showOffcanvas={showViewClient}
-        hideFunction={() => setShowViewClient(false)}
-        client={clientToView}
-        isOrg={orgView}
+      <ViewInvoiceOffcanvas
+        showOffcanvas={showViewInvoice}
+        hideFunction={() => setShowViewInvoice(false)}
+        invoice={invoiceToView}
+        isYourInvoice={type === "Yours invoices"}
       />
     </Container>
   );
