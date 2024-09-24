@@ -16,6 +16,8 @@ public partial class CreditNote
     public string Note { get; set; } = null!;
 
     public int InvoiceId { get; set; }
+    public bool IsPaid { get; set; }
+    public string? CreditFilePath { get; set; }
 
     public virtual IEnumerable<CreditNoteItem> CreditNoteItems { get; set; } = new List<CreditNoteItem>();
 

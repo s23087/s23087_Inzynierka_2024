@@ -21,7 +21,10 @@ function AddEanWindow({ modalShow, onHideFunction, addAction, eanExistFun }) {
         </Container>
         <Container className="mt-4 mb-2">
           <Row>
-            <ErrorMessage message="Ean already exist or have letters or empty" messageStatus={isInvalid} />
+            <ErrorMessage
+              message="Ean already exist or have letters or empty"
+              messageStatus={isInvalid}
+            />
           </Row>
           <Form.Group className="mb-4">
             <Form.Control

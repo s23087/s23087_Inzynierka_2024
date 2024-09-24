@@ -301,6 +301,10 @@ public partial class HandlerContext : DbContext
             entity.ToTable("Credit_note");
 
             entity.Property(e => e.IdCreditNote).HasColumnName("id_credit_note");
+            entity.Property(e => e.CreditFilePath)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("credit_file_path");
             entity.Property(e => e.CreditNoteDate)
                 .HasColumnType("date")
                 .HasColumnName("credit_note_date");
@@ -309,6 +313,7 @@ public partial class HandlerContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("credit_note_number");
             entity.Property(e => e.InSystem).HasColumnName("in_system");
+            entity.Property(e => e.IsPaid).HasColumnName("is_paid");
             entity.Property(e => e.InvoiceId).HasColumnName("invoice_id");
             entity.Property(e => e.Note)
                 .HasMaxLength(500)
@@ -327,7 +332,6 @@ public partial class HandlerContext : DbContext
 
             entity.ToTable("Credit_note_Items");
 
-            entity.Property(e => e.IncludeQty).HasColumnName("include_qty");
             entity.Property(e => e.CreditItemId)
                 .HasColumnName("credit_item_id");
             entity.Property(e => e.CreditNoteId)
@@ -871,7 +875,7 @@ public partial class HandlerContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Owned_Item_Invoice_relation");
 
-            entity.HasOne(d => d.OwnedItemNavigation).WithMany(p => p.OwnedItems)
+            entity.HasOne(d => d.OriginalItem).WithMany(p => p.OwnedItems)
                 .HasForeignKey(d => d.OwnedItemId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Owned_Item_Item_relation");

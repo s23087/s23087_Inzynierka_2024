@@ -17,6 +17,17 @@ import SelectComponent from "../smaller_components/select_compontent";
 import getPagationInfo from "@/utils/flexible/get_page_info";
 import ViewInvoiceOffcanvas from "../offcanvas/view/view_invoice";
 import ModifyInvoiceOffcanvas from "../offcanvas/modify/documents/modify_invoice";
+import AddCreditNoteOffcanvas from "../offcanvas/create/documents/create_credit_note";
+
+function getIfSelected(type, document, selected) {
+  if (type.includes("note")) {
+    return selected.indexOf(document.creditNoteId) !== -1;
+  }
+  if (type.includes("Request")) {
+    return selected.indexOf(document.requestId) !== -1;
+  }
+  return selected.indexOf(document.invoiceId) !== -1;
+}
 
 function getDocument(
   type,
@@ -29,48 +40,27 @@ function getDocument(
   viewAction,
   modifyAction,
 ) {
-  switch (type) {
-    case "Sales invoices":
-      return (
-        <InvoiceContainer
-          key={document.invoiceId}
-          invoice={document}
-          is_org={is_org}
-          selected={selected}
-          is_user_type={false}
-          selectAction={selectAction}
-          unselectAction={unselectAction}
-          deleteAction={deleteAction}
-          viewAction={viewAction}
-          modifyAction={modifyAction}
-        />
-      );
-    case "Yours credit notes":
-      return (
-        <CreditNoteContainer
-          credit_note={document}
-          is_org={is_org}
-          selected={selected}
-          is_user_type={true}
-        />
-      );
-    case "Client credit notes":
-      return (
-        <CreditNoteContainer
-          credit_note={document}
-          is_org={is_org}
-          selected={selected}
-          is_user_type={false}
-        />
-      );
-    case "Requests":
-      return (
-        <RequestContainer
-          request={document}
-          is_org={is_org}
-          selected={selected}
-        />
-      );
+  if (type.includes("note")) {
+    return (
+      <CreditNoteContainer
+        key={document.creditNoteId}
+        credit_note={document}
+        is_org={is_org}
+        selected={selected}
+        is_user_type={type.includes("yours")}
+        selectAction={selectAction}
+        unselectAction={unselectAction}
+      />
+    );
+  }
+  if (type.includes("Requests")) {
+    return (
+      <RequestContainer
+        request={document}
+        is_org={is_org}
+        selected={selected}
+      />
+    );
   }
 
   return (
@@ -119,16 +109,17 @@ function InvoiceList({
   // More action
   const [showMoreAction, setShowMoreAction] = useState(false);
   const [isShowAddInvoice, setShowAddInvoice] = useState(false);
+  const [isShowAddCreditNote, setShowCreditNote] = useState(false);
   // Seleted
   const [selectedQty, setSelectedQty] = useState(0);
-  const [selectedInvoices] = useState([]);
+  const [selectedDocuments] = useState([]);
   // Nav
   const router = useRouter();
   const params = useSearchParams();
   // Type change
   useEffect(() => {
     setSelectedQty(0);
-    selectedInvoices.shift(0, selectedInvoices.length);
+    selectedDocuments.shift(0, selectedDocuments.length);
   }, [type]);
   const containerMargin = {
     height: "67px",
@@ -158,16 +149,26 @@ function InvoiceList({
               type,
               value,
               orgView,
-              selectedInvoices.indexOf(value.invoiceId) !== -1,
+              getIfSelected(type, value, selectedDocuments),
               () => {
                 // Select
-                selectedInvoices.push(value.invoiceId);
                 setSelectedQty(selectedQty + 1);
+                if (type.includes("notes")) {
+                  selectedDocuments.push(value.creditNoteId);
+                  return;
+                }
+                selectedDocuments.push(value.invoiceId);
               },
               () => {
                 // Unselect
-                let index = selectedInvoices.indexOf(value.invoiceId);
-                selectedInvoices.splice(index, 1);
+                let index;
+                if (type.includes("notes")) {
+                  index = selectedDocuments.indexOf(value.creditNoteId);
+                }
+                if (type.includes("invoice")) {
+                  index = selectedDocuments.indexOf(value.invoiceId);
+                }
+                selectedDocuments.splice(index, 1);
                 setSelectedQty(selectedQty - 1);
               },
               () => {
@@ -193,35 +194,48 @@ function InvoiceList({
         onHideFunction={() => setShowMoreAction(false)}
         instanceName="document"
         addAction={() => {
-          if (orgView || role === "Admin") {
+          if ((orgView || role === "Admin") && type.includes("invoice")) {
             setShowMoreAction(false);
             setShowAddInvoice(true);
           }
+          if ((orgView || role === "Admin") && type.includes("note")) {
+            setShowMoreAction(false);
+            setShowCreditNote(true);
+          }
         }}
         selectAllOnPage={() => {
-          selectedInvoices.splice(0, selectedInvoices.length);
+          selectedDocuments.splice(0, selectedDocuments.length);
           setSelectedQty(0);
           let pagationInfo = getPagationInfo(params);
           Object.values(invoices)
             .slice(pagationInfo.start, pagationInfo.end)
-            .forEach((e) => selectedInvoices.push(e.invoiceId));
-          setSelectedQty(selectedInvoices.length);
+            .forEach((e) => {
+              if (type.includes("invoice")) selectedDocuments.push(e.invoiceId);
+              if (type.includes("note")) selectedDocuments.push(e.creditNoteId);
+            });
+          setSelectedQty(selectedDocuments.length);
           setShowMoreAction(false);
         }}
         selectAll={() => {
-          selectedInvoices.splice(0, selectedInvoices.length);
+          selectedDocuments.splice(0, selectedDocuments.length);
           setSelectedQty(0);
-          Object.values(invoices).forEach((e) =>
-            selectedInvoices.push(e.invoiceId),
-          );
-          setSelectedQty(selectedInvoices.length);
+          Object.values(invoices).forEach((e) => {
+            if (type.includes("invoice")) selectedDocuments.push(e.invoiceId);
+            if (type.includes("note")) selectedDocuments.push(e.creditNoteId);
+          });
+          setSelectedQty(selectedDocuments.length);
           setShowMoreAction(false);
         }}
         deselectAll={() => {
-          selectedInvoices.splice(0, selectedInvoices.length);
+          selectedDocuments.splice(0, selectedDocuments.length);
           setSelectedQty(0);
           setShowMoreAction(false);
         }}
+      />
+      <AddCreditNoteOffcanvas
+        showOffcanvas={isShowAddCreditNote}
+        hideFunction={() => setShowCreditNote(false)}
+        isYourCreditNote={type === "Yours credit notes"}
       />
       <AddInvoiceOffcanvas
         showOffcanvas={isShowAddInvoice}

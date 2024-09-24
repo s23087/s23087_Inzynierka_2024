@@ -71,6 +71,8 @@ namespace database_comunicator.Controllers
         [Route("getPurchaseInvoiceItems/{invoiceId}")]
         public async Task<IActionResult> GetPurchaseInvoiceItems(int invoiceId)
         {
+            var invoiceExist = await _invoicesService.InvoiceExist(invoiceId);
+            if (!invoiceExist) return NotFound("Invoice not found.");
             var result = await _invoicesService.GetInvoiceItems(invoiceId, true);
             return Ok(result);
         }
@@ -78,6 +80,8 @@ namespace database_comunicator.Controllers
         [Route("getSalesInvoiceItems/{invoiceId}")]
         public async Task<IActionResult> GetSalesInvoiceItems(int invoiceId)
         {
+            var invoiceExist = await _invoicesService.InvoiceExist(invoiceId);
+            if (!invoiceExist) return NotFound("Invoice not found.");
             var result = await _invoicesService.GetInvoiceItems(invoiceId, false);
             return Ok(result);
         }
@@ -165,7 +169,7 @@ namespace database_comunicator.Controllers
             var invoiceId = await _invoicesService.AddPurchaseInvoice(data);
             if (invoiceId == 0) return BadRequest("Cloud not create the document.");
             var logId = await _logServices.getLogTypeId("Create");
-            var desc = $"User with id {userId} has created the invoice {data.InvoiceNumber} for user wit id {data.UserId}.";
+            var desc = $"User with id {userId} has created the invoice {data.InvoiceNumber} for user with id {data.UserId}.";
             await _logServices.CreateActionLog(desc, userId, logId);
             if (data.UserId != userId)
             {
@@ -198,7 +202,7 @@ namespace database_comunicator.Controllers
             var invoiceId = await _invoicesService.AddSalesInvoice(data);
             if (invoiceId == 0) return BadRequest("Cloud not create the document.");
             var logId = await _logServices.getLogTypeId("Create");
-            var desc = $"User with id {userId} has created the invoice {data.InvoiceNumber} for user wit id {data.UserId}.";
+            var desc = $"User with id {userId} has created the invoice {data.InvoiceNumber} for user with id {data.UserId}.";
             await _logServices.CreateActionLog(desc, userId, logId);
             if (data.UserId != userId)
             {

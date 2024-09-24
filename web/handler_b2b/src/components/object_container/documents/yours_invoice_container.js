@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import Image from "next/image";
-import getInvoiceStatusColor from "@/utils/documents/get_invoice_status_color";
+import getInvoiceStatusStyle from "@/utils/documents/get_invoice_status_color";
 import { Container, Row, Col } from "react-bootstrap";
 import ContainerButtons from "@/components/smaller_components/container_buttons";
 import user_small_icon from "../../../../public/icons/user_small_icon.png";
@@ -18,23 +18,6 @@ function InvoiceContainer({
 }) {
   const containerBg = {
     backgroundColor: "var(--sec-blue)",
-  };
-  let statusColor = getInvoiceStatusColor(invoice.paymentStatus);
-  let systemStatusColor = invoice.inSystem
-    ? getInvoiceStatusColor("In system")
-    : getInvoiceStatusColor("Not in system");
-  const getTextColor = (bgColor) =>
-    bgColor === "var(--sec-red)"
-      ? "var(--text-main-color)"
-      : "var(--text-black-color)";
-  const statusStyle = {
-    backgroundColor: statusColor,
-    color: getTextColor(statusColor),
-  };
-  const systemStyle = {
-    backgroundColor: systemStatusColor,
-    color: getTextColor(systemStatusColor),
-    justifyContent: "center",
   };
   return (
     <Container
@@ -78,7 +61,7 @@ function InvoiceContainer({
                 <Col className="ps-1">
                   <span
                     className="spanStyle d-flex rounded-span px-2"
-                    style={statusStyle}
+                    style={getInvoiceStatusStyle(invoice.paymentStatus)}
                   >
                     <p className="mb-0">Status: {invoice.paymentStatus}</p>
                   </span>
@@ -113,7 +96,9 @@ function InvoiceContainer({
             <Col className="pe-1 d-xxl-none" xs="auto">
               <span
                 className="spanStyle d-flex rounded-span px-2"
-                style={systemStyle}
+                style={getInvoiceStatusStyle(
+                  invoice.inSystem ? "In system" : "Not in system",
+                )}
               >
                 <p className="mb-0">
                   {invoice.inSystem ? "In system" : "Not in system"}
@@ -148,7 +133,9 @@ function InvoiceContainer({
                 <Col className="pe-1" xs="auto">
                   <span
                     className="spanStyle d-flex rounded-span px-2"
-                    style={systemStyle}
+                    style={getInvoiceStatusStyle(
+                      invoice.inSystem ? "In system" : "Not in system",
+                    )}
                   >
                     <p className="mb-0 text-truncate d-block w-100">
                       {invoice.inSystem ? "In system" : "Not in system"}

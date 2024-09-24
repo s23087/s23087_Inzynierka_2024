@@ -8,7 +8,7 @@ export default async function changeBindings(bindings) {
   const userId = await getUserId();
   let data = {
     userId: userId,
-    bindings: bindings
+    bindings: bindings,
   };
 
   const dbName = await getDbName();
@@ -32,7 +32,7 @@ export default async function changeBindings(bindings) {
   }
 
   if (info.status == 404) {
-    logout()
+    logout();
     return {
       error: true,
       completed: true,
@@ -44,7 +44,7 @@ export default async function changeBindings(bindings) {
     return {
       error: false,
       completed: true,
-      message: "Success!"
+      message: "Success!",
     };
   } else {
     return {

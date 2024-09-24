@@ -15,8 +15,13 @@ function haveNoNumbers(str) {
   return reg.test(str);
 }
 
-function haveOnlyNumbers(str) {
+function haveOnlyPositiveNumbers(str) {
   const reg = /^\d*$/;
+  return reg.test(str);
+}
+
+function haveOnlyIntegers(str) {
+  const reg = /^-{0,1}\d*$/;
   return reg.test(str);
 }
 
@@ -43,13 +48,14 @@ function validate(str, func, maxLength) {
 const validators = {
   isEmail,
   haveNoNumbers,
-  haveOnlyNumbers,
+  haveOnlyNumbers: haveOnlyPositiveNumbers,
   lengthSmallerThen,
   stringAreEqual,
   isEmpty,
   stringIsNotEmpty,
   validate,
   isPriceFormat,
+  haveOnlyIntegers,
 };
 
 export default validators;

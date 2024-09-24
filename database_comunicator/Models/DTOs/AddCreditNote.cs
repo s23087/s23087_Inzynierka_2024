@@ -5,8 +5,11 @@
         public required string CreditNotenumber { get; set; } = null!;
         public required DateTime CreditNoteDate { get; set; }
         public required bool InSystem { get; set; }
+        public required bool IsPaid { get; set; }
         public string Note { get; set; } = null!;
         public required int InvoiceId { get; set; }
-        public IEnumerable<CreditNoteItems> CreditNoteItems { get; set; } = new List<CreditNoteItems>();
+        public required bool IsYourCreditNote { get; set; }
+        public string? FilePath { get; set; }
+        public IEnumerable<NewCreditNoteItems> CreditNoteItems { get; set; } = new List<NewCreditNoteItems>();
     }
 }

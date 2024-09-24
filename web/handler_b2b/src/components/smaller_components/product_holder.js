@@ -6,7 +6,7 @@ import close_white from "../../../public/icons/close_white.png";
 function ProductHolder({ value, deleteValue }) {
   let productValue =
     value.partnumber +
-    " - " +
+    "\nQty: " +
     value.qty +
     " pcs " +
     (value.invoiceNumber ? "\nInvoice: " + value.invoiceNumber : "") +
@@ -26,7 +26,7 @@ function ProductHolder({ value, deleteValue }) {
         type="text"
         defaultValue={productValue}
         as="textarea"
-        rows={value.invoiceNumber ? 4 : 3}
+        rows={value.invoiceNumber ? 5 : 4}
         readOnly
         disabled
         style={inputStyle}

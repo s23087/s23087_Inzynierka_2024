@@ -46,12 +46,12 @@ function ModifyItemOffcanvas({
   // Eans
   const [eans, setEans] = useState([]);
   // Binding to modify
-  const [showBindingWindow, setShowBindingWindow] = useState(false)
+  const [showBindingWindow, setShowBindingWindow] = useState(false);
   const [bindingToModify, setBindingToModify] = useState({
     invoiceNumber: "",
-    qty: 0
-  })
-  const [bindingsChanges] = useState([])
+    qty: 0,
+  });
+  const [bindingsChanges] = useState([]);
   // Errors
   const [partnumberError, setPartnumberError] = useState(false);
   const [nameError, setNameError] = useState(false);
@@ -105,13 +105,11 @@ function ModifyItemOffcanvas({
       message: "",
     },
   );
-  const [bindingState, setBindingState] = useState(
-    {
-      error: false,
-      completed: false,
-      message: "",
-    },
-  );
+  const [bindingState, setBindingState] = useState({
+    error: false,
+    completed: false,
+    message: "",
+  });
   // Styles
   const maxStyle = {
     maxWidth: "393px",
@@ -300,24 +298,34 @@ function ModifyItemOffcanvas({
             fluid
           >
             <Form>
-              <Form.Group
-                className="mb-5"
-                controlId="formDescription"
-              >
+              <Form.Group className="mb-5" controlId="formDescription">
                 <Form.Label className="blue-main-text maxInputWidth">
                   Users:
                 </Form.Label>
-                {bindings.filter(e => e.qty > 0).map((value, key) => {
-                  return <BindingInput 
-                    value={value} 
-                    key={[key, value.username, value.userId, value.qty, value.price, value.currency, value.invoiceNumber, value.invoiceId]} 
-                    modifyAction={() => {
-                      setBindingToModify(value)
-                      setShowBindingWindow(true)
-                    }}
-                  />;
-                })}
-                <ChangeBidningsWindow 
+                {bindings
+                  .filter((e) => e.qty > 0)
+                  .map((value, key) => {
+                    return (
+                      <BindingInput
+                        value={value}
+                        key={[
+                          key,
+                          value.username,
+                          value.userId,
+                          value.qty,
+                          value.price,
+                          value.currency,
+                          value.invoiceNumber,
+                          value.invoiceId,
+                        ]}
+                        modifyAction={() => {
+                          setBindingToModify(value);
+                          setShowBindingWindow(true);
+                        }}
+                      />
+                    );
+                  })}
+                <ChangeBidningsWindow
                   modalShow={showBindingWindow}
                   onHideFunction={() => setShowBindingWindow(false)}
                   value={bindingToModify}
@@ -326,28 +334,35 @@ function ModifyItemOffcanvas({
                       userId: newUserId,
                       invoiceId: oldVal.invoiceId,
                       itemId: item.itemId,
-                      qty: qty
-                    })
+                      qty: qty,
+                    });
                     bindingsChanges.push({
                       userId: oldVal.userId,
                       invoiceId: oldVal.invoiceId,
                       itemId: item.itemId,
-                      qty: qty * -1
-                    })
-                    bindings[bindings.findIndex(e => 
-                      e.userId === oldVal.userId &&
-                      e.invoiceId === oldVal.invoiceId
-                    )].qty -= qty
-                    if (bindings.findIndex(e => 
-                      e.userId === newUserId &&
-                      e.invoiceId === oldVal.invoiceId)
-                      !==
-                      -1
+                      qty: qty * -1,
+                    });
+                    bindings[
+                      bindings.findIndex(
+                        (e) =>
+                          e.userId === oldVal.userId &&
+                          e.invoiceId === oldVal.invoiceId,
+                      )
+                    ].qty -= qty;
+                    if (
+                      bindings.findIndex(
+                        (e) =>
+                          e.userId === newUserId &&
+                          e.invoiceId === oldVal.invoiceId,
+                      ) !== -1
                     ) {
-                      bindings[bindings.findIndex(e => 
-                        e.userId === newUserId &&
-                        e.invoiceId === oldVal.invoiceId
-                      )].qty += qty
+                      bindings[
+                        bindings.findIndex(
+                          (e) =>
+                            e.userId === newUserId &&
+                            e.invoiceId === oldVal.invoiceId,
+                        )
+                      ].qty += qty;
                     } else {
                       bindings.push({
                         userId: newUserId,
@@ -356,8 +371,8 @@ function ModifyItemOffcanvas({
                         price: oldVal.price,
                         currency: oldVal.currency,
                         invoiceNumber: oldVal.invoiceNumber,
-                        invoiceId: oldVal.invoiceId
-                      })
+                        invoiceId: oldVal.invoiceId,
+                      });
                     }
                   }}
                 />
@@ -369,12 +384,12 @@ function ModifyItemOffcanvas({
                 disabled={bindingsChanges.length === 0}
                 type="click"
                 onClick={async (e) => {
-                  e.preventDefault()
-                  if (bindingsChanges.length === 0){
-                    return
+                  e.preventDefault();
+                  if (bindingsChanges.length === 0) {
+                    return;
                   }
-                  let result = await changeBindings(bindingsChanges)
-                  setBindingState(result)
+                  let result = await changeBindings(bindingsChanges);
+                  setBindingState(result);
                 }}
               >
                 Save
@@ -428,17 +443,33 @@ function ModifyItemOffcanvas({
         </Offcanvas.Body>
         <Container key={state.completed}>
           <Toastes.ErrorToast
-            showToast={(state.completed && state.error) || (bindingState.completed && bindingState.error)}
+            showToast={
+              (state.completed && state.error) ||
+              (bindingState.completed && bindingState.error)
+            }
             message={state.complete ? state.message : bindingState.message}
-            key={[state.completed, state.error, bindingState.completed, bindingState.error]}
+            key={[
+              state.completed,
+              state.error,
+              bindingState.completed,
+              bindingState.error,
+            ]}
             onHideFun={() => {
               resetState();
             }}
           />
           <Toastes.SuccessToast
-            showToast={(state.completed && !state.error) || (bindingState.completed && !bindingState.error)}
+            showToast={
+              (state.completed && !state.error) ||
+              (bindingState.completed && !bindingState.error)
+            }
             message={state.complete ? state.message : bindingState.message}
-            key={[state.completed, !state.error, bindingState.completed, !bindingState.error]}
+            key={[
+              state.completed,
+              !state.error,
+              bindingState.completed,
+              !bindingState.error,
+            ]}
             onHideFun={() => {
               resetState();
               hideFunction();

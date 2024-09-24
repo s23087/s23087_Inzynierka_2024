@@ -14,7 +14,6 @@ public partial class CreditNoteItem
     public int Qty { get; set; }
 
     public decimal NewPrice { get; set; }
-    public bool IncludeQty { get; set; }
 
     public virtual ICollection<CalculatedCreditNotePrice> CalculatedCreditNotePrices { get; set; } = new List<CalculatedCreditNotePrice>();
 

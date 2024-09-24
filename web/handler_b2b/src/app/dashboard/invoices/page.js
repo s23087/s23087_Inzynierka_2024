@@ -11,6 +11,8 @@ import getYoursInvoices from "@/utils/documents/get_yours_invoices";
 import getSearchYoursInvoices from "@/utils/documents/get_yours_invoices_search";
 import getSearchSalesInvoices from "@/utils/documents/get_sales_invoices_search";
 import getSalesInvoices from "@/utils/documents/get_sales_invoices";
+import getSearchCreditNotes from "@/utils/documents/get_credit_note_with_search";
+import getCreditNotes from "@/utils/documents/get_credit_note";
 
 async function getDocuments(type, org_view, search) {
   switch (type) {
@@ -18,11 +20,17 @@ async function getDocuments(type, org_view, search) {
       if (search) {
         return await getSearchSalesInvoices(org_view, search);
       }
-      return await getSalesInvoices(org_view, search);
+      return await getSalesInvoices(org_view);
     case "Yours credit notes":
-      return [];
+      if (search) {
+        return await getSearchCreditNotes(org_view, true, search);
+      }
+      return await getCreditNotes(org_view, true);
     case "Client credit notes":
-      return [];
+      if (search) {
+        return await getSearchCreditNotes(org_view, false, search);
+      }
+      return await getCreditNotes(org_view, false);
     case "Requests":
       return [];
   }

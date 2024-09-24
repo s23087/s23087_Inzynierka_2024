@@ -463,7 +463,9 @@ namespace database_comunicator.Services
                 .Select(e => new GetInvoicesList
                 {
                     InvoiceId = e.InvoiceId,
-                    InvoiceNumber = e.InvoiceNumber
+                    InvoiceNumber = e.InvoiceNumber,
+                    ClientName = e.SellerNavigation.OrgName,
+                    OrgName = e.BuyerNavigation.OrgName
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoicesList>> GetSalesInvoicesList()
@@ -473,14 +475,16 @@ namespace database_comunicator.Services
                 .Select(e => new GetInvoicesList
                 {
                     InvoiceId = e.InvoiceId,
-                    InvoiceNumber = e.InvoiceNumber
+                    InvoiceNumber = e.InvoiceNumber,
+                    ClientName = e.BuyerNavigation.OrgName,
+                    OrgName = e.SellerNavigation.OrgName
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetInvoiceItems>> GetInvoiceItems(int invoiceId, bool isPurchaseInvoice)
         {
+            var invoiceCurrency = await _handlerContext.Invoices.Where(e => e.InvoiceId == invoiceId).Select(e => e.CurrencyName).FirstAsync();
             if (isPurchaseInvoice)
             {
-                var invoiceCurrency = await _handlerContext.Invoices.Where(e => e.InvoiceId == invoiceId).Select(e => e.CurrencyName).FirstAsync();
                 if (invoiceCurrency == "PLN")
                 {
                     return await _handlerContext.OwnedItems
@@ -489,7 +493,10 @@ namespace database_comunicator.Services
                         .Select(e => new GetInvoiceItems
                         {
                             PriceId = e.PurchasePriceId,
+                            InvoiceId = e.InvoiceId,
                             ItemId = e.OwnedItemId,
+                            ItemName = e.OwnedItem.OriginalItem.ItemName,
+                            Partnumber = e.OwnedItem.OriginalItem.PartNumber,
                             Qty = e.Qty,
                             Price = e.Price
                         }).ToListAsync();
@@ -502,7 +509,10 @@ namespace database_comunicator.Services
                         .Select(e => new GetInvoiceItems
                         {
                             PriceId = e.PurchasePriceId,
+                            InvoiceId = e.InvoiceId,
                             ItemId = e.OwnedItemId,
+                            ItemName = e.OwnedItem.OriginalItem.ItemName,
+                            Partnumber = e.OwnedItem.OriginalItem.PartNumber,
                             Qty = e.Qty,
                             Price = e.CalculatedPrices.Where(d => d.CurrencyName == invoiceCurrency).Select(d => d.Price).First()
                         }).ToListAsync();
@@ -513,11 +523,27 @@ namespace database_comunicator.Services
                 .Where(e => e.SellInvoiceId == invoiceId)
                 .Select(e => new GetInvoiceItems
                 {
-                    PriceId = e.SellingPriceId,
+                    PriceId = e.PurchasePriceId,
+                    InvoiceId = e.PurchasePrice.InvoiceId,
                     ItemId = e.PurchasePrice.OwnedItemId,
-                    Qty = e.Qty,
+                    ItemName = e.PurchasePrice.OwnedItem.OriginalItem.ItemName,
+                    Partnumber = e.PurchasePrice.OwnedItem.OriginalItem.PartNumber,
+                    Qty = e.Qty - e.PurchasePrice.CreditNoteItems.Where(d => d.CreditNote.Invoice.SellingPrices.Any()).Select(d => d.Qty).Sum(),
                     Price = e.Price
-                }).ToListAsync();
+                }).Union(
+                    _handlerContext.CreditNoteItems
+                    .Where(e => e.CreditNote.InvoiceId == invoiceId)
+                    .Select(e => new GetInvoiceItems
+                    {
+                        PriceId = e.PurchasePriceId,
+                        InvoiceId = e.PurchasePrice.InvoiceId,
+                        ItemId = e.PurchasePrice.OwnedItemId,
+                        ItemName = e.PurchasePrice.OwnedItem.OriginalItem.ItemName,
+                        Partnumber = e.PurchasePrice.OwnedItem.OriginalItem.PartNumber,
+                        Qty = e.Qty,
+                        Price = invoiceCurrency == "PLN" ? e.NewPrice : e.CalculatedCreditNotePrices.Where(d => d.CurrencyName == invoiceCurrency).Select(d => d.Price).First()
+                    })
+                ).ToListAsync();
         }
         public async Task<bool> CheckIfSellingPriceExist(int invoiceId)
         {
@@ -606,36 +632,26 @@ namespace database_comunicator.Services
             {
                 itemsInfo = await _handlerContext.PurchasePrices
                 .Where(e => e.InvoiceId == invoiceId)
-                .Join(
-                    _handlerContext.Items,
-                    price => price.OwnedItemId,
-                    item => item.ItemId,
-                    (price, item) => new GetInvoiceItemsForTable
-                    {
-                        Partnumber = item.PartNumber,
-                        ItemName = item.ItemName,
-                        Users = price.OwnedItem.ItemOwners.Select(d => d.IdUserNavigation.Username + " " + d.IdUserNavigation.Surname).ToList(),
-                        Qty = price.Qty,
-                        Price = price.Price
-                    }
-                ).ToListAsync();
+                .Select(e => new GetInvoiceItemsForTable
+                {
+                    Partnumber = e.OwnedItem.OriginalItem.PartNumber,
+                    ItemName = e.OwnedItem.OriginalItem.ItemName,
+                    Users = e.OwnedItem.ItemOwners.Select(d => d.IdUserNavigation.Username + " " + d.IdUserNavigation.Surname).ToList(),
+                    Qty = e.Qty,
+                    Price = e.Price
+                }).ToListAsync();
             } else
             {
                 itemsInfo = await _handlerContext.PurchasePrices
                 .Where(e => e.InvoiceId == invoiceId)
-                .Join(
-                    _handlerContext.Items,
-                    price => price.OwnedItemId,
-                    item => item.ItemId,
-                    (price, item) => new GetInvoiceItemsForTable
-                    {
-                        Partnumber = item.PartNumber,
-                        ItemName = item.ItemName,
-                        Users = price.OwnedItem.ItemOwners.Select(d => d.IdUserNavigation.Username + " " + d.IdUserNavigation.Surname).ToList(),
-                        Qty = price.Qty,
-                        Price = price.CalculatedPrices.Where(d => d.CurrencyName == invoiceInfo.CurrencyName).Select(d => d.Price).First()
-                    }
-                ).ToListAsync();
+                .Select(e => new GetInvoiceItemsForTable
+                {
+                    Partnumber = e.OwnedItem.OriginalItem.PartNumber,
+                    ItemName = e.OwnedItem.OriginalItem.ItemName,
+                    Users = e.OwnedItem.ItemOwners.Select(d => d.IdUserNavigation.Username + " " + d.IdUserNavigation.Surname).ToList(),
+                    Qty = e.Qty,
+                    Price = e.CalculatedPrices.Where(d => d.CurrencyName == invoiceInfo.CurrencyName).Select(d => d.Price).First()
+                }).ToListAsync();
             }
 
             invoiceInfo.Items = itemsInfo;
@@ -660,19 +676,14 @@ namespace database_comunicator.Services
                 ).FirstAsync();
             var itemsInfo = await _handlerContext.SellingPrices
                 .Where(e => e.SellInvoiceId == invoiceId)
-                .Join(
-                    _handlerContext.Items,
-                    price => price.PurchasePrice.OwnedItemId,
-                    item => item.ItemId,
-                    (price, item) => new GetInvoiceItemsForTable
-                    {
-                        Partnumber = item.PartNumber,
-                        ItemName = item.ItemName,
-                        Users = price.PurchasePrice.OwnedItem.ItemOwners.Select(d => d.IdUserNavigation.Username + " " + d.IdUserNavigation.Surname).ToList(),
-                        Qty = price.Qty,
-                        Price = price.Price
-                    }
-                ).ToListAsync();
+                .Select(e => new GetInvoiceItemsForTable
+                {
+                    Partnumber = e.PurchasePrice.OwnedItem.OriginalItem.PartNumber,
+                    ItemName = e.PurchasePrice.OwnedItem.OriginalItem.ItemName,
+                    Users = e.PurchasePrice.OwnedItem.ItemOwners.Select(d => d.IdUserNavigation.Username + " " + d.IdUserNavigation.Surname).ToList(),
+                    Qty = e.Qty,
+                    Price = e.Price
+                }).ToListAsync();
 
             invoiceInfo.Items = itemsInfo;
 

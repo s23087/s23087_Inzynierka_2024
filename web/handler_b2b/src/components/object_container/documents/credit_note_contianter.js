@@ -3,27 +3,25 @@ import Image from "next/image";
 import { Container, Row, Col } from "react-bootstrap";
 import ContainerButtons from "@/components/smaller_components/container_buttons";
 import user_small_icon from "../../../../public/icons/user_small_icon.png";
+import getInvoiceStatusStyle from "@/utils/documents/get_invoice_status_color";
 
-function CreditNoteContainer({ credit_note, is_org, selected, is_user_type }) {
-  const systemColorMap = {
-    "In system": "var(--main-green)",
-    Requested: "var(--main-yellow)",
-    "Not in system": "var(--sec-red)",
-  };
+function CreditNoteContainer({
+  credit_note,
+  is_org,
+  selected,
+  is_user_type,
+  selectAction,
+  unselectAction,
+  deleteAction,
+  viewAction,
+  modifyAction,
+}) {
   const containerBg = {
     backgroundColor: "var(--sec-blue)",
   };
-  const systemStyle = {
-    backgroundColor: systemColorMap[credit_note.system],
-    color:
-      systemColorMap[credit_note.system] === "var(--sec-red)"
-        ? "var(--text-main-color)"
-        : "var(--text-black-color)",
-    justifyContent: "center",
-  };
   return (
     <Container
-      className="py-3 black-text medium-text border-bottom-grey"
+      className="py-3 px-4 px-xl-5 black-text medium-text border-bottom-grey"
       style={selected ? containerBg : null}
       fluid
     >
@@ -37,31 +35,24 @@ function CreditNoteContainer({ credit_note, is_org, selected, is_user_type }) {
                   alt="user small icon"
                   className="me-2 mt-1"
                 />
-                <span className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1">
-                  <p className="mb-0">{credit_note.user}</p>
+                <span className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1 text-truncate d-block">
+                  <p className="mb-0">{credit_note.users.join(", ")}</p>
                 </span>
               </Col>
             </Row>
           ) : null}
           <Row className="gy-2">
             <Col xs="12" className="mb-1 mb-sm-0">
-              <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2">
-                <p className="mb-0">{credit_note.invoice}</p>
+              <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2 text-truncate d-block">
+                <p className="mb-0">{credit_note.invoiceNumber}</p>
               </span>
             </Col>
             <Col xs="12" className="mb-1 mb-md-0 mt-1 mt-sm-2">
-              <Row className="p-0">
-                <Col className="pe-1" xs="auto">
-                  <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
-                    <p className="mb-0">Date: {credit_note.date}</p>
-                  </span>
-                </Col>
-                <Col className="ps-1">
-                  <span className="main-grey-bg d-flex rounded-span px-2">
-                    <p className="mb-0">---------------------------------</p>
-                  </span>
-                </Col>
-              </Row>
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
+                <p className="mb-0">
+                  Date: {credit_note.date.substring(0, 10)}
+                </p>
+              </span>
             </Col>
             <Col className="pe-1 mb-1 d-md-none">
               <span
@@ -78,30 +69,39 @@ function CreditNoteContainer({ credit_note, is_org, selected, is_user_type }) {
                 style={selected ? null : containerBg}
               >
                 <p className="mb-0">Total Value:</p>
-                <p className="mb-0">
-                  {credit_note.total_value} {credit_note.currency_name}
-                </p>
+                <p className="mb-0">{credit_note.total} PLN</p>
               </span>
             </Col>
             <Col xs="12">
-              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2 text-truncate d-block">
                 <p className="mb-0">
-                  {is_user_type ? "For" : "Source"}:{" "}
-                  {is_user_type ? credit_note.for : credit_note.source}
+                  {is_user_type ? "Source: " : "For: "}
+                  {credit_note.clientName}
                 </p>
               </span>
             </Col>
             <Col className="pe-1 d-xxl-none" xs="auto">
               <span
                 className="spanStyle d-flex rounded-span px-2"
-                style={systemStyle}
+                style={getInvoiceStatusStyle(
+                  credit_note.inSystem ? "In system" : "Not in system",
+                )}
               >
-                <p className="mb-0">{credit_note.system}</p>
+                <p className="mb-0">
+                  {credit_note.inSystem ? "In system" : "Not in system"}
+                </p>
               </span>
             </Col>
             <Col className="ps-1 d-xxl-none">
-              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
-                <p className="mb-0">Due date: {credit_note.due_date}</p>
+              <span
+                className="spanStyle main-grey-bg d-flex rounded-span px-2"
+                style={getInvoiceStatusStyle(
+                  credit_note.isPaid ? "Paid" : "Unpaid",
+                )}
+              >
+                <p className="mb-0">
+                  Status: {credit_note.isPaid ? "Paid" : "Unpaid"}
+                </p>
               </span>
             </Col>
           </Row>
@@ -117,9 +117,7 @@ function CreditNoteContainer({ credit_note, is_org, selected, is_user_type }) {
             <Col className="ps-1 mb-2 mt-auto">
               <span className="main-blue-bg d-block rounded-span px-2 pb-2 pt-1 main-text text-center">
                 <p className="mb-0">Total Value:</p>
-                <p className="mb-0">
-                  {credit_note.total_value} {credit_note.currency_name}
-                </p>
+                <p className="mb-0">{credit_note.total} PLN</p>
               </span>
             </Col>
             <Col xs="12">
@@ -127,14 +125,25 @@ function CreditNoteContainer({ credit_note, is_org, selected, is_user_type }) {
                 <Col className="pe-1" xs="auto">
                   <span
                     className="spanStyle d-flex rounded-span px-2"
-                    style={systemStyle}
+                    style={getInvoiceStatusStyle(
+                      credit_note.inSystem ? "In system" : "Not in system",
+                    )}
                   >
-                    <p className="mb-0">{credit_note.system}</p>
+                    <p className="mb-0">
+                      {credit_note.inSystem ? "In system" : "Not in system"}
+                    </p>
                   </span>
                 </Col>
                 <Col className="ps-1">
-                  <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
-                    <p className="mb-0">Due date: {credit_note.due_date}</p>
+                  <span
+                    className="spanStyle main-grey-bg d-flex rounded-span px-2"
+                    style={getInvoiceStatusStyle(
+                      credit_note.isPaid ? "Paid" : "Unpaid",
+                    )}
+                  >
+                    <p className="mb-0">
+                      Status: {credit_note.isPaid ? "Paid" : "Unpaid"}
+                    </p>
                   </span>
                 </Col>
               </Row>
@@ -142,7 +151,14 @@ function CreditNoteContainer({ credit_note, is_org, selected, is_user_type }) {
           </Row>
         </Col>
         <Col xs="12" xl="4" className="px-0 pt-3 pt-xl-2 pb-2">
-          <ContainerButtons selected={selected} />
+          <ContainerButtons
+            selected={selected}
+            selectAction={selectAction}
+            unselectAction={unselectAction}
+            deleteAction={deleteAction}
+            viewAction={viewAction}
+            modifyAction={modifyAction}
+          />
         </Col>
       </Row>
     </Container>
@@ -154,6 +170,11 @@ CreditNoteContainer.PropTypes = {
   is_org: PropTypes.bool.isRequired,
   selected: PropTypes.bool.isRequired,
   is_user_type: PropTypes.bool.isRequired, // If true is user invoice, if false is client invoice
+  selectAction: PropTypes.func.isRequired,
+  unselectAction: PropTypes.func.isRequired,
+  deleteAction: PropTypes.func.isRequired,
+  viewAction: PropTypes.func.isRequired,
+  modifyAction: PropTypes.func.isRequired,
 };
 
 export default CreditNoteContainer;

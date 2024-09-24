@@ -4,7 +4,7 @@ import Image from "next/image";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { Offcanvas, Container, Row, Col, Button, Stack } from "react-bootstrap";
-import getInvoiceStatusColor from "@/utils/documents/get_invoice_status_color";
+import getInvoiceStatusStyle from "@/utils/documents/get_invoice_status_color";
 import dropdown_big_down from "../../../../public/icons/dropdown_big_down.png";
 import download_off from "../../../../public/icons/download_off.png";
 import download_on from "../../../../public/icons/download_on.png";
@@ -53,18 +53,9 @@ function ViewInvoiceOffcanvas({
   // Download bool
   const [isDownloading, setIsDowlonding] = useState(false);
   // Styles
-  let systemStatusColor = invoice.inSystem
-    ? getInvoiceStatusColor("In system")
-    : getInvoiceStatusColor("Not in system");
-  const systemStatusStyle = {
-    backgroundColor: systemStatusColor,
-    color:
-      systemStatusColor === "var(--sec-red)"
-        ? "var(--text-main-color)"
-        : "var(--text-black-color)",
-    justifyContent: "center",
-  };
-  let statusTextColor = getInvoiceStatusColor(invoice.paymentStatus);
+  let statusTextColor = getInvoiceStatusStyle(
+    invoice.paymentStatus,
+  ).backgroundColor;
   const paymentStatusStyle = {
     color:
       statusTextColor === "var(--main-yellow)"
@@ -191,7 +182,9 @@ function ViewInvoiceOffcanvas({
                 <Container className="px-1 ms-0">
                   <span
                     className="spanStyle rounded-span d-flex"
-                    style={systemStatusStyle}
+                    style={getInvoiceStatusStyle(
+                      invoice.inSystem ? "In system" : "Not in system",
+                    )}
                   >
                     <p className="mb-1">
                       {invoice.inSystem ? "In system" : "Not in system"}
