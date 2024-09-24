@@ -18,6 +18,8 @@ public partial class CreditNote
     public int InvoiceId { get; set; }
     public bool IsPaid { get; set; }
     public string? CreditFilePath { get; set; }
+    public int IdUser { get; set; }
+    public virtual AppUser User { get; set; } = null!;
 
     public virtual IEnumerable<CreditNoteItem> CreditNoteItems { get; set; } = new List<CreditNoteItem>();
 

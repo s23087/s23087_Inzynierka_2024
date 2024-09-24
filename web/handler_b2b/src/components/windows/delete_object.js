@@ -21,8 +21,8 @@ function DeleteObjectWindow({
       <Modal.Body>
         <Container>
           <Row>
-            <Col>
-              <h5 className="mb-0 mt-4">Delete {instanceName}</h5>
+            <Col xs="auto">
+              <h5 className="mb-0 mt-3">Delete {instanceName}</h5>
             </Col>
             <Col className="d-flex justify-content-end pe-0">
               <Button variant="as-link" className="p-0">

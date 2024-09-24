@@ -52,7 +52,7 @@ export default async function CreateCreditNote(
       itemId: element.id,
       invoiceId: element.invoiceId,
       purchasePriceId: element.priceId,
-      qty: element.qty,
+      qty: isYourCreditNote ? element.qty : Math.abs(element.qty),
       newPrice: element.price,
     });
     if (element.qty > 0) {

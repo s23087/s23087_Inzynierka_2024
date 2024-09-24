@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import Image from "next/image";
-import getInvoiceStatusStyle from "@/utils/documents/get_invoice_status_color";
+import getDocumentStatusStyle from "@/utils/documents/get_document_status_color";
 import { Container, Row, Col } from "react-bootstrap";
 import ContainerButtons from "@/components/smaller_components/container_buttons";
 import user_small_icon from "../../../../public/icons/user_small_icon.png";
@@ -61,7 +61,7 @@ function InvoiceContainer({
                 <Col className="ps-1">
                   <span
                     className="spanStyle d-flex rounded-span px-2"
-                    style={getInvoiceStatusStyle(invoice.paymentStatus)}
+                    style={getDocumentStatusStyle(invoice.paymentStatus)}
                   >
                     <p className="mb-0">Status: {invoice.paymentStatus}</p>
                   </span>
@@ -96,7 +96,7 @@ function InvoiceContainer({
             <Col className="pe-1 d-xxl-none" xs="auto">
               <span
                 className="spanStyle d-flex rounded-span px-2"
-                style={getInvoiceStatusStyle(
+                style={getDocumentStatusStyle(
                   invoice.inSystem ? "In system" : "Not in system",
                 )}
               >
@@ -133,7 +133,7 @@ function InvoiceContainer({
                 <Col className="pe-1" xs="auto">
                   <span
                     className="spanStyle d-flex rounded-span px-2"
-                    style={getInvoiceStatusStyle(
+                    style={getDocumentStatusStyle(
                       invoice.inSystem ? "In system" : "Not in system",
                     )}
                   >

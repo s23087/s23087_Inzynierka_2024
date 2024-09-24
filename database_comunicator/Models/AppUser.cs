@@ -39,4 +39,5 @@ public partial class AppUser
         OrganizationId = orgId
     });
     public virtual ICollection<SellingPrice> SellingPrices { get; set; } = new List<SellingPrice>();
+    public virtual ICollection<CreditNote> CreditNotes { get; set; } = new List<CreditNote>();
 }

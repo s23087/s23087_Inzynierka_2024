@@ -15,9 +15,11 @@ import AddInvoiceOffcanvas from "../offcanvas/create/documents/create_invoice";
 import deleteInvoice from "@/utils/documents/delete_invoice";
 import SelectComponent from "../smaller_components/select_compontent";
 import getPagationInfo from "@/utils/flexible/get_page_info";
-import ViewInvoiceOffcanvas from "../offcanvas/view/view_invoice";
+import ViewInvoiceOffcanvas from "../offcanvas/view/documents/view_invoice";
 import ModifyInvoiceOffcanvas from "../offcanvas/modify/documents/modify_invoice";
 import AddCreditNoteOffcanvas from "../offcanvas/create/documents/create_credit_note";
+import ViewCreditNoteOffcanvas from "../offcanvas/view/documents/view_credit_note";
+import deleteCreditNote from "@/utils/documents/delete_credit_note";
 
 function getIfSelected(type, document, selected) {
   if (type.includes("note")) {
@@ -50,6 +52,8 @@ function getDocument(
         is_user_type={type.includes("yours")}
         selectAction={selectAction}
         unselectAction={unselectAction}
+        viewAction={viewAction}
+        deleteAction={deleteAction}
       />
     );
   }
@@ -96,11 +100,27 @@ function InvoiceList({
     inSystem: false,
     paymentStatus: "",
   });
+  // View credit note
+  const [showViewCredit, setShowViewCredit] = useState(false);
+  const [creditToView, setCreditToView] = useState({
+    user: "",
+    creditNoteId: 0,
+    invoiceNumber: "",
+    date: "",
+    qty: 0,
+    total: 0,
+    clientName: 0,
+    inSystem: false,
+    isPaid: false,
+  });
   // Modify invoice
   const [showModifyInvoice, setShowModifyInvoice] = useState(false);
   const [invoiceToModify, setInvoiceToModify] = useState({
     invoiceNumber: "",
   });
+  // Delete credit note
+  const [showDeleteCreditNote, setShowDeleteCreditNote] = useState(false);
+  const [creditNoteToDelete, setCreditNoteToDelete] = useState(null);
   // Delete invoice
   const [showDeleteInvoice, setShowDeleteInvoice] = useState(false);
   const [invoiceToDelete, setInvoiceToDelete] = useState(null);
@@ -109,7 +129,7 @@ function InvoiceList({
   // More action
   const [showMoreAction, setShowMoreAction] = useState(false);
   const [isShowAddInvoice, setShowAddInvoice] = useState(false);
-  const [isShowAddCreditNote, setShowCreditNote] = useState(false);
+  const [isShowAddCreditNote, setShowAddCreditNote] = useState(false);
   // Seleted
   const [selectedQty, setSelectedQty] = useState(0);
   const [selectedDocuments] = useState([]);
@@ -173,13 +193,25 @@ function InvoiceList({
               },
               () => {
                 // Delete
-                setInvoiceToDelete(value.invoiceId);
-                setShowDeleteInvoice(true);
+                if (type.includes("notes")) {
+                  setCreditNoteToDelete(value.creditNoteId);
+                  setShowDeleteCreditNote(true);
+                }
+                if (type.includes("invoice")) {
+                  setInvoiceToDelete(value.invoiceId);
+                  setShowDeleteInvoice(true);
+                }
               },
               () => {
                 // View
-                setInvoiceToView(value);
-                setShowViewInvoice(true);
+                if (type.includes("notes")) {
+                  setCreditToView(value);
+                  setShowViewCredit(true);
+                }
+                if (type.includes("invoice")) {
+                  setInvoiceToView(value);
+                  setShowViewInvoice(true);
+                }
               },
               () => {
                 // Modify
@@ -200,7 +232,7 @@ function InvoiceList({
           }
           if ((orgView || role === "Admin") && type.includes("note")) {
             setShowMoreAction(false);
-            setShowCreditNote(true);
+            setShowAddCreditNote(true);
           }
         }}
         selectAllOnPage={() => {
@@ -234,7 +266,7 @@ function InvoiceList({
       />
       <AddCreditNoteOffcanvas
         showOffcanvas={isShowAddCreditNote}
-        hideFunction={() => setShowCreditNote(false)}
+        hideFunction={() => setShowAddCreditNote(false)}
         isYourCreditNote={type === "Yours credit notes"}
       />
       <AddInvoiceOffcanvas
@@ -248,12 +280,33 @@ function InvoiceList({
           setShowDeleteInvoice(false);
           setIsErrorDelete(false);
         }}
-        instanceName="document"
+        instanceName="invoice"
         instanceId={invoiceToDelete}
         deleteItemFunc={async () => {
           let result = await deleteInvoice(invoiceToDelete);
           if (!result.error) {
             setShowDeleteInvoice(false);
+            router.refresh();
+          } else {
+            setErrorMessage(result.message);
+            setIsErrorDelete(true);
+          }
+        }}
+        isError={isErrorDelete}
+        errorMessage={errorMessage}
+      />
+      <DeleteObjectWindow
+        modalShow={showDeleteCreditNote}
+        onHideFunction={() => {
+          setShowDeleteCreditNote(false);
+          setIsErrorDelete(false);
+        }}
+        instanceName="document"
+        instanceId={creditNoteToDelete}
+        deleteItemFunc={async () => {
+          let result = await deleteCreditNote(creditNoteToDelete);
+          if (!result.error) {
+            setShowDeleteCreditNote(false);
             router.refresh();
           } else {
             setErrorMessage(result.message);
@@ -274,6 +327,12 @@ function InvoiceList({
         hideFunction={() => setShowViewInvoice(false)}
         invoice={invoiceToView}
         isYourInvoice={type === "Yours invoices"}
+      />
+      <ViewCreditNoteOffcanvas
+        showOffcanvas={showViewCredit}
+        hideFunction={() => setShowViewCredit(false)}
+        creditNote={creditToView}
+        isYourCredit={type === "Yours credit notes"}
       />
     </Container>
   );

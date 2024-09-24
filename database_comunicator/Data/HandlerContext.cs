@@ -36,7 +36,6 @@ public partial class HandlerContext : DbContext
     public virtual DbSet<Country> Countries { get; set; }
 
     public virtual DbSet<CreditNote> CreditNotes { get; set; }
-
     public virtual DbSet<CreditNoteItem> CreditNoteItems { get; set; }
 
     public virtual DbSet<CurrencyName> CurrencyNames { get; set; }
@@ -319,11 +318,16 @@ public partial class HandlerContext : DbContext
                 .HasMaxLength(500)
                 .IsUnicode(false)
                 .HasColumnName("note");
+            entity.Property(e => e.IdUser).HasColumnName("id_user");
 
             entity.HasOne(d => d.Invoice).WithMany(p => p.CreditNotes)
                 .HasForeignKey(d => d.InvoiceId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Credit_note_Invoice_relation");
+            entity.HasOne(d => d.User).WithMany(p => p.CreditNotes)
+                .HasForeignKey(d => d.IdUser)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Credit_note_App_User_relation");
         });
 
         modelBuilder.Entity<CreditNoteItem>(entity =>

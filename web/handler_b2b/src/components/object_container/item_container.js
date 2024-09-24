@@ -70,8 +70,8 @@ function ItemContainer({
                   className="me-2 mt-1"
                 />
                 <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1">
-                  <p className="mb-0">
-                    {getShortUsers() === "" ? "No user" : getShortUsers()}
+                  <p className="mb-0 w-100 d-block text-turncate">
+                    {item.users.length > 0 ? item.users.join(", ") : "-"}
                   </p>
                 </span>
               </Col>

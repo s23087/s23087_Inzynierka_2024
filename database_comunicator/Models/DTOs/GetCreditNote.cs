@@ -2,7 +2,7 @@
 {
     public class GetCreditNote
     {
-        public IEnumerable<string>? Users { get; set; } = new List<string>();
+        public string? User { get; set; }
         public int CreditNoteId { get; set; }
         public string InvoiceNumber { get; set; } = null!;
         public DateTime Date { get; set; }

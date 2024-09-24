@@ -216,7 +216,7 @@ namespace database_comunicator.Services
                                 .Select(e => e.Qty).Sum()
                                 - instance.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.SellingPrices).Select(d => d.Qty).Sum()
                                 + instance.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.CreditNoteItems)
-                                    .Where(d => d.IncludeQty).Select(d => d.Qty).Sum(),
+                                    .Select(d => d.Qty).Sum(),
                             instance.OutsideItems.Select(e => e.Qty).Sum(),
                             instance.OwnedItems.SelectMany(e => e.Invoice.Deliveries).Any()
                         ),
@@ -225,13 +225,13 @@ namespace database_comunicator.Services
                     .SelectMany(e => e.PurchasePrices)
                     .Select(e => e.Qty).Sum()
                     - instance.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.SellingPrices).Select(d => d.Qty).Sum()
-                    + instance.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.CreditNoteItems).Where(d => d.IncludeQty).Select(d => d.Qty).Sum(),
+                    + instance.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.CreditNoteItems).Select(d => d.Qty).Sum(),
                     PurchasePrice = instance.OwnedItems
                         .SelectMany(e => e.PurchasePrices)
                         .Where(e => 
                         e.Qty 
                         - e.SellingPrices.Select(d => d.Qty).Sum()
-                        + e.CreditNoteItems.Where(d  => d.IncludeQty).Select(d => d.Qty).Sum()
+                        + e.CreditNoteItems.Select(d => d.Qty).Sum()
                         > 0
                         )
                         .Select(e => e.Price)
@@ -239,7 +239,7 @@ namespace database_comunicator.Services
                             instance.OwnedItems
                             .SelectMany(e => e.PurchasePrices)
                             .SelectMany(e => e.CreditNoteItems)
-                            .Where(e => e.IncludeQty && !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
+                            .Where(e => !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
                             .Select(e => e.NewPrice)
                         )
                         .Average(),
@@ -266,7 +266,7 @@ namespace database_comunicator.Services
                                 .Select(e => e.Qty).Sum()
                                 - insta.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.SellingPrices).Select(d => d.Qty).Sum()
                                 + insta.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.CreditNoteItems)
-                                    .Where(d => d.IncludeQty).Select(d => d.Qty).Sum(),
+                                    .Select(d => d.Qty).Sum(),
                             insta.OutsideItems.Select(e => e.Qty).Sum(),
                             insta.OwnedItems.SelectMany(e => e.Invoice.Deliveries).Any()
                         ),
@@ -275,13 +275,13 @@ namespace database_comunicator.Services
                         .SelectMany(e => e.PurchasePrices)
                         .Select(e => e.Qty).Sum()
                         - insta.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.SellingPrices).Select(d => d.Qty).Sum()
-                        + insta.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.CreditNoteItems).Where(d => d.IncludeQty).Select(d => d.Qty).Sum(),
+                        + insta.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.CreditNoteItems).Select(d => d.Qty).Sum(),
                     PurchasePrice = insta.OwnedItems
                         .SelectMany(e => e.PurchasePrices)
                         .Where(e =>
                         e.Qty
                         - e.SellingPrices.Select(d => d.Qty).Sum()
-                        + e.CreditNoteItems.Where(d => d.IncludeQty).Select(d => d.Qty).Sum()
+                        + e.CreditNoteItems.Select(d => d.Qty).Sum()
                         > 0
                         ).SelectMany(e => e.CalculatedPrices)
                         .Where(e => e.CurrencyName == currency)
@@ -290,7 +290,7 @@ namespace database_comunicator.Services
                             insta.OwnedItems
                             .SelectMany(e => e.PurchasePrices)
                             .SelectMany(e => e.CreditNoteItems)
-                            .Where(e => e.IncludeQty && !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
+                            .Where(e => !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
                             .SelectMany(e => e.CalculatedCreditNotePrices)
                             .Where(e => e.CurrencyName == currency)
                             .Select(e => e.Price)
@@ -325,7 +325,7 @@ namespace database_comunicator.Services
                                     .Select(e =>
                                         e.Qty
                                         - e.SellingPrices.Select(d => d.Qty).Sum()
-                                        + e.CreditNoteItems.Where(d => d.IncludeQty).Select(d => d.Qty).Sum()
+                                        + e.CreditNoteItems.Select(d => d.Qty).Sum()
                                     )
                                     .Sum(),
                                 instc.OutsideItems.Select(e => e.Qty).Sum(),
@@ -337,7 +337,7 @@ namespace database_comunicator.Services
                             .Select(e =>
                                 e.Qty
                                 - e.SellingPrices.Select(d => d.Qty).Sum()
-                                + e.CreditNoteItems.Where(d => d.IncludeQty).Select(d => d.Qty).Sum()
+                                + e.CreditNoteItems.Select(d => d.Qty).Sum()
                             )
                             .Sum(),
                         PurchasePrice = instc.OwnedItems
@@ -345,7 +345,7 @@ namespace database_comunicator.Services
                             .Where(e =>
                             e.Qty
                             - e.SellingPrices.Select(d => d.Qty).Sum()
-                            + e.CreditNoteItems.Where(d => d.IncludeQty).Select(d => d.Qty).Sum()
+                            + e.CreditNoteItems.Select(d => d.Qty).Sum()
                             > 0
                             ).SelectMany(e => e.CalculatedPrices)
                             .Where(e => e.CurrencyName == currency)
@@ -354,7 +354,7 @@ namespace database_comunicator.Services
                                 instc.OwnedItems
                                 .SelectMany(e => e.PurchasePrices)
                                 .SelectMany(e => e.CreditNoteItems)
-                                .Where(e => e.IncludeQty && !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
+                                .Where(e => !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
                                 .SelectMany(e => e.CalculatedCreditNotePrices)
                                 .Where(e => e.CurrencyName == currency)
                                 .Select(e => e.Price)
@@ -382,7 +382,7 @@ namespace database_comunicator.Services
                                     .Select(e =>
                                         e.Qty
                                         - e.SellingPrices.Select(d => d.Qty).Sum()
-                                        + e.CreditNoteItems.Where(d => d.IncludeQty).Select(d => d.Qty).Sum()
+                                        + e.CreditNoteItems.Select(d => d.Qty).Sum()
                                     )
                                     .Sum(),
                                 instac.OutsideItems.Select(e => e.Qty).Sum(),
@@ -394,7 +394,7 @@ namespace database_comunicator.Services
                             .Select(e =>
                                 e.Qty
                                 - e.SellingPrices.Select(d => d.Qty).Sum()
-                                + e.CreditNoteItems.Where(d => d.IncludeQty).Select(d => d.Qty).Sum()
+                                + e.CreditNoteItems.Select(d => d.Qty).Sum()
                             )
                             .Sum(),
                         PurchasePrice = instac.OwnedItems
@@ -412,7 +412,7 @@ namespace database_comunicator.Services
                                 instac.OwnedItems
                                 .SelectMany(e => e.PurchasePrices)
                                 .SelectMany(e => e.CreditNoteItems)
-                                .Where(e => e.IncludeQty && !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
+                                .Where(e => !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
                                 .SelectMany(e => e.CalculatedCreditNotePrices)
                                 .Where(e => e.CurrencyName == currency)
                                 .Select(e => e.Price)
@@ -460,7 +460,7 @@ namespace database_comunicator.Services
                                 inst.OwnedItems
                                 .SelectMany(e => e.PurchasePrices)
                                 .SelectMany(e => e.CreditNoteItems)
-                                .Where(e => e.IncludeQty && !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
+                                .Where(e => !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
                                 .Select(e => e.NewPrice)
                             )
                             .Average(),
@@ -501,7 +501,7 @@ namespace database_comunicator.Services
                                 instace.OwnedItems
                                 .SelectMany(e => e.PurchasePrices)
                                 .SelectMany(e => e.CreditNoteItems)
-                                .Where(e => e.IncludeQty && !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
+                                .Where(e => !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
                                 .SelectMany(e => e.CalculatedCreditNotePrices)
                                 .Where(e => e.CurrencyName == currency)
                                 .Select(e => e.Price)
@@ -552,7 +552,7 @@ namespace database_comunicator.Services
                                 obj.OwnedItems
                                 .SelectMany(e => e.PurchasePrices)
                                 .SelectMany(e => e.CreditNoteItems)
-                                .Where(e => e.IncludeQty && !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
+                                .Where(e => !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
                                 .SelectMany(e => e.CalculatedCreditNotePrices)
                                 .Where(e => e.CurrencyName == currency)
                                 .Select(e => e.Price)
@@ -597,7 +597,7 @@ namespace database_comunicator.Services
                                 objs.OwnedItems
                                 .SelectMany(e => e.PurchasePrices)
                                 .SelectMany(e => e.CreditNoteItems)
-                                .Where(e => e.IncludeQty && !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
+                                .Where(e => !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
                                 .SelectMany(e => e.CalculatedCreditNotePrices)
                                 .Where(e => e.CurrencyName == currency)
                                 .Select(e => e.Price)

@@ -14,7 +14,12 @@ namespace database_comunicator.Services
         public Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string search, int userId);
         public Task<bool> CreditDeductionCanBeApplied(int userId, int invoiceid, int itemId, int qty);
         public Task<bool> CreditNoteExist(string creditNoteNumber, int invoiceId);
+        public Task<bool> CreditNoteExist(int creditNoteId);
         public Task<GetRestCreditNote> GetRestCreditNote(int creditNoteId);
+        public Task<bool> DeleteCreditNote(int creditNoteId);
+        public Task<int> GetCreditNoteUser(int creditNoteId);
+        public Task<string> GetCreditNumber(int creditNoteId);
+        public Task<string?> GetCreditFilePath(int creditNoteId);
     }
     public class CreditNoteServices : ICreditNoteServices
     {
@@ -36,7 +41,8 @@ namespace database_comunicator.Services
                     Note = data.Note,
                     InvoiceId = data.InvoiceId,
                     IsPaid = data.IsPaid,
-                    CreditFilePath = data.FilePath
+                    CreditFilePath = data.FilePath,
+                    IdUser = data.CreditNoteItems.Select(e => e.UserId).First()
                 };
                 await _handlerContext.AddAsync<CreditNote>(creditNote);
                 await _handlerContext.SaveChangesAsync();
@@ -156,18 +162,7 @@ namespace database_comunicator.Services
                 .Where(e => yourCreditNotes ? e.Invoice.OwnedItems.Any() : e.Invoice.SellingPrices.Any())
                 .Select(e => new GetCreditNote
                 {
-                    Users = yourCreditNotes ?
-                    e.CreditNoteItems.SelectMany(e => e.PurchasePrice.OwnedItem.ItemOwners)
-                        .Select(d => d.IdUserNavigation)
-                        .GroupBy(d => new {d.IdUser, d.Username, d.Surname})
-                        .Select(d => d.Key.Username + " " + d.Key.Surname)
-                        .ToList()
-                    :
-                    e.CreditNoteItems.SelectMany(e => e.PurchasePrice.SellingPrices)
-                        .Select(d => d.User)
-                        .GroupBy(d => new { d.IdUser, d.Username, d.Surname })
-                        .Select(d => d.Key.Username + " " + d.Key.Surname)
-                        .ToList(),
+                    User = e.User.Username + " " + e.User.Surname,
                     CreditNoteId = e.IdCreditNote,
                     InvoiceNumber = e.Invoice.InvoiceNumber,
                     Date = e.CreditNoteDate,
@@ -192,18 +187,7 @@ namespace database_comunicator.Services
                 )
                 .Select(obj => new GetCreditNote
                 {
-                    Users = yourCreditNotes ? 
-                    obj.CreditNoteItems.SelectMany(e => e.PurchasePrice.OwnedItem.ItemOwners)
-                        .Select(d => d.IdUserNavigation)
-                        .GroupBy(d => new { d.IdUser, d.Username, d.Surname })
-                        .Select(d => d.Key.Username + " " + d.Key.Surname)
-                        .ToList()
-                    :
-                    obj.CreditNoteItems.SelectMany(e => e.PurchasePrice.SellingPrices)
-                        .Select(d => d.User)
-                        .GroupBy(d => new { d.IdUser, d.Username, d.Surname })
-                        .Select(d => d.Key.Username + " " + d.Key.Surname)
-                        .ToList(),
+                    User = obj.User.Username + " " + obj.User.Surname,
                     CreditNoteId = obj.IdCreditNote,
                     InvoiceNumber = obj.Invoice.InvoiceNumber,
                     Date = obj.CreditNoteDate,
@@ -217,11 +201,7 @@ namespace database_comunicator.Services
         public async Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, int userId)
         {
             return await _handlerContext.CreditNotes
-                .Where(e => yourCreditNotes ? 
-                    e.Invoice.OwnedItems.SelectMany(e => e.ItemOwners).Any(x => x.IdUser == userId) 
-                    : 
-                    e.Invoice.SellingPrices.Any(x => x.IdUser == userId)
-                 )
+                .Where(e => e.IdUser == userId)
                 .Where(e => yourCreditNotes ? e.Invoice.OwnedItems.Any() : e.Invoice.SellingPrices.Any())
                 .Select(inst => new GetCreditNote
                 {
@@ -238,11 +218,7 @@ namespace database_comunicator.Services
         public async Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string search, int userId)
         {
             return await _handlerContext.CreditNotes
-                .Where(e => yourCreditNotes ?
-                    e.Invoice.OwnedItems.SelectMany(e => e.ItemOwners).Any(x => x.IdUser == userId)
-                    :
-                    e.Invoice.SellingPrices.Any(x => x.IdUser == userId)
-                 )
+                .Where(e => e.IdUser == userId)
                 .Where(e => yourCreditNotes ? e.Invoice.OwnedItems.Any() : e.Invoice.SellingPrices.Any())
                 .Where(e => e.Invoice.InvoiceNumber.ToLower().Contains(search.ToLower())
                     ||
@@ -276,22 +252,74 @@ namespace database_comunicator.Services
         {
             return await _handlerContext.CreditNotes.AnyAsync(x => x.CreditNoteNumber == creditNoteNumber && x.InvoiceId == invoiceId);
         }
+        public async Task<bool> CreditNoteExist(int creditNoteId)
+        {
+            return await _handlerContext.CreditNotes.AnyAsync(x => x.IdCreditNote == creditNoteId);
+        }
         public async Task<GetRestCreditNote> GetRestCreditNote(int creditNoteId)
         {
+            var creditCurrency = await _handlerContext.CreditNotes.Where(e => e.IdCreditNote == creditNoteId).Select(e => e.Invoice.CurrencyName).FirstAsync();
             return await _handlerContext.CreditNotes
                 .Where(e => e.IdCreditNote == creditNoteId)
                 .Select(e => new GetRestCreditNote
                 {
+                    CreditNoteNumber = e.CreditNoteNumber,
+                    CurrencyName = creditCurrency,
                     Note = e.Note,
+                    Path = e.CreditFilePath ?? "",
                     CreditItems = e.CreditNoteItems.Select(x => new GetCredtItemForTable
                     {
                         CreditItemId = x.CreditItemId,
                         Partnumber = x.PurchasePrice.OwnedItem.OriginalItem.PartNumber,
                         ItemName = x.PurchasePrice.OwnedItem.OriginalItem.ItemName,
-                        Qty = x.Qty,
-                        Price = x.NewPrice
+                        Qty = e.CreditNoteItems.All(d => d.Qty > 0 && d.CreditItemId == x.CreditItemId) ? x.Qty * -1 : x.Qty,
+                        Price = creditCurrency == "PLN" ? x.NewPrice : x.CalculatedCreditNotePrices.Where(d => d.CurrencyName == creditCurrency).Select(d => d.Price).First(),
                     }).ToList(),
                 }).FirstAsync();
+        }
+        public async Task<bool> DeleteCreditNote(int creditNoteId)
+        {
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
+            {
+                var creditItems = await _handlerContext.CreditNoteItems
+                    .Where(e => e.CreditNoteId == creditNoteId)
+                    .Select(e => new
+                    {
+                        e.CreditItemId, e.PurchasePrice.InvoiceId, e.PurchasePrice.OwnedItemId, e.CreditNote.IdUser, e.Qty
+                    }).ToListAsync();
+                foreach (var creditItem in creditItems)
+                {
+                    await _handlerContext.ItemOwners
+                        .Where(e => e.InvoiceId == creditItem.InvoiceId && e.IdUser == creditItem.IdUser && e.OwnedItemId == creditItem.OwnedItemId)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => s.Qty, s => s.Qty - creditItem.Qty)
+                        );
+                    await _handlerContext.CalculatedCreditNotePrices.Where(e => e.CreditItemId == creditItem.CreditItemId).ExecuteDeleteAsync();
+                }
+                await _handlerContext.CreditNoteItems.Where(e => e.CreditNoteId == creditNoteId).ExecuteDeleteAsync();
+                await _handlerContext.CreditNotes.Where(e => e.IdCreditNote == creditNoteId).ExecuteDeleteAsync();
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+                return true;
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                await trans.RollbackAsync();
+                return false;
+            }
+        }
+        public async Task<int> GetCreditNoteUser(int creditNoteId)
+        {
+            return await _handlerContext.CreditNotes.Where(e => e.IdCreditNote == creditNoteId).Select(e => e.IdUser).FirstAsync();
+        }
+        public async Task<string> GetCreditNumber(int creditNoteId)
+        {
+            return await _handlerContext.CreditNotes.Where(e => e.IdCreditNote == creditNoteId).Select(e => e.CreditNoteNumber).FirstAsync();
+        }
+        public async Task<string?> GetCreditFilePath(int creditNoteId)
+        {
+            return await _handlerContext.CreditNotes.Where(e => e.IdCreditNote == creditNoteId).Select(e => e.CreditFilePath).FirstAsync();
         }
     }
 }

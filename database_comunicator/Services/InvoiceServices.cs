@@ -623,7 +623,8 @@ namespace database_comunicator.Services
                     TransportCost = e.TransportCost,
                     PaymentType = e.PaymentMethod.MethodName,
                     Note = e.Note,
-                    Path = e.InvoiceFilePath
+                    Path = e.InvoiceFilePath,
+                    CreditNotes = e.CreditNotes.Select(e => e.CreditNoteNumber).ToList(),
                 }
                 ).FirstAsync();
             var itemsInfo = new List<GetInvoiceItemsForTable>();
@@ -671,7 +672,8 @@ namespace database_comunicator.Services
                     TransportCost = e.TransportCost,
                     PaymentType = e.PaymentMethod.MethodName,
                     Note = e.Note,
-                    Path = e.InvoiceFilePath
+                    Path = e.InvoiceFilePath,
+                    CreditNotes = e.CreditNotes.Select(e => e.CreditNoteNumber).ToList(),
                 }
                 ).FirstAsync();
             var itemsInfo = await _handlerContext.SellingPrices

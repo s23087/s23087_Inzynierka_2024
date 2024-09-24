@@ -3,6 +3,7 @@ using database_comunicator.Models.DTOs;
 using database_comunicator.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace database_comunicator.Controllers
 {
@@ -53,7 +54,7 @@ namespace database_comunicator.Controllers
                 {
                     UserId = data.CreditNoteItems.Select(e => e.UserId).First(),
                     Info = $"The credit note with number {data.CreditNotenumber} has been added.",
-                    ObjectType = "Invoice",
+                    ObjectType = "Credit note",
                     Referance = $"{result}"
                 });
             }
@@ -77,7 +78,7 @@ namespace database_comunicator.Controllers
         }
         [HttpGet]
         [Route("getCreditNote/{isYourInvoice}")]
-        public async Task<IActionResult> GeCreditNote(bool isYourInvoice, string? search)
+        public async Task<IActionResult> GetCreditNote(bool isYourInvoice, string? search)
         {
             if (search != null)
             {
@@ -89,6 +90,49 @@ namespace database_comunicator.Controllers
                 var result = await _creditNoteServices.GetCreditNotes(isYourInvoice);
                 return Ok(result);
             }
+        }
+        [HttpGet]
+        [Route("creditnote/rest/{creditId}")]
+        public async Task<IActionResult> GetRestCreditNote(int creditId)
+        {
+            var exist = await _creditNoteServices.CreditNoteExist(creditId);
+            if (!exist) return NotFound();
+            var result = await _creditNoteServices.GetRestCreditNote(creditId);
+            return Ok(result);
+        }
+        [HttpGet]
+        [Route("creditnote/path/{creditId}")]
+        public async Task<IActionResult> GetCreditFilePAth(int creditId)
+        {
+            var exist = await _creditNoteServices.CreditNoteExist(creditId);
+            if (!exist) return NotFound();
+            var result = await _creditNoteServices.GetCreditFilePath(creditId);
+            return Ok(result);
+        }
+        [HttpDelete]
+        [Route("creditnote/delete/{creditId}")]
+        public async Task<IActionResult> DeleteCreditNote(int creditId, int userId)
+        {
+            var exist = await _creditNoteServices.CreditNoteExist(creditId);
+            if (!exist) return NotFound();
+            var creditUser = await _creditNoteServices.GetCreditNoteUser(creditId);
+            var creditNumber = await _creditNoteServices.GetCreditNumber(creditId);
+            var result = await _creditNoteServices.DeleteCreditNote(creditId);
+            if (!result) return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            var logId = await _logServices.getLogTypeId("Delete");
+            var desc = $"User with id {userId} has deleted the credit note with id {creditId} and number {creditNumber}.";
+            await _logServices.CreateActionLog(desc, userId, logId);
+            if (creditUser != userId)
+            {
+                await _notificationServices.CreateNotification(new CreateNotification
+                {
+                    UserId = creditUser,
+                    Info = $"The credit note with number {creditNumber} has been deleted.",
+                    ObjectType = "Credit note",
+                    Referance = $"{creditId}"
+                });
+            }
+            return Ok(result);
         }
     }
 }

@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Container, Row, Col } from "react-bootstrap";
 import ContainerButtons from "@/components/smaller_components/container_buttons";
 import user_small_icon from "../../../../public/icons/user_small_icon.png";
-import getInvoiceStatusStyle from "@/utils/documents/get_invoice_status_color";
+import getDocumentStatusStyle from "@/utils/documents/get_document_status_color";
 
 function CreditNoteContainer({
   credit_note,
@@ -36,7 +36,7 @@ function CreditNoteContainer({
                   className="me-2 mt-1"
                 />
                 <span className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1 text-truncate d-block">
-                  <p className="mb-0">{credit_note.users.join(", ")}</p>
+                  <p className="mb-0">{credit_note.user}</p>
                 </span>
               </Col>
             </Row>
@@ -83,7 +83,7 @@ function CreditNoteContainer({
             <Col className="pe-1 d-xxl-none" xs="auto">
               <span
                 className="spanStyle d-flex rounded-span px-2"
-                style={getInvoiceStatusStyle(
+                style={getDocumentStatusStyle(
                   credit_note.inSystem ? "In system" : "Not in system",
                 )}
               >
@@ -95,7 +95,7 @@ function CreditNoteContainer({
             <Col className="ps-1 d-xxl-none">
               <span
                 className="spanStyle main-grey-bg d-flex rounded-span px-2"
-                style={getInvoiceStatusStyle(
+                style={getDocumentStatusStyle(
                   credit_note.isPaid ? "Paid" : "Unpaid",
                 )}
               >
@@ -125,7 +125,7 @@ function CreditNoteContainer({
                 <Col className="pe-1" xs="auto">
                   <span
                     className="spanStyle d-flex rounded-span px-2"
-                    style={getInvoiceStatusStyle(
+                    style={getDocumentStatusStyle(
                       credit_note.inSystem ? "In system" : "Not in system",
                     )}
                   >
@@ -137,7 +137,7 @@ function CreditNoteContainer({
                 <Col className="ps-1">
                   <span
                     className="spanStyle main-grey-bg d-flex rounded-span px-2"
-                    style={getInvoiceStatusStyle(
+                    style={getDocumentStatusStyle(
                       credit_note.isPaid ? "Paid" : "Unpaid",
                     )}
                   >
