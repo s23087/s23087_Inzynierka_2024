@@ -3,7 +3,7 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 
-export default async function deleteInvoice(invoiceId) {
+export default async function deleteInvoice(invoiceId, isYourInvoice) {
   const dbName = await getDbName();
   const path = await fetch(
     `${process.env.API_DEST}/${dbName}/Invoices/invoicePath/${invoiceId}`,
@@ -20,7 +20,7 @@ export default async function deleteInvoice(invoiceId) {
   let invoicePath = await path.text();
   const userId = await getUserId();
 
-  let url = `${process.env.API_DEST}/${dbName}/Invoices/deleteInvoice/${invoiceId}?userId=${userId}`;
+  let url = `${process.env.API_DEST}/${dbName}/Invoices/deleteInvoice/${invoiceId}?userId=${userId}&isYourInvoice=${isYourInvoice}`;
   const info = await fetch(url, {
     method: "Delete",
   });

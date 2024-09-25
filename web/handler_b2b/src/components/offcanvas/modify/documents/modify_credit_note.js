@@ -5,77 +5,57 @@ import { useState, useEffect } from "react";
 import { useFormState } from "react-dom";
 import Toastes from "@/components/smaller_components/toast";
 import { useRouter } from "next/navigation";
-import getOrgsList from "@/utils/documents/get_orgs_list";
-import getPaymentMethods from "@/utils/documents/get_payment_methods";
-import getPaymentStatuses from "@/utils/documents/get_payment_statuses";
 import CloseIcon from "../../../../../public/icons/close_black.png";
 import ErrorMessage from "@/components/smaller_components/error_message";
-import updateInvoice from "@/utils/documents/modify_invoice";
 import StringValidtor from "@/utils/validators/form_validator/stringValidator";
-import getRestModifyInvoice from "@/utils/documents/get_rest_modify_info";
+import getRestModifyCredit from "@/utils/documents/get_rest_modify_credit";
+import updateCreditNote from "@/utils/documents/modify_credit_note";
 
-function ModifyInvoiceOffcanvas({
+function ModifyCreditNoteOffcanvas({
   showOffcanvas,
   hideFunction,
-  isYourInvoice,
-  invoice,
+  isYourCredit,
+  creditNote,
 }) {
   const router = useRouter();
   useEffect(() => {
     if (showOffcanvas) {
-      const orgs = getOrgsList();
-      orgs.then((data) => setOrgs(data));
-      const paymentMethods = getPaymentMethods();
-      paymentMethods.then((data) => setPaymentMethods(data));
-      const paymentStatuses = getPaymentStatuses();
-      paymentStatuses.then((data) => setPaymentStatuses(data));
-      const restInfo = getRestModifyInvoice(invoice.invoiceId);
-      restInfo.then((data) => {
-        setRestInfo(data);
-        prevState.invoiceNumber = invoice.invoiceNumber;
-        prevState.transport = data.transport;
-        prevState.paymentMethod = data.paymentMethod;
-        prevState.note = data.note;
-        prevState.status = invoice.inSystem;
-      });
+        const restData = getRestModifyCredit(creditNote.creditNoteId, isYourCredit);
+        restData.then(data => {
+            setRestInfo(data)
+            prevState.creditNoteNumber = data.creditNumber
+            prevState.note = data.note
+        })
     }
   }, [showOffcanvas]);
-  // rest info
+  // Rest info
   const [restInfo, setRestInfo] = useState({
-    transport: "is loading",
-    paymentMethod: "is loading",
-    note: "is loading",
-  });
-  // options
-  const [orgs, setOrgs] = useState({
-    restOrgs: [],
-  });
-  const [paymentMethods, setPaymentMethods] = useState([]);
-  const [paymentStatuses, setPaymentStatuses] = useState([]);
+    creditNumber: "Is loading",
+    orgName: "Is loading",
+    note: "Is loading",
+  })
   // File
   const [file, setFile] = useState();
   // Errors
-  const [invoiceNumberError, setInvoiceNumberError] = useState(false);
-  const [transportError, setTransportError] = useState(false);
+  const [creditNumberError, setCreditNumberError] = useState(false);
   const [documentError, setDocumentError] = useState(false);
-  const anyErrorActive = invoiceNumberError || transportError || documentError;
+  const [dateError, setDateError] = useState(false);
+  const anyErrorActive = creditNumberError || documentError || dateError || restInfo.creditNumber === "Is loading";
   // Misc
   const [isLoading, setIsLoading] = useState(false);
   // Form
-  const [prevState, setPrevState] = useState({
-    invoiceNumber: "",
-    client: -1,
-    transport: 0.0,
-    paymentMethod: -1,
-    paymentStatus: -1,
-    status: null,
+  const [prevState] = useState({
+    creditNoteNumber: "",
+    date: "",
+    inSystem: false,
+    isPaid: false,
     note: "",
   });
   const [state, formPurchaseAction] = useFormState(
-    updateInvoice
+    updateCreditNote
       .bind(null, file)
-      .bind(null, isYourInvoice)
-      .bind(null, invoice.invoiceId)
+      .bind(null, isYourCredit)
+      .bind(null, creditNote.creditNoteId)
       .bind(null, prevState),
     {
       error: false,
@@ -103,7 +83,7 @@ function ModifyInvoiceOffcanvas({
             <Row>
               <Col xs="9" className="d-flex align-items-center">
                 <p className="blue-main-text h4 mb-0">
-                  Modify {isYourInvoice ? "purchase" : "sales"} invoice
+                  Modify {isYourCredit ? "your" : "client"} credit note
                 </p>
               </Col>
               <Col xs="3" className="text-end pe-0">
@@ -127,154 +107,101 @@ function ModifyInvoiceOffcanvas({
           <Container className="p-0" style={vhStyle} fluid>
             <Form
               className="mx-1 mx-xl-4"
-              id="invoiceForm"
+              id="creditModifyForm"
               action={formPurchaseAction}
             >
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">
-                  Invoice Number:
+                  Credit Note Number:
                 </Form.Label>
                 <ErrorMessage
                   message="Is empty, not a number or lenght is greater than 40."
-                  messageStatus={invoiceNumberError}
+                  messageStatus={creditNumberError}
                 />
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
-                  name="invoice"
-                  isInvalid={invoiceNumberError}
+                  name="creditNumber"
+                  isInvalid={creditNumberError}
                   onInput={(e) => {
                     StringValidtor.normalStringValidtor(
                       e.target.value,
-                      setInvoiceNumberError,
+                      setCreditNumberError,
                       40,
                     );
                   }}
                   maxLength={40}
-                  defaultValue={invoice.invoiceNumber}
+                  key={restInfo.creditNumber}
+                  defaultValue={restInfo.creditNumber}
                 />
               </Form.Group>
-              <Form.Group className="mb-3">
+            <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">
-                  {isYourInvoice ? "Buyer:" : "Seller:"}
+                    For Invoice:
                 </Form.Label>
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
-                  defaultValue={orgs.orgName}
+                  defaultValue={creditNote.invoiceNumber}
+                  readOnly
+                  disabled
+                />
+            </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label className="blue-main-text">
+                  Date:
+                </Form.Label>
+                <ErrorMessage
+                  message="Date excceed today's date."
+                  messageStatus={dateError}
+                />
+                <Form.Control
+                  className="input-style shadow-sm maxInputWidth"
+                  name="date"
+                  type="date"
+                  defaultValue={new Date(creditNote.date).toLocaleDateString("en-CA")}
+                  onChange={(e) => {
+                    let date = new Date(e.target.value);
+                    if (date > Date.now()) {
+                      setDateError(true);
+                    } else {
+                      setDateError(false);
+                    }
+                  }}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label className="blue-main-text">
+                  {isYourCredit ? "For:" : "Source:"}
+                </Form.Label>
+                <Form.Control
+                  className="input-style shadow-sm maxInputWidth"
+                  type="text"
+                  key={restInfo.orgName}
+                  defaultValue={restInfo.orgName}
                   readOnly
                   disabled
                 />
               </Form.Group>
               <Form.Group className="mb-4">
                 <Form.Label className="blue-main-text">
-                  {isYourInvoice ? "Seller:" : "Buyer:"}
+                  {isYourCredit ? "Source:" : "For:"}
                 </Form.Label>
-                <Form.Select
-                  id="orgSelect"
-                  className="input-style shadow-sm maxInputWidth"
-                  name="org"
-                >
-                  <option value={-1}>{invoice.clientName}</option>
-                  {Object.values(orgs.restOrgs)
-                    .filter((e) => e.orgName !== invoice.clientName)
-                    .map((value) => {
-                      return (
-                        <option key={value.orgId} value={value.orgId}>
-                          {value.orgName}
-                        </option>
-                      );
-                    })}
-                </Form.Select>
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label className="blue-main-text">
-                  Transport cost:
-                </Form.Label>
-                <ErrorMessage
-                  message="Is empty or is not a number."
-                  messageStatus={transportError}
-                />
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
-                  key={restInfo.transport}
-                  name="transport"
-                  defaultValue={restInfo.transport}
-                  isInvalid={transportError}
-                  onInput={(e) => {
-                    StringValidtor.decimalValidator(
-                      e.target.value,
-                      setTransportError,
-                    );
-                  }}
+                  defaultValue={creditNote.clientName}
+                  readOnly
+                  disabled
                 />
               </Form.Group>
-              <Container className="px-0 maxInputWidth ms-0">
-                <Row className="justify-content-between">
-                  <Col className="align-self-start" xs="6" sm="4">
-                    <Form.Group className="mb-4">
-                      <Form.Label className="blue-main-text">
-                        Payment method:
-                      </Form.Label>
-                      <Form.Select
-                        id="methodSelect"
-                        className="input-style shadow-sm"
-                        name="paymentMethod"
-                      >
-                        <option value={-1}>{restInfo.paymentMethod}</option>
-                        {Object.values(paymentMethods)
-                          .filter(
-                            (e) => e.methodName !== restInfo.paymentMethod,
-                          )
-                          .map((value) => {
-                            return (
-                              <option
-                                key={value.paymentMethodId}
-                                value={value.paymentMethodId}
-                              >
-                                {value.methodName}
-                              </option>
-                            );
-                          })}
-                      </Form.Select>
-                    </Form.Group>
-                  </Col>
-                  <Col className="align-self-end" xs="6" sm="4">
-                    <Form.Group className="mb-4">
-                      <Form.Label className="blue-main-text">
-                        Payment status:
-                      </Form.Label>
-                      <Form.Select
-                        id="statusSelect"
-                        className="input-style shadow-sm"
-                        name="paymentStatus"
-                      >
-                        <option value={-1}>{invoice.paymentStatus}</option>
-                        {Object.values(paymentStatuses)
-                          .filter((e) => e.statusName !== invoice.paymentStatus)
-                          .map((value) => {
-                            return (
-                              <option
-                                key={value.paymentStatusId}
-                                value={value.paymentStatusId}
-                              >
-                                {value.statusName}
-                              </option>
-                            );
-                          })}
-                      </Form.Select>
-                    </Form.Group>
-                  </Col>
-                </Row>
-              </Container>
               <Form.Group className="mb-4">
                 <Form.Label className="blue-main-text">Status:</Form.Label>
                 <Form.Select
                   className="input-style shadow-sm maxInputWidth"
                   name="status"
                 >
-                  {invoice.inSystem ? (
+                  {creditNote.inSystem ? (
                     <>
                       <option value={true}>In system</option>
                       <option value={false}>Not in system</option>
@@ -287,10 +214,19 @@ function ModifyInvoiceOffcanvas({
                   )}
                 </Form.Select>
               </Form.Group>
+              <Form.Group className="mb-4">
+                <Form.Check
+                  className="blue-sec-text"
+                  type="checkbox"
+                  label="Is paid?"
+                  name="isPaid"
+                  defaultChecked={creditNote.isPaid}
+                />
+              </Form.Group>
               <Form.Group className="mb-4 maxInputWidth">
                 <Form.Label className="blue-main-text">Document:</Form.Label>
                 <ErrorMessage
-                  message="Must be a pdf file or not empty."
+                  message="Must be a pdf file."
                   messageStatus={documentError}
                 />
                 <Form.Control
@@ -317,9 +253,9 @@ function ModifyInvoiceOffcanvas({
                   className="input-style shadow-sm"
                   as="textarea"
                   rows={5}
-                  key={restInfo.note}
                   type="text"
                   name="note"
+                  key={restInfo.note}
                   defaultValue={restInfo.note}
                   maxLength={500}
                 />
@@ -336,7 +272,11 @@ function ModifyInvoiceOffcanvas({
                         e.preventDefault();
                         setIsLoading(true);
 
-                        let form = document.getElementById("invoiceForm");
+                        prevState.inSystem = creditNote.inSystem
+                        prevState.isPaid = creditNote.isPaid
+                        prevState.date = creditNote.date.substring(0,10)
+
+                        let form = document.getElementById("creditModifyForm");
                         form.requestSubmit();
                       }}
                     >
@@ -378,7 +318,7 @@ function ModifyInvoiceOffcanvas({
           message={state.message}
           onHideFun={() => {
             resetState();
-            document.getElementById("invoiceForm").reset();
+            document.getElementById("creditModifyForm").reset();
             hideFunction();
             router.refresh();
           }}
@@ -395,11 +335,11 @@ function ModifyInvoiceOffcanvas({
   }
 }
 
-ModifyInvoiceOffcanvas.PropTypes = {
+ModifyCreditNoteOffcanvas.PropTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
-  isYourInvoice: PropTypes.bool.isRequired,
+  isYourCredit: PropTypes.bool.isRequired,
   invoice: PropTypes.object.isRequired,
 };
 
-export default ModifyInvoiceOffcanvas;
+export default ModifyCreditNoteOffcanvas;

@@ -20,6 +20,9 @@ namespace database_comunicator.Services
         public Task<int> GetCreditNoteUser(int creditNoteId);
         public Task<string> GetCreditNumber(int creditNoteId);
         public Task<string?> GetCreditFilePath(int creditNoteId);
+        public Task<GetRestModifyCredit> GetRestModifyCredit(int creditNoteId, bool isYourCredit);
+        public Task<int> GetCreditNoteInvoiceId(int creditNoteId);
+        public Task<bool> ModifyCreditNote(ModifyCreditNote data);
     }
     public class CreditNoteServices : ICreditNoteServices
     {
@@ -320,6 +323,88 @@ namespace database_comunicator.Services
         public async Task<string?> GetCreditFilePath(int creditNoteId)
         {
             return await _handlerContext.CreditNotes.Where(e => e.IdCreditNote == creditNoteId).Select(e => e.CreditFilePath).FirstAsync();
+        }
+        public async Task<GetRestModifyCredit> GetRestModifyCredit(int creditNoteId, bool isYourCredit)
+        {
+            return await _handlerContext.CreditNotes
+                .Where(e => e.IdCreditNote == creditNoteId)
+                .Select(e => new GetRestModifyCredit
+                {
+                    CreditNumber = e.CreditNoteNumber,
+                    OrgName = isYourCredit ? e.Invoice.BuyerNavigation.OrgName : e.Invoice.SellerNavigation.OrgName,
+                    Note = e.Note
+                }).FirstAsync();
+        }
+        public async Task<int> GetCreditNoteInvoiceId(int creditNoteId)
+        {
+            return await _handlerContext.CreditNotes
+                .Where(e => e.IdCreditNote == creditNoteId)
+                .Select(e => e.InvoiceId)
+                .FirstAsync();
+        }
+        public async Task<bool> ModifyCreditNote(ModifyCreditNote data)
+        {
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
+            {
+                if (data.CreditNumber != null)
+                {
+                    await _handlerContext.CreditNotes
+                        .Where(e => e.IdCreditNote == data.Id)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => s.CreditNoteNumber, data.CreditNumber)
+                        );
+                }
+                if (data.Note != null)
+                {
+                    await _handlerContext.CreditNotes
+                        .Where(e => e.IdCreditNote == data.Id)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => s.Note, data.Note)
+                        );
+                }
+                if (data.IsPaid != null)
+                {
+                    await _handlerContext.CreditNotes
+                        .Where(e => e.IdCreditNote == data.Id)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => s.IsPaid, data.IsPaid)
+                        );
+                }
+                if (data.InSystem != null)
+                {
+                    await _handlerContext.CreditNotes
+                        .Where(e => e.IdCreditNote == data.Id)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => s.InSystem, data.InSystem)
+                        );
+                }
+                if (data.Date != null)
+                {
+                    await _handlerContext.CreditNotes
+                        .Where(e => e.IdCreditNote == data.Id)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => s.CreditNoteDate, data.Date)
+                        );
+                }
+                if (data.Path != null)
+                {
+                    await _handlerContext.CreditNotes
+                        .Where(e => e.IdCreditNote == data.Id)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => s.CreditFilePath, data.Path)
+                        );
+                }
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+                return true;
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                await trans.RollbackAsync();
+                return false;
+            }
+
         }
     }
 }

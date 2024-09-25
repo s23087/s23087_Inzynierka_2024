@@ -3,10 +3,10 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 
-export default async function deleteCreditNote(creditNoteId) {
+export default async function deleteCreditNote(creditNoteId, isYourCredit) {
   const dbName = await getDbName();
   const path = await fetch(
-    `${process.env.API_DEST}/${dbName}/CreditNote/creditnote/path/${creditNoteId}`,
+    `${process.env.API_DEST}/${dbName}/CreditNote/path/${creditNoteId}`,
     {
       method: "GET",
     },
@@ -26,7 +26,7 @@ export default async function deleteCreditNote(creditNoteId) {
   let creditPath = await path.text();
   const userId = await getUserId();
 
-  let url = `${process.env.API_DEST}/${dbName}/CreditNote/creditnote/delete/${creditNoteId}?userId=${userId}`;
+  let url = `${process.env.API_DEST}/${dbName}/CreditNote/delete/${creditNoteId}?userId=${userId}&isYourCredit=${isYourCredit}`;
   const info = await fetch(url, {
     method: "Delete",
   });

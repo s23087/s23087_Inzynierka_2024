@@ -4,7 +4,7 @@ import getDbName from "../auth/get_db_name";
 
 export default async function getRestCreditNote(creditId) {
   const dbName = await getDbName();
-  let url = `${process.env.API_DEST}/${dbName}/CreditNote/creditnote/rest/${creditId}`;
+  let url = `${process.env.API_DEST}/${dbName}/CreditNote/rest/${creditId}`;
   const items = await fetch(url, {
     method: "GET",
   });

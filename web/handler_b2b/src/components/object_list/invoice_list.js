@@ -20,6 +20,7 @@ import ModifyInvoiceOffcanvas from "../offcanvas/modify/documents/modify_invoice
 import AddCreditNoteOffcanvas from "../offcanvas/create/documents/create_credit_note";
 import ViewCreditNoteOffcanvas from "../offcanvas/view/documents/view_credit_note";
 import deleteCreditNote from "@/utils/documents/delete_credit_note";
+import ModifyCreditNoteOffcanvas from "../offcanvas/modify/documents/modify_credit_note";
 
 function getIfSelected(type, document, selected) {
   if (type.includes("note")) {
@@ -54,6 +55,7 @@ function getDocument(
         unselectAction={unselectAction}
         viewAction={viewAction}
         deleteAction={deleteAction}
+        modifyAction={modifyAction}
       />
     );
   }
@@ -117,6 +119,14 @@ function InvoiceList({
   const [showModifyInvoice, setShowModifyInvoice] = useState(false);
   const [invoiceToModify, setInvoiceToModify] = useState({
     invoiceNumber: "",
+  });
+  // Modify credit note
+  const [showModifyCreditNote, setShowModifyCreditNote] = useState(false);
+  const [creditNoteToModify, setCreditNoteToModify] = useState({
+    invoiceNumber: "",
+    date: "",
+    clientName: "",
+    inSystem: ""
   });
   // Delete credit note
   const [showDeleteCreditNote, setShowDeleteCreditNote] = useState(false);
@@ -215,8 +225,14 @@ function InvoiceList({
               },
               () => {
                 // Modify
-                setInvoiceToModify(value);
-                setShowModifyInvoice(true);
+                if (type.includes("notes")) {
+                  setCreditNoteToModify(value);
+                  setShowModifyCreditNote(true);
+                }
+                if (type.includes("invoice")) {
+                  setInvoiceToModify(value);
+                  setShowModifyInvoice(true);
+                }
               },
             );
           })
@@ -283,7 +299,7 @@ function InvoiceList({
         instanceName="invoice"
         instanceId={invoiceToDelete}
         deleteItemFunc={async () => {
-          let result = await deleteInvoice(invoiceToDelete);
+          let result = await deleteInvoice(invoiceToDelete, type === "Yours invoices");
           if (!result.error) {
             setShowDeleteInvoice(false);
             router.refresh();
@@ -304,7 +320,7 @@ function InvoiceList({
         instanceName="document"
         instanceId={creditNoteToDelete}
         deleteItemFunc={async () => {
-          let result = await deleteCreditNote(creditNoteToDelete);
+          let result = await deleteCreditNote(creditNoteToDelete, type === "Yours credit notes");
           if (!result.error) {
             setShowDeleteCreditNote(false);
             router.refresh();
@@ -321,6 +337,12 @@ function InvoiceList({
         hideFunction={() => setShowModifyInvoice(false)}
         isYourInvoice={type === "Yours invoices"}
         invoice={invoiceToModify}
+      />
+      <ModifyCreditNoteOffcanvas
+        showOffcanvas={showModifyCreditNote}
+        hideFunction={() => setShowModifyCreditNote(false)}
+        isYourCredit={type === "Yours credit notes"}
+        creditNote={creditNoteToModify}
       />
       <ViewInvoiceOffcanvas
         showOffcanvas={showViewInvoice}

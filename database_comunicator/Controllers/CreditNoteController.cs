@@ -30,7 +30,7 @@ namespace database_comunicator.Controllers
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("This user does not exists.");
             var creditExist = await _creditNoteServices.CreditNoteExist(data.CreditNotenumber, data.InvoiceId);
-            if (creditExist) return BadRequest("This invoice exist.");
+            if (creditExist) return BadRequest("Credit note with that number alredy exist.");
             foreach (var item in data.CreditNoteItems.Select(e => new {e.ItemId, e.InvoiceId, e.UserId, e.Qty}))
             {
                 if (item.Qty > 0)
@@ -40,7 +40,7 @@ namespace database_comunicator.Controllers
                 var canBeApplied = await _creditNoteServices.CreditDeductionCanBeApplied(item.UserId, item.InvoiceId, item.ItemId, item.Qty);
                 if (!canBeApplied)
                 {
-                    return BadRequest("This user do not posses enought item to be deducted.");
+                    return BadRequest("This user do not posses enough qty of this item to be deducted.");
                 }
             }
             var result = await _creditNoteServices.AddCreditNote(data);
@@ -54,7 +54,7 @@ namespace database_comunicator.Controllers
                 {
                     UserId = data.CreditNoteItems.Select(e => e.UserId).First(),
                     Info = $"The credit note with number {data.CreditNotenumber} has been added.",
-                    ObjectType = "Credit note",
+                    ObjectType = data.IsYourCreditNote ? "Yours credit notes" : "Client credit notes",
                     Referance = $"{result}"
                 });
             }
@@ -92,7 +92,7 @@ namespace database_comunicator.Controllers
             }
         }
         [HttpGet]
-        [Route("creditnote/rest/{creditId}")]
+        [Route("rest/{creditId}")]
         public async Task<IActionResult> GetRestCreditNote(int creditId)
         {
             var exist = await _creditNoteServices.CreditNoteExist(creditId);
@@ -101,8 +101,8 @@ namespace database_comunicator.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("creditnote/path/{creditId}")]
-        public async Task<IActionResult> GetCreditFilePAth(int creditId)
+        [Route("path/{creditId}")]
+        public async Task<IActionResult> GetCreditFilePath(int creditId)
         {
             var exist = await _creditNoteServices.CreditNoteExist(creditId);
             if (!exist) return NotFound();
@@ -110,8 +110,8 @@ namespace database_comunicator.Controllers
             return Ok(result);
         }
         [HttpDelete]
-        [Route("creditnote/delete/{creditId}")]
-        public async Task<IActionResult> DeleteCreditNote(int creditId, int userId)
+        [Route("delete/{creditId}")]
+        public async Task<IActionResult> DeleteCreditNote(int creditId, int userId, bool isYourCredit)
         {
             var exist = await _creditNoteServices.CreditNoteExist(creditId);
             if (!exist) return NotFound();
@@ -128,8 +128,50 @@ namespace database_comunicator.Controllers
                 {
                     UserId = creditUser,
                     Info = $"The credit note with number {creditNumber} has been deleted.",
-                    ObjectType = "Credit note",
+                    ObjectType = isYourCredit ? "Yours credit notes" : "Client credit notes",
                     Referance = $"{creditId}"
+                });
+            }
+            return Ok(result);
+        }
+        [HttpGet]
+        [Route("modify/rest/{isYourCredit}/{creditId}")]
+        public async Task<IActionResult> GetRestModifyCredit(int creditId, bool isYourCredit)
+        {
+            var exist = await _creditNoteServices.CreditNoteExist(creditId);
+            if (!exist) return NotFound();
+            var result = await _creditNoteServices.GetRestModifyCredit(creditId, isYourCredit);
+            return Ok(result);
+        }
+        [HttpPost]
+        [Route("modify")]
+        public async Task<IActionResult> ModifyCreditNote(ModifyCreditNote data, int userId)
+        {
+            var exist = await _userServices.UserExist(userId);
+            if (!exist) return NotFound("User not found.");
+            var cdExist = await _creditNoteServices.CreditNoteExist(data.Id);
+            if (!cdExist) return NotFound("Credit note does not exist.");
+            if (data.CreditNumber != null)
+            {
+                var invoiceId = await _creditNoteServices.GetCreditNoteInvoiceId(data.Id);
+                var newNumberExist = await _creditNoteServices.CreditNoteExist(data.CreditNumber, invoiceId);
+                if (newNumberExist) return BadRequest("Credit note with this number and invoice alredy exist.");
+            }
+            var creditUser = await _creditNoteServices.GetCreditNoteUser(data.Id);
+            var result = await _creditNoteServices.ModifyCreditNote(data);
+            var creditNumber = await _creditNoteServices.GetCreditNumber(data.Id);
+            if (!result) return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            var logId = await _logServices.getLogTypeId("Delete");
+            var desc = $"User with id {userId} has modified the credit note with id {data.Id} and number {creditNumber}.";
+            await _logServices.CreateActionLog(desc, userId, logId);
+            if (creditUser != userId)
+            {
+                await _notificationServices.CreateNotification(new CreateNotification
+                {
+                    UserId = creditUser,
+                    Info = $"The credit note with number {creditNumber} has been modified.",
+                    ObjectType = data.IsYourCredit ? "Yours credit notes" : "Client credit notes",
+                    Referance = $"{data.Id}"
                 });
             }
             return Ok(result);

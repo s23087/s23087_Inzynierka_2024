@@ -177,7 +177,7 @@ namespace database_comunicator.Controllers
                 {
                     UserId = data.UserId,
                     Info = $"The purchase invoice with number {data.InvoiceNumber} has been added.",
-                    ObjectType = "Invoice",
+                    ObjectType = "Yours invoices",
                     Referance = $"{invoiceId}"
                 });
             }
@@ -210,7 +210,7 @@ namespace database_comunicator.Controllers
                 {
                     UserId = data.UserId,
                     Info = $"The sales invoice with number {data.InvoiceNumber} has been added.",
-                    ObjectType = "Invoice",
+                    ObjectType = "Sales invoices",
                     Referance = $"{invoiceId}"
                 });
             }
@@ -234,7 +234,7 @@ namespace database_comunicator.Controllers
         }
         [HttpDelete]
         [Route("deleteInvoice/{invoiceId}")]
-        public async Task<IActionResult> DeleteInvoice(int invoiceId, int userId)
+        public async Task<IActionResult> DeleteInvoice(int invoiceId, int userId, bool isYourInvoice)
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("User not found.");
@@ -260,7 +260,7 @@ namespace database_comunicator.Controllers
                     {
                         UserId = user,
                         Info = $"The invoice with number {invoiceNumber} has been deleted.",
-                        ObjectType = "Invoice",
+                        ObjectType = isYourInvoice ? "Yours invoices" : "Sales invoices",
                         Referance = $"{invoiceId}"
                     });
                 }
@@ -305,7 +305,7 @@ namespace database_comunicator.Controllers
         }
         [HttpPost]
         [Route("modify/{userId}")]
-        public async Task<IActionResult> GetRestModifyInvoice(ModifyInvoice data, int userId)
+        public async Task<IActionResult> ModifyInvoice(ModifyInvoice data, int userId)
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("User not found.");
@@ -329,7 +329,7 @@ namespace database_comunicator.Controllers
                     {
                         UserId = user,
                         Info = $"The invoice with number {invoiceNumber} has been deleted.",
-                        ObjectType = "Invoice",
+                        ObjectType = data.IsYourInvoice ? "Yours invoices" : "Sales invoices",
                         Referance = $"{data.InvoiceId}"
                     });
                 }
