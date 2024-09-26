@@ -94,8 +94,6 @@ public partial class HandlerContext : DbContext
 
     public virtual DbSet<Request> Requests { get; set; }
 
-    public virtual DbSet<RequestCreditNote> RequestCreditNotes { get; set; }
-
     public virtual DbSet<RequestStatus> RequestStatuses { get; set; }
 
     public virtual DbSet<SellingPrice> SellingPrices { get; set; }
@@ -1060,97 +1058,38 @@ public partial class HandlerContext : DbContext
             entity.ToTable("Request");
 
             entity.Property(e => e.RequestId).HasColumnName("request_id");
-            entity.Property(e => e.IdUser).HasColumnName("id_user");
+            entity.Property(e => e.IdUserCreator).HasColumnName("id_user_creator");
+            entity.Property(e => e.IdUserReciver).HasColumnName("id_user_receiver");
             entity.Property(e => e.RequestStatusId).HasColumnName("request_status_id");
+            entity.Property(e => e.ObjectTypeId).HasColumnName("object_type_id");
+            entity.Property(e => e.Note)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("note");
+            entity.Property(e => e.FilePath)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("filePath");
 
-            entity.HasOne(d => d.IdUserNavigation).WithMany(p => p.Requests)
-                .HasForeignKey(d => d.IdUser)
+            entity.HasOne(d => d.UserCreator).WithMany(p => p.CreatedRequest)
+                .HasForeignKey(d => d.IdUserCreator)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("Request_Org_User_relation");
+                .HasConstraintName("Request_App_User_creator_relation");
+
+            entity.HasOne(d => d.UserReciver).WithMany(p => p.Requests)
+                .HasForeignKey(d => d.IdUserReciver)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Request_App_User_relation");
 
             entity.HasOne(d => d.RequestStatus).WithMany(p => p.Requests)
                 .HasForeignKey(d => d.RequestStatusId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Request_Request_status_relation");
 
-            entity.HasMany(d => d.Invoices).WithMany(p => p.Requests)
-                .UsingEntity<Dictionary<string, object>>(
-                    "RequestInvoice",
-                    r => r.HasOne<Invoice>().WithMany()
-                        .HasForeignKey("InvoiceId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("Request_Invoice_Invoice_relation"),
-                    l => l.HasOne<Request>().WithMany()
-                        .HasForeignKey("RequestId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("Request_Invoice_Request_relation"),
-                    j =>
-                    {
-                        j.HasKey("RequestId", "InvoiceId").HasName("Request_Invoice_pk");
-                        j.ToTable("Request_Invoice");
-                        j.IndexerProperty<int>("RequestId").HasColumnName("request_id");
-                        j.IndexerProperty<int>("InvoiceId").HasColumnName("invoice_id");
-                    });
-
-            entity.HasMany(d => d.Notes).WithMany(p => p.Requests)
-                .UsingEntity<Dictionary<string, object>>(
-                    "RequestNote",
-                    r => r.HasOne<Note>().WithMany()
-                        .HasForeignKey("NoteId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("Request_Note_Note_relation"),
-                    l => l.HasOne<Request>().WithMany()
-                        .HasForeignKey("RequestId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("Request_Note_Request_relation"),
-                    j =>
-                    {
-                        j.HasKey("RequestId", "NoteId").HasName("Request_Note_pk");
-                        j.ToTable("Request_Note");
-                        j.IndexerProperty<int>("RequestId").HasColumnName("request_id");
-                        j.IndexerProperty<int>("NoteId").HasColumnName("note_id");
-                    });
-
-            entity.HasMany(d => d.Proformas).WithMany(p => p.Requests)
-                .UsingEntity<Dictionary<string, object>>(
-                    "RequestProforma",
-                    r => r.HasOne<Proforma>().WithMany()
-                        .HasForeignKey("ProformaId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("Request_Proforma_Proforma_relation"),
-                    l => l.HasOne<Request>().WithMany()
-                        .HasForeignKey("RequestId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("Request_Proforma_Request_relation"),
-                    j =>
-                    {
-                        j.HasKey("RequestId", "ProformaId").HasName("Request_Proforma_pk");
-                        j.ToTable("Request_Proforma");
-                        j.IndexerProperty<int>("RequestId").HasColumnName("request_id");
-                        j.IndexerProperty<int>("ProformaId").HasColumnName("proforma_id");
-                    });
-        });
-
-        modelBuilder.Entity<RequestCreditNote>(entity =>
-        {
-            entity.HasKey(e => e.CreditNoteId).HasName("Request_Credit_note_pk");
-
-            entity.ToTable("Request_Credit_note");
-
-            entity.Property(e => e.CreditNoteId)
-                .ValueGeneratedNever()
-                .HasColumnName("credit_note_id");
-            entity.Property(e => e.RequestId).HasColumnName("request_id");
-
-            entity.HasOne(d => d.CreditNote).WithOne(p => p.RequestCreditNote)
-                .HasForeignKey<RequestCreditNote>(d => d.CreditNoteId)
+            entity.HasOne(d => d.ObjectType).WithMany(p => p.Requests)
+                .HasForeignKey(d => d.ObjectTypeId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("Request_Credit_note_Credit_note_relation");
-
-            entity.HasOne(d => d.Request).WithMany(p => p.RequestCreditNotes)
-                .HasForeignKey(d => d.RequestId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("Request_Request_Credit_note_relation");
+                .HasConstraintName("Request_Object_type_relation");
         });
 
         modelBuilder.Entity<RequestStatus>(entity =>

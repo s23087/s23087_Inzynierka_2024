@@ -6,14 +6,17 @@ namespace database_comunicator.Models;
 public partial class Request
 {
     public int RequestId { get; set; }
-
-    public int IdUser { get; set; }
+    public int IdUserCreator { get; set; }
+    public int IdUserReciver { get; set; }
 
     public int RequestStatusId { get; set; }
+    public int ObjectTypeId { get; set; }
+    public string? FilePath { get; set; }
+    public string Note { get; set; } = null!;
 
-    public virtual OrgUser IdUserNavigation { get; set; } = null!;
-
-    public virtual ICollection<RequestCreditNote> RequestCreditNotes { get; set; } = new List<RequestCreditNote>();
+    public virtual AppUser UserReciver { get; set; } = null!;
+    public virtual AppUser UserCreator { get; set; } = null!;
+    public virtual ObjectType ObjectType { get; set; } = null!;
 
     public virtual RequestStatus RequestStatus { get; set; } = null!;
 

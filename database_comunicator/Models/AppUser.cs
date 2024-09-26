@@ -34,10 +34,8 @@ public partial class AppUser
     public virtual ICollection<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
 
     public virtual ICollection<Organization> Clients { get; set; } = new List<Organization>();
-    public void DeleteClient(int orgId) => Clients.Remove(new Organization
-    {
-        OrganizationId = orgId
-    });
     public virtual ICollection<SellingPrice> SellingPrices { get; set; } = new List<SellingPrice>();
     public virtual ICollection<CreditNote> CreditNotes { get; set; } = new List<CreditNote>();
+    public virtual ICollection<Request> CreatedRequest { get; set; } = new List<Request>();
+    public virtual ICollection<Request> Requests { get; set; } = new List<Request>();
 }

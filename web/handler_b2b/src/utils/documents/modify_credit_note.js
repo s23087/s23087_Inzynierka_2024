@@ -95,7 +95,7 @@ export default async function updateCreditNote(
 
   if (info.status === 404) {
     let infoText = await info.text();
-    if (infoText.includes("User")) logout()
+    if (infoText.includes("User")) logout();
     return {
       error: true,
       completed: true,
@@ -121,8 +121,8 @@ export default async function updateCreditNote(
           {
             method: "POST",
             body: JSON.stringify({
-              isYourInvoice: isYourInvoice,
-              invoiceId: invoiceId,
+              isYourCredit: isYourCredit,
+              id: creditNoteId,
               path: prevPath,
             }),
             headers: {

@@ -167,7 +167,7 @@ namespace database_comunicator.Controllers
                 }
             }
             var invoiceId = await _invoicesService.AddPurchaseInvoice(data);
-            if (invoiceId == 0) return BadRequest("Cloud not create the document.");
+            if (invoiceId == 0) return BadRequest("Could not create the document.");
             var logId = await _logServices.getLogTypeId("Create");
             var desc = $"User with id {userId} has created the invoice {data.InvoiceNumber} for user with id {data.UserId}.";
             await _logServices.CreateActionLog(desc, userId, logId);
@@ -200,7 +200,7 @@ namespace database_comunicator.Controllers
                 }
             }
             var invoiceId = await _invoicesService.AddSalesInvoice(data);
-            if (invoiceId == 0) return BadRequest("Cloud not create the document.");
+            if (invoiceId == 0) return BadRequest("Could not create the document.");
             var logId = await _logServices.getLogTypeId("Create");
             var desc = $"User with id {userId} has created the invoice {data.InvoiceNumber} for user with id {data.UserId}.";
             await _logServices.CreateActionLog(desc, userId, logId);

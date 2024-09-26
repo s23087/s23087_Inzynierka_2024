@@ -21,13 +21,17 @@ import AddCreditNoteOffcanvas from "../offcanvas/create/documents/create_credit_
 import ViewCreditNoteOffcanvas from "../offcanvas/view/documents/view_credit_note";
 import deleteCreditNote from "@/utils/documents/delete_credit_note";
 import ModifyCreditNoteOffcanvas from "../offcanvas/modify/documents/modify_credit_note";
+import AddRequestOffcanvas from "../offcanvas/create/documents/create_request";
+import ViewRequestOffcanvas from "../offcanvas/view/documents/view_request";
+import deleteRequest from "@/utils/documents/delete_request";
+import ModifyRequestOffcanvas from "../offcanvas/modify/documents/modify_request";
 
 function getIfSelected(type, document, selected) {
   if (type.includes("note")) {
     return selected.indexOf(document.creditNoteId) !== -1;
   }
-  if (type.includes("Request")) {
-    return selected.indexOf(document.requestId) !== -1;
+  if (type === "Requests") {
+    return selected.indexOf(document.id) !== -1;
   }
   return selected.indexOf(document.invoiceId) !== -1;
 }
@@ -62,9 +66,15 @@ function getDocument(
   if (type.includes("Requests")) {
     return (
       <RequestContainer
+        key={document.id}
         request={document}
         is_org={is_org}
         selected={selected}
+        selectAction={selectAction}
+        unselectAction={unselectAction}
+        viewAction={viewAction}
+        deleteAction={deleteAction}
+        modifyAction={modifyAction}
       />
     );
   }
@@ -115,6 +125,14 @@ function InvoiceList({
     inSystem: false,
     isPaid: false,
   });
+  // View request
+  const [showViewRequest, setShowViewRequest] = useState(false);
+  const [requestToView, setRequestToView] = useState({
+    id: 0,
+    username: "",
+    status: "",
+    objectType: "",
+  });
   // Modify invoice
   const [showModifyInvoice, setShowModifyInvoice] = useState(false);
   const [invoiceToModify, setInvoiceToModify] = useState({
@@ -126,20 +144,31 @@ function InvoiceList({
     invoiceNumber: "",
     date: "",
     clientName: "",
-    inSystem: ""
+    inSystem: "",
+  });
+  // Modify request
+  const [showModifyRequest, setShowModifyRequest] = useState(false);
+  const [requestToModify, setRequestToModify] = useState({
+    id: 0,
+    objectType: "",
   });
   // Delete credit note
   const [showDeleteCreditNote, setShowDeleteCreditNote] = useState(false);
   const [creditNoteToDelete, setCreditNoteToDelete] = useState(null);
+  // Delete credit note
+  const [showDeleteRequest, setShowDeleteRequest] = useState(false);
+  const [requestToDelete, setRequestToDelete] = useState(null);
   // Delete invoice
   const [showDeleteInvoice, setShowDeleteInvoice] = useState(false);
   const [invoiceToDelete, setInvoiceToDelete] = useState(null);
+  // Delete error
   const [isErrorDelete, setIsErrorDelete] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   // More action
   const [showMoreAction, setShowMoreAction] = useState(false);
   const [isShowAddInvoice, setShowAddInvoice] = useState(false);
   const [isShowAddCreditNote, setShowAddCreditNote] = useState(false);
+  const [isShowAddRequest, setShowAddRequest] = useState(false);
   // Seleted
   const [selectedQty, setSelectedQty] = useState(0);
   const [selectedDocuments] = useState([]);
@@ -187,7 +216,14 @@ function InvoiceList({
                   selectedDocuments.push(value.creditNoteId);
                   return;
                 }
-                selectedDocuments.push(value.invoiceId);
+                if (type.includes("invoice")) {
+                  selectedDocuments.push(value.invoiceId);
+                  return;
+                }
+                if (type === "Requests") {
+                  selectedDocuments.push(value.id);
+                  return;
+                }
               },
               () => {
                 // Unselect
@@ -197,6 +233,9 @@ function InvoiceList({
                 }
                 if (type.includes("invoice")) {
                   index = selectedDocuments.indexOf(value.invoiceId);
+                }
+                if (type === "Requests") {
+                  index = selectedDocuments.indexOf(value.id);
                 }
                 selectedDocuments.splice(index, 1);
                 setSelectedQty(selectedQty - 1);
@@ -211,6 +250,10 @@ function InvoiceList({
                   setInvoiceToDelete(value.invoiceId);
                   setShowDeleteInvoice(true);
                 }
+                if (type === "Requests") {
+                  setRequestToDelete(value.id);
+                  setShowDeleteRequest(true);
+                }
               },
               () => {
                 // View
@@ -221,6 +264,10 @@ function InvoiceList({
                 if (type.includes("invoice")) {
                   setInvoiceToView(value);
                   setShowViewInvoice(true);
+                }
+                if (type === "Requests") {
+                  setRequestToView(value);
+                  setShowViewRequest(true);
                 }
               },
               () => {
@@ -233,6 +280,10 @@ function InvoiceList({
                   setInvoiceToModify(value);
                   setShowModifyInvoice(true);
                 }
+                if (type === "Requests") {
+                  setRequestToModify(value);
+                  setShowModifyRequest(true);
+                }
               },
             );
           })
@@ -240,7 +291,7 @@ function InvoiceList({
       <MoreActionWindow
         modalShow={showMoreAction}
         onHideFunction={() => setShowMoreAction(false)}
-        instanceName="document"
+        instanceName={type !== "Requests" ? "document" : "request"}
         addAction={() => {
           if ((orgView || role === "Admin") && type.includes("invoice")) {
             setShowMoreAction(false);
@@ -249,6 +300,10 @@ function InvoiceList({
           if ((orgView || role === "Admin") && type.includes("note")) {
             setShowMoreAction(false);
             setShowAddCreditNote(true);
+          }
+          if ((!orgView || role === "Admin") && type === "Requests") {
+            setShowMoreAction(false);
+            setShowAddRequest(true);
           }
         }}
         selectAllOnPage={() => {
@@ -260,6 +315,7 @@ function InvoiceList({
             .forEach((e) => {
               if (type.includes("invoice")) selectedDocuments.push(e.invoiceId);
               if (type.includes("note")) selectedDocuments.push(e.creditNoteId);
+              if (type === "Requests") selectedDocuments.push(e.id);
             });
           setSelectedQty(selectedDocuments.length);
           setShowMoreAction(false);
@@ -270,6 +326,7 @@ function InvoiceList({
           Object.values(invoices).forEach((e) => {
             if (type.includes("invoice")) selectedDocuments.push(e.invoiceId);
             if (type.includes("note")) selectedDocuments.push(e.creditNoteId);
+            if (type === "Requests") selectedDocuments.push(e.id);
           });
           setSelectedQty(selectedDocuments.length);
           setShowMoreAction(false);
@@ -290,6 +347,10 @@ function InvoiceList({
         hideFunction={() => setShowAddInvoice(false)}
         isYourInvoice={type === "Yours invoices"}
       />
+      <AddRequestOffcanvas
+        showOffcanvas={isShowAddRequest}
+        hideFunction={() => setShowAddRequest(false)}
+      />
       <DeleteObjectWindow
         modalShow={showDeleteInvoice}
         onHideFunction={() => {
@@ -299,7 +360,10 @@ function InvoiceList({
         instanceName="invoice"
         instanceId={invoiceToDelete}
         deleteItemFunc={async () => {
-          let result = await deleteInvoice(invoiceToDelete, type === "Yours invoices");
+          let result = await deleteInvoice(
+            invoiceToDelete,
+            type === "Yours invoices",
+          );
           if (!result.error) {
             setShowDeleteInvoice(false);
             router.refresh();
@@ -320,9 +384,33 @@ function InvoiceList({
         instanceName="document"
         instanceId={creditNoteToDelete}
         deleteItemFunc={async () => {
-          let result = await deleteCreditNote(creditNoteToDelete, type === "Yours credit notes");
+          let result = await deleteCreditNote(
+            creditNoteToDelete,
+            type === "Yours credit notes",
+          );
           if (!result.error) {
             setShowDeleteCreditNote(false);
+            router.refresh();
+          } else {
+            setErrorMessage(result.message);
+            setIsErrorDelete(true);
+          }
+        }}
+        isError={isErrorDelete}
+        errorMessage={errorMessage}
+      />
+      <DeleteObjectWindow
+        modalShow={showDeleteRequest}
+        onHideFunction={() => {
+          setShowDeleteRequest(false);
+          setIsErrorDelete(false);
+        }}
+        instanceName="request"
+        instanceId={requestToDelete}
+        deleteItemFunc={async () => {
+          let result = await deleteRequest(requestToDelete);
+          if (!result.error) {
+            setShowDeleteRequest(false);
             router.refresh();
           } else {
             setErrorMessage(result.message);
@@ -344,6 +432,11 @@ function InvoiceList({
         isYourCredit={type === "Yours credit notes"}
         creditNote={creditNoteToModify}
       />
+      <ModifyRequestOffcanvas
+        showOffcanvas={showModifyRequest}
+        hideFunction={() => setShowModifyRequest(false)}
+        request={requestToModify}
+      />
       <ViewInvoiceOffcanvas
         showOffcanvas={showViewInvoice}
         hideFunction={() => setShowViewInvoice(false)}
@@ -355,6 +448,12 @@ function InvoiceList({
         hideFunction={() => setShowViewCredit(false)}
         creditNote={creditToView}
         isYourCredit={type === "Yours credit notes"}
+      />
+      <ViewRequestOffcanvas
+        showOffcanvas={showViewRequest}
+        hideFunction={() => setShowViewRequest(false)}
+        request={requestToView}
+        isOrg={orgView}
       />
     </Container>
   );

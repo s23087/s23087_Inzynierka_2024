@@ -13,6 +13,7 @@ import getSearchSalesInvoices from "@/utils/documents/get_sales_invoices_search"
 import getSalesInvoices from "@/utils/documents/get_sales_invoices";
 import getSearchCreditNotes from "@/utils/documents/get_credit_note_with_search";
 import getCreditNotes from "@/utils/documents/get_credit_note";
+import getRequests from "@/utils/documents/get_requests";
 
 async function getDocuments(type, org_view, search) {
   switch (type) {
@@ -32,7 +33,7 @@ async function getDocuments(type, org_view, search) {
       }
       return await getCreditNotes(org_view, false);
     case "Requests":
-      return [];
+      return await getRequests(org_view);
   }
   if (search) {
     return await getSearchYoursInvoices(org_view, search);

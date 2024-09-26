@@ -20,12 +20,15 @@ function ModifyCreditNoteOffcanvas({
   const router = useRouter();
   useEffect(() => {
     if (showOffcanvas) {
-        const restData = getRestModifyCredit(creditNote.creditNoteId, isYourCredit);
-        restData.then(data => {
-            setRestInfo(data)
-            prevState.creditNoteNumber = data.creditNumber
-            prevState.note = data.note
-        })
+      const restData = getRestModifyCredit(
+        creditNote.creditNoteId,
+        isYourCredit,
+      );
+      restData.then((data) => {
+        setRestInfo(data);
+        prevState.creditNoteNumber = data.creditNumber;
+        prevState.note = data.note;
+      });
     }
   }, [showOffcanvas]);
   // Rest info
@@ -33,14 +36,18 @@ function ModifyCreditNoteOffcanvas({
     creditNumber: "Is loading",
     orgName: "Is loading",
     note: "Is loading",
-  })
+  });
   // File
   const [file, setFile] = useState();
   // Errors
   const [creditNumberError, setCreditNumberError] = useState(false);
   const [documentError, setDocumentError] = useState(false);
   const [dateError, setDateError] = useState(false);
-  const anyErrorActive = creditNumberError || documentError || dateError || restInfo.creditNumber === "Is loading";
+  const anyErrorActive =
+    creditNumberError ||
+    documentError ||
+    dateError ||
+    restInfo.creditNumber === "Is loading";
   // Misc
   const [isLoading, setIsLoading] = useState(false);
   // Form
@@ -135,10 +142,8 @@ function ModifyCreditNoteOffcanvas({
                   defaultValue={restInfo.creditNumber}
                 />
               </Form.Group>
-            <Form.Group className="mb-3">
-                <Form.Label className="blue-main-text">
-                    For Invoice:
-                </Form.Label>
+              <Form.Group className="mb-3">
+                <Form.Label className="blue-main-text">For Invoice:</Form.Label>
                 <Form.Control
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
@@ -146,11 +151,9 @@ function ModifyCreditNoteOffcanvas({
                   readOnly
                   disabled
                 />
-            </Form.Group>
+              </Form.Group>
               <Form.Group className="mb-3">
-                <Form.Label className="blue-main-text">
-                  Date:
-                </Form.Label>
+                <Form.Label className="blue-main-text">Date:</Form.Label>
                 <ErrorMessage
                   message="Date excceed today's date."
                   messageStatus={dateError}
@@ -159,7 +162,9 @@ function ModifyCreditNoteOffcanvas({
                   className="input-style shadow-sm maxInputWidth"
                   name="date"
                   type="date"
-                  defaultValue={new Date(creditNote.date).toLocaleDateString("en-CA")}
+                  defaultValue={new Date(creditNote.date).toLocaleDateString(
+                    "en-CA",
+                  )}
                   onChange={(e) => {
                     let date = new Date(e.target.value);
                     if (date > Date.now()) {
@@ -272,9 +277,9 @@ function ModifyCreditNoteOffcanvas({
                         e.preventDefault();
                         setIsLoading(true);
 
-                        prevState.inSystem = creditNote.inSystem
-                        prevState.isPaid = creditNote.isPaid
-                        prevState.date = creditNote.date.substring(0,10)
+                        prevState.inSystem = creditNote.inSystem;
+                        prevState.isPaid = creditNote.isPaid;
+                        prevState.date = creditNote.date.substring(0, 10);
 
                         let form = document.getElementById("creditModifyForm");
                         form.requestSubmit();

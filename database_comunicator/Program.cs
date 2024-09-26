@@ -23,6 +23,7 @@ builder.Services.AddScoped<IRolesServices, RolesServices>();
 builder.Services.AddScoped<IInvoiceServices, InvoiceServices>();
 builder.Services.AddScoped<INotificationServices, NotificationServices>();
 builder.Services.AddScoped<ICreditNoteServices, CreditNoteServices>();
+builder.Services.AddScoped<IRequestServices, RequestServices>();
 
 var app = builder.Build();
 

@@ -9,7 +9,6 @@ import dropdown_big_down from "../../../../../public/icons/dropdown_big_down.png
 import download_off from "../../../../../public/icons/download_off.png";
 import download_on from "../../../../../public/icons/download_on.png";
 import getInvoiceFile from "@/utils/documents/download_invoice";
-import InvoiceTable from "@/components/tables/invoice_table";
 import getRestCreditNote from "@/utils/documents/get_rest_credit_note";
 import CreditNoteTable from "@/components/tables/credit_table";
 function ViewCreditNoteOffcanvas({
