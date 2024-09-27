@@ -11,6 +11,8 @@ function ContainerButtons({
   completeAction,
   rejectAction,
   is_request = false,
+  rejectUnaval = false,
+  completeUnaval = false,
 }) {
   return (
     <Container className="h-100" fluid>
@@ -38,6 +40,7 @@ function ContainerButtons({
             variant={is_request ? "green" : "mainBlue"}
             className="basicButtonStyle rounded-span w-100 p-0"
             onClick={is_request ? completeAction : viewAction}
+            disabled={completeUnaval && is_request}
           >
             {is_request ? "Complete" : "View"}
           </Button>
@@ -47,6 +50,7 @@ function ContainerButtons({
             variant={is_request ? "red" : "mainBlue"}
             className="basicButtonStyle rounded-span w-100"
             onClick={is_request ? rejectAction : modifyAction}
+            disabled={rejectUnaval && is_request}
           >
             {is_request ? "Reject" : "Modify"}
           </Button>
@@ -66,6 +70,8 @@ ContainerButtons.propTypes = {
   completeAction: PropTypes.func,
   rejectAction: PropTypes.func,
   is_request: PropTypes.bool.isRequired,
+  completeUnaval: PropTypes.bool,
+  rejectUnaval: PropTypes.bool,
 };
 
 export default ContainerButtons;

@@ -13,6 +13,8 @@ public partial class Request
     public int ObjectTypeId { get; set; }
     public string? FilePath { get; set; }
     public string Note { get; set; } = null!;
+    public string Title { get; set; } = null!;
+    public DateTime CreationDate { get; set; }
 
     public virtual AppUser UserReciver { get; set; } = null!;
     public virtual AppUser UserCreator { get; set; } = null!;

@@ -9,7 +9,11 @@ import download_off from "../../../../../public/icons/download_off.png";
 import download_on from "../../../../../public/icons/download_on.png";
 import getInvoiceFile from "@/utils/documents/download_invoice";
 import getRestRequest from "@/utils/documents/get_rest_request";
+import setRequestStatus from "@/utils/documents/set_request_status";
+import { useRouter } from "next/navigation";
+import ErrorMessage from "@/components/smaller_components/error_message";
 function ViewRequestOffcanvas({ showOffcanvas, hideFunction, request, isOrg }) {
+  const router = useRouter();
   const [note, setNote] = useState("");
   const [requestPath, setRequestPath] = useState("");
   useEffect(() => {
@@ -23,11 +27,15 @@ function ViewRequestOffcanvas({ showOffcanvas, hideFunction, request, isOrg }) {
   }, [showOffcanvas]);
   // Download bool
   const [isDownloading, setIsDowlonding] = useState(false);
+  // Status change
+  const [isLoadingCompleted, setIsLoadingCompleted] = useState(false);
+  const [isLoadingRejected, setIsLoadingRejected] = useState(false);
+  const [statusError, setStatusError] = useState(false);
   // Styles
   const statusColorMap = {
     Fulfilled: "var(--main-green)",
     "In progress": "var(--main-yellow)",
-    Rejected: "var(--sec-red)",
+    "Request cancelled": "var(--sec-red)",
   };
   const statusStyle = {
     backgroundColor: statusColorMap[request.status],
@@ -89,6 +97,7 @@ function ViewRequestOffcanvas({ showOffcanvas, hideFunction, request, isOrg }) {
               <Button
                 variant="as-link"
                 onClick={() => {
+                  setStatusError(false);
                   hideFunction();
                 }}
                 className="ps-2"
@@ -104,6 +113,30 @@ function ViewRequestOffcanvas({ showOffcanvas, hideFunction, request, isOrg }) {
           <Row>
             <Col xs="12" md="6">
               <Stack className="pt-3" gap={3}>
+                <Container className="px-1 ms-0">
+                  <ErrorMessage
+                    message="Note has excceed the max length."
+                    messageStatus={statusError}
+                  />
+                  <Row>
+                    <Col className="me-auto">
+                      <p className="mb-1 blue-main-text">Title:</p>
+                      <p className="mb-1">{request.title}</p>
+                    </Col>
+                  </Row>
+                </Container>
+                <Container className="px-1 ms-0">
+                  <Row>
+                    <Col className="me-auto">
+                      <p className="mb-1 blue-main-text">Creation date:</p>
+                      <p className="mb-1">
+                        {request.creationDate
+                          .replace("T", " ")
+                          .substring(0, 19)}
+                      </p>
+                    </Col>
+                  </Row>
+                </Container>
                 <Container className="px-1 ms-0">
                   <Row>
                     <Col className="me-auto">
@@ -130,8 +163,69 @@ function ViewRequestOffcanvas({ showOffcanvas, hideFunction, request, isOrg }) {
                 </Container>
                 <Container className="px-1 ms-0">
                   <p className="mb-1 blue-main-text">Note:</p>
-                  <p className="mb-1">{note ? note : "-"}</p>
+                  <p
+                    className="mb-1 noteContainer break-spaces overflow-y-scroll p-2"
+                    style={{ maxHeight: "150px" }}
+                  >
+                    {note ? note : "-"}
+                  </p>
                 </Container>
+                {isOrg && request.status === "In progress" ? (
+                  <Container className="main-grey-bg p-3 fixed-bottom w-100">
+                    <Row className="mx-auto minScalableWidth">
+                      <Col>
+                        <Button
+                          variant="green"
+                          className="w-100"
+                          disabled={isLoadingCompleted}
+                          onClick={async () => {
+                            setIsLoadingCompleted(true);
+                            let result = await setRequestStatus(
+                              request.id,
+                              "Fulfilled",
+                              "",
+                            );
+                            if (result) {
+                              setStatusError(false);
+                              setIsLoadingCompleted(false);
+                              router.refresh();
+                            } else {
+                              setStatusError(true);
+                              setIsLoadingCompleted(false);
+                            }
+                          }}
+                        >
+                          Complete
+                        </Button>
+                      </Col>
+                      <Col>
+                        <Button
+                          variant="red"
+                          className="w-100"
+                          disabled={isLoadingRejected}
+                          onClick={async () => {
+                            setIsLoadingRejected(true);
+                            let result = await setRequestStatus(
+                              request.id,
+                              "Request cancelled",
+                              "",
+                            );
+                            if (result) {
+                              setStatusError(false);
+                              setIsLoadingRejected(false);
+                              router.refresh();
+                            } else {
+                              setStatusError(true);
+                              setIsLoadingRejected(false);
+                            }
+                          }}
+                        >
+                          Reject
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Container>
+                ) : null}
               </Stack>
             </Col>
           </Row>

@@ -19,6 +19,11 @@
   color: var(--text-main-color-hover) !important;
 }
 
+.btn-mainBlue:disabled {
+  background-color: var(--main-blue-hover) !important;
+  color: var(--text-main-color-hover) !important;
+}
+
 .btn-secBlue {
   background-color: var(--sec-blue) !important;
   color: var(--text-main-color) !important;
@@ -30,6 +35,11 @@
 }
 
 .btn-secBlue:active {
+  background-color: var(--sec-blue-hover) !important;
+  color: var(--text-main-color-hover) !important;
+}
+
+.btn-secBlue:disabled {
   background-color: var(--sec-blue-hover) !important;
   color: var(--text-main-color-hover) !important;
 }
@@ -67,6 +77,11 @@
   color: var(--text-main-color) !important;
 }
 
+.btn-red:disabled {
+  background-color: var(--sec-red) !important;
+  color: var(--text-main-color) !important;
+}
+
 .btn-green {
   background-color: var(--main-green);
   color: var(--text-main-color);
@@ -82,6 +97,11 @@
   color: var(--text-main-color) !important;
 }
 
+.btn-green:disabled {
+  background-color: var(--main-green) !important;
+  color: var(--text-main-color) !important;
+}
+
 .btn-yellow {
   background-color: var(--main-yellow);
   color: var(--text-black-color);
@@ -93,6 +113,11 @@
 }
 
 .btn-yellow:active {
+  background-color: var(--main-yellow) !important;
+  color: var(--text-black-color) !important;
+}
+
+.btn-yellow:disabled {
   background-color: var(--main-yellow) !important;
   color: var(--text-black-color) !important;
 }

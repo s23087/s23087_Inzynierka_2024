@@ -7,5 +7,6 @@
         public string? ObjectType { get; set; }
         public string? Note { get; set; }
         public string? Path { get; set; }
+        public string? Title { get; set; }
     }
 }

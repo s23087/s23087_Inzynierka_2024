@@ -7,5 +7,6 @@
         public required string ObjectType { get; set;}
         public string? Path { get; set;}
         public required string Note { get; set;}
+        public required string Title { get; set;}
     }
 }

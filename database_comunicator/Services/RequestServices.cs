@@ -15,7 +15,7 @@ namespace database_comunicator.Services
         public Task<bool> RequestExist(int requestId);
         public Task DeleteRequest(int requestId);
         public Task<bool> ModifyRequest(ModifyRequest data);
-        public Task SetRequestStatus(int requestId, int statusId);
+        public Task<bool> SetRequestStatus(int requestId, int statusId, SetRequestStatus data);
         public Task<string?> GetRequestPath(int requestId);
         public Task<int> GetRecevierId(int requestId);
         public Task<GetRestModifyRequest> GetRestModifyRequest(int requestId);
@@ -48,7 +48,9 @@ namespace database_comunicator.Services
                     RequestStatusId = statusId,
                     ObjectTypeId = typeId,
                     FilePath = data.Path,
-                    Note = data.Note
+                    Note = data.Note,
+                    Title = data.Title,
+                    CreationDate = DateTime.Now,
                 };
                 await _handlerContext.Requests.AddAsync(toAdd);
                 await _handlerContext.SaveChangesAsync();
@@ -70,7 +72,9 @@ namespace database_comunicator.Services
                     Id = e.RequestId,
                     Username = e.UserReciver.Username + " " + e.UserReciver.Surname,
                     Status = e.RequestStatus.StatusName,
-                    ObjectType = e.ObjectType.ObjectTypeName
+                    ObjectType = e.ObjectType.ObjectTypeName,
+                    CreationDate = e.CreationDate,
+                    Title = e.Title
                 }).ToListAsync();
         }
         public async Task<IEnumerable<GetRequest>> GetRecivedRequests(int userId)
@@ -82,7 +86,9 @@ namespace database_comunicator.Services
                     Id = e.RequestId,
                     Username = e.UserCreator.Username + " " + e.UserCreator.Surname,
                     Status = e.RequestStatus.StatusName,
-                    ObjectType = e.ObjectType.ObjectTypeName
+                    ObjectType = e.ObjectType.ObjectTypeName,
+                    CreationDate = e.CreationDate,
+                    Title = e.Title
                 }).ToListAsync();
         }
         public async Task<GetRestRequest> GetRestRequest(int requestId)
@@ -114,6 +120,14 @@ namespace database_comunicator.Services
                         .Where(e => e.RequestId == data.RequestId)
                         .ExecuteUpdateAsync(setters =>
                             setters.SetProperty(s => s.IdUserReciver, data.RecevierId)
+                        );
+                }
+                if (data.Title != null)
+                {
+                    await _handlerContext.Requests
+                        .Where(e => e.RequestId == data.RequestId)
+                        .ExecuteUpdateAsync(setters =>
+                            setters.SetProperty(s => s.Title, data.Title)
                         );
                 }
                 if (data.ObjectType != null)
@@ -154,14 +168,28 @@ namespace database_comunicator.Services
                 return false;
             }
         }
-        public async Task SetRequestStatus(int requestId, int statusId)
+        public async Task<bool> SetRequestStatus(int requestId, int statusId, SetRequestStatus data)
         {
+            var toAdd = $"\n[{data.StatusName}] {DateTime.Now:dd/MM/yyyy H:mm}";
+            if (data.Note != null || data.Note != "")
+            {
+                toAdd += "\n" + data.Note;
+            }
+            var note = await _handlerContext.Requests
+                .Where(e => e.RequestId == requestId)
+                .Select(e => e.Note).FirstAsync();
+            if (note.Length + toAdd.Length > 500)
+            {
+                return false;
+            }
             await _handlerContext.Requests
                 .Where(e => e.RequestId == requestId)
                 .ExecuteUpdateAsync(setters =>
                     setters.SetProperty(s => s.RequestStatusId, statusId)
+                    .SetProperty(s => s.Note, s=> s.Note + toAdd)
                 );
             await _handlerContext.SaveChangesAsync();
+            return true;
         }
         public async Task<string?> GetRequestPath(int requestId)
         {

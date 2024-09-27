@@ -25,6 +25,9 @@ import AddRequestOffcanvas from "../offcanvas/create/documents/create_request";
 import ViewRequestOffcanvas from "../offcanvas/view/documents/view_request";
 import deleteRequest from "@/utils/documents/delete_request";
 import ModifyRequestOffcanvas from "../offcanvas/modify/documents/modify_request";
+import ChangeStatusWindow from "../windows/set_status_Window";
+import setRequestStatus from "@/utils/documents/set_request_status";
+import Toastes from "../smaller_components/toast";
 
 function getIfSelected(type, document, selected) {
   if (type.includes("note")) {
@@ -46,6 +49,8 @@ function getDocument(
   deleteAction,
   viewAction,
   modifyAction,
+  completeAction,
+  rejectAction,
 ) {
   if (type.includes("note")) {
     return (
@@ -75,6 +80,8 @@ function getDocument(
         viewAction={viewAction}
         deleteAction={deleteAction}
         modifyAction={modifyAction}
+        completeAction={completeAction}
+        rejectAction={rejectAction}
       />
     );
   }
@@ -132,6 +139,7 @@ function InvoiceList({
     username: "",
     status: "",
     objectType: "",
+    creationDate: "",
   });
   // Modify invoice
   const [showModifyInvoice, setShowModifyInvoice] = useState(false);
@@ -145,6 +153,7 @@ function InvoiceList({
     date: "",
     clientName: "",
     inSystem: "",
+    title: "",
   });
   // Modify request
   const [showModifyRequest, setShowModifyRequest] = useState(false);
@@ -169,6 +178,12 @@ function InvoiceList({
   const [isShowAddInvoice, setShowAddInvoice] = useState(false);
   const [isShowAddCreditNote, setShowAddCreditNote] = useState(false);
   const [isShowAddRequest, setShowAddRequest] = useState(false);
+  // Change request status
+  const [showCompleteWindow, setShowCompleteWindow] = useState(false);
+  const [requestToComplete, setRequestToComplete] = useState();
+  const [showRejectWindow, setShowRejectWindow] = useState(false);
+  const [requestToReject, setRequestToReject] = useState();
+  const [showErrorToast, setShowErrorToast] = useState(false);
   // Seleted
   const [selectedQty, setSelectedQty] = useState(0);
   const [selectedDocuments] = useState([]);
@@ -283,6 +298,20 @@ function InvoiceList({
                 if (type === "Requests") {
                   setRequestToModify(value);
                   setShowModifyRequest(true);
+                }
+              },
+              () => {
+                // Complete
+                if (type === "Requests") {
+                  setRequestToComplete(value.id);
+                  setShowCompleteWindow(true);
+                }
+              },
+              () => {
+                // Reject
+                if (type === "Requests") {
+                  setRequestToReject(value.id);
+                  setShowRejectWindow(true);
                 }
               },
             );
@@ -454,6 +483,45 @@ function InvoiceList({
         hideFunction={() => setShowViewRequest(false)}
         request={requestToView}
         isOrg={orgView}
+      />
+      <ChangeStatusWindow
+        modalShow={showCompleteWindow}
+        onHideFunction={() => setShowCompleteWindow(false)}
+        actionName="complete"
+        actionFunc={async (val) => {
+          let result = await setRequestStatus(
+            requestToComplete,
+            "Fulfilled",
+            val,
+          );
+          if (result) {
+            router.refresh();
+          } else {
+            setShowErrorToast(true);
+          }
+        }}
+      />
+      <ChangeStatusWindow
+        modalShow={showRejectWindow}
+        onHideFunction={() => setShowRejectWindow(false)}
+        actionName="reject"
+        actionFunc={async (val) => {
+          let result = await setRequestStatus(
+            requestToReject,
+            "Request cancelled",
+            val,
+          );
+          if (result) {
+            router.refresh();
+          } else {
+            setShowErrorToast(true);
+          }
+        }}
+      />
+      <Toastes.ErrorToast
+        showToast={showErrorToast}
+        message="Note has excceed the max length."
+        onHideFun={() => setShowErrorToast(false)}
       />
     </Container>
   );

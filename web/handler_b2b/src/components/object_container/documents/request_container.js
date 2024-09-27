@@ -13,6 +13,8 @@ function RequestContainer({
   viewAction,
   deleteAction,
   modifyAction,
+  completeAction,
+  rejectAction,
 }) {
   const statusColorMap = {
     Fulfilled: "var(--main-green)",
@@ -49,7 +51,7 @@ function RequestContainer({
               </span>
             </Col>
           </Row>
-          <Row className="gy-2">
+          <Row className="mb-2">
             <Col xs="6" className="pe-1">
               <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2">
                 <p className="mb-0">{request.objectType}</p>
@@ -69,6 +71,22 @@ function RequestContainer({
               </span>
             </Col>
           </Row>
+          <Row className="mb-2">
+            <Col>
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
+                <p className="mb-0">{request.title}</p>
+              </span>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
+                <p className="mb-0">
+                  {request.creationDate.replace("T", " ").substring(0, 19)}
+                </p>
+              </span>
+            </Col>
+          </Row>
         </Col>
         <Col xs="12" xl="4" className="px-0 pt-4 pt-xl-2 pb-2">
           <ContainerButtons
@@ -79,6 +97,10 @@ function RequestContainer({
             viewAction={viewAction}
             deleteAction={deleteAction}
             modifyAction={modifyAction}
+            completeAction={completeAction}
+            rejectAction={rejectAction}
+            completeUnaval={request.status === "Fulfilled"}
+            rejectUnaval={request.status === "Request cancelled"}
           />
         </Col>
       </Row>
@@ -95,6 +117,8 @@ RequestContainer.PropTypes = {
   viewAction: PropTypes.func.isRequired,
   deleteAction: PropTypes.func.isRequired,
   modifyAction: PropTypes.func.isRequired,
+  completeAction: PropTypes.func.isRequired,
+  rejectAction: PropTypes.func.isRequired,
 };
 
 export default RequestContainer;

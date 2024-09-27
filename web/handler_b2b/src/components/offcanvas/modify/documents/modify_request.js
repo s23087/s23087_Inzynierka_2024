@@ -25,6 +25,7 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
         prevState.note = data.note;
       });
       prevState.objectType = request.objectType;
+      prevState.title = request.title;
     }
   }, [showOffcanvas]);
   // rest info
@@ -36,6 +37,7 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
     recevierId: 0,
     objectType: "",
     note: "",
+    title: "",
   });
   // options
   const [users, setUsers] = useState([]);
@@ -44,9 +46,11 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
   // Errors
   const [documentError, setDocumentError] = useState(false);
   const [noteError, setNoteError] = useState(false);
+  const [titleError, setTitleError] = useState(false);
   let anyErrorActive =
     documentError ||
     noteError ||
+    titleError ||
     users.length === 0 ||
     request.status !== "In progress" ||
     restInfo.recevierId === 0;
@@ -112,6 +116,29 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
                 message="You can't modify request if the status is diffrent then 'In progress.'"
                 messageStatus={request.status !== "In progress"}
               />
+              <Form.Group className="mb-4">
+                <Form.Label className="blue-main-text">Title:</Form.Label>
+                <ErrorMessage
+                  message="Is empty or lenght is greater than 100."
+                  messageStatus={titleError}
+                />
+                <Form.Control
+                  className="input-style shadow-sm maxInputWidth"
+                  type="text"
+                  name="title"
+                  defaultValue={request.title}
+                  id="title"
+                  isInvalid={titleError}
+                  onInput={(e) => {
+                    StringValidtor.normalStringValidtor(
+                      e.target.value,
+                      setTitleError,
+                      100,
+                    );
+                  }}
+                  maxLength={100}
+                />
+              </Form.Group>
               <Form.Group className="mb-4">
                 <Form.Label className="blue-main-text">Receiver:</Form.Label>
                 <Form.Select

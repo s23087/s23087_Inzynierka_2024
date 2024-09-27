@@ -134,14 +134,14 @@ namespace database_comunicator.Controllers
             return Ok();
         }
         [HttpPost]
-        [Route("modify/{requestId}/status/{status}")]
-        public async Task<IActionResult> SetStatus(int requestId, string status)
+        [Route("modify/{requestId}/status")]
+        public async Task<IActionResult> SetStatus(int requestId, SetRequestStatus data)
         {
             var exist = await _requestServices.RequestExist(requestId);
             if (!exist) return NotFound("Requests not found.");
-            var statusId = await _requestServices.GetStatusId(status);
-            await _requestServices.SetRequestStatus(requestId, statusId);
-            return Ok();
+            var statusId = await _requestServices.GetStatusId(data.StatusName);
+            var result = await _requestServices.SetRequestStatus(requestId, statusId, data);
+            return result ? Ok() : BadRequest();
         }
         [HttpGet]
         [Route("get/path/{requestId}")]

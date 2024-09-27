@@ -12,3 +12,9 @@
 .maxContainerStyle {
   max-width: 450px;
 }
+
+.noteContainer {
+  background-color: var(--main-blue);
+  color: var(--text-main-color);
+  border-radius: 10px;
+}

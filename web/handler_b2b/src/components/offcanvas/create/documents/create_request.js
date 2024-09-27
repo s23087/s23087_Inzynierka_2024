@@ -26,7 +26,9 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
   // Errors
   const [documentError, setDocumentError] = useState(false);
   const [noteError, setNoteError] = useState(false);
-  let anyErrorActive = documentError || noteError || users.length === 0;
+  const [titleError, setTitleError] = useState(false);
+  let anyErrorActive =
+    documentError || noteError || users.length === 0 || titleError;
   // Misc
   const [isLoading, setIsLoading] = useState(false);
   // Form
@@ -78,6 +80,29 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
         <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
           <Container className="p-0" style={vhStyle} fluid>
             <Form className="mx-1 mx-xl-4" id="requestForm" action={formAction}>
+              <Form.Group className="mb-4">
+                <Form.Label className="blue-main-text">Title:</Form.Label>
+                <ErrorMessage
+                  message="Is empty or lenght is greater than 100."
+                  messageStatus={titleError}
+                />
+                <Form.Control
+                  className="input-style shadow-sm maxInputWidth"
+                  type="text"
+                  name="title"
+                  placeholder="title"
+                  id="title"
+                  isInvalid={titleError}
+                  onInput={(e) => {
+                    StringValidtor.normalStringValidtor(
+                      e.target.value,
+                      setTitleError,
+                      100,
+                    );
+                  }}
+                  maxLength={100}
+                />
+              </Form.Group>
               <Form.Group className="mb-4">
                 <Form.Label className="blue-main-text">Receiver:</Form.Label>
                 <Form.Select
@@ -168,8 +193,10 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
                       onClick={(e) => {
                         e.preventDefault();
                         let note = document.getElementById("noteId").value;
-                        if (!note) {
-                          setNoteError(true);
+                        let title = document.getElementById("title").value;
+                        if (!note || !title) {
+                          !note ? setNoteError(true) : null;
+                          !title ? setTitleError(true) : null;
                           return;
                         }
                         setIsLoading(true);
@@ -235,6 +262,7 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
     state.message = "";
     setNoteError(false);
     setDocumentError(false);
+    setTitleError(false);
     setIsLoading(false);
   }
 }

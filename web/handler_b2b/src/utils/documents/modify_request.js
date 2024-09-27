@@ -16,10 +16,12 @@ export default async function updateRequest(
   let recevierId = parseInt(formData.get("user"));
   let objectType = formData.get("type");
   let note = formData.get("note");
-  let message = "Error:";
+  let title = formData.get("title");
   let path = "";
+  let message = "Error:";
   if (!recevierId) message += "\nRecevier must not be empty.";
   if (!note) message += "\nNote must not be empty.";
+  if (!title) message += "\nTitle must not be empty.";
 
   if (message.length > 6) {
     return {
@@ -70,6 +72,7 @@ export default async function updateRequest(
     objectType: objectType !== prevState.objectType ? objectType : null,
     path: path ? path : null,
     note: note !== prevState.note ? note : null,
+    title: title !== prevState.title ? title : null,
   };
 
   const info = await fetch(

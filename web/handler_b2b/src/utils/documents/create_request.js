@@ -8,18 +8,17 @@ export default async function createRequest(file, state, formData) {
   let recevier = parseInt(formData.get("user"));
   let type = formData.get("type");
   let note = formData.get("note");
-  if (!recevier) {
+  let title = formData.get("title");
+  let message = "Error:";
+  if (!recevier) message += "\nRecevier must not be empty.";
+  if (!note) message += "\nNote must not be empty.";
+  if (!title) message += "\nTitle must not be empty.";
+
+  if (message.length > 6) {
     return {
       error: true,
       completed: true,
-      message: "Error:\nRecevier must not be empty.",
-    };
-  }
-  if (!note) {
-    return {
-      error: true,
-      completed: true,
-      message: "Error:\nNote must not be empty.",
+      message: message,
     };
   }
 
@@ -33,6 +32,8 @@ export default async function createRequest(file, state, formData) {
     objectType: type,
     path: file ? fileName : null,
     note: note,
+    title,
+    title,
   };
 
   const fs = require("node:fs");

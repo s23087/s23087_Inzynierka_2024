@@ -1062,6 +1062,7 @@ public partial class HandlerContext : DbContext
             entity.Property(e => e.IdUserReciver).HasColumnName("id_user_receiver");
             entity.Property(e => e.RequestStatusId).HasColumnName("request_status_id");
             entity.Property(e => e.ObjectTypeId).HasColumnName("object_type_id");
+            entity.Property(e => e.CreationDate).HasColumnName("creation_date");
             entity.Property(e => e.Note)
                 .HasMaxLength(500)
                 .IsUnicode(false)
@@ -1070,6 +1071,10 @@ public partial class HandlerContext : DbContext
                 .HasMaxLength(500)
                 .IsUnicode(false)
                 .HasColumnName("filePath");
+            entity.Property(e => e.Title)
+                .HasMaxLength(100)
+                .IsUnicode(false)
+                .HasColumnName("title");
 
             entity.HasOne(d => d.UserCreator).WithMany(p => p.CreatedRequest)
                 .HasForeignKey(d => d.IdUserCreator)
