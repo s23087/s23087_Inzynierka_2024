@@ -24,6 +24,7 @@ builder.Services.AddScoped<IInvoiceServices, InvoiceServices>();
 builder.Services.AddScoped<INotificationServices, NotificationServices>();
 builder.Services.AddScoped<ICreditNoteServices, CreditNoteServices>();
 builder.Services.AddScoped<IRequestServices, RequestServices>();
+builder.Services.AddScoped<IProformaServices, ProformaServices>();
 
 var app = builder.Build();
 

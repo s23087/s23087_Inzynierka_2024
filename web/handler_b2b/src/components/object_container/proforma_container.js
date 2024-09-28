@@ -4,7 +4,17 @@ import { Container, Row, Col } from "react-bootstrap";
 import ContainerButtons from "../smaller_components/container_buttons";
 import user_small_icon from "../../../public/icons/user_small_icon.png";
 
-function ProformaContainer({ proforma, is_org, selected, boolean_value }) {
+function ProformaContainer({
+  proforma,
+  is_org,
+  selected,
+  isYourProforma,
+  selectAction,
+  unselectAction,
+  deleteAction,
+  viewAction,
+  modifyAction,
+}) {
   const containerBg = {
     backgroundColor: "var(--sec-blue)",
   };
@@ -48,7 +58,7 @@ function ProformaContainer({ proforma, is_org, selected, boolean_value }) {
             </Col>
             <Col xs="12">
               <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
-                {boolean_value ? (
+                {isYourProforma ? (
                   <p className="mb-0">For: {proforma.for}</p>
                 ) : (
                   <p className="mb-0">Source: {proforma.source}</p>
@@ -107,7 +117,12 @@ ProformaContainer.PropTypes = {
   proforma: PropTypes.object.isRequired,
   is_org: PropTypes.bool.isRequired,
   selected: PropTypes.bool.isRequired,
-  boolean_value: PropTypes.bool.isRequired, // 1 for client, 0 for user
+  isYourProforma: PropTypes.bool.isRequired, // 1 for client, 0 for user
+  selectAction: PropTypes.func,
+  unselectAction: PropTypes.func,
+  deleteAction: PropTypes.func,
+  viewAction: PropTypes.func,
+  modifyAction: PropTypes.func,
 };
 
 export default ProformaContainer;

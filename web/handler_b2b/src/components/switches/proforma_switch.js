@@ -6,8 +6,9 @@ import Image from "next/image";
 import { Dropdown, Stack, Button } from "react-bootstrap";
 import your_proformas_icon from "../../../public/icons/your_proformas_icon.png";
 import clients_proformas_icon from "../../../public/icons/clients_proformas_icon.png";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-function ProformaSwitch({ boolean_value, switch_action }) {
+function ProformaSwitch({ isYourProforma }) {
   const menuRef = useRef(null);
   const [closingBool, setClosingBool] = useState(false);
   const onOutside = (event) => {
@@ -19,8 +20,13 @@ function ProformaSwitch({ boolean_value, switch_action }) {
     document.addEventListener("mousedown", onOutside);
     return () => document.removeEventListener("mousedown", onOutside);
   });
-  const buttonAction = () => {
-    switch_action();
+  const router = useRouter();
+  const pathName = usePathname();
+  const params = useSearchParams();
+  const buttonAction = (type) => {
+    const newParams = new URLSearchParams(params);
+    newParams.set("proformaType", type);
+    router.replace(`${pathName}?${newParams}`);
     setClosingBool(false);
   };
   return (
@@ -30,35 +36,35 @@ function ProformaSwitch({ boolean_value, switch_action }) {
         variant="as-link"
         onClick={() => setClosingBool(true)}
       >
-        {boolean_value ? (
-          <Image src={clients_proformas_icon} alt="proforma switch icon" />
-        ) : (
+        {isYourProforma ? (
           <Image src={your_proformas_icon} alt="proforma switch icon" />
+        ) : (
+          <Image src={clients_proformas_icon} alt="proforma switch icon" />
         )}
       </Dropdown.Toggle>
       <Dropdown.Menu ref={menuRef}>
         <Stack gap={1} className="px-3 blue-main-text">
-          {boolean_value ? (
-            <>
-              <Button
-                variant="as-link"
-                className="p-0 text-start"
-                onClick={buttonAction}
-              >
-                User proformas
-              </Button>
-              <p className="mb-2 h-100 blue-sec-text">Client proformas</p>
-            </>
-          ) : (
+          {isYourProforma ? (
             <>
               <p className="mb-0 pt-2 h-100 blue-sec-text">User proformas</p>
               <Button
                 variant="as-link"
                 className="p-0 text-start"
-                onClick={buttonAction}
+                onClick={() => buttonAction("Clients proformas")}
               >
                 Client proformas
               </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="as-link"
+                className="p-0 text-start"
+                onClick={() => buttonAction("Yours proformas")}
+              >
+                User proformas
+              </Button>
+              <p className="mb-2 h-100 blue-sec-text">Client proformas</p>
             </>
           )}
         </Stack>
@@ -68,8 +74,7 @@ function ProformaSwitch({ boolean_value, switch_action }) {
 }
 
 ProformaSwitch.propTypes = {
-  boolean_value: propTypes.bool.isRequired, // 1 for client, 0 for user
-  switch_action: propTypes.func.isRequired,
+  isYourProforma: propTypes.bool.isRequired, // 1 for user, 0 for client
 };
 
 export default ProformaSwitch;

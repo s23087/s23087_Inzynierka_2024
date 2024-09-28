@@ -15,7 +15,5 @@ public partial class OwnedItem
 
     public virtual Item OriginalItem { get; set; } = null!;
 
-    public virtual ICollection<ProformaOwnedItem> ProformaOwnedItems { get; set; } = new List<ProformaOwnedItem>();
-
     public virtual ICollection<PurchasePrice> PurchasePrices { get; set; } = new List<PurchasePrice>();
 }

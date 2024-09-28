@@ -20,6 +20,7 @@ public partial class PurchasePrice
     public virtual ICollection<CreditNoteItem> CreditNoteItems { get; set; } = new List<CreditNoteItem>();
 
     public virtual OwnedItem OwnedItem { get; set; } = null!;
+    public virtual ICollection<ProformaOwnedItem> ProformaOwnedItems { get; set; } = new List<ProformaOwnedItem>();
 
     public virtual ICollection<SellingPrice> SellingPrices { get; set; } = new List<SellingPrice>();
 }

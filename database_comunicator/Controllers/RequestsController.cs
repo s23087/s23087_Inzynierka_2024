@@ -55,19 +55,29 @@ namespace database_comunicator.Controllers
         }
         [HttpGet]
         [Route("get/created/{userId}")]
-        public async Task<IActionResult> GetMyRequests(int userId)
+        public async Task<IActionResult> GetMyRequests(int userId, string? search)
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("User not found.");
+            if (search != null)
+            {
+                var sResult = await _requestServices.GetMyRequests(userId,search);
+                return Ok(sResult);
+            }
             var result = await _requestServices.GetMyRequests(userId);
             return Ok(result);
         }
         [HttpGet]
         [Route("get/recived/{userId}")]
-        public async Task<IActionResult> GetRecivedRequests(int userId)
+        public async Task<IActionResult> GetRecivedRequests(int userId, string? search)
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("User not found.");
+            if (search != null)
+            {
+                var sResult = await _requestServices.GetRecivedRequests(userId, search);
+                return Ok(sResult);
+            }
             var result = await _requestServices.GetRecivedRequests(userId);
             return Ok(result);
         }

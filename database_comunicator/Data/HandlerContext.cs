@@ -947,6 +947,12 @@ public partial class HandlerContext : DbContext
             entity.Property(e => e.TransportCost)
                 .HasColumnType("decimal(6, 2)")
                 .HasColumnName("transport_cost");
+            entity.Property(e => e.UserId).HasColumnName("id_user");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Proformas)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Proforma_App_User_realtion");
 
             entity.HasOne(d => d.BuyerNavigation).WithMany(p => p.ProformaBuyerNavigations)
                 .HasForeignKey(d => d.Buyer)
@@ -1012,8 +1018,7 @@ public partial class HandlerContext : DbContext
 
             entity.Property(e => e.ProformaOwnedItemId)
                 .HasColumnName("proforma_owned_item_id");
-            entity.Property(e => e.InvoiceId).HasColumnName("invoice_id");
-            entity.Property(e => e.OwnedItemId).HasColumnName("owned_item_id");
+            entity.Property(e => e.PurchasePriceId).HasColumnName("purchase_price_id");
             entity.Property(e => e.ProformaId).HasColumnName("proforma_id");
             entity.Property(e => e.Qty).HasColumnName("qty");
             entity.Property(e => e.SellingPrice)
@@ -1025,10 +1030,10 @@ public partial class HandlerContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Proforma_Owned_Item_Proforma_relation");
 
-            entity.HasOne(d => d.OwnedItem).WithMany(p => p.ProformaOwnedItems)
-                .HasForeignKey(d => new { d.OwnedItemId, d.InvoiceId })
+            entity.HasOne(d => d.Item).WithMany(p => p.ProformaOwnedItems)
+                .HasForeignKey(d => d.PurchasePriceId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("Proforma_Owned_Item_Owned_Item_relation");
+                .HasConstraintName("Proforma_Owned_Item_Purchase_Price_relation");
         });
 
         modelBuilder.Entity<PurchasePrice>(entity =>

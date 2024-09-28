@@ -10,7 +10,9 @@ namespace database_comunicator.Services
         public Task<int> GetStatusId(string status);
         public Task<int> AddRequest(AddRequest data);
         public Task<IEnumerable<GetRequest>> GetMyRequests(int userId);
+        public Task<IEnumerable<GetRequest>> GetMyRequests(int userId, string search);
         public Task<IEnumerable<GetRequest>> GetRecivedRequests(int userId);
+        public Task<IEnumerable<GetRequest>> GetRecivedRequests(int userId, string search);
         public Task<GetRestRequest> GetRestRequest(int requestId);
         public Task<bool> RequestExist(int requestId);
         public Task DeleteRequest(int requestId);
@@ -77,10 +79,38 @@ namespace database_comunicator.Services
                     Title = e.Title
                 }).ToListAsync();
         }
+        public async Task<IEnumerable<GetRequest>> GetMyRequests(int userId, string search)
+        {
+            return await _handlerContext.Requests
+                .Where(e => e.IdUserCreator == userId && e.Title.ToLower().Contains(search.ToLower()))
+                .Select(e => new GetRequest
+                {
+                    Id = e.RequestId,
+                    Username = e.UserReciver.Username + " " + e.UserReciver.Surname,
+                    Status = e.RequestStatus.StatusName,
+                    ObjectType = e.ObjectType.ObjectTypeName,
+                    CreationDate = e.CreationDate,
+                    Title = e.Title
+                }).ToListAsync();
+        }
         public async Task<IEnumerable<GetRequest>> GetRecivedRequests(int userId)
         {
             return await _handlerContext.Requests
                 .Where(e => e.IdUserReciver == userId)
+                .Select(e => new GetRequest
+                {
+                    Id = e.RequestId,
+                    Username = e.UserCreator.Username + " " + e.UserCreator.Surname,
+                    Status = e.RequestStatus.StatusName,
+                    ObjectType = e.ObjectType.ObjectTypeName,
+                    CreationDate = e.CreationDate,
+                    Title = e.Title
+                }).ToListAsync();
+        }
+        public async Task<IEnumerable<GetRequest>> GetRecivedRequests(int userId, string search)
+        {
+            return await _handlerContext.Requests
+                .Where(e => e.IdUserReciver == userId && e.Title.ToLower().Contains(search.ToLower()))
                 .Select(e => new GetRequest
                 {
                     Id = e.RequestId,

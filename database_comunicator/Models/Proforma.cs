@@ -33,7 +33,8 @@ public partial class Proforma
     public string CurrencyName { get; set; } = null!;
 
     public int? InvoiceId { get; set; }
-
+    public int UserId { get; set; }
+    public virtual AppUser User { get; set; } = null!;
     public virtual Organization BuyerNavigation { get; set; } = null!;
 
     public virtual CurrencyValue Currency { get; set; } = null!;

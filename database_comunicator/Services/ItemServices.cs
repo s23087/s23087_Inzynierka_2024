@@ -754,10 +754,14 @@ namespace database_comunicator.Services
                             InvoiceNumber = e.OwnedItem.Invoice.InvoiceNumber,
                             Partnumber = e.OwnedItem.OriginalItem.PartNumber,
                             Name = e.OwnedItem.OriginalItem.ItemName,
-                            Qty = e.Qty - e.SellingPrices.Select(d => d.Qty).Sum(),
+                            Qty = e.Qty 
+                                - e.SellingPrices.Select(d => d.Qty).Sum() 
+                                + e.CreditNoteItems.Select(d => d.Qty).Sum() 
+                                - e.OwnedItem.ItemOwners.Where(d => d.InvoiceId == e.InvoiceId && d.OwnedItemId == e.OwnedItemId && d.IdUser != userId).Select(d => d.Qty).Sum(),
                             Price = e.Price
                         }).Union(
                             _handlerContext.CreditNoteItems
+                                .Where(d => d.CreditNote.CreditNoteItems.Where(x => x.PurchasePriceId == d.PurchasePriceId).Select(x => x.Qty).Sum() != 0)
                                 .Where(d => d.PurchasePrice.OwnedItem.ItemOwners.Any(x => x.IdUser == userId))
                                 .Where(d => d.Qty > 0 && !d.CreditNote.Invoice.SellingPrices.Any())
                                 .Select(d => new GetSalesItemList
@@ -784,10 +788,14 @@ namespace database_comunicator.Services
                             InvoiceNumber = e.OwnedItem.Invoice.InvoiceNumber,
                             Partnumber = e.OwnedItem.OriginalItem.PartNumber,
                             Name = e.OwnedItem.OriginalItem.ItemName,
-                            Qty = e.Qty - e.SellingPrices.Select(d => d.Qty).Sum(),
+                            Qty = e.Qty
+                                - e.SellingPrices.Select(d => d.Qty).Sum()
+                                + e.CreditNoteItems.Select(d => d.Qty).Sum()
+                                - e.OwnedItem.ItemOwners.Where(d => d.InvoiceId == e.InvoiceId && d.OwnedItemId == e.OwnedItemId && d.IdUser != userId).Select(d => d.Qty).Sum(),
                             Price = e.CalculatedPrices.Where(d => d.CurrencyName == currency).Select(d => d.Price).First()
                         }).Union(
                             _handlerContext.CreditNoteItems
+                                .Where(d => d.CreditNote.CreditNoteItems.Where(x => x.PurchasePriceId == d.PurchasePriceId).Select(x => x.Qty).Sum() != 0)
                                 .Where(d => d.PurchasePrice.OwnedItem.ItemOwners.Any(x => x.IdUser == userId))
                                 .Where(d => d.Qty > 0 && !d.CreditNote.Invoice.SellingPrices.Any())
                                 .Select(d => new GetSalesItemList

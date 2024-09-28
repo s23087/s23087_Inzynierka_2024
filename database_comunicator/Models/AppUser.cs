@@ -38,4 +38,5 @@ public partial class AppUser
     public virtual ICollection<CreditNote> CreditNotes { get; set; } = new List<CreditNote>();
     public virtual ICollection<Request> CreatedRequest { get; set; } = new List<Request>();
     public virtual ICollection<Request> Requests { get; set; } = new List<Request>();
+    public virtual ICollection<Proforma> Proformas { get; set; } = new List<Proforma>();
 }
