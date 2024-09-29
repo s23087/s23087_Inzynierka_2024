@@ -7,7 +7,7 @@ import { Offcanvas, Container, Row, Col, Button, Stack } from "react-bootstrap";
 import dropdown_big_down from "../../../../../public/icons/dropdown_big_down.png";
 import download_off from "../../../../../public/icons/download_off.png";
 import download_on from "../../../../../public/icons/download_on.png";
-import getInvoiceFile from "@/utils/documents/download_invoice";
+import getFileFormServer from "@/utils/documents/download_file";
 import getRestRequest from "@/utils/documents/get_rest_request";
 import setRequestStatus from "@/utils/documents/set_request_status";
 import { useRouter } from "next/navigation";
@@ -70,7 +70,7 @@ function ViewRequestOffcanvas({ showOffcanvas, hideFunction, request, isOrg }) {
                 disabled={isDownloading || !requestPath}
                 onClick={async () => {
                   setIsDowlonding(true);
-                  let file = await getInvoiceFile(requestPath);
+                  let file = await getFileFormServer(requestPath);
                   if (file) {
                     let parsed = JSON.parse(file);
                     let buffer = Buffer.from(parsed.data);

@@ -2,6 +2,7 @@
 using database_comunicator.Models;
 using database_comunicator.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace database_comunicator.Services
 {
@@ -9,10 +10,19 @@ namespace database_comunicator.Services
     {
         public Task<int> AddProforma(AddProforma data);
         public Task<bool> ProformaExist(string number, int sellerId, int buyerId);
-        public Task<IEnumerable<GetProforma>> GetProformas(bool isYourProfrma);
-        public Task<IEnumerable<GetProforma>> GetProformas(bool isYourProfrma, string search);
-        public Task<IEnumerable<GetProforma>> GetProformas(bool isYourProfrma, int userId);
-        public Task<IEnumerable<GetProforma>> GetProformas(bool isYourProfrma, int userId, string search);
+        public Task<bool> ProformaExist(int proformaId);
+        public Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma);
+        public Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, string search);
+        public Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, int userId);
+        public Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, int userId, string search);
+        public Task<GetRestProforma> GetRestProforma(bool isYourProforma, int proformaId);
+        public Task<bool> DeleteProforma(bool isYourProforma, int proformaId);
+        public Task<bool> DoesDeliveryExist(int proformaId);
+        public Task<int> GetProformaUserId(int proformaId);
+        public Task<string> GetProformaNumber(int proformaId);
+        public Task<string?> GetProformaPath(int proformaId);
+        public Task<GetRestModifyProforma> GetRestModifyProforma(int proformaId);
+        public Task<bool> ModifyProforma(ModifyProforma data);
     }
     public class ProformaServices : IProformaServices
     {
@@ -101,6 +111,12 @@ namespace database_comunicator.Services
                 .Where(e => e.ProformaNumber == number && e.Seller == sellerId && e.Buyer == buyerId)
                 .AnyAsync();
         }
+        public async Task<bool> ProformaExist(int proformaId)
+        {
+            return await _handlerContext.Proformas
+                .Where(e => e.ProformaId == proformaId)
+                .AnyAsync();
+        }
         public async Task<IEnumerable<GetProforma>> GetProformas(bool isYourProfrma)
         {
             return await _handlerContext.Proformas
@@ -170,6 +186,178 @@ namespace database_comunicator.Services
                     CurrencyName = prof.CurrencyName,
                     ClientName = isYourProfrma ? prof.SellerNavigation.OrgName : prof.BuyerNavigation.OrgName
                 }).ToListAsync();
+        }
+        public async Task<GetRestProforma> GetRestProforma(bool isYourProforma, int proformaId)
+        {
+            return await _handlerContext.Proformas
+                .Where(e => e.ProformaId == proformaId)
+                .Select(e => new GetRestProforma
+                {
+                    Taxes = e.TaxesNavigation.TaxValue,
+                    CurrencyValue = e.CurrencyName == "PLN" ? 1 : e.Currency.CurrencyValue1,
+                    CurrencyDate = e.CurrencyValueDate,
+                    PaymentMethod = e.PaymentMethod.MethodName,
+                    InSystem = e.InSystem,
+                    Note = e.Note,
+                    Path = e.ProformaFilePath ?? "",
+                    Items = isYourProforma ?
+                        e.ProformaFutureItems.Select(d => new GetCredtItemForTable
+                        {
+                            CreditItemId = d.ProformaFutureItemId,
+                            Partnumber = d.Item.PartNumber,
+                            ItemName = d.Item.ItemName,
+                            Qty = d.Qty,
+                            Price = d.PurchasePrice
+                        }).ToList()
+                        :
+                        e.ProformaOwnedItems.Select(d => new GetCredtItemForTable
+                        {
+                            CreditItemId = d.ProformaOwnedItemId,
+                            Partnumber = d.Item.OwnedItem.OriginalItem.PartNumber,
+                            ItemName = d.Item.OwnedItem.OriginalItem.ItemName,
+                            Qty = d.Qty,
+                            Price = d.SellingPrice
+                        }).ToList()
+                })
+                .FirstAsync();
+        }
+        public async Task<bool> DeleteProforma(bool isYourProforma, int proformaId)
+        {
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
+            {
+                if (isYourProforma)
+                {
+                    await _handlerContext.ProformaFutureItems.Where(e => e.ProformaId == proformaId).ExecuteDeleteAsync();
+                } else
+                {
+                    await _handlerContext.ProformaOwnedItems.Where(e => e.ProformaId == proformaId).ExecuteDeleteAsync();
+                }
+                await _handlerContext.Proformas.Where(e => e.ProformaId == proformaId).ExecuteDeleteAsync();
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+                return true;
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                await trans.RollbackAsync();
+                return false;
+            }
+        }
+        public async Task<bool> DoesDeliveryExist(int proformaId)
+        {
+            return await _handlerContext.Proformas.AnyAsync(e => e.ProformaId == proformaId && e.Deliveries.Any());
+        }
+        public async Task<int> GetProformaUserId(int proformaId)
+        {
+            return await _handlerContext.Proformas
+                .Where(e => e.ProformaId == proformaId)
+                .Select(e => e.UserId).FirstAsync();
+        }
+        public async Task<string> GetProformaNumber(int proformaId)
+        {
+            return await _handlerContext.Proformas
+                .Where(e => e.ProformaId == proformaId)
+                .Select(e => e.ProformaNumber)
+                .FirstAsync();
+        }
+        public async Task<string?> GetProformaPath(int proformaId)
+        {
+            return await _handlerContext.Proformas
+                .Where(e => e.ProformaId == proformaId)
+                .Select(e => e.ProformaFilePath)
+                .FirstAsync();
+        }
+        public async Task<GetRestModifyProforma> GetRestModifyProforma(int proformaId)
+        {
+            return await _handlerContext.Proformas
+                .Where(e => e.ProformaId == proformaId)
+                .Select(e => new GetRestModifyProforma
+                {
+                    UserId = e.UserId,
+                    PaymentMethod = e.PaymentMethod.MethodName,
+                    InSystem = e.InSystem,
+                    Note = e.Note
+                }).FirstAsync();
+        }
+        public async Task<bool> ModifyProforma(ModifyProforma data)
+        {
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
+            {
+                if (data.UserId != null)
+                {
+                    await _handlerContext.Proformas
+                        .Where(e => e.ProformaId == data.ProformaId)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => s.UserId, data.UserId)
+                        );
+                }
+                if (data.ProformaNumber != null)
+                {
+                    await _handlerContext.Proformas
+                        .Where(e => e.ProformaId == data.ProformaId)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => s.ProformaNumber, data.ProformaNumber)
+                        );
+                }
+                if (data.ClientId != null)
+                {
+                    await _handlerContext.Proformas
+                        .Where(e => e.ProformaId == data.ProformaId)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => data.IsYourProforma ? s.Seller : s.Buyer, data.ClientId)
+                        );
+                }
+                if (data.Transport != null)
+                {
+                    await _handlerContext.Proformas
+                        .Where(e => e.ProformaId == data.ProformaId)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => s.TransportCost, data.Transport)
+                        );
+                }
+                if (data.PaymentMethodId != null)
+                {
+                    await _handlerContext.Proformas
+                        .Where(e => e.ProformaId == data.ProformaId)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => s.PaymentMethodId, data.PaymentMethodId)
+                        );
+                }
+                if (data.InSystem != null)
+                {
+                    await _handlerContext.Proformas
+                        .Where(e => e.ProformaId == data.ProformaId)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => s.InSystem, data.InSystem)
+                        );
+                }
+                if (data.Path != null)
+                {
+                    await _handlerContext.Proformas
+                        .Where(e => e.ProformaId == data.ProformaId)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => s.ProformaFilePath, data.Path)
+                        );
+                }
+                if (data.Note != null)
+                {
+                    await _handlerContext.Proformas
+                        .Where(e => e.ProformaId == data.ProformaId)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => s.Note, data.Note)
+                        );
+                }
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+                return true;
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                await trans.RollbackAsync();
+                return false;
+            }
         }
     }
 }

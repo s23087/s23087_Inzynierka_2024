@@ -108,7 +108,7 @@ namespace database_comunicator.Controllers
                 await _notificationServices.CreateNotification(new CreateNotification
                 {
                     UserId = recevier,
-                    Info = $"User has modified a request wit id {requestId}.",
+                    Info = $"User has deleted a request with id {requestId}.",
                     ObjectType = "Requests",
                     Referance = $"{requestId}"
                 });
@@ -136,7 +136,7 @@ namespace database_comunicator.Controllers
                 await _notificationServices.CreateNotification(new CreateNotification
                 {
                     UserId = (int)data.RecevierId,
-                    Info = $"User has modified a request wit id {data.RequestId}.",
+                    Info = $"User has modified a request with id {data.RequestId}.",
                     ObjectType = "Requests",
                     Referance = $"{data.RequestId}"
                 });

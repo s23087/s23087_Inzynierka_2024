@@ -5,64 +5,52 @@ import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { Offcanvas, Container, Row, Col, Button, Stack } from "react-bootstrap";
 import getDocumentStatusStyle from "@/utils/documents/get_document_status_color";
-import dropdown_big_down from "../../../../../public/icons/dropdown_big_down.png";
-import download_off from "../../../../../public/icons/download_off.png";
-import download_on from "../../../../../public/icons/download_on.png";
-import getRestInvoice from "@/utils/documents/get_rest_invoice";
+import dropdown_big_down from "../../../../public/icons/dropdown_big_down.png";
+import download_off from "../../../../public/icons/download_off.png";
+import download_on from "../../../../public/icons/download_on.png";
 import getFileFormServer from "@/utils/documents/download_file";
-import InvoiceTable from "@/components/tables/invoice_table";
-function ViewInvoiceOffcanvas({
+import CreditNoteTable from "@/components/tables/credit_table";
+import getRestProforma from "@/utils/proformas/get_rest_proforma";
+function ViewProformaOffcanvas({
   showOffcanvas,
   hideFunction,
-  invoice,
-  isYourInvoice,
+  proforma,
+  isYourProforma,
+  isOrg,
 }) {
   const [restInfo, setRestInfo] = useState({
-    tax: 0,
-    currencyValue: 0,
-    currencyName: "",
+    taxes: 0,
+    currencyValue: 0.0,
     currencyDate: "",
-    transportCost: 0,
-    paymentType: "",
-    note: "",
-    creditNotes: [],
+    paymentMethod: "Is loading",
+    inSystem: false,
+    note: "Is loading",
     items: [],
   });
-  const [invoicePath, setInvoicePath] = useState("");
+  const [proformaPath, setProformaPath] = useState("");
   useEffect(() => {
     if (showOffcanvas) {
-      let restInfo = getRestInvoice(invoice.invoiceId, isYourInvoice);
-      restInfo
-        .then((data) => {
+      let restProforma = getRestProforma(isYourProforma, proforma.proformaId);
+      restProforma.then((data) => {
+        if (data.length !== 0) {
           setRestInfo(data);
-          setInvoicePath(data.path);
-        })
-        .catch(() => {
+          setProformaPath(data.path);
+        } else {
           setRestInfo({
-            tax: 0,
-            currencyValue: 0,
-            currencyName: "error",
-            currencyDate: "error",
-            transportCost: 0,
-            paymentType: "error",
-            note: "error",
+            taxes: 0,
+            currencyValue: 0.0,
+            currencyDate: "Not found",
+            paymentMethod: "Not found",
+            inSystem: false,
+            note: "Not found",
             items: [],
           });
-        });
+        }
+      });
     }
-  }, [showOffcanvas, isYourInvoice]);
+  }, [showOffcanvas]);
   // Download bool
   const [isDownloading, setIsDowlonding] = useState(false);
-  // Styles
-  let statusTextColor = getDocumentStatusStyle(
-    invoice.paymentStatus,
-  ).backgroundColor;
-  const paymentStatusStyle = {
-    color:
-      statusTextColor === "var(--main-yellow)"
-        ? "var(--warning-color)"
-        : statusTextColor,
-  };
   return (
     <Offcanvas
       className="h-100 minScalableWidth"
@@ -74,7 +62,7 @@ function ViewInvoiceOffcanvas({
         <Container className="px-3" fluid>
           <Row>
             <Col xs="6" lg="9" xl="10" className="d-flex align-items-center">
-              <p className="blue-main-text h4 mb-0">Invoice view</p>
+              <p className="blue-main-text h4 mb-0">Proforma view</p>
             </Col>
             <Col
               xs="4"
@@ -88,7 +76,7 @@ function ViewInvoiceOffcanvas({
                 disabled={isDownloading}
                 onClick={async () => {
                   setIsDowlonding(true);
-                  let file = await getFileFormServer(invoicePath);
+                  let file = await getFileFormServer(proformaPath);
                   if (file) {
                     let parsed = JSON.parse(file);
                     let buffer = Buffer.from(parsed.data);
@@ -96,9 +84,9 @@ function ViewInvoiceOffcanvas({
                     var url = URL.createObjectURL(blob);
                     let downloadObject = document.createElement("a");
                     downloadObject.href = url;
-                    downloadObject.download = invoicePath.substring(
-                      invoicePath.lastIndexOf("/"),
-                      invoicePath.length,
+                    downloadObject.download = proformaPath.substring(
+                      proformaPath.lastIndexOf("/"),
+                      proformaPath.length,
                     );
                     downloadObject.click();
                   }
@@ -106,7 +94,7 @@ function ViewInvoiceOffcanvas({
                 }}
               >
                 <Image
-                  src={invoicePath === "" ? download_off : download_on}
+                  src={proformaPath === "" ? download_off : download_on}
                   alt="download button"
                 />
               </Button>
@@ -128,70 +116,62 @@ function ViewInvoiceOffcanvas({
       <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
         <Container className="p-0" fluid>
           <Row>
-            <p className="h5 my-2">{invoice.invoiceNumber}</p>
+            <p className="h5 my-2">{proforma.proformaNumber}</p>
           </Row>
           <Row>
             <Col xs="12" md="6">
               <Stack className="pt-3" gap={3}>
+                {isOrg ? (
+                  <Container className="px-1 ms-0">
+                    <p className="mb-1 blue-main-text">User:</p>
+                    <p className="mb-1">{proforma.user}</p>
+                  </Container>
+                ) : null}
                 <Container className="px-1 ms-0">
-                  <Row>
-                    <Col xs="4" className="me-auto">
-                      <p className="mb-1 blue-main-text">Date:</p>
-                      <p className="mb-1">
-                        {invoice.invoiceDate.substring(0, 10)}
-                      </p>
-                    </Col>
-                    <Col xs="4">
-                      <p className="mb-1 blue-main-text">Due date:</p>
-                      <p className="mb-1">{invoice.dueDate.substring(0, 10)}</p>
-                    </Col>
-                  </Row>
+                  <p className="mb-1 blue-main-text">Date:</p>
+                  <p className="mb-1">{proforma.date.substring(0, 10)}</p>
                 </Container>
                 <Container className="px-1 ms-0">
                   <p className="mb-1 blue-main-text">
-                    {isYourInvoice ? "Source:" : "Buyer:"}
+                    {isYourProforma ? "Source:" : "For:"}
                   </p>
-                  <p className="mb-1">{invoice.clientName}</p>
+                  <p className="mb-1">{proforma.clientName}</p>
                 </Container>
                 <Container className="px-1 ms-0">
                   <p className="mb-1 blue-main-text">Taxes:</p>
-                  <p className="mb-1">{restInfo.tax}</p>
+                  <p className="mb-1">{restInfo.taxes}%</p>
                 </Container>
                 <Container className="px-1 ms-0">
                   <p className="mb-1 blue-main-text">Currency:</p>
                   <p className="mb-1">
-                    {restInfo.currencyValue +
-                      " " +
-                      restInfo.currencyName +
-                      " " +
-                      restInfo.currencyDate.substring(0, 10)}
+                    {proforma.currencyName === "PLN"
+                      ? "PLN"
+                      : restInfo.currencyValue +
+                        " " +
+                        proforma.currencyName +
+                        " " +
+                        restInfo.currencyDate.substring(0, 10)}
                   </p>
                 </Container>
                 <Container className="px-1 ms-0">
                   <p className="mb-1 blue-main-text">Transport Cost:</p>
                   <p className="mb-1">
-                    {restInfo.transportCost + " " + restInfo.currencyName}
+                    {proforma.transport + " " + proforma.currencyName}
                   </p>
                 </Container>
                 <Container className="px-1 ms-0">
                   <p className="mb-1 blue-main-text">Payment method:</p>
-                  <p className="mb-1">{restInfo.paymentType}</p>
-                </Container>
-                <Container className="px-1 ms-0">
-                  <p className="mb-1 blue-main-text">Status:</p>
-                  <p className="mb-1" style={paymentStatusStyle}>
-                    {invoice.paymentStatus}
-                  </p>
+                  <p className="mb-1">{restInfo.paymentMethod}</p>
                 </Container>
                 <Container className="px-1 ms-0">
                   <span
                     className="spanStyle rounded-span d-flex"
                     style={getDocumentStatusStyle(
-                      invoice.inSystem ? "In system" : "Not in system",
+                      restInfo.inSystem ? "In system" : "Not in system",
                     )}
                   >
                     <p className="mb-1">
-                      {invoice.inSystem ? "In system" : "Not in system"}
+                      {restInfo.inSystem ? "In system" : "Not in system"}
                     </p>
                   </span>
                 </Container>
@@ -199,24 +179,14 @@ function ViewInvoiceOffcanvas({
                   <p className="mb-1 blue-main-text">Note:</p>
                   <p className="mb-1">{restInfo.note ? restInfo.note : "-"}</p>
                 </Container>
-                {restInfo.creditNotes.length > 0 ? (
-                  <Container className="px-1 ms-0">
-                    <p className="mb-1 blue-main-text">Credit notes:</p>
-                    <ul className="mb-0">
-                      {restInfo.creditNotes.map((val) => {
-                        return <li key={val}>{val}</li>;
-                      })}
-                    </ul>
-                  </Container>
-                ) : null}
               </Stack>
             </Col>
             <Col xs="12" md="6" lg="4" className="px-0 offset-lg-2">
               <Container className="pt-5 text-center overflow-x-scroll">
                 {restInfo.items.length > 0 ? (
-                  <InvoiceTable
-                    items={restInfo.items}
-                    currency={restInfo.currencyName}
+                  <CreditNoteTable
+                    creditItems={restInfo.items}
+                    currency={proforma.currencyName}
                   />
                 ) : null}
               </Container>
@@ -228,11 +198,12 @@ function ViewInvoiceOffcanvas({
   );
 }
 
-ViewInvoiceOffcanvas.PropTypes = {
+ViewProformaOffcanvas.PropTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
-  invoice: PropTypes.object.isRequired,
-  isYourInvoice: PropTypes.bool.isRequired,
+  proforma: PropTypes.object.isRequired,
+  isYourProforma: PropTypes.bool.isRequired,
+  isOrg: PropTypes.bool.isRequired,
 };
 
-export default ViewInvoiceOffcanvas;
+export default ViewProformaOffcanvas;

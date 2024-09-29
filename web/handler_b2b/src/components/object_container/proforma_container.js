@@ -43,12 +43,12 @@ function ProformaContainer({
           <Row className="gy-2">
             <Col xs="12" className="mb-0">
               <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2">
-                <p className="mb-0">{proforma.number}</p>
+                <p className="mb-0">{proforma.proformaNumber}</p>
               </span>
             </Col>
             <Col className="pe-1" xs="auto">
               <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
-                <p className="mb-0">Date: {proforma.date}</p>
+                <p className="mb-0">Date: {proforma.date.substring(0, 10)}</p>
               </span>
             </Col>
             <Col className="ps-1">
@@ -58,11 +58,9 @@ function ProformaContainer({
             </Col>
             <Col xs="12">
               <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
-                {isYourProforma ? (
-                  <p className="mb-0">For: {proforma.for}</p>
-                ) : (
-                  <p className="mb-0">Source: {proforma.source}</p>
-                )}
+                <p className="mb-0">
+                  {isYourProforma ? "Source:" : "For:"} {proforma.clientName}
+                </p>
               </span>
             </Col>
             <Col className="pe-1 mb-1 d-md-none">
@@ -81,7 +79,7 @@ function ProformaContainer({
               >
                 <p className="mb-0">Total Value:</p>
                 <p className="mb-0">
-                  {proforma.total_value} {proforma.currency_name}
+                  {proforma.total} {proforma.currencyName}
                 </p>
               </span>
             </Col>
@@ -99,14 +97,21 @@ function ProformaContainer({
               <span className="main-blue-bg d-block rounded-span px-2 pb-2 pt-1 main-text text-center">
                 <p className="mb-0">Total Value:</p>
                 <p className="mb-0">
-                  {proforma.total_value} {proforma.currency_name}
+                  {proforma.total} {proforma.currencyName}
                 </p>
               </span>
             </Col>
           </Row>
         </Col>
         <Col xs="12" xl="4" className="px-0 pt-3 pt-xl-2 pb-2">
-          <ContainerButtons selected={selected} />
+          <ContainerButtons
+            selected={selected}
+            selectAction={selectAction}
+            unselectAction={unselectAction}
+            viewAction={viewAction}
+            deleteAction={deleteAction}
+            modifyAction={modifyAction}
+          />
         </Col>
       </Row>
     </Container>

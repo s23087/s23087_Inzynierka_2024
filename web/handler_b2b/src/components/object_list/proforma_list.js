@@ -7,14 +7,15 @@ import SearchFilterBar from "../menu/search_filter_bar";
 import MoreActionWindow from "../windows/more_action";
 import { useSearchParams } from "next/navigation";
 import DeleteObjectWindow from "../windows/delete_object";
-import ViewClientOffcanvas from "../offcanvas/view/view_client";
-import deleteClient from "@/utils/clients/delete_client";
 import { useRouter } from "next/navigation";
 import ModifyClientOffcanvas from "../offcanvas/modify/modify_client";
 import SelectComponent from "../smaller_components/select_compontent";
 import getPagationInfo from "@/utils/flexible/get_page_info";
 import ProformaContainer from "../object_container/proforma_container";
 import AddProformaOffcanvas from "../offcanvas/create/create_proforma";
+import ViewProformaOffcanvas from "../offcanvas/view/view_proforma";
+import deleteProforma from "@/utils/proformas/delete_proforma";
+import ModifyProformaOffcanvas from "../offcanvas/modify/modify_proforma";
 
 function ProformaList({
   proformas,
@@ -26,16 +27,28 @@ function ProformaList({
   // View proforma
   const [showViewProforma, setShowViewProforma] = useState(false);
   const [proformaToView, setProformaToView] = useState({
-    users: [],
+    proformaId: 0,
+    user: "",
+    date: "",
+    transport: 0.0,
+    clientName: "",
+    qty: 0,
+    total: 0.0,
   });
   // Modify proforma
   const [showModifyProforma, setShowModifyProforma] = useState(false);
-  const [proformaToModify, setClientToProforma] = useState({
-    users: [],
+  const [proformaToModify, setProformaToModify] = useState({
+    proformaId: 0,
+    user: "",
+    date: "",
+    transport: 0.0,
+    clientName: "",
+    qty: 0,
+    total: 0.0,
   });
   // Delete proforma
   const [showDeleteProforma, setShowDeleteProforma] = useState(false);
-  const [proformaToDelete, setItemToProforma] = useState(null);
+  const [proformaToDelete, setProformaToDelete] = useState(null);
   const [isErrorDelete, setIsErrorDelete] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   // More action
@@ -73,22 +86,22 @@ function ProformaList({
           .map((value) => {
             return (
               <ProformaContainer
-                key={value.clientId}
+                key={value.proformaId}
                 proforma={value}
                 is_org={orgView}
                 isYourProforma={type === "Yours proformas"}
-                selected={selectedProforma.indexOf(value.clientId) !== -1}
+                selected={selectedProforma.indexOf(value.proformaId) !== -1}
                 selectAction={() => {
-                  selectedProforma.push(value.clientId);
+                  selectedProforma.push(value.proformaId);
                   setSelectedQty(selectedQty + 1);
                 }}
                 unselectAction={() => {
-                  let index = selectedProforma.indexOf(value.clientId);
+                  let index = selectedProforma.indexOf(value.proformaId);
                   selectedProforma.splice(index, 1);
                   setSelectedQty(selectedQty - 1);
                 }}
                 deleteAction={() => {
-                  setItemToProforma(value.clientId);
+                  setProformaToDelete(value.proformaId);
                   setShowDeleteProforma(true);
                 }}
                 viewAction={() => {
@@ -96,7 +109,7 @@ function ProformaList({
                   setShowViewProforma(true);
                 }}
                 modifyAction={() => {
-                  setClientToProforma(value);
+                  setProformaToModify(value);
                   setShowModifyProforma(true);
                 }}
               />
@@ -117,7 +130,7 @@ function ProformaList({
           let pagationInfo = getPagationInfo(params);
           Object.values(proformas)
             .slice(pagationInfo.start, pagationInfo.end)
-            .forEach((e) => selectedProforma.push(e.clientId));
+            .forEach((e) => selectedProforma.push(e.proformaId));
           setSelectedQty(selectedProforma.length);
           setShowMoreAction(false);
         }}
@@ -125,7 +138,7 @@ function ProformaList({
           selectedProforma.splice(0, selectedProforma.length);
           setSelectedQty(0);
           Object.values(proformas).forEach((e) =>
-            selectedProforma.push(e.clientId),
+            selectedProforma.push(e.proformaId),
           );
           setSelectedQty(selectedProforma.length);
           setShowMoreAction(false);
@@ -150,7 +163,10 @@ function ProformaList({
         instanceName="proforma"
         instanceId={proformaToDelete}
         deleteItemFunc={async () => {
-          let result = await deleteClient(proformaToDelete);
+          let result = await deleteProforma(
+            type === "Yours proformas",
+            proformaToDelete,
+          );
           if (!result.error) {
             setShowDeleteProforma(false);
             router.refresh();
@@ -162,16 +178,17 @@ function ProformaList({
         isError={isErrorDelete}
         errorMessage={errorMessage}
       />
-      <ModifyClientOffcanvas
+      <ModifyProformaOffcanvas
         showOffcanvas={showModifyProforma}
         hideFunction={() => setShowModifyProforma(false)}
-        client={proformaToModify}
-        isOrg={orgView}
+        proforma={proformaToModify}
+        isYourProforma={type === "Yours proformas"}
       />
-      <ViewClientOffcanvas
+      <ViewProformaOffcanvas
         showOffcanvas={showViewProforma}
         hideFunction={() => setShowViewProforma(false)}
-        client={proformaToView}
+        proforma={proformaToView}
+        isYourProforma={type === "Yours proformas"}
         isOrg={orgView}
       />
     </Container>

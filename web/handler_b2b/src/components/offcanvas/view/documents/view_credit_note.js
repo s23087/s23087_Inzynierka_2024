@@ -8,7 +8,7 @@ import getDocumentStatusStyle from "@/utils/documents/get_document_status_color"
 import dropdown_big_down from "../../../../../public/icons/dropdown_big_down.png";
 import download_off from "../../../../../public/icons/download_off.png";
 import download_on from "../../../../../public/icons/download_on.png";
-import getInvoiceFile from "@/utils/documents/download_invoice";
+import getFileFormServer from "@/utils/documents/download_file";
 import getRestCreditNote from "@/utils/documents/get_rest_credit_note";
 import CreditNoteTable from "@/components/tables/credit_table";
 function ViewCreditNoteOffcanvas({
@@ -71,7 +71,7 @@ function ViewCreditNoteOffcanvas({
                 disabled={isDownloading}
                 onClick={async () => {
                   setIsDowlonding(true);
-                  let file = await getInvoiceFile(creditPath);
+                  let file = await getFileFormServer(creditPath);
                   if (file) {
                     let parsed = JSON.parse(file);
                     let buffer = Buffer.from(parsed.data);

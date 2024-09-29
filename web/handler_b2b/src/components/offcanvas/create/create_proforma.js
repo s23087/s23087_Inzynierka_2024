@@ -10,16 +10,14 @@ import getUsers from "@/utils/flexible/get_users";
 import getOrgsList from "@/utils/documents/get_orgs_list";
 import getTaxes from "@/utils/documents/get_taxes";
 import getPaymentMethods from "@/utils/documents/get_payment_methods";
-import getPaymentStatuses from "@/utils/documents/get_payment_statuses";
 import CloseIcon from "../../../../public/icons/close_black.png";
 import ProductHolder from "@/components/smaller_components/product_holder";
 import AddProductWindow from "@/components/windows/addProduct";
-import CreatePurchaseInvoice from "@/utils/documents/create_purchase_invoice";
 import getCurrencyValuesList from "@/utils/flexible/get_currency_values_list";
 import AddSaleProductWindow from "@/components/windows/add_Sales_product";
-import CreateSalesInvoice from "@/utils/documents/create_sales_invoice";
 import ErrorMessage from "@/components/smaller_components/error_message";
 import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import createProforma from "@/utils/proformas/create_proforma";
 
 function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
   const router = useRouter();
@@ -110,14 +108,12 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
   // Misc
   const [isLoading, setIsLoading] = useState(false);
   // Form
-  const [state, formPurchaseAction] = useFormState(
-    isYourProforma
-      ? CreatePurchaseInvoice.bind(null, products)
-          .bind(null, file)
-          .bind(null, orgs)
-      : CreateSalesInvoice.bind(null, products)
-          .bind(null, file)
-          .bind(null, orgs),
+  const [state, createProformaAction] = useFormState(
+    createProforma
+      .bind(null, products)
+      .bind(null, file)
+      .bind(null, orgs)
+      .bind(null, isYourProforma),
     {
       error: false,
       completed: false,
@@ -184,7 +180,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
             <Form
               className="mx-1 mx-xl-4"
               id="proformaForm"
-              action={formPurchaseAction}
+              action={createProformaAction}
             >
               <Form.Group className="mb-4">
                 <Form.Label className="blue-main-text">User:</Form.Label>
