@@ -86,8 +86,16 @@ function ItemContainer({
               </span>
             </Col>
             <Col className="ps-1">
-              <span className=" d-flex rounded-span px-2" style={statusBgStyle}>
-                <p className="mb-0">Availability: {item.statusName}</p>
+              <span
+                className=" d-flex rounded-span px-2 d-block"
+                style={statusBgStyle}
+              >
+                <p className="mb-0">
+                  Availability:{" "}
+                  {item.statusName === "In warehouse | In delivery"
+                    ? "In warehouse++"
+                    : item.statusName}
+                </p>
               </span>
             </Col>
             <Col xs="12" className="mb-1 mb-sm-0">

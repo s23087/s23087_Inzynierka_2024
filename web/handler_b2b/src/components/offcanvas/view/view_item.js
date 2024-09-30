@@ -54,8 +54,8 @@ function ViewItemOffcanvas({
   }, [showOffcanvas, currency, item.itemId, isOrg]);
   const statusColorStyle = {
     color:
-      getStatusColor(item.statusName) === "var(--sec-red)"
-        ? "var(--main-red)"
+      getStatusColor(item.statusName) === "var(--main-yellow)"
+        ? "var(--warning-color)"
         : getStatusColor(item.statusName),
     marginBottom: ".25rem",
   };

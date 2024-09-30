@@ -8,7 +8,6 @@ import MoreActionWindow from "../windows/more_action";
 import { useSearchParams } from "next/navigation";
 import DeleteObjectWindow from "../windows/delete_object";
 import { useRouter } from "next/navigation";
-import ModifyClientOffcanvas from "../offcanvas/modify/modify_client";
 import SelectComponent from "../smaller_components/select_compontent";
 import getPagationInfo from "@/utils/flexible/get_page_info";
 import ProformaContainer from "../object_container/proforma_container";

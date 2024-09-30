@@ -67,7 +67,6 @@ namespace database_comunicator.Services
                     PaymentMethodId = data.PaymentId,
                     CurrencyValueDate = data.CurrencyDate,
                     CurrencyName = data.CurrencyName,
-                    InvoiceId = null,
                     UserId = data.UserId,
                 };
                 await _handlerContext.Proformas.AddAsync(newProforma);

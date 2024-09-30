@@ -56,7 +56,7 @@ function AddAvailabilityStatusWindow({ modalShow, onHideFunction, statuses }) {
                     validators.stringIsNotEmpty(e.target.value) &&
                     validators.lengthSmallerThen(e.target.value, 150) &&
                     !Object.values(statuses).find(
-                      (d) => d.name == e.target.value,
+                      (d) => d.name === e.target.value,
                     )
                   ) {
                     setNameError(false);

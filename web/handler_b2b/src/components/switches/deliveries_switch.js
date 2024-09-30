@@ -6,8 +6,9 @@ import Image from "next/image";
 import { Dropdown, Stack, Button } from "react-bootstrap";
 import to_client_delivery_icon from "../../../public/icons/to_client_delivery_icon.png";
 import to_user_delivery_icon from "../../../public/icons/to_user_delivery_icon.png";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-function DeliverySwitch({ boolean_value, switch_action }) {
+function DeliverySwitch({ isDeliveryToUser }) {
   const deliverySwitchRef = useRef(null);
   const onOutside = (event) => {
     if (
@@ -22,8 +23,13 @@ function DeliverySwitch({ boolean_value, switch_action }) {
     return () => document.removeEventListener("mousedown", onOutside);
   });
   const [closingBool, setClosingBool] = useState(false);
-  const buttonAction = () => {
-    switch_action();
+  const router = useRouter();
+  const pathName = usePathname();
+  const params = useSearchParams();
+  const buttonAction = (type) => {
+    const newParams = new URLSearchParams(params);
+    newParams.set("deliveryType", type);
+    router.replace(`${pathName}?${newParams}`);
     setClosingBool(false);
   };
   return (
@@ -33,35 +39,35 @@ function DeliverySwitch({ boolean_value, switch_action }) {
         variant="as-link"
         onClick={() => setClosingBool(true)}
       >
-        {boolean_value ? (
-          <Image src={to_client_delivery_icon} alt="delivery switch icon" />
-        ) : (
+        {isDeliveryToUser ? (
           <Image src={to_user_delivery_icon} alt="delivery switch icon" />
+        ) : (
+          <Image src={to_client_delivery_icon} alt="delivery switch icon" />
         )}
       </Dropdown.Toggle>
       <Dropdown.Menu ref={deliverySwitchRef}>
         <Stack gap={1} className="px-3 blue-main-text">
-          {boolean_value ? (
-            <>
-              <Button
-                variant="as-link"
-                className="p-0 text-start"
-                onClick={buttonAction}
-              >
-                User deliveries
-              </Button>
-              <p className="mb-2 h-100 blue-sec-text">Client deliveries</p>
-            </>
-          ) : (
+          {isDeliveryToUser ? (
             <>
               <p className="mb-0 pt-2 h-100 blue-sec-text">User deliveries</p>
               <Button
                 variant="as-link"
                 className="p-0 text-start"
-                onClick={buttonAction}
+                onClick={() => buttonAction("Deliveries to clients")}
               >
                 Client deliveries
               </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="as-link"
+                className="p-0 text-start"
+                onClick={() => buttonAction("Deliveries to user")}
+              >
+                User deliveries
+              </Button>
+              <p className="mb-2 h-100 blue-sec-text">Client deliveries</p>
             </>
           )}
         </Stack>

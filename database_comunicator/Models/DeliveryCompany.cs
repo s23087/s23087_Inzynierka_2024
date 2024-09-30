@@ -9,5 +9,5 @@ public partial class DeliveryCompany
 
     public string DeliveryCompanyName { get; set; } = null!;
 
-    public virtual ICollection<Waybill> Waybills { get; set; } = new List<Waybill>();
+    public virtual ICollection<Delivery> Deliveries { get; set; } = new List<Delivery>();
 }

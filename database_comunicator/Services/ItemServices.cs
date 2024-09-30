@@ -210,7 +210,7 @@ namespace database_comunicator.Services
                     ItemId = instance.ItemId,
                     ItemName = instance.ItemName,
                     PartNumber = instance.PartNumber,
-                    StatusName = WarehouseUtils.getItemStatus(
+                    StatusName = WarehouseUtils.GetItemStatus(
                             instance.OwnedItems
                                 .SelectMany(e => e.PurchasePrices)
                                 .Select(e => e.Qty).Sum()
@@ -218,7 +218,7 @@ namespace database_comunicator.Services
                                 + instance.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.CreditNoteItems)
                                     .Select(d => d.Qty).Sum(),
                             instance.OutsideItems.Select(e => e.Qty).Sum(),
-                            instance.OwnedItems.SelectMany(e => e.Invoice.Deliveries).Any()
+                            instance.ProformaFutureItems.SelectMany(e => e.Proforma.Deliveries).Any(e => e.DeliveryStatus.StatusName == "In transport")
                         ),
                     Eans = instance.Eans.Select(e => e.EanValue),
                     Qty = instance.OwnedItems
@@ -260,7 +260,7 @@ namespace database_comunicator.Services
                     ItemId = insta.ItemId,
                     ItemName = insta.ItemName,
                     PartNumber = insta.PartNumber,
-                    StatusName = WarehouseUtils.getItemStatus(
+                    StatusName = WarehouseUtils.GetItemStatus(
                             insta.OwnedItems
                                 .SelectMany(e => e.PurchasePrices)
                                 .Select(e => e.Qty).Sum()
@@ -268,7 +268,7 @@ namespace database_comunicator.Services
                                 + insta.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.CreditNoteItems)
                                     .Select(d => d.Qty).Sum(),
                             insta.OutsideItems.Select(e => e.Qty).Sum(),
-                            insta.OwnedItems.SelectMany(e => e.Invoice.Deliveries).Any()
+                            insta.ProformaFutureItems.SelectMany(e => e.Proforma.Deliveries).Any(e => e.DeliveryStatus.StatusName == "In transport")
                         ),
                     Eans = insta.Eans.Select(e => e.EanValue),
                     Qty = insta.OwnedItems
@@ -319,7 +319,7 @@ namespace database_comunicator.Services
                         ItemId = instc.ItemId,
                         ItemName = instc.ItemName,
                         PartNumber = instc.PartNumber,
-                        StatusName = WarehouseUtils.getItemStatus(
+                        StatusName = WarehouseUtils.GetItemStatus(
                                 instc.OwnedItems
                                     .SelectMany(e => e.PurchasePrices)
                                     .Select(e =>
@@ -329,7 +329,7 @@ namespace database_comunicator.Services
                                     )
                                     .Sum(),
                                 instc.OutsideItems.Select(e => e.Qty).Sum(),
-                                instc.OwnedItems.SelectMany(e => e.Invoice.Deliveries).Any()
+                                instc.ProformaFutureItems.SelectMany(e => e.Proforma.Deliveries).Any(e => e.DeliveryStatus.StatusName == "In transport")
                             ),
                         Eans = instc.Eans.Select(e => e.EanValue),
                         Qty = instc.OwnedItems
@@ -376,7 +376,7 @@ namespace database_comunicator.Services
                         ItemId = instac.ItemId,
                         ItemName = instac.ItemName,
                         PartNumber = instac.PartNumber,
-                        StatusName = WarehouseUtils.getItemStatus(
+                        StatusName = WarehouseUtils.GetItemStatus(
                                 instac.OwnedItems
                                     .SelectMany(e => e.PurchasePrices)
                                     .Select(e =>
@@ -386,7 +386,7 @@ namespace database_comunicator.Services
                                     )
                                     .Sum(),
                                 instac.OutsideItems.Select(e => e.Qty).Sum(),
-                                instac.OwnedItems.SelectMany(e => e.Invoice.Deliveries).Any()
+                                instac.ProformaFutureItems.SelectMany(e => e.Proforma.Deliveries).Any(e => e.DeliveryStatus.StatusName == "In transport")
                             ),
                         Eans = instac.Eans.Select(e => e.EanValue),
                         Qty = instac.OwnedItems
@@ -436,10 +436,10 @@ namespace database_comunicator.Services
                         ItemId = inst.ItemId,
                         ItemName = inst.ItemName,
                         PartNumber = inst.PartNumber,
-                        StatusName = WarehouseUtils.getItemStatus(
+                        StatusName = WarehouseUtils.GetItemStatus(
                                 inst.OwnedItems.SelectMany(e => e.ItemOwners).Where(e => e.IdUser == userId).Select(e => e.Qty).Sum(),
                                 inst.OutsideItems.Select(e => e.Qty).Sum(),
-                                inst.OwnedItems.Where(e => e.ItemOwners.Select(e => e.IdUser).Contains(userId)).SelectMany(e => e.Invoice.Deliveries).Any()
+                                inst.ProformaFutureItems.SelectMany(e => e.Proforma.Deliveries).Any(e => e.DeliveryStatus.StatusName == "In transport")
                             ),
                         Eans = inst.Eans.Select(e => e.EanValue),
                         Qty = inst.OwnedItems
@@ -476,10 +476,10 @@ namespace database_comunicator.Services
                         ItemId = instace.ItemId,
                         ItemName = instace.ItemName,
                         PartNumber = instace.PartNumber,
-                        StatusName = WarehouseUtils.getItemStatus(
+                        StatusName = WarehouseUtils.GetItemStatus(
                                 instace.OwnedItems.SelectMany(e => e.ItemOwners).Where(e => e.IdUser == userId).Select(e => e.Qty).Sum(),
                                 instace.OutsideItems.Select(e => e.Qty).Sum(),
-                                instace.OwnedItems.Where(e => e.ItemOwners.Select(e => e.IdUser).Contains(userId)).SelectMany(e => e.Invoice.Deliveries).Any()
+                                instace.ProformaFutureItems.SelectMany(e => e.Proforma.Deliveries).Any(e => e.DeliveryStatus.StatusName == "In transport")
                             ),
                         Eans = instace.Eans.Select(e => e.EanValue),
                         Qty = instace.OwnedItems
@@ -527,10 +527,10 @@ namespace database_comunicator.Services
                         ItemId = obj.ItemId,
                         ItemName = obj.ItemName,
                         PartNumber = obj.PartNumber,
-                        StatusName = WarehouseUtils.getItemStatus(
+                        StatusName = WarehouseUtils.GetItemStatus(
                                 obj.OwnedItems.SelectMany(e => e.ItemOwners).Where(e => e.IdUser == userId).Select(e => e.Qty).Sum(),
                                 obj.OutsideItems.Select(e => e.Qty).Sum(),
-                                obj.OwnedItems.SelectMany(e => e.Invoice.Deliveries).Any()
+                                obj.ProformaFutureItems.SelectMany(e => e.Proforma.Deliveries).Any(e => e.DeliveryStatus.StatusName == "In transport")
                             ),
                         Eans = obj.Eans.Select(e => e.EanValue),
                         Qty = obj.OwnedItems
@@ -572,10 +572,10 @@ namespace database_comunicator.Services
                         ItemId = objs.ItemId,
                         ItemName = objs.ItemName,
                         PartNumber = objs.PartNumber,
-                        StatusName = WarehouseUtils.getItemStatus(
+                        StatusName = WarehouseUtils.GetItemStatus(
                                 objs.OwnedItems.SelectMany(e => e.ItemOwners).Where(e => e.IdUser == userId).Select(e => e.Qty).Sum(),
                                 objs.OutsideItems.Select(e => e.Qty).Sum(),
-                                objs.OwnedItems.Where(e => e.ItemOwners.Select(e => e.IdUser).Contains(userId)).SelectMany(e => e.Invoice.Deliveries).Any()
+                                objs.ProformaFutureItems.SelectMany(e => e.Proforma.Deliveries).Any(e => e.DeliveryStatus.StatusName == "In transport")
                             ),
                         Eans = objs.Eans.Select(e => e.EanValue),
                         Qty = objs.OwnedItems

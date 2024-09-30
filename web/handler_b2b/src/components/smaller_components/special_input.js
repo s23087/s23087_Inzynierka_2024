@@ -2,28 +2,24 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import { Button, InputGroup, Form } from "react-bootstrap";
 import Image from "next/image";
-import validators from "@/utils/validators/validator";
 import pen_icon from "../../../public/icons/pen_icon.png";
 import close_white from "../../../public/icons/close_white.png";
+import ErrorMessage from "./error_message";
 
-function SpecialInput({ value, deleteValue, modifyValue, eanExistFun }) {
+function SpecialInput({
+  value,
+  deleteValue,
+  modifyValue,
+  existFun,
+  validatorFunc,
+  errorMessage,
+}) {
   const [isUnavail, setIsUnavail] = useState(true);
   const [ean, setEan] = useState(value);
   const [isInvalid, setIsInvalid] = useState(false);
-  const hidden = {
-    display: "none",
-  };
-  const unhidden = {
-    display: "block",
-  };
   return (
     <>
-      <Form.Label
-        className="text-start mb-0 red-sec-text small-text"
-        style={isInvalid ? unhidden : hidden}
-      >
-        Ean already exist or have letters
-      </Form.Label>
+      <ErrorMessage message={errorMessage} messageStatus={isInvalid} />
       <InputGroup className="mb-3 maxInputWidth">
         <Form.Control
           className="input-style shadow-sm"
@@ -33,9 +29,9 @@ function SpecialInput({ value, deleteValue, modifyValue, eanExistFun }) {
           isInvalid={isInvalid}
           onInput={(e) => {
             if (
-              validators.haveOnlyNumbers(e.target.value) &&
-              (!eanExistFun(e.target.value) ||
-                e.target.value == e.target.defaultValue)
+              validatorFunc(e.target.value) &&
+              (!existFun(e.target.value) ||
+                e.target.value === e.target.defaultValue)
             ) {
               setIsInvalid(false);
             } else {
@@ -75,7 +71,9 @@ SpecialInput.PropTypes = {
   value: PropTypes.string.isRequired,
   deleteValue: PropTypes.func.isRequired,
   modifyValue: PropTypes.func.isRequired,
-  eanExistFun: PropTypes.func.isRequired,
+  existFun: PropTypes.func.isRequired,
+  validatorFunc: PropTypes.func.isRequired,
+  errorMessage: PropTypes.string.isRequired,
 };
 
 export default SpecialInput;

@@ -31,8 +31,6 @@ public partial class Proforma
     public DateTime CurrencyValueDate { get; set; }
 
     public string CurrencyName { get; set; } = null!;
-
-    public int? InvoiceId { get; set; }
     public int UserId { get; set; }
     public virtual AppUser User { get; set; } = null!;
     public virtual Organization BuyerNavigation { get; set; } = null!;
@@ -40,8 +38,6 @@ public partial class Proforma
     public virtual CurrencyValue Currency { get; set; } = null!;
 
     public virtual ICollection<Delivery> Deliveries { get; set; } = new List<Delivery>();
-
-    public virtual Invoice? Invoice { get; set; }
 
     public virtual PaymentMethod PaymentMethod { get; set; } = null!;
 

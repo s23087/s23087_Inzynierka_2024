@@ -430,17 +430,18 @@ public partial class HandlerContext : DbContext
             entity.Property(e => e.EstimatedDeliveryDate)
                 .HasColumnType("datetime")
                 .HasColumnName("estimated_delivery_date");
-            entity.Property(e => e.InvoiceId).HasColumnName("invoice_id");
             entity.Property(e => e.ProformaId).HasColumnName("proforma_id");
+            entity.Property(e => e.DeliveryCompanyId).HasColumnName("delivery_company_id");
 
             entity.HasOne(d => d.DeliveryStatus).WithMany(p => p.Deliveries)
                 .HasForeignKey(d => d.DeliveryStatusId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Delivery_Delivery_Status_relation");
 
-            entity.HasOne(d => d.Invoice).WithMany(p => p.Deliveries)
-                .HasForeignKey(d => d.InvoiceId)
-                .HasConstraintName("Delivery_Invoice_relation");
+            entity.HasOne(d => d.DeliveryCompany).WithMany(p => p.Deliveries)
+                .HasForeignKey(d => d.DeliveryCompanyId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Delivery_Delivery_company_relation");
 
             entity.HasOne(d => d.Proforma).WithMany(p => p.Deliveries)
                 .HasForeignKey(d => d.ProformaId)
@@ -925,7 +926,6 @@ public partial class HandlerContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("currency_value_date");
             entity.Property(e => e.InSystem).HasColumnName("in_system");
-            entity.Property(e => e.InvoiceId).HasColumnName("invoice_id");
             entity.Property(e => e.Note)
                 .HasMaxLength(500)
                 .IsUnicode(false)
@@ -958,10 +958,6 @@ public partial class HandlerContext : DbContext
                 .HasForeignKey(d => d.Buyer)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("buyer_Proforma_relation");
-
-            entity.HasOne(d => d.Invoice).WithMany(p => p.Proformas)
-                .HasForeignKey(d => d.InvoiceId)
-                .HasConstraintName("Proforma_Invoice_relation");
 
             entity.HasOne(d => d.PaymentMethod).WithMany(p => p.Proformas)
                 .HasForeignKey(d => d.PaymentMethodId)
@@ -1222,8 +1218,7 @@ public partial class HandlerContext : DbContext
 
             entity.Property(e => e.WaybillId).HasColumnName("waybill_id");
             entity.Property(e => e.DeliveriesId).HasColumnName("deliveries_id");
-            entity.Property(e => e.DeliveryCompanyId).HasColumnName("delivery_company_id");
-            entity.Property(e => e.Waybill1)
+            entity.Property(e => e.WaybillValue)
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("waybill");
@@ -1232,11 +1227,6 @@ public partial class HandlerContext : DbContext
                 .HasForeignKey(d => d.DeliveriesId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Waybill_Delivery_relation");
-
-            entity.HasOne(d => d.DeliveryCompany).WithMany(p => p.Waybills)
-                .HasForeignKey(d => d.DeliveryCompanyId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("Waybill_Delivery_company_relation");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -9,17 +9,14 @@ public partial class Delivery
 
     public DateTime EstimatedDeliveryDate { get; set; }
 
-    public DateTime DeliveryDate { get; set; }
+    public DateTime? DeliveryDate { get; set; }
 
     public int DeliveryStatusId { get; set; }
 
     public int ProformaId { get; set; }
-
-    public int? InvoiceId { get; set; }
-
+    public int DeliveryCompanyId { get; set; }
+    public virtual DeliveryCompany DeliveryCompany { get; set; } = null!;
     public virtual DeliveryStatus DeliveryStatus { get; set; } = null!;
-
-    public virtual Invoice? Invoice { get; set; }
 
     public virtual Proforma Proforma { get; set; } = null!;
 

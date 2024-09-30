@@ -19,6 +19,7 @@ import Toastes from "@/components/smaller_components/toast";
 import { useRouter } from "next/navigation";
 import StringValidtor from "@/utils/validators/form_validator/stringValidator";
 import ErrorMessage from "@/components/smaller_components/error_message";
+import validators from "@/utils/validators/validator";
 
 function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
   const router = useRouter();
@@ -154,8 +155,10 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                             setRerenderVar(rerenderVar - 1);
                           }
                         }}
-                        eanExistFun={eanExist}
+                        existFun={eanExist}
                         modifyValue={(variable) => (eans[key] = variable)}
+                        validatorFunc={(val) => validators.haveOnlyNumbers(val)}
+                        errorMessage="Ean already exist or have letters"
                       />
                     );
                   })}

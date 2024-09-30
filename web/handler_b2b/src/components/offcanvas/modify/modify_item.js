@@ -26,6 +26,7 @@ import StringValidtor from "@/utils/validators/form_validator/stringValidator";
 import ErrorMessage from "@/components/smaller_components/error_message";
 import ChangeBidningsWindow from "@/components/windows/change_bindings_window";
 import changeBindings from "@/utils/warehouse/change_bindings";
+import validators from "@/utils/validators/validator";
 
 function ModifyItemOffcanvas({
   showOffcanvas,
@@ -256,7 +257,9 @@ function ModifyItemOffcanvas({
                           }
                         }}
                         modifyValue={(variable) => (eans[key] = variable)}
-                        eanExistFun={eanExist}
+                        existFun={eanExist}
+                        validatorFunc={(val) => validators.haveOnlyNumbers(val)}
+                        errorMessage="Ean already exist or have letters"
                       />
                     );
                   })}

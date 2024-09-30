@@ -1,0 +1,87 @@
+"use server";
+
+import getDbName from "../auth/get_db_name";
+import getUserId from "../auth/get_user_id";
+import logout from "../auth/logout";
+
+export default async function createDelivery(
+  waybills,
+  isDeliveryToUser,
+  state,
+  formData,
+) {
+  let errorMessage = "Error:";
+  let proforma = formData.get("proforma");
+  let date = formData.get("date");
+  let company = formData.get("company");
+  let note = formData.get("note");
+  if (!proforma) errorMessage += "\nProforma must not be empty.";
+  if (!date) errorMessage += "\nDate must not be empty.";
+  if (!company) errorMessage += "\nCompany must not be empty.";
+  if (waybills.length === 0)
+    errorMessage += "\nMust have at least one waybill.";
+
+  if (errorMessage.length > 6)
+    return {
+      error: true,
+      completed: true,
+      message: errorMessage,
+    };
+
+  const userId = await getUserId();
+  const dbName = await getDbName();
+
+  let deliveryData = {
+    userId: userId,
+    isDeliveryToUser: isDeliveryToUser,
+    estimatedDeliveryDate: date,
+    proformaId: parseInt(proforma),
+    companyId: parseInt(company),
+    waybills: waybills,
+    note: note === "" ? null : note,
+  };
+
+  const info = await fetch(`${process.env.API_DEST}/${dbName}/Delivery/add`, {
+    method: "POST",
+    body: JSON.stringify(deliveryData),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (info.status === 404) {
+    logout();
+    return {
+      error: true,
+      completed: true,
+      message: "Your user profile does not exists.",
+    };
+  }
+  if (info.status === 400) {
+    return {
+      error: true,
+      completed: true,
+      message: await info.text(),
+    };
+  }
+  if (info.status === 500) {
+    return {
+      error: true,
+      completed: true,
+      message: "Server error.",
+    };
+  }
+
+  if (info.ok) {
+    return {
+      error: false,
+      completed: true,
+      message: "Success! You had created delivery.",
+    };
+  } else {
+    return {
+      error: true,
+      completed: true,
+      message: "Critical error.",
+    };
+  }
+}

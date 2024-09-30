@@ -2,7 +2,7 @@
 {
     public static class WarehouseUtils
     {
-        public static string getItemStatus(int warQty, int outQty, bool deliveryExist)
+        public static string GetItemStatus(int warQty, int outQty, bool deliveryExist)
         {
             if (warQty <= 0 && outQty > 0 && !deliveryExist) return "On request";
             if (warQty <= 0 && outQty <= 0 && deliveryExist) return "In delivery";

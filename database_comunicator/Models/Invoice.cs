@@ -42,15 +42,11 @@ public partial class Invoice
 
     public virtual CurrencyValue Currency { get; set; } = null!;
 
-    public virtual ICollection<Delivery> Deliveries { get; set; } = new List<Delivery>();
-
     public virtual ICollection<OwnedItem> OwnedItems { get; set; } = new List<OwnedItem>();
 
     public virtual PaymentMethod PaymentMethod { get; set; } = null!;
 
     public virtual PaymentStatus PaymentsStatus { get; set; } = null!;
-
-    public virtual ICollection<Proforma> Proformas { get; set; } = new List<Proforma>();
 
     public virtual Organization SellerNavigation { get; set; } = null!;
 
