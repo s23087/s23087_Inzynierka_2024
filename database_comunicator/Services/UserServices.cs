@@ -34,6 +34,7 @@ namespace database_comunicator.Services
         public Task<string> GetUserEmail(int userId);
         public Task<IEnumerable<GetUsers>> GetUsers();
         public Task<IEnumerable<GetUsers>> GetAccountantUser();
+        public Task<string> GetUserFullName(int userId);
     }
     public class UserServices : IUserServices
     {
@@ -315,6 +316,12 @@ namespace database_comunicator.Services
                 Username = e.Username,
                 Surname = e.Surname
             }).ToListAsync();
+        }
+        public async Task<string> GetUserFullName(int userId)
+        {
+            return await _handlerContext.AppUsers
+                .Where(e => e.IdUser == userId)
+                .Select(e => e.Username + " " + e.Surname).FirstAsync();
         }
     }
 }

@@ -37,10 +37,11 @@ namespace database_comunicator.Controllers
             await _logServices.CreateActionLog(desc, userId, logId);
             if (userId != data.UserId)
             {
+                var userFull = await _userServices.GetUserFullName(userId);
                 await _notificationServices.CreateNotification(new CreateNotification
                 {
                     UserId = data.UserId,
-                    Info = $"User has created a new proforma for you with number {data.ProformaNumber}.",
+                    Info = $"{userFull} has created a new proforma for you with number {data.ProformaNumber}.",
                     ObjectType = data.IsYourProforma ? "Yours Proformas" : "Clients Proformas",
                     Referance = $"{proformaId}"
                 });
@@ -136,10 +137,11 @@ namespace database_comunicator.Controllers
             await _logServices.CreateActionLog(desc, userId, logId);
             if (userId != owner)
             {
+                var userFull = await _userServices.GetUserFullName(userId);
                 await _notificationServices.CreateNotification(new CreateNotification
                 {
                     UserId = owner,
-                    Info = $"User has deleted a proforma with id {proformaId}.",
+                    Info = $"{userFull} has deleted a proforma with id {proformaId}.",
                     ObjectType = "Yours Proformas",
                     Referance = $"{proformaId}"
                 });
@@ -165,10 +167,11 @@ namespace database_comunicator.Controllers
             await _logServices.CreateActionLog(desc, userId, logId);
             if (userId != owner)
             {
+                var userFull = await _userServices.GetUserFullName(userId);
                 await _notificationServices.CreateNotification(new CreateNotification
                 {
                     UserId = owner,
-                    Info = $"User has deleted a proforma with id {proformaId}.",
+                    Info = $"{userFull} has deleted a proforma with id {proformaId}.",
                     ObjectType = "Clients Proformas",
                     Referance = $"{proformaId}"
                 });
@@ -212,10 +215,11 @@ namespace database_comunicator.Controllers
             await _logServices.CreateActionLog(desc, userId, logId);
             if (userId != data.UserId && data.UserId != null)
             {
+                var userFull = await _userServices.GetUserFullName(userId);
                 await _notificationServices.CreateNotification(new CreateNotification
                 {
                     UserId = (int)data.UserId,
-                    Info = $"User has modified a proforma with number {data.ProformaNumber ?? proformaOldNumber}.",
+                    Info = $"{userFull} has modified a proforma with number {data.ProformaNumber ?? proformaOldNumber}.",
                     ObjectType = "Requests",
                     Referance = $"{data.ProformaId}"
                 });

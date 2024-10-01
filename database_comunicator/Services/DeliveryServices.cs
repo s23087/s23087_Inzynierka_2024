@@ -2,6 +2,7 @@
 using database_comunicator.Models;
 using database_comunicator.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace database_comunicator.Services
 {
@@ -10,13 +11,20 @@ namespace database_comunicator.Services
         public Task<bool> DoesDeliveryCompanyExist(string companyName);
         public Task AddDeliveryCompany(string companyName);
         public Task<int> AddDelivery(AddDelivery data);
-        public Task<bool> DeliveryExist(int proformaId);
+        public Task<bool> DeliveryProformaExist(int proformaId);
+        public Task<bool> DeliveryExist(int deliveryId);
         public Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser);
         public Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, int userId);
         public Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, string search);
         public Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, int userId, string search);
         public Task<IEnumerable<GetDeliveryCompany>> GetDeliveryCompanies();
         public Task<IEnumerable<GetProformaList>> GetProformaListWithoutDelivery(bool IsDeliveryToUser, int userId);
+        public Task<bool> DeleteDelivery(int deliveryId);
+        public Task<int> GetDeliveryOwnerId(int deliveryId);
+        public Task<GetRestDelivery> GetRestDelivery(int deliveryId);
+        public Task<bool> AddNote(AddNote data);
+        public Task SetDeliveryStatus(SetDeliveryStatus data);
+        public Task<bool> ModifyDelivery(ModifyDelivery data);
     }
     public class DeliveryServices : IDeliveryServices
     {
@@ -82,9 +90,13 @@ namespace database_comunicator.Services
                 return 0;
             }
         }
-        public async Task<bool> DeliveryExist(int proformaId)
+        public async Task<bool> DeliveryProformaExist(int proformaId)
         {
             return await _handlerContext.Deliveries.AnyAsync(x => x.ProformaId == proformaId);
+        }
+        public async Task<bool> DeliveryExist(int deliveryId)
+        {
+            return await _handlerContext.Deliveries.AnyAsync(x => x.DeliveryId == deliveryId);
         }
         public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser)
         {
@@ -173,6 +185,178 @@ namespace database_comunicator.Services
                     Id = e.ProformaId,
                     ProformaNumber = e.ProformaNumber,
                 }).ToListAsync();
+        }
+        public async Task<bool> DeleteDelivery(int deliveryId)
+        {
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
+            {
+                var notesIds = await _handlerContext.Notes.Where(e => e.Deliveries.Any(x => x.DeliveryId == deliveryId)).Select(e => e.NoteId).ToListAsync();
+                foreach (var noteId in notesIds)
+                {
+                    await _handlerContext.Database.ExecuteSqlAsync($"Delete from Notes_Delivery where delivery_id={deliveryId} and note_id={noteId}");
+                    await _handlerContext.Notes.Where(e => e.NoteId == noteId).ExecuteDeleteAsync();
+                }
+                await _handlerContext.Waybills
+                    .Where(e => e.DeliveriesId == deliveryId)
+                    .ExecuteDeleteAsync();
+                await _handlerContext.Deliveries
+                    .Where(e => e.DeliveryId == deliveryId)
+                    .ExecuteDeleteAsync();
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+                return true;
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                await trans.RollbackAsync();
+                return false;
+            }
+        }
+        public async Task<int> GetDeliveryOwnerId(int deliveryId)
+        {
+            return await _handlerContext.Deliveries
+                .Where(e => e.DeliveryId == deliveryId)
+                .Select(e => e.Proforma.UserId).FirstAsync();
+        }
+        public async Task<GetRestDelivery> GetRestDelivery(int deliveryId)
+        {
+            var isYourProforma = await _handlerContext.Deliveries
+                .Where(e => e.DeliveryId == deliveryId)
+                .AnyAsync(e => e.Proforma.ProformaFutureItems.Any());
+            var restInfo = new GetRestDelivery
+            {
+                Notes = await _handlerContext.Notes
+                .Where(e => e.Deliveries.Any(d => d.DeliveryId == deliveryId))
+                .Select(e => new GetNote
+                {
+                    NoteDate = e.NoteDate,
+                    Username = e.Users.Username + " " + e.Users.Surname,
+                    Note = e.NoteDescription
+                }).ToListAsync()
+            };
+            if (isYourProforma)
+            {
+                restInfo.Items = await _handlerContext.Deliveries
+                     .Where(e => e.DeliveryId == deliveryId)
+                     .SelectMany(e => e.Proforma.ProformaFutureItems)
+                     .Select(e => new GetItemForDeliveryTable
+                     {
+                         ItemName = e.Item.ItemName,
+                         Partnumber = e.Item.PartNumber,
+                         Qty = e.Qty
+                     }).ToListAsync();
+            } else
+            {
+                restInfo.Items = await _handlerContext.Deliveries
+                     .Where(e => e.DeliveryId == deliveryId)
+                     .SelectMany(e => e.Proforma.ProformaOwnedItems)
+                     .Select(e => new GetItemForDeliveryTable
+                     {
+                         ItemName = e.Item.OwnedItem.OriginalItem.ItemName,
+                         Partnumber = e.Item.OwnedItem.OriginalItem.PartNumber,
+                         Qty = e.Qty
+                     }).ToListAsync();
+            }
+            return restInfo;
+        }
+        public async Task<bool> AddNote(AddNote data)
+        {
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
+            {
+                var newNote = new Note
+                {
+                    NoteDescription = data.Note,
+                    NoteDate = DateTime.Now,
+                    UsersId = data.UserId
+                };
+                await _handlerContext.Notes.AddAsync(newNote);
+                await _handlerContext.SaveChangesAsync();
+                await _handlerContext.Database.ExecuteSqlAsync($"insert into Notes_Delivery (delivery_id, note_id) Values ({data.DeliveryId}, {newNote.NoteId})");
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+                return true;
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                await trans.RollbackAsync();
+                return false;
+            }
+        }
+        public async Task SetDeliveryStatus(SetDeliveryStatus data)
+        {
+            var statusId = await _handlerContext.DeliveryStatuses
+                .Where(e => e.StatusName == data.StatusName)
+                .Select(e => e.DeliveryStatusId).FirstAsync();
+            await _handlerContext.Deliveries
+                .Where(e => e.DeliveryId == data.DeliveryId)
+                .ExecuteUpdateAsync(setter =>
+                    setter.SetProperty(s => s.DeliveryStatusId, statusId)
+                );
+            string[] statusDateChange = { "Fulfilled", "Rejected", "Delivered with issues" };
+            if (statusDateChange.Contains(data.StatusName))
+            {
+                await _handlerContext.Deliveries
+                .Where(e => e.DeliveryId == data.DeliveryId)
+                .ExecuteUpdateAsync(setter =>
+                    setter.SetProperty(s => s.DeliveryDate, DateTime.Now)
+                );
+            } else
+            {
+                await _handlerContext.Deliveries
+                .Where(e => e.DeliveryId == data.DeliveryId)
+                .ExecuteUpdateAsync(setter =>
+                    setter.SetProperty(s => s.DeliveryDate, (DateTime?)null)
+                );
+            }
+            await _handlerContext.SaveChangesAsync();
+        }
+        public async Task<bool> ModifyDelivery(ModifyDelivery data)
+        {
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
+            {
+                if (data.Estimated != null)
+                {
+                    await _handlerContext.Deliveries
+                        .Where(e => e.DeliveryId == data.DeliveryId)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => s.EstimatedDeliveryDate, data.Estimated)
+                        );
+                }
+                if (data.CompanyId != null)
+                {
+                    await _handlerContext.Deliveries
+                        .Where(e => e.DeliveryId == data.DeliveryId)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => s.DeliveryCompanyId, data.CompanyId)
+                        );
+                }
+                if (data.Waybills != null)
+                {
+                    await _handlerContext.Waybills
+                        .Where(e => e.DeliveriesId == data.DeliveryId && !data.Waybills.Contains(e.WaybillValue))
+                        .ExecuteDeleteAsync();
+                    var restWaybills = await _handlerContext.Waybills.Where(e => e.DeliveriesId == data.DeliveryId).Select(e => e.WaybillValue).ToListAsync();
+                    foreach ( var waybill in data.Waybills.Where(e => !restWaybills.Contains(e)) )
+                    {
+                        await _handlerContext.Waybills.AddAsync(new Waybill
+                        {
+                            DeliveriesId = data.DeliveryId,
+                            WaybillValue = waybill
+                        });
+                    }
+                }
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+                return true;
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                await trans.RollbackAsync();
+                return false;
+            }
         }
     }
 }

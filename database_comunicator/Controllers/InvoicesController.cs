@@ -173,10 +173,11 @@ namespace database_comunicator.Controllers
             await _logServices.CreateActionLog(desc, userId, logId);
             if (data.UserId != userId)
             {
+                var userFull = await _userServices.GetUserFullName(userId);
                 await _notificationServices.CreateNotification(new CreateNotification
                 {
                     UserId = data.UserId,
-                    Info = $"The purchase invoice with number {data.InvoiceNumber} has been added.",
+                    Info = $"The purchase invoice with number {data.InvoiceNumber} has been added by {userFull}.",
                     ObjectType = "Yours invoices",
                     Referance = $"{invoiceId}"
                 });
@@ -206,10 +207,11 @@ namespace database_comunicator.Controllers
             await _logServices.CreateActionLog(desc, userId, logId);
             if (data.UserId != userId)
             {
+                var userFull = await _userServices.GetUserFullName(userId);
                 await _notificationServices.CreateNotification(new CreateNotification
                 {
                     UserId = data.UserId,
-                    Info = $"The sales invoice with number {data.InvoiceNumber} has been added.",
+                    Info = $"The sales invoice with number {data.InvoiceNumber} has been added by {userFull}.",
                     ObjectType = "Sales invoices",
                     Referance = $"{invoiceId}"
                 });
@@ -250,6 +252,7 @@ namespace database_comunicator.Controllers
                 var logId = await _logServices.getLogTypeId("Delete");
                 var desc = $"User with id {userId} has deleted the invoice {invoiceNumber}.";
                 await _logServices.CreateActionLog(desc, userId, logId);
+                var userFull = await _userServices.GetUserFullName(userId);
                 foreach (var user in invoiceUsers)
                 {
                     if (user == userId)
@@ -259,7 +262,7 @@ namespace database_comunicator.Controllers
                     await _notificationServices.CreateNotification(new CreateNotification
                     {
                         UserId = user,
-                        Info = $"The invoice with number {invoiceNumber} has been deleted.",
+                        Info = $"The invoice with number {invoiceNumber} has been deleted by {userFull}.",
                         ObjectType = isYourInvoice ? "Yours invoices" : "Sales invoices",
                         Referance = $"{invoiceId}"
                     });
@@ -319,6 +322,7 @@ namespace database_comunicator.Controllers
                 var logId = await _logServices.getLogTypeId("Modify");
                 var desc = $"User with id {userId} has modify the invoice {invoiceNumber}.";
                 await _logServices.CreateActionLog(desc, userId, logId);
+                var userFull = await _userServices.GetUserFullName(userId);
                 foreach (var user in invoiceUsers)
                 {
                     if (user == userId)
@@ -328,7 +332,7 @@ namespace database_comunicator.Controllers
                     await _notificationServices.CreateNotification(new CreateNotification
                     {
                         UserId = user,
-                        Info = $"The invoice with number {invoiceNumber} has been deleted.",
+                        Info = $"The invoice with number {invoiceNumber} has been deleted by {userFull}.",
                         ObjectType = data.IsYourInvoice ? "Yours invoices" : "Sales invoices",
                         Referance = $"{data.InvoiceId}"
                     });

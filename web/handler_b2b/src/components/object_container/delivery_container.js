@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Container, Row, Col } from "react-bootstrap";
 import ContainerButtons from "../smaller_components/container_buttons";
 import user_small_icon from "../../../public/icons/user_small_icon.png";
+import getDeliveryStatusColor from "@/utils/deliveries/get_delivery_status_color";
 
 function DeliveryContainer({
   delivery,
@@ -17,20 +18,6 @@ function DeliveryContainer({
 }) {
   const containerBg = {
     backgroundColor: "var(--sec-blue)",
-  };
-  const statusColorMap = {
-    Fullfiled: "var(--main-green)",
-    "In transport": "var(--main-yellow)",
-    "Delivered with issues": "var(--sec-red)",
-    Preparing: "var(--main-yellow)",
-    Rejected: "var(--sec-red)",
-  };
-  const statusBgStyle = {
-    backgroundColor: statusColorMap[delivery.status],
-    color:
-      statusColorMap[delivery.status] === "var(--sec-red)"
-        ? "var(--text-main-color)"
-        : "var(--text-black-color)",
   };
   return (
     <Container
@@ -63,9 +50,14 @@ function DeliveryContainer({
             <Col className="ps-1">
               <span
                 className="spanStyle d-flex rounded-span px-2"
-                style={statusBgStyle}
+                style={getDeliveryStatusColor(delivery.status)}
               >
-                <p className="mb-0">Status: {delivery.status}</p>
+                <p className="mb-0">
+                  Status:{" "}
+                  {delivery.status === "Delivered with issues"
+                    ? "Has issues"
+                    : delivery.status}
+                </p>
               </span>
             </Col>
             <Col xs="12" className="mb-0">
@@ -123,6 +115,9 @@ function DeliveryContainer({
             selected={selected}
             selectAction={selectAction}
             unselectAction={unselectAction}
+            deleteAction={deleteAction}
+            viewAction={viewAction}
+            modifyAction={modifyAction}
           />
         </Col>
       </Row>

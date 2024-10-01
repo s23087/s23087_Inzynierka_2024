@@ -50,10 +50,11 @@ namespace database_comunicator.Controllers
             await _logServices.CreateActionLog(desc, userId, logId);
             if (data.CreditNoteItems.Select(e => e.UserId).First() != userId)
             {
+                var userFull = await _userServices.GetUserFullName(userId);
                 await _notificationServices.CreateNotification(new CreateNotification
                 {
                     UserId = data.CreditNoteItems.Select(e => e.UserId).First(),
-                    Info = $"The credit note with number {data.CreditNotenumber} has been added.",
+                    Info = $"The credit note with number {data.CreditNotenumber} has been added by {userFull}.",
                     ObjectType = data.IsYourCreditNote ? "Yours credit notes" : "Client credit notes",
                     Referance = $"{result}"
                 });
@@ -124,10 +125,11 @@ namespace database_comunicator.Controllers
             await _logServices.CreateActionLog(desc, userId, logId);
             if (creditUser != userId)
             {
+                var userFull = await _userServices.GetUserFullName(userId);
                 await _notificationServices.CreateNotification(new CreateNotification
                 {
                     UserId = creditUser,
-                    Info = $"The credit note with number {creditNumber} has been deleted.",
+                    Info = $"The credit note with number {creditNumber} has been deleted by {userFull}.",
                     ObjectType = isYourCredit ? "Yours credit notes" : "Client credit notes",
                     Referance = $"{creditId}"
                 });
@@ -166,10 +168,11 @@ namespace database_comunicator.Controllers
             await _logServices.CreateActionLog(desc, userId, logId);
             if (creditUser != userId)
             {
+                var userFull = await _userServices.GetUserFullName(userId);
                 await _notificationServices.CreateNotification(new CreateNotification
                 {
                     UserId = creditUser,
-                    Info = $"The credit note with number {creditNumber} has been modified.",
+                    Info = $"The credit note with number {creditNumber} has been modified by {userFull}.",
                     ObjectType = data.IsYourCredit ? "Yours credit notes" : "Client credit notes",
                     Referance = $"{data.Id}"
                 });

@@ -169,6 +169,7 @@ namespace database_comunicator.Controllers
             var logId = await _logServices.getLogTypeId("Modify");
             var desc = $"The bindings for item with id {data.Bindings.Select(e => e.ItemId).First()} has been modified, by user with id {data.UserId}.";
             await _logServices.CreateActionLog(desc, data.UserId, logId);
+            var userFull = await _userServices.GetUserFullName(data.UserId);
             foreach (var user in data.Bindings.GroupBy(e => e.UserId).Select(e => e.Key))
             {
                 if (user == data.UserId)
@@ -178,7 +179,7 @@ namespace database_comunicator.Controllers
                 await _notificationServices.CreateNotification(new CreateNotification
                 {
                     UserId = user,
-                    Info = $"The item with id {data.Bindings.Select(e => e.ItemId).First()} has been binded to you.",
+                    Info = $"The item with id {data.Bindings.Select(e => e.ItemId).First()} has been binded to you by {userFull}.",
                     ObjectType = "Item",
                     Referance = $"{data.Bindings.Select(e => e.ItemId).First()}"
                 });

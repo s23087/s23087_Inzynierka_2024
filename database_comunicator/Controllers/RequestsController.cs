@@ -43,10 +43,11 @@ namespace database_comunicator.Controllers
             await _logServices.CreateActionLog(desc, data.CreatorId, logId);
             if (data.CreatorId != data.ReceiverId)
             {
+                var userFull = await _userServices.GetUserFullName(data.CreatorId);
                 await _notificationServices.CreateNotification(new CreateNotification
                 {
                     UserId = data.ReceiverId,
-                    Info = $"User has created a new {data.ObjectType} request for you.",
+                    Info = $"{userFull} has created a new {data.ObjectType} request for you.",
                     ObjectType = "Requests",
                     Referance = $"{requestId}"
                 });
@@ -105,10 +106,11 @@ namespace database_comunicator.Controllers
             await _logServices.CreateActionLog(desc, userId, logId);
             if (userId != recevier)
             {
+                var userFull = await _userServices.GetUserFullName(userId);
                 await _notificationServices.CreateNotification(new CreateNotification
                 {
                     UserId = recevier,
-                    Info = $"User has deleted a request with id {requestId}.",
+                    Info = $"{userFull} has deleted a request with id {requestId}.",
                     ObjectType = "Requests",
                     Referance = $"{requestId}"
                 });
@@ -133,10 +135,11 @@ namespace database_comunicator.Controllers
             await _logServices.CreateActionLog(desc, userId, logId);
             if (userId != data.RecevierId && data.RecevierId != null)
             {
+                var userFull = await _userServices.GetUserFullName(userId);
                 await _notificationServices.CreateNotification(new CreateNotification
                 {
                     UserId = (int)data.RecevierId,
-                    Info = $"User has modified a request with id {data.RequestId}.",
+                    Info = $"{userFull} has modified a request with id {data.RequestId}.",
                     ObjectType = "Requests",
                     Referance = $"{data.RequestId}"
                 });

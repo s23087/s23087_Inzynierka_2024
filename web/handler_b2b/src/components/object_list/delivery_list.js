@@ -10,12 +10,11 @@ import DeleteObjectWindow from "../windows/delete_object";
 import { useRouter } from "next/navigation";
 import SelectComponent from "../smaller_components/select_compontent";
 import getPagationInfo from "@/utils/flexible/get_page_info";
-import AddProformaOffcanvas from "../offcanvas/create/create_proforma";
-import ViewProformaOffcanvas from "../offcanvas/view/view_proforma";
-import deleteProforma from "@/utils/proformas/delete_proforma";
-import ModifyProformaOffcanvas from "../offcanvas/modify/modify_proforma";
 import DeliveryContainer from "../object_container/delivery_container";
 import AddDeliveryOffcanvas from "../offcanvas/create/create_delivery";
+import deleteDelivery from "@/utils/deliveries/delete_delivery";
+import ViewDeliveryOffcanvas from "../offcanvas/view/view_delivery";
+import ModifyDeliveryOffcanvas from "../offcanvas/modify/modify_delivery";
 
 function DeliveryList({
   deliveries,
@@ -29,11 +28,12 @@ function DeliveryList({
   const [deliveryToView, setDeliveryToView] = useState({
     deliveryId: 0,
     user: "",
-    date: "",
-    transport: 0.0,
-    clientName: "",
-    qty: 0,
-    total: 0.0,
+    proformaNumber: "",
+    deliveryCompany: "",
+    estimated: "",
+    delivered: "",
+    status: "",
+    waybill: [],
   });
   // Modify delivery
   const [showModifyDelivery, setShowModifyDelivery] = useState(false);
@@ -163,7 +163,7 @@ function DeliveryList({
         instanceName="delivery"
         instanceId={deliveryToDelete}
         deleteItemFunc={async () => {
-          let result = await deleteProforma(
+          let result = await deleteDelivery(
             type === "Deliveries to user",
             deliveryToDelete,
           );
@@ -178,18 +178,18 @@ function DeliveryList({
         isError={isErrorDelete}
         errorMessage={errorMessage}
       />
-      <ModifyProformaOffcanvas
+      <ModifyDeliveryOffcanvas
         showOffcanvas={showModifyDelivery}
         hideFunction={() => setShowModifyDelivery(false)}
-        proforma={deliveryToModify}
-        isYourProforma={type === "Deliveries to user"}
+        delivery={deliveryToModify}
+        isDeliveryToUser={type === "Deliveries to user"}
       />
-      <ViewProformaOffcanvas
+      <ViewDeliveryOffcanvas
         showOffcanvas={showViewDelivery}
         hideFunction={() => setShowViewDelivery(false)}
-        proforma={deliveryToView}
-        isYourProforma={type === "Deliveries to user"}
+        delivery={deliveryToView}
         isOrg={orgView}
+        isDeliveryToUser={type === "Deliveries to user"}
       />
     </Container>
   );
