@@ -26,6 +26,7 @@ builder.Services.AddScoped<ICreditNoteServices, CreditNoteServices>();
 builder.Services.AddScoped<IRequestServices, RequestServices>();
 builder.Services.AddScoped<IProformaServices, ProformaServices>();
 builder.Services.AddScoped<IDeliveryServices, DeliveryServices>();
+builder.Services.AddScoped<IOutsideItemServices, OutsideItemServices>();
 
 var app = builder.Build();
 

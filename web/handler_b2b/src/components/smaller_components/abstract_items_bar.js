@@ -4,7 +4,7 @@ import { Stack, Container, Button } from "react-bootstrap";
 
 function AbstractItemPostionBar({ site_name }) {
   const barHeight = {
-    height: "65px",
+    height: "60px",
   };
   const buttonStyle = {
     height: "40px",

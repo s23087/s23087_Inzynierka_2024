@@ -3,7 +3,13 @@ import Image from "next/image";
 import { Container, Row, Col, Stack, Button } from "react-bootstrap";
 import user_small_icon from "../../../public/icons/user_small_icon.png";
 
-function AbstractItemContainer({ abstract_item, selected }) {
+function AbstractItemContainer({
+  abstract_item,
+  selected,
+  selectAction,
+  unselectAction,
+  deleteAction,
+}) {
   const containerBg = {
     backgroundColor: "var(--sec-blue)",
   };
@@ -19,32 +25,37 @@ function AbstractItemContainer({ abstract_item, selected }) {
     >
       <Row>
         <Col xs="12" md="7" lg="7" xl="4">
-          <Row className="mb-2">
-            <Col className="d-flex">
-              <Image
-                src={user_small_icon}
-                alt="user small icon"
-                className="me-2 mt-1"
-              />
-              <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1">
-                <p className="mb-0">{abstract_item.user}</p>
-              </span>
-            </Col>
-          </Row>
+          {abstract_item.users ? (
+            <Row className="mb-2">
+              <Col className="d-flex">
+                <Image
+                  src={user_small_icon}
+                  alt="user small icon"
+                  className="me-2 mt-1"
+                />
+                <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1 d-block text-truncate">
+                  <p className="mb-0">{abstract_item.users.join(", ")}</p>
+                </span>
+              </Col>
+            </Row>
+          ) : null}
           <Row className="gy-2">
             <Col xs="12" className="mb-0">
               <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
-                <p className="mb-0">P/N: {abstract_item.partnumber}</p>
+                <p className="mb-0">
+                  P/N: {abstract_item.partnumber}{" "}
+                  {abstract_item.users ? "y" : "n"}
+                </p>
               </span>
             </Col>
             <Col xs="12" className="mb-0">
               <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
-                <p className="mb-0">Source: {abstract_item.source}</p>
+                <p className="mb-0">Source: {abstract_item.orgName}</p>
               </span>
             </Col>
             <Col xs="12">
               <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
-                <p className="mb-0">Ean: {abstract_item.EAN}</p>
+                <p className="mb-0">Item id: {abstract_item.itemId}</p>
               </span>
             </Col>
             <Col className="pe-1 mb-1 d-md-none">
@@ -57,7 +68,7 @@ function AbstractItemContainer({ abstract_item, selected }) {
               <span className="main-blue-bg d-block rounded-span px-2 pb-2 pt-1 main-text text-center">
                 <p className="mb-0">Purchase price:</p>
                 <p className="mb-0">
-                  {abstract_item.purchase_price} {abstract_item.currency_name}
+                  {abstract_item.price} {abstract_item.currency}
                 </p>
               </span>
             </Col>
@@ -75,7 +86,7 @@ function AbstractItemContainer({ abstract_item, selected }) {
               <span className="main-blue-bg d-block rounded-span px-2 pb-2 pt-1 main-text text-center">
                 <p className="mb-0">Purchase price:</p>
                 <p className="mb-0">
-                  {abstract_item.purchase_price} {abstract_item.currency_name}
+                  {abstract_item.price} {abstract_item.currency}
                 </p>
               </span>
             </Col>
@@ -87,14 +98,21 @@ function AbstractItemContainer({ abstract_item, selected }) {
           className="px-0 pt-3 pt-xl-2 pb-2 d-flex align-items-center justify-content-center"
         >
           <Stack direction="horizontal">
-            <Button variant="mainBlue" className="ms-auto" style={buttonStyle}>
-              Select
+            <Button
+              variant="mainBlue"
+              className="ms-auto"
+              style={buttonStyle}
+              onClick={selected ? unselectAction : selectAction}
+            >
+              {selected ? "Deselect" : "Select"}
             </Button>
-            <Button variant="red" className="mx-4" style={buttonStyle}>
+            <Button
+              variant="red"
+              className="mx-4"
+              style={buttonStyle}
+              onClick={deleteAction}
+            >
               Delete
-            </Button>
-            <Button variant="yellow" className="me-auto" style={buttonStyle}>
-              Modify
             </Button>
           </Stack>
         </Col>
@@ -105,6 +123,10 @@ function AbstractItemContainer({ abstract_item, selected }) {
 
 AbstractItemContainer.PropTypes = {
   abstract_item: PropTypes.object.isRequired,
+  selected: PropTypes.bool.isRequired,
+  selectAction: PropTypes.func.isRequired,
+  unselectAction: PropTypes.func.isRequired,
+  deleteAction: PropTypes.func.isRequired,
 };
 
 export default AbstractItemContainer;

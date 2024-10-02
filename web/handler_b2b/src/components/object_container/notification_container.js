@@ -9,9 +9,9 @@ function NotificationContainer({ notification, switch_read_action }) {
     maxWidth: "369px",
   };
   const messageStyle = {
-    minWidth: "369px",
+    minWidth: "309px",
     minHeight: "94px",
-    wordBreak: "break-all",
+    wordBreak: "break-word",
   };
   const buttonStyle = {
     minWidth: "140px",
@@ -57,12 +57,13 @@ function NotificationContainer({ notification, switch_read_action }) {
           xxl="4"
           className="px-0 pt-3 pt-xl-2 pb-2 offset-xxl-2"
         >
-          <Container className="h-100 ps-5" fluid>
+          <Container className="h-100" fluid>
             <Row className="align-items-center justify-content-center justify-content-lg-end h-100">
               <Col className="pe-2 text-end" xs="auto">
                 <Button
                   variant="mainBlue"
                   className="rounded-span w-100 p-0"
+                  disabled={notification.objectType === "User"}
                   style={buttonStyle}
                 >
                   Go to change
