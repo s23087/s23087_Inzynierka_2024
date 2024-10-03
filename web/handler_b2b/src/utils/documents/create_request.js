@@ -32,8 +32,7 @@ export default async function createRequest(file, state, formData) {
     objectType: type,
     path: file ? fileName : null,
     note: note,
-    title,
-    title,
+    title: title,
   };
 
   const fs = require("node:fs");
