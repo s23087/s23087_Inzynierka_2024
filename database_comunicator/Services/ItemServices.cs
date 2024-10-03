@@ -133,7 +133,7 @@ namespace database_comunicator.Services
                     OrganizationName = outItem.Organization.OrgName,
                     Qty = outItem.Qty,
                     Price = outItem.PurchasePrice,
-                    Curenncy = outItem.CurrencyName
+                    Currency = outItem.CurrencyName
                 }).ToListAsync();
 
             return new GetRestInfo
@@ -186,7 +186,7 @@ namespace database_comunicator.Services
                     OrganizationName = obj.Organization.OrgName,
                     Qty = obj.Qty,
                     Price = obj.PurchasePrice,
-                    Curenncy = obj.CurrencyName
+                    Currency = obj.CurrencyName
                 }).ToListAsync();
 
             return new GetRestInfo

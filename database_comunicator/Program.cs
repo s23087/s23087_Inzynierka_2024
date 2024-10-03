@@ -27,6 +27,7 @@ builder.Services.AddScoped<IRequestServices, RequestServices>();
 builder.Services.AddScoped<IProformaServices, ProformaServices>();
 builder.Services.AddScoped<IDeliveryServices, DeliveryServices>();
 builder.Services.AddScoped<IOutsideItemServices, OutsideItemServices>();
+builder.Services.AddScoped<IOfferServices, OfferServices>();
 
 var app = builder.Build();
 

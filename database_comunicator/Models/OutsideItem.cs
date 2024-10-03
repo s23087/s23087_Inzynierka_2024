@@ -20,6 +20,4 @@ public partial class OutsideItem
     public virtual Item Item { get; set; } = null!;
 
     public virtual Organization Organization { get; set; } = null!;
-
-    public virtual ICollection<OutsideItemOffer> OutsideItemOffers { get; set; } = new List<OutsideItemOffer>();
 }

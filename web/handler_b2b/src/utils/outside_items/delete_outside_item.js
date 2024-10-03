@@ -32,8 +32,8 @@ export default async function deleteOutsideItem(itemId, orgId) {
 
   if (info.ok) {
     return {
-        error: false,
-        message: "Success!",
+      error: false,
+      message: "Success!",
     };
   }
   return {

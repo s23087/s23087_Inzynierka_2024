@@ -42,10 +42,7 @@ function AbstractItemContainer({
           <Row className="gy-2">
             <Col xs="12" className="mb-0">
               <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
-                <p className="mb-0">
-                  P/N: {abstract_item.partnumber}{" "}
-                  {abstract_item.users ? "y" : "n"}
-                </p>
+                <p className="mb-0">P/N: {abstract_item.partnumber}</p>
               </span>
             </Col>
             <Col xs="12" className="mb-0">

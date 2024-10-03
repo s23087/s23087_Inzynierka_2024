@@ -42,8 +42,6 @@ public partial class HandlerContext : DbContext
 
     public virtual DbSet<CurrencyValue> CurrencyValues { get; set; }
 
-    public virtual DbSet<CurrencyValueOffer> CurrencyValueOffers { get; set; }
-
     public virtual DbSet<Delivery> Deliveries { get; set; }
 
     public virtual DbSet<DeliveryCompany> DeliveryCompanies { get; set; }
@@ -75,8 +73,6 @@ public partial class HandlerContext : DbContext
     public virtual DbSet<Organization> Organizations { get; set; }
 
     public virtual DbSet<OutsideItem> OutsideItems { get; set; }
-
-    public virtual DbSet<OutsideItemOffer> OutsideItemOffers { get; set; }
 
     public virtual DbSet<OwnedItem> OwnedItems { get; set; }
 
@@ -390,32 +386,6 @@ public partial class HandlerContext : DbContext
                 .HasConstraintName("Currency_Value_Currency_Name_relation");
         });
 
-        modelBuilder.Entity<CurrencyValueOffer>(entity =>
-        {
-            entity.HasKey(e => new { e.OfferId, e.CurrancyName }).HasName("Currency_Value_Offer_pk");
-
-            entity.ToTable("Currency_Value_Offer");
-
-            entity.Property(e => e.OfferId).HasColumnName("offer_id");
-            entity.Property(e => e.CurrancyName)
-                .HasMaxLength(5)
-                .IsUnicode(false)
-                .HasColumnName("currancy_name");
-            entity.Property(e => e.CurencyDate)
-                .HasColumnType("datetime")
-                .HasColumnName("curency_date");
-
-            entity.HasOne(d => d.Offer).WithMany(p => p.CurrencyValueOffers)
-                .HasForeignKey(d => d.OfferId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("Currency_Value_Offer_Offer_relation");
-
-            entity.HasOne(d => d.Cur).WithMany(p => p.CurrencyValueOffers)
-                .HasForeignKey(d => new { d.CurencyDate, d.CurrancyName })
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("Currency_Value_Offer_Currency_Value_relation");
-        });
-
         modelBuilder.Entity<Delivery>(entity =>
         {
             entity.HasKey(e => e.DeliveryId).HasName("Delivery_pk");
@@ -685,40 +655,46 @@ public partial class HandlerContext : DbContext
             entity.Property(e => e.OfferId).HasColumnName("offer_id");
             entity.Property(e => e.CreationDate).HasColumnName("creation_date");
             entity.Property(e => e.ModificationDate).HasColumnName("modification_date");
+            entity.Property(e => e.MaxQty).HasColumnName("max_qty");
+            entity.Property(e => e.CurrencyName)
+                .HasMaxLength(5)
+                .IsUnicode(false)
+                .HasColumnName("curenncy_name");
             entity.Property(e => e.OfferName)
                 .HasMaxLength(100)
                 .IsUnicode(false)
                 .HasColumnName("offer_name");
             entity.Property(e => e.OfferStatusId).HasColumnName("offer_status_id");
-            entity.Property(e => e.OrganizationsId).HasColumnName("organizations_id");
             entity.Property(e => e.PathToFile)
                 .HasMaxLength(200)
                 .IsUnicode(false)
                 .HasColumnName("path_to_file");
+            entity.Property(e => e.UserId).HasColumnName("id_user");
 
             entity.HasOne(d => d.OfferStatus).WithMany(p => p.Offers)
                 .HasForeignKey(d => d.OfferStatusId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Offer_Offer_status_relation");
 
-            entity.HasOne(d => d.Organizations).WithMany(p => p.Offers)
-                .HasForeignKey(d => d.OrganizationsId)
-                .HasConstraintName("Offer_Organization_relation");
+            entity.HasOne(d => d.CurrencyNameNavigation).WithMany(p => p.Offers)
+                .HasForeignKey(d => d.CurrencyName)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Offer_Currency_Name_relation");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Offers)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("Offer_App_User_relation");
         });
 
         modelBuilder.Entity<OfferItem>(entity =>
         {
-            entity.HasKey(e => e.OfferItemId).HasName("Offer_Item_pk");
+            entity.HasKey(e => new {e.OfferId, e.ItemId}).HasName("Offer_Item_pk");
 
             entity.ToTable("Offer_Item");
 
-            entity.Property(e => e.OfferItemId)
-                .HasColumnName("offer_item_id");
-            entity.Property(e => e.IdUser).HasColumnName("id_user");
-            entity.Property(e => e.InvoiceId).HasColumnName("invoice_id");
             entity.Property(e => e.ItemId).HasColumnName("item_id");
             entity.Property(e => e.OfferId).HasColumnName("offer_id");
-            entity.Property(e => e.Qty).HasColumnName("qty");
             entity.Property(e => e.SellingPrice)
                 .HasColumnType("decimal(20, 2)")
                 .HasColumnName("selling_price");
@@ -728,10 +704,10 @@ public partial class HandlerContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Offer_Items_relation");
 
-            entity.HasOne(d => d.ItemOwner).WithMany(p => p.OfferItems)
-                .HasForeignKey(d => new { d.IdUser, d.InvoiceId, d.ItemId })
+            entity.HasOne(d => d.Item).WithMany(p => p.OfferItems)
+                .HasForeignKey(d => d.ItemId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("Offer_Item_Item_owner_relation");
+                .HasConstraintName("Offer_Item_Item_relation");
         });
 
         modelBuilder.Entity<OfferStatus>(entity =>
@@ -837,31 +813,6 @@ public partial class HandlerContext : DbContext
                 .HasForeignKey(d => d.OrganizationId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Outside_Item_Organization_relation");
-        });
-
-        modelBuilder.Entity<OutsideItemOffer>(entity =>
-        {
-            entity.HasKey(e => new { e.OfferId, e.OrganizationId, e.OutsideItemId }).HasName("Outside_Item_Offer_pk");
-
-            entity.ToTable("Outside_Item_Offer");
-
-            entity.Property(e => e.OfferId).HasColumnName("offer_id");
-            entity.Property(e => e.OrganizationId).HasColumnName("organization_id");
-            entity.Property(e => e.OutsideItemId).HasColumnName("outside_item_id");
-            entity.Property(e => e.Qty).HasColumnName("qty");
-            entity.Property(e => e.SellingPrice)
-                .HasColumnType("decimal(20, 2)")
-                .HasColumnName("selling_price");
-
-            entity.HasOne(d => d.Offer).WithMany(p => p.OutsideItemOffers)
-                .HasForeignKey(d => d.OfferId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("Outside_Item_Offer_Offer_relation");
-
-            entity.HasOne(d => d.O).WithMany(p => p.OutsideItemOffers)
-                .HasForeignKey(d => new { d.OutsideItemId, d.OrganizationId })
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("Outside_Item_Offer_Outside_Item_relation");
         });
 
         modelBuilder.Entity<OwnedItem>(entity =>

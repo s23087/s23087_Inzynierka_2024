@@ -1,0 +1,285 @@
+import Image from "next/image";
+import PropTypes from "prop-types";
+import { Offcanvas, Container, Row, Col, Button, Form } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { useFormState } from "react-dom";
+import Toastes from "@/components/smaller_components/toast";
+import { useRouter } from "next/navigation";
+import CloseIcon from "../../../../public/icons/close_black.png";
+import ProductHolder from "@/components/smaller_components/product_holder";
+import CreatePurchaseInvoice from "@/utils/documents/create_purchase_invoice";
+import AddSaleProductWindow from "@/components/windows/add_Sales_product";
+import ErrorMessage from "@/components/smaller_components/error_message";
+import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import getOfferStatuses from "@/utils/pricelist/get_statuses";
+
+function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
+  const router = useRouter();
+  useEffect(() => {
+    if (showOffcanvas) {
+      let getStatus = getOfferStatuses();
+      getStatus.then((data) => setStatuses(data));
+    }
+  }, [showOffcanvas]);
+  const [statuses, setStatuses] = useState([]);
+  // products
+  const [showSalesProductWindow, setShowSalesProductWindow] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [resetSeed, setResetSeed] = useState(false);
+  // Errors
+  const [nameError, setNameError] = useState(false);
+  const [maxQtyError, setMaxQtyError] = useState(false);
+  const anyErrorActive =
+    nameError || maxQtyError || statuses.length === 0 || products.length === 0;
+  // Misc
+  const [isLoading, setIsLoading] = useState(false);
+  // Form
+  const [state, formAction] = useFormState(
+    CreatePurchaseInvoice.bind(null, products),
+    {
+      error: false,
+      completed: false,
+      message: "",
+    },
+  );
+  // Styles
+  const maxStyle = {
+    maxWidth: "393px",
+  };
+  const vhStyle = {
+    height: "81vh",
+  };
+  const buttonStyle = {
+    maxWidth: "250px",
+    minWidth: "200px",
+    borderRadius: "5px",
+  };
+  const maxHeightScrollContainer = {
+    maxHeight: "200px",
+  };
+  return (
+    <Offcanvas
+      className="h-100 minScalableWidth"
+      show={showOffcanvas}
+      onHide={hideFunction}
+      placement="bottom"
+    >
+      <Container className="h-100 w-100 p-0" fluid>
+        <Offcanvas.Header className="border-bottom-grey px-xl-5">
+          <Container className="px-3" fluid>
+            <Row>
+              <Col xs="9" className="d-flex align-items-center">
+                <p className="blue-main-text h4 mb-0">Create pricelist</p>
+              </Col>
+              <Col xs="3" className="text-end pe-0">
+                <Button
+                  variant="as-link"
+                  onClick={() => {
+                    hideFunction();
+                    setProducts([]);
+                    if (!state.error && state.complete) {
+                      router.refresh();
+                    }
+                  }}
+                  className="pe-0"
+                >
+                  <Image src={CloseIcon} alt="Close" />
+                </Button>
+              </Col>
+            </Row>
+          </Container>
+        </Offcanvas.Header>
+        <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
+          <Container className="p-0" style={vhStyle} fluid>
+            <Form className="mx-1 mx-xl-4" id="offerForm" action={formAction}>
+              <Form.Group className="mb-3">
+                <Form.Label className="blue-main-text">Offer name:</Form.Label>
+                <ErrorMessage
+                  message="Is empty or lenght is greater than 100."
+                  messageStatus={nameError}
+                />
+                <Form.Control
+                  className="input-style shadow-sm maxInputWidth"
+                  type="text"
+                  name="name"
+                  placeholder="offer name"
+                  isInvalid={nameError}
+                  onInput={(e) => {
+                    StringValidtor.normalStringValidtor(
+                      e.target.value,
+                      setNameError,
+                      100,
+                    );
+                  }}
+                  maxLength={100}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label className="blue-main-text">
+                  Offer status:
+                </Form.Label>
+                <Form.Select
+                  className="input-style shadow-sm maxInputWidth"
+                  name="status"
+                >
+                  {statuses.map((val) => {
+                    return (
+                      <option key={val.statusId} value={val.statusId}>
+                        {val.statusName}
+                      </option>
+                    );
+                  })}
+                </Form.Select>
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label className="blue-main-text">
+                  Max showed product qty:
+                </Form.Label>
+                <ErrorMessage
+                  message="Is empty or is not a number."
+                  messageStatus={maxQtyError}
+                />
+                <Form.Control
+                  className="input-style shadow-sm maxInputWidth"
+                  type="text"
+                  name="maxQty"
+                  placeholder="qty"
+                  isInvalid={maxQtyError}
+                  onInput={(e) => {
+                    StringValidtor.decimalValidator(
+                      e.target.value,
+                      setMaxQtyError,
+                    );
+                  }}
+                />
+              </Form.Group>
+              <Form.Group className="mb-4">
+                <Form.Label className="blue-main-text">Currency:</Form.Label>
+                <Form.Select
+                  className="input-style shadow-sm maxInputWidth"
+                  name="status"
+                >
+                  <option value="PLN">PLN</option>
+                  <option value="EUR">EUR</option>
+                  <option value="USD">USD</option>
+                </Form.Select>
+              </Form.Group>
+              <Form.Group className="mb-4 maxInputWidth">
+                <Form.Label className="blue-main-text">Product:</Form.Label>
+                <Container
+                  className="overflow-y-scroll px-0"
+                  style={maxHeightScrollContainer}
+                  key={resetSeed}
+                >
+                  {products.map((value, key) => {
+                    return (
+                      <ProductHolder
+                        key={key}
+                        value={value}
+                        deleteValue={() => {
+                          products.splice(key, 1);
+                          setResetSeed(!resetSeed);
+                        }}
+                      />
+                    );
+                  })}
+                </Container>
+                <Button
+                  variant="mainBlue"
+                  className="mb-3 mt-4 ms-3 py-3"
+                  style={buttonStyle}
+                  onClick={() => {
+                    setShowSalesProductWindow(true);
+                  }}
+                >
+                  Add Product
+                </Button>
+              </Form.Group>
+              <Container className="main-grey-bg p-3 fixed-bottom w-100" fluid>
+                <Row style={maxStyle} className="mx-auto minScalableWidth">
+                  <Col>
+                    <Button
+                      variant="mainBlue"
+                      className="w-100"
+                      type="submit"
+                      disabled={anyErrorActive}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsLoading(true);
+
+                        let form = document.getElementById("offerForm");
+                        form.requestSubmit();
+                      }}
+                    >
+                      {isLoading && !state.completed ? (
+                        <div className="spinner-border main-text"></div>
+                      ) : (
+                        "Create"
+                      )}
+                    </Button>
+                  </Col>
+                  <Col>
+                    <Button
+                      variant="red"
+                      className="w-100"
+                      onClick={() => {
+                        hideFunction();
+                        setProducts([]);
+                        if (!state.error && state.completed) {
+                          router.refresh();
+                        }
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </Col>
+                </Row>
+              </Container>
+            </Form>
+          </Container>
+        </Offcanvas.Body>
+        <AddSaleProductWindow
+          modalShow={showSalesProductWindow}
+          onHideFunction={() => setShowSalesProductWindow(false)}
+          addFunction={(val) => {
+            products.push(val);
+          }}
+          addedProductsQty={products.length}
+        />
+        <Toastes.ErrorToast
+          showToast={state.completed && state.error}
+          message={state.message}
+          onHideFun={() => {
+            resetState();
+          }}
+        />
+        <Toastes.SuccessToast
+          showToast={state.completed && !state.error}
+          message={state.message}
+          onHideFun={() => {
+            resetState();
+            document.getElementById("offerForm").reset();
+            setProducts([]);
+            hideFunction();
+            router.refresh();
+          }}
+        />
+      </Container>
+    </Offcanvas>
+  );
+
+  function resetState() {
+    state.error = false;
+    state.completed = false;
+    state.message = "";
+    setIsLoading(false);
+  }
+}
+
+AddPricelistOffcanvas.PropTypes = {
+  showOffcanvas: PropTypes.bool.isRequired,
+  hideFunction: PropTypes.func.isRequired,
+  isYourInvoice: PropTypes.bool.isRequired,
+};
+
+export default AddPricelistOffcanvas;

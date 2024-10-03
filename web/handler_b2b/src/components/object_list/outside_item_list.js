@@ -79,7 +79,7 @@ function OutsideItemList({ items, itemsStart, itemsEnd }) {
                   setSelectedQty(selectedQty - 1);
                 }}
                 deleteAction={() => {
-                  setItemToDelete({ itemId: value.itemId, orgId: value.orgId });
+                  setItemToDelete([value.itemId, value.orgId]);
                   setShowDeleteItem(true);
                 }}
               />
@@ -134,7 +134,10 @@ function OutsideItemList({ items, itemsStart, itemsEnd }) {
         instanceName="outside item"
         instanceId={itemToDelete}
         deleteItemFunc={async () => {
-          let result = await deleteOutsideItem(itemToDelete.itemId, itemToDelete.orgId);
+          let result = await deleteOutsideItem(
+            itemToDelete[0],
+            itemToDelete[1],
+          );
           if (!result.error) {
             setShowDeleteItem(false);
             router.refresh();

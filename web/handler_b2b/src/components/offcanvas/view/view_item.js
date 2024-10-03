@@ -34,7 +34,7 @@ function ViewItemOffcanvas({
     outsideItemInfos: [],
     ownedItemInfos: [],
   });
-  const [description, setDescription] = useState(null);
+  const [description, setDescription] = useState("Is loading");
   useEffect(() => {
     if (showOffcanvas) {
       let restData = getRestInfo(currency, item.itemId, isOrg);
@@ -141,21 +141,23 @@ function ViewItemOffcanvas({
                 </Container>
                 <Container className="px-1 ms-0">
                   <p className="mb-1 blue-main-text">EAN:</p>
-                  <ul className="mb-1">
-                    {Object.values(item.eans).map((val) => {
-                      return <li key={val}>{val}</li>;
-                    })}
-                  </ul>
+                  {Object.values(item.eans).length > 0 ? (
+                    <ul className="mb-1">
+                      {Object.values(item.eans).map((val) => {
+                        return <li key={val}>{val}</li>;
+                      })}
+                    </ul>
+                  ) : (
+                    <p className="mb-1">-</p>
+                  )}
                 </Container>
                 <Container className="px-1 ms-0">
                   <p className="mb-1 blue-main-text">Availability:</p>
                   <p style={statusColorStyle}>{item.statusName}</p>
                 </Container>
-                <Container className="px-1 ms-0">
+                <Container className="px-1 ms-0" key={description}>
                   <p className="mb-1 blue-main-text">Description:</p>
-                  <p className="mb-1">
-                    {description ? description : "Loading.."}
-                  </p>
+                  <p className="mb-1">{description ? description : "-"}</p>
                 </Container>
               </Stack>
             </Col>

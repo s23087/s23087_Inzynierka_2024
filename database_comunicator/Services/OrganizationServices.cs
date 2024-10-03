@@ -298,11 +298,10 @@ namespace database_comunicator.Services
             var proformaCheck = await _handlerContext.Proformas.Where(e => e.Buyer == orgId || e.Seller == orgId).AnyAsync();
             var soloUserCheck = await _handlerContext.SoloUsers.Where(e => e.OrganizationsId == orgId).AnyAsync();
             var orgUserCheck = await _handlerContext.OrgUsers.Where(e => e.OrganizationsId == orgId).AnyAsync();
-            var offerCheck = await _handlerContext.Offers.Where(e => e.OrganizationsId == orgId).AnyAsync();
             var outsideItemsCheck = await _handlerContext.OutsideItems.Where(e => e.OrganizationId == orgId).AnyAsync();
             var userClientCheck = await _handlerContext.Database.ExecuteSqlAsync($"Select 1 from User_Client where organization_id = {orgId}");
 
-            return invoicesCheck || proformaCheck || soloUserCheck || orgUserCheck || offerCheck || outsideItemsCheck || userClientCheck.ToString().Contains('1');
+            return invoicesCheck || proformaCheck || soloUserCheck || orgUserCheck || outsideItemsCheck || userClientCheck.ToString().Contains('1');
         }
         public async Task DeleteOrg(int orgId)
         {

@@ -9,23 +9,20 @@ public partial class Offer
 
     public string OfferName { get; set; } = null!;
 
-    public int CreationDate { get; set; }
+    public DateTime CreationDate { get; set; }
 
-    public int ModificationDate { get; set; }
-
-    public int? OrganizationsId { get; set; }
+    public DateTime ModificationDate { get; set; }
 
     public string PathToFile { get; set; } = null!;
 
     public int OfferStatusId { get; set; }
-
-    public virtual ICollection<CurrencyValueOffer> CurrencyValueOffers { get; set; } = new List<CurrencyValueOffer>();
+    public int MaxQty { get; set; }
+    public string CurrencyName { get; set; } = null!;
+    public int UserId { get; set; }
+    public virtual AppUser User { get; set; } = null!;
+    public virtual CurrencyName CurrencyNameNavigation { get; set; } = null!;
 
     public virtual ICollection<OfferItem> OfferItems { get; set; } = new List<OfferItem>();
 
     public virtual OfferStatus OfferStatus { get; set; } = null!;
-
-    public virtual Organization? Organizations { get; set; }
-
-    public virtual ICollection<OutsideItemOffer> OutsideItemOffers { get; set; } = new List<OutsideItemOffer>();
 }

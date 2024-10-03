@@ -12,7 +12,6 @@ namespace database_comunicator.Services
         public Task<IEnumerable<GetOutsideItem>> GetItems(int userId);
         public Task<IEnumerable<GetOutsideItem>> GetItems(string search);
         public Task<IEnumerable<GetOutsideItem>> GetItems(int userId, string search);
-        public Task<bool> DoesItemIncludedInOffer(int itemId, int orgId);
         public Task<bool> ItemExist(int itemId, int orgId);
         public Task DeleteItem(int itemId, int orgId);
         public Task<IEnumerable<string>> AddItems(CreateOutsideItems data);
@@ -86,10 +85,6 @@ namespace database_comunicator.Services
                     Qty = item.Qty,
                     Currency = item.CurrencyName
                 }).ToListAsync();
-        }
-        public async Task<bool> DoesItemIncludedInOffer(int itemId, int orgId)
-        {
-            return await _handlerContext.OutsideItemOffers.AnyAsync(x => x.OutsideItemId == itemId && x.OrganizationId == orgId);
         }
         public async Task<bool> ItemExist(int itemId, int orgId)
         {

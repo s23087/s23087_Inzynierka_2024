@@ -15,7 +15,5 @@ public partial class ItemOwner
 
     public virtual AppUser IdUserNavigation { get; set; } = null!;
 
-    public virtual ICollection<OfferItem> OfferItems { get; set; } = new List<OfferItem>();
-
     public virtual OwnedItem OwnedItem { get; set; } = null!;
 }

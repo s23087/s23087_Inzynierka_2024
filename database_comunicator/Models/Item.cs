@@ -21,4 +21,5 @@ public partial class Item
     public virtual ICollection<OwnedItem> OwnedItems { get; set; } = new List<OwnedItem>();
 
     public virtual ICollection<ProformaFutureItem> ProformaFutureItems { get; set; } = new List<ProformaFutureItem>();
+    public virtual ICollection<OfferItem> OfferItems { get; set; } = new List<OfferItem>();
 }

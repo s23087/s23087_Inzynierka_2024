@@ -31,8 +31,6 @@ public partial class Organization
 
     public virtual ICollection<Invoice> InvoiceSellerNavigations { get; set; } = new List<Invoice>();
 
-    public virtual ICollection<Offer> Offers { get; set; } = new List<Offer>();
-
     public virtual ICollection<OrgUser> OrgUsers { get; set; } = new List<OrgUser>();
 
     public virtual ICollection<OutsideItem> OutsideItems { get; set; } = new List<OutsideItem>();

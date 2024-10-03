@@ -1,81 +1,54 @@
-"use client";
+"use server";
 
-import { useState } from "react";
-import { Container, Stack } from "react-bootstrap";
-import PagePostionBar from "@/components/menu/page_position_bar";
-import SearchFilterBar from "@/components/menu/search_filter_bar";
-import MenuTemplate from "@/components/menu/menu_template";
-import CustomSidebar from "@/components/menu/sidebars/sidebar";
-import Navlinks from "@/components/menu/navlinks";
-import PagationFooter from "@/components/footer/pagation_footer";
-import PricelistContainer from "@/components/object_container/pricelist_container";
+import WholeFooter from "@/components/footer/whole_footers/whole_footer";
+import PricelistMenu from "@/components/menu/wholeMenu/pricelist_menu";
+import PricelistList from "@/components/object_list/pricelist_list";
+import getRole from "@/utils/auth/get_role";
+import getBasicInfo from "@/utils/menu/get_basic_user_info";
+import getNotificationCounter from "@/utils/menu/get_nofication_counter";
+import getPricelists from "@/utils/pricelist/get_pricelist";
+import getSearchPricelists from "@/utils/pricelist/get_search_pricelist";
 
-export default function PricelistPage() {
-  const [sidebarShow, setSidebarShow] = useState(false);
-  const showSidebar = () => setSidebarShow(true);
-  const hideSidebar = () => setSidebarShow(false);
-  const current_role = "Admin";
-  const current_nofitication_qty = 1;
-  const tmp_pricelist = {
-    created: "dd.mm.yyyy",
-    status: "Active",
-    name: "<<name>>",
-    item_qty: "<<Product count>>",
-    type: "<<type>>",
-    modified: "dd.mm.yyyy",
-    clients: ["client a", "client b"],
-  };
+export default async function PricelistPage({ searchParams }) {
+  const current_role = await getRole();
+  const userInfo = await getBasicInfo();
+  const current_nofitication_qty = await getNotificationCounter();
+  let isSearchTrue = searchParams.searchQuery !== undefined;
+  let pricelists = isSearchTrue
+    ? await getSearchPricelists(searchParams.searchQuery)
+    : await getPricelists();
+  let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
+  let itemsLength = pricelists === null ? 0 : pricelists.length;
+  let pageQty = Math.ceil(itemsLength / maxInstanceOnPage);
+  pageQty = pageQty === 0 ? 1 : pageQty;
+  let currentPage = parseInt(searchParams.page)
+    ? parseInt(searchParams.page)
+    : 1;
+  let pricelistsStart = currentPage * maxInstanceOnPage - maxInstanceOnPage;
+  pricelistsStart = pricelistsStart < 0 ? 0 : pricelistsStart;
+  let pricelistsEnd = pricelistsStart + maxInstanceOnPage;
 
   return (
     <main className="d-flex flex-column h-100">
-      <nav className="fixed-top main-bg">
-        <MenuTemplate sidebar_action={showSidebar} user_name="<<User name>>">
-          <Stack className="ps-xl-2" direction="horizontal" gap={4}>
-            <Stack className="d-none d-xl-flex" direction="horizontal" gap={4}>
-              <Navlinks
-                role={current_role}
-                active_link="Pricelist"
-                notification_qty={current_nofitication_qty}
-                is_sidebar={false}
-              />
-            </Stack>
-          </Stack>
-        </MenuTemplate>
-        <PagePostionBar
-          site_name="Pricelist"
-          with_switch={false}
-          switch_bool={false}
-        />
-        <SearchFilterBar filter_icon_bool="false" />
-        <CustomSidebar
-          user_name="<<User name>>"
-          org_name="<<Org name>>"
-          offcanvasShow={sidebarShow}
-          onHideAction={hideSidebar}
-        >
-          <Navlinks
-            role={current_role}
-            active_link="Pricelist"
-            notification_qty={current_nofitication_qty}
-            is_sidebar={true}
-          />
-        </CustomSidebar>
-      </nav>
+      <PricelistMenu
+        current_role={current_role}
+        current_nofitication_qty={current_nofitication_qty}
+        user={userInfo}
+      />
 
-      <section className="h-100">
-        <Container className="p-0 middleSectionPlacement" fluid>
-          <PricelistContainer pricelist={tmp_pricelist} selected={false} />
-          <PricelistContainer pricelist={tmp_pricelist} selected={true} />
-        </Container>
+      <section className="h-100 z-0">
+        <PricelistList
+          pricelist={pricelists}
+          pricelistStart={pricelistsStart}
+          pricelistEnd={pricelistsEnd}
+        />
       </section>
 
-      <footer className="fixed-bottom w-100">
-        <PagationFooter
-          max_instance_on_page={10}
-          page_qty={20}
-          current_page={1}
-        />
-      </footer>
+      <WholeFooter
+        max_instance_on_page={maxInstanceOnPage}
+        page_qty={pageQty}
+        current_page={currentPage}
+      />
     </main>
   );
 }
