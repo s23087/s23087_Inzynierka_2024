@@ -7,11 +7,11 @@ import Toastes from "@/components/smaller_components/toast";
 import { useRouter } from "next/navigation";
 import CloseIcon from "../../../../public/icons/close_black.png";
 import ProductHolder from "@/components/smaller_components/product_holder";
-import CreatePurchaseInvoice from "@/utils/documents/create_purchase_invoice";
-import AddSaleProductWindow from "@/components/windows/add_Sales_product";
 import ErrorMessage from "@/components/smaller_components/error_message";
 import StringValidtor from "@/utils/validators/form_validator/stringValidator";
 import getOfferStatuses from "@/utils/pricelist/get_statuses";
+import AddItemToPricelistWindow from "@/components/windows/add_item_to_pricelist";
+import createPricelist from "@/utils/pricelist/create_pricelist";
 
 function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
   const router = useRouter();
@@ -26,6 +26,8 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
   const [showSalesProductWindow, setShowSalesProductWindow] = useState(false);
   const [products, setProducts] = useState([]);
   const [resetSeed, setResetSeed] = useState(false);
+  // currency
+  const [chosenCurrency, setChosenCurrency] = useState("PLN");
   // Errors
   const [nameError, setNameError] = useState(false);
   const [maxQtyError, setMaxQtyError] = useState(false);
@@ -35,7 +37,7 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
   const [isLoading, setIsLoading] = useState(false);
   // Form
   const [state, formAction] = useFormState(
-    CreatePurchaseInvoice.bind(null, products),
+    createPricelist.bind(null, products).bind(null, chosenCurrency),
     {
       error: false,
       completed: false,
@@ -77,6 +79,7 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
                   onClick={() => {
                     hideFunction();
                     setProducts([]);
+                    setChosenCurrency("PLN");
                     if (!state.error && state.complete) {
                       router.refresh();
                     }
@@ -153,15 +156,27 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
                   }}
                 />
               </Form.Group>
-              <Form.Group className="mb-4">
+              <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Currency:</Form.Label>
                 <Form.Select
                   className="input-style shadow-sm maxInputWidth"
-                  name="status"
+                  name="currency"
+                  disabled={products.length > 0}
+                  onChange={(e) => setChosenCurrency(e.target.value)}
                 >
                   <option value="PLN">PLN</option>
                   <option value="EUR">EUR</option>
                   <option value="USD">USD</option>
+                </Form.Select>
+              </Form.Group>
+              <Form.Group className="mb-4">
+                <Form.Label className="blue-main-text">Type:</Form.Label>
+                <Form.Select
+                  className="input-style shadow-sm maxInputWidth"
+                  name="type"
+                >
+                  <option value="csv">csv</option>
+                  <option value="xlsx">xml</option>
                 </Form.Select>
               </Form.Group>
               <Form.Group className="mb-4 maxInputWidth">
@@ -238,13 +253,14 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
             </Form>
           </Container>
         </Offcanvas.Body>
-        <AddSaleProductWindow
+        <AddItemToPricelistWindow
           modalShow={showSalesProductWindow}
           onHideFunction={() => setShowSalesProductWindow(false)}
           addFunction={(val) => {
             products.push(val);
           }}
-          addedProductsQty={products.length}
+          currency={chosenCurrency}
+          addedProducts={products}
         />
         <Toastes.ErrorToast
           showToast={state.completed && state.error}
@@ -260,6 +276,7 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
             resetState();
             document.getElementById("offerForm").reset();
             setProducts([]);
+            setChosenCurrency("PLN");
             hideFunction();
             router.refresh();
           }}

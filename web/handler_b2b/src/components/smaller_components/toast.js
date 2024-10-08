@@ -11,7 +11,7 @@ function ErrorToast({ showToast, message, onHideFun }) {
   return (
     <Toast
       show={showToast}
-      className="position-absolute bottom-0 end-0 me-3 w-auto main-red-bg border"
+      className="position-absolute bottom-0 end-0 me-3 w-auto main-red-bg border z-2"
       onClose={onHideFun}
       style={toastStyle}
     >
@@ -33,7 +33,7 @@ function SuccessToast({ showToast, message, onHideFun }) {
   return (
     <Toast
       show={showToast}
-      className="position-absolute bottom-0 end-0 me-3 w-auto main-green-bg border"
+      className="position-absolute bottom-0 end-0 me-3 w-auto main-green-bg border z-2"
       onClose={onHideFun}
       style={toastStyle}
     >

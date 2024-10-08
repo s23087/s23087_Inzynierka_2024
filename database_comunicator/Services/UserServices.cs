@@ -35,6 +35,7 @@ namespace database_comunicator.Services
         public Task<IEnumerable<GetUsers>> GetUsers();
         public Task<IEnumerable<GetUsers>> GetAccountantUser();
         public Task<string> GetUserFullName(int userId);
+        public Task<string> GetUserOrg(int userId);
     }
     public class UserServices : IUserServices
     {
@@ -322,6 +323,19 @@ namespace database_comunicator.Services
             return await _handlerContext.AppUsers
                 .Where(e => e.IdUser == userId)
                 .Select(e => e.Username + " " + e.Surname).FirstAsync();
+        }
+        public async Task<string> GetUserOrg(int userId)
+        {
+            var isSolo = await _handlerContext.AppUsers.AnyAsync(x => x.IdUser == userId && x.OrgUserId == null);
+            string result;
+            if (isSolo)
+            {
+                result = await _handlerContext.AppUsers.Where(e => e.IdUser == userId).Select(e => e.SoloUser!.Organizations.OrgName).FirstAsync();
+            } else
+            {
+                result = await _handlerContext.AppUsers.Where(e => e.IdUser == userId).Select(e => e.OrgUser!.Organizations.OrgName).FirstAsync();
+            }
+            return result;
         }
     }
 }

@@ -29,3 +29,7 @@ tr {
 .bottom-right-rounded {
   border-radius: 0 0 15px 0;
 }
+
+.bottom-both-rounded {
+  border-radius: 0 0 15px 15px;
+}

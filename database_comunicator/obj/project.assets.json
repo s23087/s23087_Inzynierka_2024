@@ -59,6 +59,15 @@
           }
         }
       },
+      "LINQtoCSV/1.5.0": {
+        "type": "package",
+        "compile": {
+          "lib/net35/LINQtoCSV.dll": {}
+        },
+        "runtime": {
+          "lib/net35/LINQtoCSV.dll": {}
+        }
+      },
       "Microsoft.AspNetCore.OpenApi/7.0.9": {
         "type": "package",
         "dependencies": {
@@ -1253,6 +1262,18 @@
         "lib/netstandard2.0/Humanizer.dll",
         "lib/netstandard2.0/Humanizer.xml",
         "logo.png"
+      ]
+    },
+    "LINQtoCSV/1.5.0": {
+      "sha512": "R3FWKGV326oWhEIJFgBQvJyeEs7ylViAMjTYs1YetwVdGfbDGf465xfLaxUxePwF/8Tcajt/1Llj3exhYL2xhQ==",
+      "type": "package",
+      "path": "linqtocsv/1.5.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net35/LINQtoCSV.dll",
+        "linqtocsv.1.5.0.nupkg.sha512",
+        "linqtocsv.nuspec"
       ]
     },
     "Microsoft.AspNetCore.OpenApi/7.0.9": {
@@ -3506,6 +3527,7 @@
   },
   "projectFileDependencyGroups": {
     "net7.0": [
+      "LinqToCsv >= 1.5.0",
       "Microsoft.AspNetCore.OpenApi >= 7.0.9",
       "Microsoft.EntityFrameworkCore >= 7.0.20",
       "Microsoft.EntityFrameworkCore.SqlServer >= 7.0.20",
@@ -3554,6 +3576,10 @@
       "net7.0": {
         "targetAlias": "net7.0",
         "dependencies": {
+          "LinqToCsv": {
+            "target": "Package",
+            "version": "[1.5.0, )"
+          },
           "Microsoft.AspNetCore.OpenApi": {
             "target": "Package",
             "version": "[7.0.9, )"
@@ -3603,5 +3629,17 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'LINQtoCSV 1.5.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net7.0'. This package may not be fully compatible with your project.",
+      "libraryId": "LINQtoCSV",
+      "targetGraphs": [
+        "net7.0"
+      ]
+    }
+  ]
 }

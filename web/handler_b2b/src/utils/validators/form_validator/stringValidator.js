@@ -23,6 +23,17 @@ function onlyNumberStringValidtor(string, setter, maxLenght) {
   }
 }
 
+function onlyNumberValidtor(string, setter) {
+  if (
+    validators.stringIsNotEmpty(string) &&
+    validators.haveOnlyNumbers(string)
+  ) {
+    setter(false);
+  } else {
+    setter(true);
+  }
+}
+
 function emptyNumberStringValidtor(string, setter, maxLenght) {
   if (
     validators.lengthSmallerThen(string, maxLenght) &&
@@ -60,6 +71,7 @@ const StringValidtor = {
   emptyNumberStringValidtor,
   emailValidator,
   decimalValidator,
+  onlyNumberValidtor
 };
 
 export default StringValidtor;

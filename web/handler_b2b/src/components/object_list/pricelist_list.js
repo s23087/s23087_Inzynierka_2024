@@ -7,29 +7,40 @@ import SearchFilterBar from "../menu/search_filter_bar";
 import MoreActionWindow from "../windows/more_action";
 import { useSearchParams } from "next/navigation";
 import DeleteObjectWindow from "../windows/delete_object";
-import ViewClientOffcanvas from "../offcanvas/view/view_client";
-import deleteClient from "@/utils/clients/delete_client";
 import { useRouter } from "next/navigation";
-import ModifyClientOffcanvas from "../offcanvas/modify/modify_client";
 import SelectComponent from "../smaller_components/select_compontent";
 import getPagationInfo from "@/utils/flexible/get_page_info";
 import PricelistContainer from "../object_container/pricelist_container";
 import AddPricelistOffcanvas from "../offcanvas/create/create_pricelist";
+import deletePricelist from "@/utils/pricelist/delete_pricelist";
+import ViewPricelistOffcanvas from "../offcanvas/view/view_pricelist";
+import ModifyPricelistOffcanvas from "../offcanvas/modify/modify_pricelist";
 
 function PricelistList({ pricelist, pricelistStart, pricelistEnd }) {
   // View pricelist
   const [showViewPricelist, setShowViewPricelist] = useState(false);
   const [pricelistToView, setPricelistToView] = useState({
-    users: [],
+    created: "",
+    modified: "",
+    name: "",
+    status: "",
+    totalItems: 0,
+    currency: "",
   });
   // Modify pricelist
   const [showModifyPricelist, setShowModifyPricelist] = useState(false);
   const [pricelistToModify, setPricelistToModify] = useState({
-    users: [],
+    created: "",
+    modified: "",
+    name: "",
+    status: "",
+    totalItems: 0,
+    currency: "",
+    path: "",
   });
   // Delete pricelist
   const [showDeletePricelist, setShowDeletePricelist] = useState(false);
-  const [pricelistToDelete, setItemToDelete] = useState(null);
+  const [pricelistToDelete, setItemToDelete] = useState([0, ""]);
   const [isErrorDelete, setIsErrorDelete] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   // More action
@@ -84,7 +95,7 @@ function PricelistList({ pricelist, pricelistStart, pricelistEnd }) {
                   setSelectedQty(selectedQty - 1);
                 }}
                 deleteAction={() => {
-                  setItemToDelete(value.pricelistId);
+                  setItemToDelete([value.pricelistId, value.path]);
                   setShowDeletePricelist(true);
                 }}
                 viewAction={() => {
@@ -143,9 +154,12 @@ function PricelistList({ pricelist, pricelistStart, pricelistEnd }) {
           setIsErrorDelete(false);
         }}
         instanceName="pricelist"
-        instanceId={pricelistToDelete}
+        instanceId={pricelistToDelete[0]}
         deleteItemFunc={async () => {
-          let result = await deleteClient(pricelistToDelete);
+          let result = await deletePricelist(
+            pricelistToDelete[0],
+            pricelistToDelete[1],
+          );
           if (!result.error) {
             setShowDeletePricelist(false);
             router.refresh();
@@ -157,15 +171,15 @@ function PricelistList({ pricelist, pricelistStart, pricelistEnd }) {
         isError={isErrorDelete}
         errorMessage={errorMessage}
       />
-      <ModifyClientOffcanvas
+      <ModifyPricelistOffcanvas
         showOffcanvas={showModifyPricelist}
         hideFunction={() => setShowModifyPricelist(false)}
-        client={pricelistToModify}
+        pricelist={pricelistToModify}
       />
-      <ViewClientOffcanvas
+      <ViewPricelistOffcanvas
         showOffcanvas={showViewPricelist}
         hideFunction={() => setShowViewPricelist(false)}
-        client={pricelistToView}
+        pricelist={pricelistToView}
       />
     </Container>
   );

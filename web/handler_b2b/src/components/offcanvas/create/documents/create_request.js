@@ -195,8 +195,8 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
                         let note = document.getElementById("noteId").value;
                         let title = document.getElementById("title").value;
                         if (!note || !title) {
-                          if (!note) setNoteError(true)
-                          if (!title) setTitleError(true)
+                          if (!note) setNoteError(true);
+                          if (!title) setTitleError(true);
                           return;
                         }
                         setIsLoading(true);

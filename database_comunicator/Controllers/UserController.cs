@@ -72,9 +72,18 @@ namespace database_comunicator.Controllers
         }
         [HttpGet]
         [Route("getUsers")]
-        public async Task<IActionResult> GetUSers()
+        public async Task<IActionResult> GetUsers()
         {
             var result = await _userServices.GetUsers();
+            return Ok(result);
+        }
+        [HttpGet]
+        [Route("get/organization/{userId}")]
+        public async Task<IActionResult> GetUserOrganization(int userId)
+        {
+            var isExist = await _userServices.UserExist(userId);
+            if (!isExist) return NotFound();
+            var result = await _userServices.GetUserOrg(userId);
             return Ok(result);
         }
     }

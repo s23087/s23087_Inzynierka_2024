@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Products>
+  <Product>
+    <Partnumber>Bqw2352/as534</Partnumber>
+    <ItemName>Benq monitor 32" Black</ItemName>
+    <ItemDescription>This is another monitor.</ItemDescription>
+    <Eans>156156165156, 55616565165</Eans>
+    <Qty>&gt; 10</Qty>
+    <Price>1200.00</Price>
+  </Product>
+  <Product>
+    <Partnumber>Hp23ads/234s</Partnumber>
+    <ItemName>Hp laptop 27" Silver</ItemName>
+    <ItemDescription>Super gaming laptop.</ItemDescription>
+    <Eans>1553165486</Eans>
+    <Qty>&gt; 10</Qty>
+    <Price>2709.00</Price>
+  </Product>
+  <Product>
+    <Partnumber>exrazerGam4k/27b</Partnumber>
+    <ItemName>Razer gaming laptop 4k 27" 144Hz Intel i9 Black</ItemName>
+    <ItemDescription>Super laptop.</ItemDescription>
+    <Eans>561561561551</Eans>
+    <Qty>5</Qty>
+    <Price>2549.00</Price>
+  </Product>
+  <Product>
+    <Partnumber>Raz45xi9/26b</Partnumber>
+    <ItemName>Razer 4500x Intel i9 26" Black</ItemName>
+    <ItemDescription>Razer laptop.</ItemDescription>
+    <Eans>2356363466436</Eans>
+    <Qty>2</Qty>
+    <Price>2899.00</Price>
+  </Product>
+</Products>

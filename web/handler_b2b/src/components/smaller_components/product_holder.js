@@ -14,10 +14,15 @@ function ProductHolder({ value, deleteValue }) {
     (value.purchasePrice
       ? value.purchasePrice + " -> " + value.price
       : value.price) +
-    "\n" +
-    value.name;
+    (value.name ? "\n" + value.name : "");
   const inputStyle = {
     resize: "none",
+  };
+  let getRowNumber = () => {
+    let result = 5;
+    if (!value.invoiceNumber) result--;
+    if (!value.name) result--;
+    return result;
   };
   return (
     <InputGroup className="mb-3 maxInputWidth">
@@ -26,7 +31,7 @@ function ProductHolder({ value, deleteValue }) {
         type="text"
         defaultValue={productValue}
         as="textarea"
-        rows={value.invoiceNumber ? 5 : 4}
+        rows={getRowNumber()}
         readOnly
         disabled
         style={inputStyle}
