@@ -18,7 +18,6 @@ export default async function getCurrencyValuesList(
   } else {
     url = `https://api.nbp.pl/api/exchangerates/rates/a/${curr}/${startDate}/${endDate}/?format=json`;
   }
-  console.log(url);
   const info = await fetch(url, {
     method: "GET",
   });

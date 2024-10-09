@@ -3,7 +3,7 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import validators from "../validators/validator";
-import getInvoicePath from "./get_document_path";
+import { getInvoicePath } from "./get_document_path";
 
 export default async function updateInvoice(
   file,

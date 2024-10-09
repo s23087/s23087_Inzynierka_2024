@@ -340,5 +340,12 @@ namespace database_comunicator.Controllers
             }
             return result ? Ok() : new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
+        [HttpPost]
+        [Route("update/status")]
+        public async Task<IActionResult> UpdateStatus()
+        {
+            await _invoicesService.UpdateInvoiceStatus();
+            return Ok();
+        }
     }
 }

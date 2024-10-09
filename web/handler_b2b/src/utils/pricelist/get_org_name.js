@@ -12,8 +12,8 @@ export default async function getUserOrgName() {
       method: "GET",
     });
 
-    if (info.status == 404){
-        return "404";
+    if (info.status == 404) {
+      return "404";
     }
 
     if (info.ok) {

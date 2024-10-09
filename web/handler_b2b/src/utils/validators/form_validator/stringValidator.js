@@ -71,7 +71,7 @@ const StringValidtor = {
   emptyNumberStringValidtor,
   emailValidator,
   decimalValidator,
-  onlyNumberValidtor
+  onlyNumberValidtor,
 };
 
 export default StringValidtor;

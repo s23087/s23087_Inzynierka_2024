@@ -25,14 +25,17 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
         if (data) {
           setMaxQty(data.maxQty);
           setProducts(data.items);
-          prevState.maxQty = data.maxQty
+          prevState.maxQty = data.maxQty;
         }
       });
       setChosenCurrency(pricelist.currency);
-      prevState.offerName = pricelist.name
-      prevState.currency = pricelist.currency
-      prevState.type = pricelist.path.substring(pricelist.path.lastIndexOf(".")+1, pricelist.path.length)
-      prevState.path = pricelist.path
+      prevState.offerName = pricelist.name;
+      prevState.currency = pricelist.currency;
+      prevState.type = pricelist.path.substring(
+        pricelist.path.lastIndexOf(".") + 1,
+        pricelist.path.length,
+      );
+      prevState.path = pricelist.path;
     }
   }, [showOffcanvas]);
   const [statuses, setStatuses] = useState([]);
@@ -50,7 +53,7 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
     maxQty: 0,
     currency: "",
     type: "",
-    path: ""
+    path: "",
   });
   // Errors
   const [nameError, setNameError] = useState(false);
@@ -62,10 +65,10 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
   // Form
   const [state, formAction] = useFormState(
     modifyPricelist
-    .bind(null, products)
-    .bind(null, chosenCurrency)
-    .bind(null, pricelist.pricelistId)
-    .bind(null, prevState),
+      .bind(null, products)
+      .bind(null, chosenCurrency)
+      .bind(null, pricelist.pricelistId)
+      .bind(null, prevState),
     {
       error: false,
       completed: false,
@@ -185,7 +188,7 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
                   onInput={(e) => {
                     StringValidtor.onlyNumberValidtor(
                       e.target.value,
-                      setMaxQtyError
+                      setMaxQtyError,
                     );
                   }}
                 />

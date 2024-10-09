@@ -159,5 +159,24 @@ namespace database_comunicator.Controllers
             var result = await _offerServices.GetDeactivatedStatusId();
             return Ok(result);
         }
+        [HttpPost]
+        [Route("start/update")]
+        public async Task<IActionResult> StartUpdate()
+        {
+            var csvIds = await _offerServices.GetAllActiveCsvOfferId();
+            var xmlIds = await _offerServices.GetAllActiveXmlOfferId();
+            var rejectedIds = new List<int>();
+            foreach (var csvId in csvIds)
+            {
+                var isUpdated = await _offerServices.CreateCsvFile(csvId);
+                if (!isUpdated) rejectedIds.Add(csvId);
+            }
+            foreach (var xmlId in xmlIds)
+            {
+                var isUpdated = await _offerServices.CreateXmlFile(xmlId);
+                if (!isUpdated) rejectedIds.Add(xmlId);
+            }
+            return Ok(rejectedIds);
+        }
     }
 }

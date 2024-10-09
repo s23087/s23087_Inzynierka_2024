@@ -4,7 +4,7 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 import validators from "../validators/validator";
-import getUserOrgName from "./get_org_Name";
+import getUserOrgName from "./get_org_name";
 
 export default async function createPricelist(
   products,
@@ -41,24 +41,24 @@ export default async function createPricelist(
 
   const userId = await getUserId();
   const dbName = await getDbName();
-  let orgName = await getUserOrgName()
-    if (orgName === "404"){
-        logout()
-        return {
-            error: true,
-            completed: true,
-            message: "Your account does not exist.",
-        };
-    }
-    if (!orgName){
-        return {
-            error: true,
-            completed: true,
-            message: "Could not connect to server.",
-        };
-    }
-    orgName = orgName.replace(/[^a-zA-Z0-9]/, "");
-    orgName = orgName.replace(" ", "");
+  let orgName = await getUserOrgName();
+  if (orgName === "404") {
+    logout();
+    return {
+      error: true,
+      completed: true,
+      message: "Your account does not exist.",
+    };
+  }
+  if (!orgName) {
+    return {
+      error: true,
+      completed: true,
+      message: "Could not connect to server.",
+    };
+  }
+  orgName = orgName.replace(/[^a-zA-Z0-9]/, "");
+  orgName = orgName.replace(" ", "");
   let fileName = `src/app/api/pricelist/${orgName}/${offerName.replaceAll(" ", "_").replaceAll(/[^a-zA-Z0-9_]/g, 25 + userId)}${maxQty}${currency}${Date.now().toString()}.${type}`;
 
   const fs = require("node:fs");

@@ -21,7 +21,7 @@ function createFolders(dbfile, logFile, docFile, pricelistFile) {
   }
 }
 
-function deleteFolders(dbfile, logFile, docFile,pricelistFile) {
+function deleteFolders(dbfile, logFile, docFile, pricelistFile) {
   const fs = require("node:fs");
   try {
     fs.rmdirSync(logFile);
@@ -43,7 +43,7 @@ async function registerUser(is_org, formData) {
   let pricelistFile = `src/app/api/pricelist/${folderName}`;
   let fileCreation = false;
 
-  fileCreation = createFolders(dbFilePath, dbLogPath, docPath,pricelistFile);
+  fileCreation = createFolders(dbFilePath, dbLogPath, docPath, pricelistFile);
 
   if (fileCreation) {
     let creationResult = await initDb(folderName);

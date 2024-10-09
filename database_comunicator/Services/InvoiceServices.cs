@@ -36,6 +36,7 @@ namespace database_comunicator.Services
         public Task<GetRestInvoice> GetRestSalesInvoice(int invoiceId);
         public Task<GetRestModifyInvoice> GetRestModifyInvoice(int invoiceId);
         public Task<bool> ModifyInvoice(ModifyInvoice data);
+        public Task UpdateInvoiceStatus();
     }
     public class InvoiceServices : IInvoiceServices
     {
@@ -773,6 +774,15 @@ namespace database_comunicator.Services
                 return false;
             }
 
+        }
+        public async Task UpdateInvoiceStatus()
+        {
+            var dueToStatusId = await _handlerContext.PaymentStatuses.Where(e => e.StatusName == "Due to").Select(e => e.PaymentStatusId).FirstAsync();
+            await _handlerContext.Invoices
+                .Where(e => DateTime.Now > e.DueDate && e.PaymentsStatus.StatusName == "Unpaid")
+                .ExecuteUpdateAsync(setter =>
+                    setter.SetProperty(s => s.PaymentsStatusId, dueToStatusId)
+                );
         }
     }
 }

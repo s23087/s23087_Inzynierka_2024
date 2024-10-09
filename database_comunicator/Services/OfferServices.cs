@@ -19,13 +19,17 @@ namespace database_comunicator.Services
         public Task<IEnumerable<GetOfferStatus>> GetOfferStatuses();
         public Task<IEnumerable<GetItemsForOffer>> GetItemsForOffers(int userId, string currency);
         public Task<bool> CreateCsvFile(int offerId, int userId, string path, int maxQty);
+        public Task<bool> CreateCsvFile(int offerId);
         public Task<bool> CreateXmlFile(int offerId, int userId, string path, int maxQty);
+        public Task<bool> CreateXmlFile(int offerId);
         public Task<int> GetDeactivatedStatusId();
         public Task<IEnumerable<GetCredtItemForTable>> GetOfferItems(int offerId, int userId);
         public Task<GetRestModifyOffer> GetRestModifyOffer(int offerId, int userId);
         public Task<bool> ModifyOffer(ModifyPricelist data);
         public Task<string> GetOfferPath(int offerId);
         public Task<int> GetOfferMaxQty(int offerId);
+        public Task<IEnumerable<int>> GetAllActiveXmlOfferId();
+        public Task<IEnumerable<int>> GetAllActiveCsvOfferId();
     }
     public class OfferServices : IOfferServices
     {
@@ -220,6 +224,11 @@ namespace database_comunicator.Services
                 return false;
             }
         }
+        public async Task<bool> CreateCsvFile(int offerId)
+        {
+            var restOfferData = await _handlerContext.Offers.Where(e => e.OfferId == offerId).Select(e => new { e.UserId, e.PathToFile, e.MaxQty }).FirstAsync();
+            return await CreateCsvFile(offerId, restOfferData.UserId, restOfferData.PathToFile, restOfferData.MaxQty);
+        }
         public async Task<bool> CreateXmlFile(int offerId, int userId, string path, int maxQty)
         {
             var items = await _handlerContext.Items
@@ -254,6 +263,11 @@ namespace database_comunicator.Services
                 Console.WriteLine(ex.ToString());
                 return false;
             }
+        }
+        public async Task<bool> CreateXmlFile(int offerId)
+        {
+            var restOfferData = await _handlerContext.Offers.Where(d => d.OfferId == offerId).Select(d => new { d.UserId, d.PathToFile, d.MaxQty }).FirstAsync();
+            return await CreateXmlFile(offerId, restOfferData.UserId, restOfferData.PathToFile, restOfferData.MaxQty);
         }
         public async Task<int> GetDeactivatedStatusId()
         {
@@ -391,6 +405,14 @@ namespace database_comunicator.Services
         public async Task<int> GetOfferMaxQty(int offerId)
         {
             return await _handlerContext.Offers.Where(e => e.OfferId == offerId).Select(e => e.MaxQty).FirstAsync();
+        }
+        public async Task<IEnumerable<int>> GetAllActiveXmlOfferId()
+        {
+            return await _handlerContext.Offers.Where(e => !e.PathToFile.EndsWith("csv") && e.OfferStatus.StatusName == "Active").Select(e => e.OfferId).ToListAsync();
+        }
+        public async Task<IEnumerable<int>> GetAllActiveCsvOfferId()
+        {
+            return await _handlerContext.Offers.Where(e => e.PathToFile.EndsWith("csv") && e.OfferStatus.StatusName == "Active").Select(e => e.OfferId).ToListAsync();
         }
     }
 }
