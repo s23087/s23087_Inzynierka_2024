@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import ModifyItemOffcanvas from "../offcanvas/modify/modify_item";
 import SelectComponent from "../smaller_components/select_compontent";
 import getPagationInfo from "@/utils/flexible/get_page_info";
+import ProductFilterOffcanvas from "../filter/product_filter_offcanvas";
 
 function ProductList({
   products,
@@ -22,6 +23,8 @@ function ProductList({
   currency,
   productStart,
   productEnd,
+  filterActive,
+  currentSort,
 }) {
   // View Item
   const [showViewItem, setShowViewItem] = useState(false);
@@ -45,6 +48,8 @@ function ProductList({
   // Seleted
   const [selectedQty, setSelectedQty] = useState(0);
   const [selectedProducts] = useState([]);
+  // Filter
+  const [showFilter, setShowFilter] = useState(false);
   // Nav
   const router = useRouter();
   const params = useSearchParams();
@@ -54,20 +59,31 @@ function ProductList({
   };
   return (
     <Container className="p-0 middleSectionPlacement position-relative" fluid>
+      <ProductFilterOffcanvas
+        showOffcanvas={showFilter}
+        hideFunction={() => setShowFilter(false)}
+        currentSort={currentSort}
+        currentDirection={
+          currentSort.startsWith("A") || currentSort.startsWith(".")
+        }
+      />
       <Container
         className="fixed-top middleSectionPlacement-no-footer p-0"
         fluid
       >
         <SearchFilterBar
-          filter_icon_bool="false"
+          filter_icon_bool={filterActive}
           moreButtonAction={() => setShowMoreAction(true)}
+          filterAction={() => setShowFilter(true)}
         />
       </Container>
       <SelectComponent selectedQty={selectedQty} />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
-      {Object.keys(products).length === 0 ? (
+      {Object.keys(products ?? []).length === 0 ? (
         <Container className="text-center" fluid>
-          <p className="mt-5 pt-5 blue-main-text h2">Items not found :/</p>
+          <p className="mt-5 pt-5 blue-main-text h2">
+            {products ? "Items not found :/" : "Could not connect to server."}
+          </p>
         </Container>
       ) : (
         Object.values(products)
@@ -100,7 +116,7 @@ function ProductList({
                   setShowModifyItem(true);
                 }}
                 selected={selectedProducts.indexOf(value.itemId) !== -1}
-                key={value.itemId}
+                key={[products, value.itemId]}
               />
             );
           })
@@ -183,6 +199,8 @@ ProductList.PropTypes = {
   currency: PropTypes.string.isRequired,
   productStart: PropTypes.number.isRequired,
   productEnd: PropTypes.number.isRequired,
+  filterActive: PropTypes.bool.isRequired,
+  currentSort: PropTypes.string.isRequired,
 };
 
 export default ProductList;

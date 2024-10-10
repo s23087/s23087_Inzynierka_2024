@@ -15,16 +15,53 @@ export default async function WarehousePage({ searchParams }) {
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
   const is_org_switch_needed = current_role == "Admin";
+  let filterStatus = searchParams.status ?? null;
+  let eanFilter = searchParams.ean ?? null;
+  let currentSort = searchParams.orderBy ?? ".None";
+  let qtyL = searchParams.qtyL ?? null;
+  let qtyG = searchParams.qtyG ?? null;
+  let priceL = searchParams.priceL ?? null;
+  let priceG = searchParams.priceG ?? null;
+  let filterActivated =
+    searchParams.orderBy ||
+    filterStatus ||
+    eanFilter ||
+    qtyL ||
+    qtyG ||
+    priceL ||
+    priceG;
   let orgActivated =
     searchParams.isOrg !== undefined ? searchParams.isOrg : false;
   let org_view = getOrgView(current_role, orgActivated === "true");
   let currency = searchParams.currency ? searchParams.currency : "PLN";
   let isSearchTrue = searchParams.searchQuery !== undefined;
   let products = isSearchTrue
-    ? await getSearchItems(currency, org_view, searchParams.searchQuery)
-    : await getItems(currency, org_view);
+    ? await getSearchItems(
+        currency,
+        org_view,
+        searchParams.searchQuery,
+        currentSort,
+        filterStatus,
+        eanFilter,
+        qtyL,
+        qtyG,
+        priceL,
+        priceG,
+      )
+    : await getItems(
+        currency,
+        org_view,
+        currentSort,
+        filterStatus,
+        eanFilter,
+        qtyL,
+        qtyG,
+        priceL,
+        priceG,
+      );
   let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
-  let pageQty = Math.ceil(products.length / maxInstanceOnPage);
+  let productsLength = products ? products.length : 0;
+  let pageQty = Math.ceil(productsLength / maxInstanceOnPage);
   pageQty = pageQty === 0 ? 1 : pageQty;
   let currentPage = parseInt(searchParams.page)
     ? parseInt(searchParams.page)
@@ -51,6 +88,8 @@ export default async function WarehousePage({ searchParams }) {
           currency={currency}
           productStart={productStart}
           productEnd={productEnd}
+          filterActive={filterActivated}
+          currentSort={currentSort}
         />
       </section>
 

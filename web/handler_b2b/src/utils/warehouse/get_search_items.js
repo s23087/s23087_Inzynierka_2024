@@ -3,22 +3,41 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 
-export default async function getSearchItems(currency, isOrg, search) {
+export default async function getSearchItems(
+  currency,
+  isOrg,
+  search,
+  sort,
+  status,
+  ean,
+) {
   let url = "";
   const dbName = await getDbName();
+  if (sort !== ".None") params.push(`sort=${sort}`);
+  if (qtyL) params.push(`qtyL=${qtyL}`);
+  if (qtyG) params.push(`totalR=${qtyG}`);
+  if (priceL) params.push(`qtyL=${qtyL}`);
+  if (priceG) params.push(`totalR=${qtyG}`);
+  if (status) params.push(`status=${status}`);
+  if (ean) params.push(`ean=${ean}`);
   if (isOrg) {
-    url = `${process.env.API_DEST}/${dbName}/Warehouse/items?currency=${currency}&search=${search}`;
+    url = `${process.env.API_DEST}/${dbName}/Warehouse/items/${currency}?search=${search}${params.length > 0 ? "&" : ""}${params.join("&")}`;
   } else {
     const userId = await getUserId();
-    url = `${process.env.API_DEST}/${dbName}/Warehouse/items?currency=${currency}&userId=${userId}&search=${search}`;
+    url = `${process.env.API_DEST}/${dbName}/Warehouse/items/${currency}?userId=${userId}&search=${search}${params.length > 0 ? "&" : ""}${params.join("&")}`;
   }
-  const items = await fetch(url, {
-    method: "GET",
-  });
+  try {
+    const items = await fetch(url, {
+      method: "GET",
+    });
 
-  if (items.ok) {
-    return await items.json();
+    if (items.ok) {
+      return await items.json();
+    }
+
+    return [];
+  } catch (error) {
+    console.log(error);
+    return null;
   }
-
-  return {};
 }

@@ -83,13 +83,13 @@
 }
 
 .btn-green {
-  background-color: var(--main-green);
-  color: var(--text-main-color);
+  background-color: var(--main-green) !important;
+  color: var(--text-main-color) !important;
 }
 
 .btn-green:hover {
-  background-color: var(--main-green-hover);
-  color: var(--text-main-color-hover);
+  background-color: var(--main-green-hover) !important;
+  color: var(--text-main-color-hover) !important;
 }
 
 .btn-green:active {
@@ -103,13 +103,13 @@
 }
 
 .btn-yellow {
-  background-color: var(--main-yellow);
-  color: var(--text-black-color);
+  background-color: var(--main-yellow) !important;
+  color: var(--text-black-color) !important;
 }
 
 .btn-yellow:hover {
-  background-color: var(--main-yellow-hover);
-  color: var(--text-black-color);
+  background-color: var(--main-yellow-hover) !important;
+  color: var(--text-black-color) !important;
 }
 
 .btn-yellow:active {
@@ -123,21 +123,21 @@
 }
 
 .btn-white-border {
-  background-color: transparent;
-  color: var(--text-blue-color);
+  background-color: transparent !important;
+  color: var(--text-blue-color) !important;
   border: none !important;
 }
 
 .btn-white-border:hover {
-  background-color: transparent;
-  color: var(--text-blue-color);
+  background-color: transparent !important;
+  color: var(--text-blue-color) !important;
   border: solid var(--text-main-color) 1px !important;
 }
 
 .btn-white-border:active {
   background-color: transparent !important;
   color: var(--text-blue-color) !important;
-  text-decoration: underline;
+  text-decoration: underline !important;
   border: none !important;
 }
 

@@ -3,10 +3,24 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 
-export default async function getPricelists() {
+export default async function getPricelists(
+  sort,
+  totalL,
+  totalR,
+  status,
+  currency,
+  type,
+) {
   const dbName = await getDbName();
   const userId = await getUserId();
-  let url = `${process.env.API_DEST}/${dbName}/Offer/get/${userId}`;
+  let params = [];
+  if (sort !== ".None") params.push(`sort=${sort}`);
+  if (totalL) params.push(`totalL=${totalL}`);
+  if (totalR) params.push(`totalR=${totalR}`);
+  if (status) params.push(`status=${status}`);
+  if (currency) params.push(`currency=${currency}`);
+  if (type) params.push(`type=${type}`);
+  let url = `${process.env.API_DEST}/${dbName}/Offer/get/${userId}${params.length > 0 ? "?" : ""}${params.join("&")}`;
   try {
     const info = await fetch(url, {
       method: "GET",

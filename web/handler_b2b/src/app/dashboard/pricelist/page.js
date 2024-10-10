@@ -13,10 +13,25 @@ export default async function PricelistPage({ searchParams }) {
   const current_role = await getRole();
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
+  let totalL = searchParams.totalL;
+  let totalG = searchParams.totalG;
+  let status = searchParams.status;
+  let currency = searchParams.currency;
+  let type = searchParams.type;
+  let filterActivated = totalL || totalG || status || currency || type;
+  let currentSort = searchParams.orderBy ?? ".None";
   let isSearchTrue = searchParams.searchQuery !== undefined;
   let pricelists = isSearchTrue
-    ? await getSearchPricelists(searchParams.searchQuery)
-    : await getPricelists();
+    ? await getSearchPricelists(
+        searchParams.searchQuery,
+        currentSort,
+        totalL,
+        totalG,
+        status,
+        currency,
+        type,
+      )
+    : await getPricelists(currentSort, totalL, totalG, status, currency, type);
   let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
   let itemsLength = pricelists === null ? 0 : pricelists.length;
   let pageQty = Math.ceil(itemsLength / maxInstanceOnPage);
@@ -41,6 +56,8 @@ export default async function PricelistPage({ searchParams }) {
           pricelist={pricelists}
           pricelistStart={pricelistsStart}
           pricelistEnd={pricelistsEnd}
+          filterActivated={filterActivated}
+          currentSort={currentSort}
         />
       </section>
 

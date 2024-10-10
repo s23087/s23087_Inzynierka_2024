@@ -15,8 +15,15 @@ import AddPricelistOffcanvas from "../offcanvas/create/create_pricelist";
 import deletePricelist from "@/utils/pricelist/delete_pricelist";
 import ViewPricelistOffcanvas from "../offcanvas/view/view_pricelist";
 import ModifyPricelistOffcanvas from "../offcanvas/modify/modify_pricelist";
+import PricelistFilterOffcanvas from "../filter/pricelist_filter";
 
-function PricelistList({ pricelist, pricelistStart, pricelistEnd }) {
+function PricelistList({
+  pricelist,
+  pricelistStart,
+  pricelistEnd,
+  filterActive,
+  currentSort,
+}) {
   // View pricelist
   const [showViewPricelist, setShowViewPricelist] = useState(false);
   const [pricelistToView, setPricelistToView] = useState({
@@ -49,6 +56,8 @@ function PricelistList({ pricelist, pricelistStart, pricelistEnd }) {
   // Seleted
   const [selectedQty, setSelectedQty] = useState(0);
   const [selectedPricelist] = useState([]);
+  // Filter
+  const [showFilter, setShowFilter] = useState(false);
   // Nav
   const router = useRouter();
   const params = useSearchParams();
@@ -57,13 +66,22 @@ function PricelistList({ pricelist, pricelistStart, pricelistEnd }) {
   };
   return (
     <Container className="p-0 middleSectionPlacement position-relative" fluid>
+      <PricelistFilterOffcanvas
+        showOffcanvas={showFilter}
+        hideFunction={() => setShowFilter(false)}
+        currentSort={currentSort}
+        currentDirection={
+          currentSort.startsWith("A") || currentSort.startsWith(".")
+        }
+      />
       <Container
         className="fixed-top middleSectionPlacement-no-footer p-0"
         fluid
       >
         <SearchFilterBar
-          filter_icon_bool="false"
+          filter_icon_bool={filterActive}
           moreButtonAction={() => setShowMoreAction(true)}
+          filterAction={() => setShowFilter(true)}
         />
       </Container>
       <SelectComponent selectedQty={selectedQty} />
@@ -189,6 +207,8 @@ PricelistList.PropTypes = {
   pricelist: PropTypes.object.isRequired,
   pricelistStart: PropTypes.number.isRequired,
   pricelistEnd: PropTypes.number.isRequired,
+  filterActive: PropTypes.bool.isRequired,
+  currentSort: PropTypes.string.isRequired,
 };
 
 export default PricelistList;

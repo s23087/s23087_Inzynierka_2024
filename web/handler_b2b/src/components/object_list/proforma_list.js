@@ -22,6 +22,8 @@ function ProformaList({
   orgView,
   proformasStart,
   proformasEnd,
+  filterActive,
+  currentSort,
 }) {
   // View proforma
   const [showViewProforma, setShowViewProforma] = useState(false);
@@ -197,8 +199,10 @@ function ProformaList({
 ProformaList.PropTypes = {
   proformas: PropTypes.object.isRequired,
   orgView: PropTypes.bool.isRequired,
-  clientsStart: PropTypes.number.isRequired,
-  clientsEnd: PropTypes.number.isRequired,
+  proformasStart: PropTypes.number.isRequired,
+  proformasEnd: PropTypes.number.isRequired,
+  filterActive: PropTypes.bool.isRequired,
+  currentSort: PropTypes.string.isRequired,
 };
 
 export default ProformaList;

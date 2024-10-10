@@ -56,12 +56,6 @@ function ModifyItemOffcanvas({
   // Errors
   const [partnumberError, setPartnumberError] = useState(false);
   const [nameError, setNameError] = useState(false);
-  const isErrorActive = () => partnumberError || nameError;
-  const resetErrors = () => {
-    setPartnumberError(false);
-    setNameError(false);
-  };
-  const errorActive = isErrorActive();
   // Get data
   const [bindings, setBindings] = useState([
     {
@@ -81,11 +75,11 @@ function ModifyItemOffcanvas({
       desc.then((data) => setDescription(data));
       let bindings = getBindings(item.itemId, curenncy);
       bindings.then((data) => setBindings(data));
-    } else {
+    } else if (showOffcanvas) {
       let copyArray = [...item.eans];
       setEans(copyArray);
       let desc = getDescription(item.itemId);
-      desc.then((data) => setDescription(data));
+      desc.then((data) => setDescription(data ?? "download error"));
     }
   }, [showOffcanvas]);
   // Rerender Eans
@@ -97,6 +91,14 @@ function ModifyItemOffcanvas({
   const [isAddEanShow, setIsAddEanShow] = useState(false);
   // Loading bool
   const [isLoading, setIsLoading] = useState(false);
+  // Error func
+  const isErrorActive = () =>
+    partnumberError || nameError || description === "download error";
+  const resetErrors = () => {
+    setPartnumberError(false);
+    setNameError(false);
+  };
+  const errorActive = isErrorActive();
   // Form
   const [state, formAction] = useFormState(
     updateItem.bind(null, eans).bind(null, prevState),

@@ -1,8 +1,11 @@
 ﻿using database_comunicator.Data;
 using database_comunicator.Models;
 using database_comunicator.Models.DTOs;
+using database_comunicator.Utils;
 using LINQtoCSV;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Xml.Linq;
 
@@ -10,8 +13,8 @@ namespace database_comunicator.Services
 {
     public interface IOfferServices
     {
-        public Task<IEnumerable<GetPriceList>> GetPriceLists(int userId);
-        public Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string serach);
+        public Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG);
+        public Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string serach, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG);
         public Task<bool> DoesPricelistExist(int offerId);
         public Task<bool> DoesPricelistExist(string offerName, int userId);
         public Task<bool> DeletePricelist(int offerId);
@@ -38,10 +41,41 @@ namespace database_comunicator.Services
         {
             _handlerContext = handlerContext;
         }
-        public async Task<IEnumerable<GetPriceList>> GetPriceLists(int userId)
+        public async Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG)
         {
+            var sortFunc = SortFilterUtils.GetPricelistSort(sort);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Offer, bool>> statusCond = status == null ?
+                e => true
+                : e => e.OfferStatus.StatusName == status;
+            Expression<Func<Offer, bool>> currencyCond = currency == null ?
+                e => true
+                : e => e.CurrencyName == currency;
+            Expression<Func<Offer, bool>> typeCond = type == null ?
+                e => true
+                : e => e.PathToFile.EndsWith(type);
+            Expression<Func<Offer, bool>> totalLCond = totalL == null ?
+                e => true
+                : e => e.OfferItems.Count < totalL;
+            Expression<Func<Offer, bool>> totalGCond = totalG == null ?
+                e => true
+                : e => e.OfferItems.Count < totalG;
             return await _handlerContext.Offers
                 .Where(e => e.UserId == userId)
+                .Where(statusCond)
+                .Where(typeCond)
+                .Where(currencyCond)
+                .Where(totalLCond)
+                .Where(totalGCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(obj => new GetPriceList
                 {
                     PricelistId = obj.OfferId,
@@ -54,11 +88,42 @@ namespace database_comunicator.Services
                     Currency = obj.CurrencyName
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string serach)
+        public async Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string serach, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG)
         {
+            var sortFunc = SortFilterUtils.GetPricelistSort(sort);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Offer, bool>> statusCond = status == null ?
+                e => true
+                : e => e.OfferStatus.StatusName == status;
+            Expression<Func<Offer, bool>> currencyCond = currency == null ?
+                e => true
+                : e => e.CurrencyName == currency;
+            Expression<Func<Offer, bool>> typeCond = type == null ?
+                e => true
+                : e => e.PathToFile.EndsWith(type);
+            Expression<Func<Offer, bool>> totalLCond = totalL == null ?
+                e => true
+                : e => e.OfferItems.Count < totalL;
+            Expression<Func<Offer, bool>> totalGCond = totalG == null ?
+                e => true
+                : e => e.OfferItems.Count < totalG;
             return await _handlerContext.Offers
                 .Where(e => e.UserId == userId)
                 .Where(e => e.OfferName.ToLower().Contains(serach.ToLower()))
+                .Where(statusCond)
+                .Where(typeCond)
+                .Where(currencyCond)
+                .Where(totalLCond)
+                .Where(totalGCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(ent => new GetPriceList
                 {
                     PricelistId = ent.OfferId,

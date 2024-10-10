@@ -101,8 +101,9 @@ namespace database_comunicator.Controllers
             return result != null ? Ok(result) : BadRequest();
         }
         [HttpGet]
-        [Route("items")]
-        public async Task<IActionResult> GetItems(string currency, int? userId, string? search)
+        [Route("items/{currency}")]
+        public async Task<IActionResult> GetItems(string currency, int? userId, string? search, string? sort, string? status, string? ean,
+            int? qtyL, int? qtyG, int? priceL, int? priceG)
         {
             IEnumerable<GetManyItems> result;
             if (userId != null)
@@ -113,21 +114,21 @@ namespace database_comunicator.Controllers
                 if (search != null)
                 {
                     string correctSearch = search;
-                    result = await _itemServices.GetItems(currency, correctUser, correctSearch);
+                    result = await _itemServices.GetItems(currency, correctUser, correctSearch, sort, status, ean, qtyL, qtyG, priceL, priceG);
                 } else
                 {
-                    result = await _itemServices.GetItems(currency, correctUser);
+                    result = await _itemServices.GetItems(currency, correctUser, sort, status, ean, qtyL, qtyG, priceL, priceG);
                 }
                 return Ok(result);
             }
             if (search != null)
             {
                 string correctSearch = search;
-                result = await _itemServices.GetItems(currency, correctSearch);
+                result = await _itemServices.GetItems(currency, correctSearch, sort, status, ean, qtyL, qtyG, priceL, priceG);
             }
             else
             {
-                result = await _itemServices.GetItems(currency);
+                result = await _itemServices.GetItems(currency, sort, status, ean, qtyL, qtyG, priceL, priceG);
             }
             return Ok(result);
         }

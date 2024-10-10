@@ -5,7 +5,7 @@ import SearchBar from "../smaller_components/search_bar";
 import FilterIcon from "../switches/filter_switch";
 import icon_more from "../../../public/icons/icon_more.png";
 
-function SearchFilterBar({ filter_icon_bool, moreButtonAction }) {
+function SearchFilterBar({ filter_icon_bool, moreButtonAction, filterAction }) {
   const barHeight = {
     height: "66px",
   };
@@ -16,7 +16,7 @@ function SearchFilterBar({ filter_icon_bool, moreButtonAction }) {
       style={barHeight}
     >
       <Container className="w-auto ms-0 ms-xl-3">
-        <FilterIcon is_active={filter_icon_bool} />
+        <FilterIcon is_active={filter_icon_bool} filterAction={filterAction} />
       </Container>
       <Container className="mx-auto">
         <SearchBar />
@@ -33,6 +33,7 @@ function SearchFilterBar({ filter_icon_bool, moreButtonAction }) {
 SearchFilterBar.PropTypes = {
   filter_icon_bool: PropTypes.bool.isRequired,
   moreButtonAction: PropTypes.func.isRequired,
+  filterAction: PropTypes.func.isRequired,
 };
 
 export default SearchFilterBar;

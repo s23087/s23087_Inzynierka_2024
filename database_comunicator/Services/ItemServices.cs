@@ -5,6 +5,7 @@ using database_comunicator.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace database_comunicator.Services
 {
@@ -16,10 +17,14 @@ namespace database_comunicator.Services
         public Task<bool> ItemExist(int id);
         public Task<bool> ItemExist(string partNumber);
         public Task<bool> EanExist(IEnumerable<string> eans);
-        public Task<IEnumerable<GetManyItems>> GetItems(string currency);
-        public Task<IEnumerable<GetManyItems>> GetItems(string currency, string search);
-        public Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId);
-        public Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId, string search);
+        public Task<IEnumerable<GetManyItems>> GetItems(string currency, string? orderBy, string? status, string? ean,
+            int? qtyL, int? qtyG, int? priceL, int? priceG);
+        public Task<IEnumerable<GetManyItems>> GetItems(string currency, string search, string? orderBy, string? status, string? ean,
+            int? qtyL, int? qtyG, int? priceL, int? priceG);
+        public Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId, string? orderBy, string? status, string? ean,
+            int? qtyL, int? qtyG, int? priceL, int? priceG);
+        public Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId, string search, string? orderBy, string? status, string? ean,
+            int? qtyL, int? qtyG, int? priceL, int? priceG);
         public Task<GetRestInfo> GetRestOfItem(int id, int userId, string currency);
         public Task<GetRestInfo> GetRestOfItemOrg(int id, string currency);
         public Task<IEnumerable<GetBinding>> GetModifyRestOfItem(int id, string currency);
@@ -195,17 +200,43 @@ namespace database_comunicator.Services
                 OwnedItemInfos = result
             };
         }
-        public async Task<IEnumerable<GetManyItems>> GetItems(string currency)
+        public async Task<IEnumerable<GetManyItems>> GetItems(string currency, string? orderBy, string? status, string? ean,
+            int? qtyL, int? qtyG, int? priceL, int? priceG)
         {
             List<GetManyItems> items;
-
+            Func<GetManyItems, bool> statusCond = SortFilterUtils.GetFilterStatus(status);
+            Expression<Func<Item, bool>> eanCond = ean == null ?
+                e => true
+                : e => e.Eans.Any(x => x.EanValue == ean);
+            Expression<Func<GetManyItems, bool>> qtyLCondition = qtyL == null ?
+                e => true
+                : e => e.Qty <= qtyL;
+            Expression<Func<GetManyItems, bool>> qtyGCondition = qtyG == null ?
+                e => true
+                : e => e.Qty >= qtyG;
+            Expression<Func<GetManyItems, bool>> priceLCondition = priceL == null ?
+                e => true
+                : e => e.PurchasePrice <= priceL;
+            Expression<Func<GetManyItems, bool>> priceGCondition = priceG == null ?
+                e => true
+                : e => e.PurchasePrice >= priceG;
+            bool direction;
+            if (orderBy == null)
+            {
+                direction = true;
+            } else
+            {
+                direction = orderBy.StartsWith("D");
+            }
+            var orderByFunc = SortFilterUtils.GetItemSort(orderBy);
             if (currency == "PLN")
             {
                 items = await _handlerContext.Items
+                .Where(eanCond)
                 .Select(instance => new GetManyItems
                 {
                     Users = instance.OwnedItems.SelectMany(e => e.ItemOwners).Select(e => e.IdUserNavigation)
-                        .GroupBy(e => new { e.Username, e.Surname })
+                        .GroupBy(e => new { e.IdUser, e.Username, e.Surname })
                         .Select(e => e.Key.Username + " " + e.Key.Surname).ToList(),
                     ItemId = instance.ItemId,
                     ItemName = instance.ItemName,
@@ -245,17 +276,22 @@ namespace database_comunicator.Services
                         .Average(),
                     Sources = instance.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation).GroupBy(e => e.OrgName).Select(e => e.Key).ToList()
                 })
-                .OrderByDescending(e => e.Qty)
+                .Where(qtyLCondition)
+                .Where(qtyGCondition)
+                .Where(priceGCondition)
+                .Where(priceLCondition)
                 .ToListAsync();
+                return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
             } else
             {
                 items = await _handlerContext.Items
+                .Where(eanCond)
                 .Select(insta => new GetManyItems
                 {
                     Users = insta.OwnedItems
                         .SelectMany(e => e.ItemOwners)
                         .Select(e => e.IdUserNavigation)
-                        .GroupBy(e => new { e.Username, e.Surname })
+                        .GroupBy(e => new { e.IdUser, e.Username, e.Surname })
                         .Select(e => e.Key.Username + " " + e.Key.Surname).ToList(),
                     ItemId = insta.ItemId,
                     ItemName = insta.ItemName,
@@ -298,23 +334,55 @@ namespace database_comunicator.Services
                         .Average(),
                     Sources = insta.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation).GroupBy(e => e.OrgName).Select(e => e.Key).ToList()
                 })
-                .OrderByDescending(e => e.Qty)
+                .Where(qtyLCondition)
+                .Where(qtyGCondition)
+                .Where(priceGCondition)
+                .Where(priceLCondition)
                 .ToListAsync();
+                return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
             }
-                
-            return items;
         }
-        public async Task<IEnumerable<GetManyItems>> GetItems(string currency, string search)
+        public async Task<IEnumerable<GetManyItems>> GetItems(string currency, string search, string? orderBy, string? status, string? ean,
+            int? qtyL, int? qtyG, int? priceL, int? priceG)
         {
             List<GetManyItems> items;
+            Func<GetManyItems, bool> statusCond = SortFilterUtils.GetFilterStatus(status);
+            Expression<Func<Item, bool>> eanCond = ean == null ?
+                e => true
+                : e => e.Eans.Any(x => x.EanValue == ean);
+            Expression<Func<GetManyItems, bool>> qtyLCondition = qtyL == null ?
+                e => true
+                : e => e.Qty <= qtyL;
+            Expression<Func<GetManyItems, bool>> qtyGCondition = qtyG == null ?
+                e => true
+                : e => e.Qty >= qtyG;
+            Expression<Func<GetManyItems, bool>> priceLCondition = priceL == null ?
+                e => true
+                : e => e.PurchasePrice <= priceL;
+            Expression<Func<GetManyItems, bool>> priceGCondition = priceG == null ?
+                e => true
+                : e => e.PurchasePrice >= priceG;
+            bool direction;
+            if (orderBy == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = orderBy.StartsWith("D");
+            }
+            var orderByFunc = SortFilterUtils.GetItemSort(orderBy);
             if (currency == "PLN")
             {
                 items = await _handlerContext.Items
+                    .Where(eanCond)
                     .Where(j => EF.Functions.FreeText(j.PartNumber, search) || EF.Functions.FreeText(j.ItemName, search))
                     .Select(instc => new GetManyItems
                     {
-                        Users = instc.OwnedItems.SelectMany(e => e.ItemOwners).Select(e => e.IdUserNavigation)
-                        .GroupBy(e => new {e.Username, e.Surname})
+                        Users = instc.OwnedItems
+                        .SelectMany(e => e.ItemOwners)
+                        .Select(e => e.IdUserNavigation)
+                        .GroupBy(e => new { e.IdUser, e.Username, e.Surname })
                         .Select(e => e.Key.Username + " " + e.Key.Surname).ToList(),
                         ItemId = instc.ItemId,
                         ItemName = instc.ItemName,
@@ -324,9 +392,21 @@ namespace database_comunicator.Services
                                     .SelectMany(e => e.PurchasePrices)
                                     .Select(e =>
                                         e.Qty
-                                        - e.SellingPrices.Select(d => d.Qty).Sum()
-                                        + e.CreditNoteItems.Select(d => d.Qty).Sum()
                                     )
+                                    .Sum()
+                                    -
+                                    instc.OwnedItems
+                                    .SelectMany(e => e.PurchasePrices)
+                                    .SelectMany(e =>
+                                        e.SellingPrices
+                                    ).Select(e => e.Qty)
+                                    .Sum()
+                                     +
+                                    instc.OwnedItems
+                                    .SelectMany(e => e.PurchasePrices)
+                                    .SelectMany(e =>
+                                        e.CreditNoteItems
+                                    ).Select(e => e.Qty)
                                     .Sum(),
                                 instc.OutsideItems.Select(e => e.Qty).Sum(),
                                 instc.ProformaFutureItems.SelectMany(e => e.Proforma.Deliveries).Any(e => e.DeliveryStatus.StatusName == "In transport")
@@ -336,9 +416,21 @@ namespace database_comunicator.Services
                             .SelectMany(e => e.PurchasePrices)
                             .Select(e =>
                                 e.Qty
-                                - e.SellingPrices.Select(d => d.Qty).Sum()
-                                + e.CreditNoteItems.Select(d => d.Qty).Sum()
                             )
+                            .Sum()
+                            -
+                            instc.OwnedItems
+                            .SelectMany(e => e.PurchasePrices)
+                            .SelectMany(e =>
+                                e.SellingPrices
+                            ).Select(e => e.Qty)
+                            .Sum()
+                             +
+                            instc.OwnedItems
+                            .SelectMany(e => e.PurchasePrices)
+                            .SelectMany(e =>
+                                e.CreditNoteItems
+                            ).Select(e => e.Qty)
                             .Sum(),
                         PurchasePrice = instc.OwnedItems
                             .SelectMany(e => e.PurchasePrices)
@@ -362,16 +454,23 @@ namespace database_comunicator.Services
                             .Average(),
                         Sources = instc.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation).GroupBy(e => e.OrgName).Select(e => e.Key).ToList()
                     })
-                    .OrderByDescending(e => e.Qty)
+                    .Where(qtyLCondition)
+                    .Where(qtyGCondition)
+                    .Where(priceGCondition)
+                    .Where(priceLCondition)
                     .ToListAsync();
+                    return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
             } else
             {
                 items = await _handlerContext.Items
+                    .Where(eanCond)
                     .Where(j => EF.Functions.FreeText(j.PartNumber, search) || EF.Functions.FreeText(j.ItemName, search))
                     .Select(instac => new GetManyItems
                     {
-                        Users = instac.OwnedItems.SelectMany(e => e.ItemOwners).Select(e => e.IdUserNavigation)
-                        .GroupBy(e => new { e.Username, e.Surname })
+                        Users = instac.OwnedItems
+                        .SelectMany(e => e.ItemOwners)
+                        .Select(e => e.IdUserNavigation)
+                        .GroupBy(e => new { e.IdUser, e.Username, e.Surname })
                         .Select(e => e.Key.Username + " " + e.Key.Surname).ToList(),
                         ItemId = instac.ItemId,
                         ItemName = instac.ItemName,
@@ -381,9 +480,21 @@ namespace database_comunicator.Services
                                     .SelectMany(e => e.PurchasePrices)
                                     .Select(e =>
                                         e.Qty
-                                        - e.SellingPrices.Select(d => d.Qty).Sum()
-                                        + e.CreditNoteItems.Select(d => d.Qty).Sum()
                                     )
+                                    .Sum()
+                                    -
+                                    instac.OwnedItems
+                                    .SelectMany(e => e.PurchasePrices)
+                                    .SelectMany(e =>
+                                        e.SellingPrices
+                                    ).Select(e => e.Qty)
+                                    .Sum()
+                                     +
+                                    instac.OwnedItems
+                                    .SelectMany(e => e.PurchasePrices)
+                                    .SelectMany(e =>
+                                        e.CreditNoteItems
+                                    ).Select(e => e.Qty)
                                     .Sum(),
                                 instac.OutsideItems.Select(e => e.Qty).Sum(),
                                 instac.ProformaFutureItems.SelectMany(e => e.Proforma.Deliveries).Any(e => e.DeliveryStatus.StatusName == "In transport")
@@ -393,9 +504,21 @@ namespace database_comunicator.Services
                             .SelectMany(e => e.PurchasePrices)
                             .Select(e =>
                                 e.Qty
-                                - e.SellingPrices.Select(d => d.Qty).Sum()
-                                + e.CreditNoteItems.Select(d => d.Qty).Sum()
                             )
+                            .Sum()
+                            -
+                            instac.OwnedItems
+                            .SelectMany(e => e.PurchasePrices)
+                            .SelectMany(e =>
+                                e.SellingPrices
+                            ).Select(e => e.Qty)
+                            .Sum()
+                             +
+                            instac.OwnedItems
+                            .SelectMany(e => e.PurchasePrices)
+                            .SelectMany(e =>
+                                e.CreditNoteItems
+                            ).Select(e => e.Qty)
                             .Sum(),
                         PurchasePrice = instac.OwnedItems
                             .SelectMany(e => e.PurchasePrices)
@@ -420,17 +543,48 @@ namespace database_comunicator.Services
                             .Average(),
                         Sources = instac.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation).GroupBy(e => e.OrgName).Select(e => e.Key).ToList()
                     })
-                    .OrderByDescending(e => e.Qty)
+                    .Where(qtyLCondition)
+                    .Where(qtyGCondition)
+                    .Where(priceGCondition)
+                    .Where(priceLCondition)
                     .ToListAsync();
+                    return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
             }
-            return items;
         }
-        public async Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId)
+        public async Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId, string? orderBy, string? status, string? ean,
+            int? qtyL, int? qtyG, int? priceL, int? priceG)
         {
             List<GetManyItems> items;
+            Func<GetManyItems, bool> statusCond = SortFilterUtils.GetFilterStatus(status);
+            Expression<Func<Item, bool>> eanCond = ean == null ?
+                e => true
+                : e => e.Eans.Any(x => x.EanValue == ean);
+            Expression<Func<GetManyItems, bool>> qtyLCondition = qtyL == null ?
+                e => true
+                : e => e.Qty <= qtyL;
+            Expression<Func<GetManyItems, bool>> qtyGCondition = qtyG == null ?
+                e => true
+                : e => e.Qty >= qtyG;
+            Expression<Func<GetManyItems, bool>> priceLCondition = priceL == null ?
+                e => true
+                : e => e.PurchasePrice <= priceL;
+            Expression<Func<GetManyItems, bool>> priceGCondition = priceG == null ?
+                e => true
+                : e => e.PurchasePrice >= priceG;
+            bool direction;
+            if (orderBy == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = orderBy.StartsWith("D");
+            }
+            var orderByFunc = SortFilterUtils.GetItemSort(orderBy);
             if (currency == "PLN")
             {
                 items = await _handlerContext.Items
+                    .Where(eanCond)
                     .Select(inst => new GetManyItems
                     {
                         ItemId = inst.ItemId,
@@ -466,11 +620,16 @@ namespace database_comunicator.Services
                             .Average(),
                         Sources = inst.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation).GroupBy(e => e.OrgName).Select(e => e.Key).ToList()
                     })
-                    .OrderByDescending(e => e.Qty)
+                    .Where(qtyLCondition)
+                    .Where(qtyGCondition)
+                    .Where(priceGCondition)
+                    .Where(priceLCondition)
                     .ToListAsync();
+                    return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
             } else
             {
                 items = await _handlerContext.Items
+                    .Where(eanCond)
                     .Select(instace => new GetManyItems
                     {
                         ItemId = instace.ItemId,
@@ -509,17 +668,48 @@ namespace database_comunicator.Services
                             .Average(),
                         Sources = instace.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation).GroupBy(e => e.OrgName).Select(e => e.Key).ToList()
                     })
-                    .OrderByDescending(e => e.Qty)
+                    .Where(qtyLCondition)
+                    .Where(qtyGCondition)
+                    .Where(priceGCondition)
+                    .Where(priceLCondition)
                     .ToListAsync();
+                    return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
             }
-            return items;
         }
-        public async Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId, string search)
+        public async Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId, string search, string? orderBy, string? status, string? ean,
+            int? qtyL, int? qtyG, int? priceL, int? priceG)
         {
             List<GetManyItems> items;
+            Func<GetManyItems, bool> statusCond = SortFilterUtils.GetFilterStatus(status);
+            Expression<Func<Item, bool>> eanCond = ean == null ? 
+                e => true 
+                : e => e.Eans.Any(x => x.EanValue == ean);
+            Expression<Func<GetManyItems, bool>> qtyLCondition = qtyL == null ?
+                e => true
+                : e => e.Qty <= qtyL;
+            Expression<Func<GetManyItems, bool>> qtyGCondition = qtyG == null ?
+                e => true
+                : e => e.Qty >= qtyG;
+            Expression<Func<GetManyItems, bool>> priceLCondition = priceL == null ?
+                e => true
+                : e => e.PurchasePrice <= priceL;
+            Expression<Func<GetManyItems, bool>> priceGCondition = priceG == null ?
+                e => true
+                : e => e.PurchasePrice >= priceG;
+            bool direction;
+            if (orderBy == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = orderBy.StartsWith("D");
+            }
+            var orderByFunc = SortFilterUtils.GetItemSort(orderBy);
             if (currency == "PLN")
             {
                 items = await _handlerContext.Items
+                    .Where(eanCond)
                     .Where(j => EF.Functions.FreeText(j.PartNumber, search) || EF.Functions.FreeText(j.ItemName, search))
                     .Where(e => e.OwnedItems.SelectMany(d => d.ItemOwners).Any(x => x.IdUser == userId))
                     .Select(obj => new GetManyItems
@@ -560,11 +750,16 @@ namespace database_comunicator.Services
                             .Average(),
                         Sources = obj.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation).GroupBy(e => e.OrgName).Select(e => e.Key).ToList()
                     })
-                    .OrderByDescending(e => e.Qty)
+                    .Where(qtyLCondition)
+                    .Where(qtyGCondition)
+                    .Where(priceGCondition)
+                    .Where(priceLCondition)
                     .ToListAsync();
+                    return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
             } else
             {
                 items = await _handlerContext.Items
+                    .Where(eanCond)
                     .Where(j => EF.Functions.FreeText(j.PartNumber, search) || EF.Functions.FreeText(j.ItemName, search))
                     .Where(e => e.OwnedItems.SelectMany(d => d.ItemOwners).Any(x => x.IdUser == userId))
                     .Select(objs => new GetManyItems
@@ -605,11 +800,13 @@ namespace database_comunicator.Services
                             .Average(),
                         Sources = objs.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation).GroupBy(e => e.OrgName).Select(e => e.Key).ToList()
                     })
-                    .OrderByDescending(e => e.Qty)
+                    .Where(qtyLCondition)
+                    .Where(qtyGCondition)
+                    .Where(priceGCondition)
+                    .Where(priceLCondition)
                     .ToListAsync();
+                    return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
             }
-
-            return items;
         }
 
         public async Task<bool> ItemExist(int id)
