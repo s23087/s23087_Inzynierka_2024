@@ -83,8 +83,8 @@ export default async function createProforma(
   let proformaData = {
     isYourProforma: isYourProforma,
     proformaNumber: proformaNumber,
-    sellerId: parseInt(seller),
-    buyerId: orgs.userOrgId,
+    sellerId: isYourProforma ? parseInt(seller) : orgs.userOrgId,
+    buyerId: isYourProforma ? orgs.userOrgId : parseInt(seller),
     date: formData.get("date"),
     transportCost: parseFloat(transport),
     note: formData.get("description") ? formData.get("description") : "",

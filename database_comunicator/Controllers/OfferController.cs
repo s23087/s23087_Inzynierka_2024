@@ -53,16 +53,19 @@ namespace database_comunicator.Controllers
         }
         [HttpGet]
         [Route("get/{userId}")]
-        public async Task<IActionResult> GetYoursProformas(int userId, string? search, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG)
+        public async Task<IActionResult> GetYoursProformas(int userId, string? search, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG, 
+            string? createdL, string? createdG, string? modifiedL, string? modifiedG)
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("User not found.");
             if (search != null)
             {
-                var sResult = await _offerServices.GetPriceLists(userId, search, sort, status: status, currency: currency, type: type, totalL, totalG);
+                var sResult = await _offerServices.GetPriceLists(userId, search, sort, status: status, currency: currency, type: type, totalL, totalG, 
+                    createdL, createdG, modifiedL, modifiedG);
                 return Ok(sResult);
             }
-            var result = await _offerServices.GetPriceLists(userId, sort: sort, status: status, currency: currency, type: type, totalL, totalG);
+            var result = await _offerServices.GetPriceLists(userId, sort: sort, status: status, currency: currency, type: type, totalL, totalG, 
+                createdL, createdG, modifiedL, modifiedG);
             return Ok(result);
         }
         [HttpDelete]

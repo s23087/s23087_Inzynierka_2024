@@ -13,12 +13,25 @@ export default async function PricelistPage({ searchParams }) {
   const current_role = await getRole();
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
+  let createdL = searchParams.createdL;
+  let createdG = searchParams.createdG;
+  let modifiedL = searchParams.modifiedL;
+  let modifiedG = searchParams.modifiedG;
   let totalL = searchParams.totalL;
   let totalG = searchParams.totalG;
   let status = searchParams.status;
   let currency = searchParams.currency;
   let type = searchParams.type;
-  let filterActivated = totalL || totalG || status || currency || type;
+  let filterActivated =
+    totalL ||
+    totalG ||
+    status ||
+    currency ||
+    type ||
+    createdL ||
+    createdG ||
+    modifiedL ||
+    modifiedG;
   let currentSort = searchParams.orderBy ?? ".None";
   let isSearchTrue = searchParams.searchQuery !== undefined;
   let pricelists = isSearchTrue
@@ -30,8 +43,23 @@ export default async function PricelistPage({ searchParams }) {
         status,
         currency,
         type,
+        createdL,
+        createdG,
+        modifiedL,
+        modifiedG,
       )
-    : await getPricelists(currentSort, totalL, totalG, status, currency, type);
+    : await getPricelists(
+        currentSort,
+        totalL,
+        totalG,
+        status,
+        currency,
+        type,
+        createdL,
+        createdG,
+        modifiedL,
+        modifiedG,
+      );
   let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
   let itemsLength = pricelists === null ? 0 : pricelists.length;
   let pageQty = Math.ceil(itemsLength / maxInstanceOnPage);
@@ -56,7 +84,7 @@ export default async function PricelistPage({ searchParams }) {
           pricelist={pricelists}
           pricelistStart={pricelistsStart}
           pricelistEnd={pricelistsEnd}
-          filterActivated={filterActivated}
+          filterActive={filterActivated}
           currentSort={currentSort}
         />
       </section>

@@ -10,6 +10,10 @@ export default async function getPricelists(
   status,
   currency,
   type,
+  createdL,
+  createdG,
+  modifiedL,
+  modifiedG,
 ) {
   const dbName = await getDbName();
   const userId = await getUserId();
@@ -20,6 +24,10 @@ export default async function getPricelists(
   if (status) params.push(`status=${status}`);
   if (currency) params.push(`currency=${currency}`);
   if (type) params.push(`type=${type}`);
+  if (createdL) params.push(`createdL=${createdL}`);
+  if (createdG) params.push(`createdG=${createdG}`);
+  if (modifiedL) params.push(`modifiedL=${modifiedL}`);
+  if (modifiedG) params.push(`modifiedG=${modifiedG}`);
   let url = `${process.env.API_DEST}/${dbName}/Offer/get/${userId}${params.length > 0 ? "?" : ""}${params.join("&")}`;
   try {
     const info = await fetch(url, {

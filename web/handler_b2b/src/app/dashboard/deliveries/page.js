@@ -15,6 +15,25 @@ export default async function DeliveriesPage({ searchParams }) {
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
   const is_org_switch_needed = current_role == "Admin";
+  let currentSort = searchParams.orderBy ?? ".None";
+  let estimatedL = searchParams.estimatedL;
+  let estimatedG = searchParams.estimatedG;
+  let deliveredL = searchParams.deliveredL;
+  let deliveredG = searchParams.deliveredG;
+  let recipient = searchParams.recipient;
+  let status = searchParams.status;
+  let company = searchParams.company;
+  let waybill = searchParams.waybill;
+  let filterActivated =
+    searchParams.orderBy ||
+    estimatedL ||
+    estimatedG ||
+    deliveredL ||
+    deliveredG ||
+    recipient ||
+    status ||
+    company ||
+    waybill;
   let type = searchParams.deliveryType
     ? searchParams.deliveryType
     : "Deliveries to user";
@@ -27,10 +46,32 @@ export default async function DeliveriesPage({ searchParams }) {
         org_view,
         type === "Deliveries to user",
         searchParams.searchQuery,
+        currentSort,
+        estimatedL,
+        estimatedG,
+        deliveredL,
+        deliveredG,
+        recipient,
+        status,
+        company,
+        waybill,
       )
-    : await getDeliveries(org_view, type === "Deliveries to user");
+    : await getDeliveries(
+        org_view,
+        type === "Deliveries to user",
+        currentSort,
+        estimatedL,
+        estimatedG,
+        deliveredL,
+        deliveredG,
+        recipient,
+        status,
+        company,
+        waybill,
+      );
+  let deliveriesLength = deliveries ? deliveries.length : 0;
   let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
-  let pageQty = Math.ceil(deliveries.length / maxInstanceOnPage);
+  let pageQty = Math.ceil(deliveriesLength / maxInstanceOnPage);
   pageQty = pageQty === 0 ? 1 : pageQty;
   let currentPage = parseInt(searchParams.page)
     ? parseInt(searchParams.page)
@@ -57,6 +98,8 @@ export default async function DeliveriesPage({ searchParams }) {
           orgView={org_view}
           deliveriesEnd={deliveriesEnd}
           deliveriesStart={deliveriesStart}
+          currentSort={currentSort}
+          filterActive={filterActivated}
         />
       </section>
 

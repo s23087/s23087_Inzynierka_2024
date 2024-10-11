@@ -29,7 +29,14 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
         setChoosenUser(data[0].idUser);
       });
       const orgs = getOrgsList();
-      orgs.then((data) => setOrgs(data));
+      orgs.then((data) => {
+        setOrgs(
+          data ?? {
+            orgName: "",
+            restOrgs: [],
+          },
+        );
+      });
       const taxes = getTaxes();
       taxes.then((data) => setTaxes(data));
       const paymentMethods = getPaymentMethods();

@@ -23,54 +23,58 @@ namespace database_comunicator.Controllers
         }
         [HttpGet]
         [Route("get/user/{userId}")]
-        public async Task<IActionResult> GetToUserDeliveries(int userId, string? search)
+        public async Task<IActionResult> GetToUserDeliveries(int userId, string? search, string? sort,
+            string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill)
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("User not found.");
             if (search != null)
             {
-                var sResult = await _deliveryService.GetDeliveries(true, userId, search);
+                var sResult = await _deliveryService.GetDeliveries(true, userId, search, sort: sort, estimatedL, estimatedG, deliveredL, deliveredG, recipient, status, company, waybill);
                 return Ok(sResult);
             }
-            var result = await _deliveryService.GetDeliveries(true, userId);
+            var result = await _deliveryService.GetDeliveries(true, userId, sort: sort, estimatedL, estimatedG, deliveredL, deliveredG, recipient, status, company, waybill);
             return Ok(result);
         }
         [HttpGet]
         [Route("get/user")]
-        public async Task<IActionResult> GetToUserDeliveries(string? search)
+        public async Task<IActionResult> GetToUserDeliveries(string? search, string? sort,
+            string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill)
         {
             if (search != null)
             {
-                var sResult = await _deliveryService.GetDeliveries(true, search);
+                var sResult = await _deliveryService.GetDeliveries(true, search, sort: sort, estimatedL, estimatedG, deliveredL, deliveredG, recipient, status, company, waybill);
                 return Ok(sResult);
             }
-            var result = await _deliveryService.GetDeliveries(true);
+            var result = await _deliveryService.GetDeliveries(true, sort: sort, estimatedL, estimatedG, deliveredL, deliveredG, recipient, status, company, waybill);
             return Ok(result);
         }
         [HttpGet]
         [Route("get/client/{userId}")]
-        public async Task<IActionResult> GetClientProformas(int userId, string? search)
+        public async Task<IActionResult> GetClientDeliveries(int userId, string? search, string? sort,
+            string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill)
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("User not found.");
             if (search != null)
             {
-                var sResult = await _deliveryService.GetDeliveries(false, userId, search);
+                var sResult = await _deliveryService.GetDeliveries(false, userId, search, sort: sort, estimatedL, estimatedG, deliveredL, deliveredG, recipient, status, company, waybill);
                 return Ok(sResult);
             }
-            var result = await _deliveryService.GetDeliveries(false, userId);
+            var result = await _deliveryService.GetDeliveries(false, userId, sort: sort, estimatedL, estimatedG, deliveredL, deliveredG, recipient, status, company, waybill);
             return Ok(result);
         }
         [HttpGet]
         [Route("get/client")]
-        public async Task<IActionResult> GetClientProformas(string? search)
+        public async Task<IActionResult> GetClientDeliveries(string? search, string? sort,
+            string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill)
         {
             if (search != null)
             {
-                var sResult = await _deliveryService.GetDeliveries(false, search);
+                var sResult = await _deliveryService.GetDeliveries(false, search, sort: sort, estimatedL, estimatedG, deliveredL, deliveredG, recipient, status, company, waybill);
                 return Ok(sResult);
             }
-            var result = await _deliveryService.GetDeliveries(false);
+            var result = await _deliveryService.GetDeliveries(false, sort: sort, estimatedL, estimatedG, deliveredL, deliveredG, recipient, status, company, waybill);
             return Ok(result);
         }
         [HttpPost]
@@ -107,6 +111,13 @@ namespace database_comunicator.Controllers
         public async Task<IActionResult> GetDeliveryCompanies()
         {
             var result = await _deliveryService.GetDeliveryCompanies();
+            return Ok(result);
+        }
+        [HttpGet]
+        [Route("get/delivery_statuses")]
+        public async Task<IActionResult> GetDeliveryStatuses()
+        {
+            var result = await _deliveryService.GetDeliveryStatuses();
             return Ok(result);
         }
         [HttpGet]

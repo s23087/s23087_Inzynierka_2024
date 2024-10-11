@@ -15,14 +15,22 @@ export default async function ClientsPage({ searchParams }) {
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
   const is_org_switch_needed = current_role == "Admin";
+  let currentSort = searchParams.orderBy ?? ".None";
+  let country = searchParams.country;
+  let filterActivated = searchParams.orderBy || country;
   let orgActivated =
     searchParams.isOrg !== undefined ? searchParams.isOrg : false;
   let org_view = getOrgView(current_role, orgActivated === "true");
   let isSearchTrue =
     searchParams.searchQuery !== undefined && searchParams.searchQuery !== "";
   let clients = isSearchTrue
-    ? await getSearchClients(org_view, searchParams.searchQuery)
-    : await getClients(org_view);
+    ? await getSearchClients(
+        org_view,
+        searchParams.searchQuery,
+        currentSort,
+        country,
+      )
+    : await getClients(org_view, currentSort, country);
   let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
   let pageQty = Math.ceil(clients.length / maxInstanceOnPage);
   pageQty = pageQty === 0 ? 1 : pageQty;
@@ -49,6 +57,8 @@ export default async function ClientsPage({ searchParams }) {
           orgView={org_view}
           clientsEnd={clientEnd}
           clientsStart={clientStart}
+          filterActive={filterActivated}
+          currentSort={currentSort}
         />
       </section>
 

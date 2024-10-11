@@ -1,9 +1,11 @@
 ﻿using database_comunicator.Data;
 using database_comunicator.Models;
 using database_comunicator.Models.DTOs;
+using database_comunicator.Utils;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Cryptography;
 
 namespace database_comunicator.Services
@@ -15,10 +17,10 @@ namespace database_comunicator.Services
         public Task<bool> CountryExist(string countryName);
         public Task<GetOrg> GetOrg(int orgId);
         public Task ModifyOrg(ModifyOrg data);
-        public Task<IEnumerable<GetClient>> GetClients(int userOrgId);
-        public Task<IEnumerable<GetClient>> GetClients(int userOrgId, string search);
-        public Task<IEnumerable<GetOrgClient>> GetOrgClients(int userOrgId);
-        public Task<IEnumerable<GetOrgClient>> GetOrgClients(int userOrgId, string search);
+        public Task<IEnumerable<GetClient>> GetClients(int userOrgId, string? sort, int? country);
+        public Task<IEnumerable<GetClient>> GetClients(int userOrgId, string search, string? sort, int? country);
+        public Task<IEnumerable<GetOrgClient>> GetOrgClients(int userOrgId, string? sort, int? country);
+        public Task<IEnumerable<GetOrgClient>> GetOrgClients(int userOrgId, string search, string? sort, int? country);
         public Task<GetClientRestInfo> GetClientsRestInfo(int orgId);
         public Task SetClientAvailabilityStatus(int orgId, int statusId);
         public Task<bool> SetClientUserBindings(SetUserClientBindings data);
@@ -125,10 +127,24 @@ namespace database_comunicator.Services
 
             await _handlerContext.SaveChangesAsync();
         }
-        public async Task<IEnumerable<GetClient>> GetClients(int userOrgId)
+        public async Task<IEnumerable<GetClient>> GetClients(int userOrgId, string? sort, int? country)
         {
+            var sortFunc = SortFilterUtils.GetClientSort(sort);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Organization, bool>> countryCond = country == null ?
+                e => true
+                : e => e.CountryId == country;
             return await _handlerContext.Organizations.Where(d => d.OrganizationId != userOrgId)
-                .Include(d => d.Country)
+                .Where(countryCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(d => new GetClient
                 {
                     ClientId = d.OrganizationId,
@@ -141,11 +157,25 @@ namespace database_comunicator.Services
 
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetClient>> GetClients(int userOrgId, string search)
+        public async Task<IEnumerable<GetClient>> GetClients(int userOrgId, string search, string? sort, int? country)
         {
+            var sortFunc = SortFilterUtils.GetClientSort(sort);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Organization, bool>> countryCond = country == null ?
+                e => true
+                : e => e.CountryId == country;
             return await _handlerContext.Organizations.Where(e => e.OrganizationId != userOrgId)
                 .Where(e => EF.Functions.FreeText(e.OrgName, search) || EF.Functions.FreeText(e.Street, search) || EF.Functions.FreeText(e.City, search))
-                .Include(e => e.Country)
+                .Where(countryCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(e => new GetClient
                 {
                     ClientId = e.OrganizationId,
@@ -158,11 +188,25 @@ namespace database_comunicator.Services
 
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetOrgClient>> GetOrgClients(int userOrgId)
+        public async Task<IEnumerable<GetOrgClient>> GetOrgClients(int userOrgId, string? sort, int? country)
         {
+            var sortFunc = SortFilterUtils.GetClientSort(sort);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Organization, bool>> countryCond = country == null ?
+                e => true
+                : e => e.CountryId == country;
             return await _handlerContext.Organizations
                 .Where(e => e.OrganizationId != userOrgId)
-                .Include(e => e.AppUsers)
+                .Where(countryCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(e => new GetOrgClient
                 {
                     ClientId = e.OrganizationId,
@@ -175,12 +219,26 @@ namespace database_comunicator.Services
                     Country = e.Country.CountryName
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetOrgClient>> GetOrgClients(int userOrgId, string search)
+        public async Task<IEnumerable<GetOrgClient>> GetOrgClients(int userOrgId, string search, string? sort, int? country)
         {
+            var sortFunc = SortFilterUtils.GetClientSort(sort);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Organization, bool>> countryCond = country == null ?
+                e => true
+                : e => e.CountryId == country;
             return await _handlerContext.Organizations
                 .Where(d => d.OrganizationId != userOrgId)
                 .Where(d => EF.Functions.FreeText(d.OrgName, search) || EF.Functions.FreeText(d.Street, search) || EF.Functions.FreeText(d.City, search))
-                .Include(d => d.AppUsers)
+                .Where(countryCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(d => new GetOrgClient
                 {
                     ClientId = d.OrganizationId,

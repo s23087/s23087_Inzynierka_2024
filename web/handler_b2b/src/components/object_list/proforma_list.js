@@ -15,6 +15,7 @@ import AddProformaOffcanvas from "../offcanvas/create/create_proforma";
 import ViewProformaOffcanvas from "../offcanvas/view/view_proforma";
 import deleteProforma from "@/utils/proformas/delete_proforma";
 import ModifyProformaOffcanvas from "../offcanvas/modify/modify_proforma";
+import ProformaFilterOffcanvas from "../filter/proforma_filter";
 
 function ProformaList({
   proformas,
@@ -58,6 +59,8 @@ function ProformaList({
   // Seleted
   const [selectedQty, setSelectedQty] = useState(0);
   const [selectedProforma] = useState([]);
+  // Filter
+  const [showFilter, setShowFilter] = useState(false);
   // Nav
   const router = useRouter();
   const params = useSearchParams();
@@ -66,23 +69,36 @@ function ProformaList({
   };
   return (
     <Container className="p-0 middleSectionPlacement position-relative" fluid>
+      <ProformaFilterOffcanvas
+        showOffcanvas={showFilter}
+        hideFunction={() => setShowFilter(false)}
+        currentSort={currentSort}
+        currentDirection={
+          currentSort.startsWith("A") || currentSort.startsWith(".")
+        }
+      />
       <Container
         className="fixed-top middleSectionPlacement-no-footer p-0"
         fluid
       >
         <SearchFilterBar
-          filter_icon_bool="false"
+          filter_icon_bool={filterActive}
           moreButtonAction={() => setShowMoreAction(true)}
+          filterAction={() => setShowFilter(true)}
         />
       </Container>
       <SelectComponent selectedQty={selectedQty} />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
-      {Object.keys(proformas).length === 0 ? (
+      {Object.keys(proformas ?? []).length === 0 ? (
         <Container className="text-center" fluid>
-          <p className="mt-5 pt-5 blue-main-text h2">Proformas not found :/</p>
+          <p className="mt-5 pt-5 blue-main-text h2">
+            {proformas
+              ? "Proformas not found :/"
+              : "Could not connect to server."}
+          </p>
         </Container>
       ) : (
-        Object.values(proformas)
+        Object.values(proformas ?? [])
           .slice(proformasStart, proformasEnd)
           .map((value) => {
             return (

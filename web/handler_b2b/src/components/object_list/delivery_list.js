@@ -15,6 +15,7 @@ import AddDeliveryOffcanvas from "../offcanvas/create/create_delivery";
 import deleteDelivery from "@/utils/deliveries/delete_delivery";
 import ViewDeliveryOffcanvas from "../offcanvas/view/view_delivery";
 import ModifyDeliveryOffcanvas from "../offcanvas/modify/modify_delivery";
+import DeliveryFilterOffcanvas from "../filter/delivery_filter";
 
 function DeliveryList({
   deliveries,
@@ -22,6 +23,8 @@ function DeliveryList({
   orgView,
   deliveriesStart,
   deliveriesEnd,
+  filterActive,
+  currentSort,
 }) {
   // View delivery
   const [showViewDelivery, setShowViewDelivery] = useState(false);
@@ -57,6 +60,8 @@ function DeliveryList({
   // Seleted
   const [selectedQty, setSelectedQty] = useState(0);
   const [selectedDelivery] = useState([]);
+  // Filter
+  const [showFilter, setShowFilter] = useState(false);
   // Nav
   const router = useRouter();
   const params = useSearchParams();
@@ -65,23 +70,36 @@ function DeliveryList({
   };
   return (
     <Container className="p-0 middleSectionPlacement position-relative" fluid>
+      <DeliveryFilterOffcanvas
+        showOffcanvas={showFilter}
+        hideFunction={() => setShowFilter(false)}
+        currentSort={currentSort}
+        currentDirection={
+          currentSort.startsWith("A") || currentSort.startsWith(".")
+        }
+      />
       <Container
         className="fixed-top middleSectionPlacement-no-footer p-0"
         fluid
       >
         <SearchFilterBar
-          filter_icon_bool="false"
+          filter_icon_bool={filterActive}
           moreButtonAction={() => setShowMoreAction(true)}
+          filterAction={() => setShowFilter(true)}
         />
       </Container>
       <SelectComponent selectedQty={selectedQty} />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
-      {Object.keys(deliveries).length === 0 ? (
+      {Object.keys(deliveries ?? []).length === 0 ? (
         <Container className="text-center" fluid>
-          <p className="mt-5 pt-5 blue-main-text h2">Deliveries not found :/</p>
+          <p className="mt-5 pt-5 blue-main-text h2">
+            {deliveries
+              ? "Deliveries not found :/"
+              : "Could not connect to server."}
+          </p>
         </Container>
       ) : (
-        Object.values(deliveries)
+        Object.values(deliveries ?? [])
           .slice(deliveriesStart, deliveriesEnd)
           .map((value) => {
             return (
@@ -200,6 +218,8 @@ DeliveryList.PropTypes = {
   orgView: PropTypes.bool.isRequired,
   deliveriesStart: PropTypes.number.isRequired,
   deliveriesEnd: PropTypes.number.isRequired,
+  filterActive: PropTypes.bool.isRequired,
+  currentSort: PropTypes.string.isRequired,
 };
 
 export default DeliveryList;

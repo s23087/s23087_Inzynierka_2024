@@ -28,6 +28,71 @@ namespace database_comunicator.Utils
                 return orderBy;
             }
         }
+        public static Expression<Func<Delivery, Object>> GetDeliverySort(string? sort, bool isDeliveryToUser)
+        {
+            Expression<Func<Delivery, Object>> orderBy;
+            if (sort == null)
+            {
+                orderBy = e => e.DeliveryId;
+                return orderBy;
+            }
+            else
+            {
+                var changedSort = sort[1..];
+                orderBy = changedSort switch
+                {
+                    "Id" => e => e.DeliveryId,
+                    "Estimated" => e => e.EstimatedDeliveryDate,
+                    "Recipient" => e => isDeliveryToUser ? e.Proforma.SellerNavigation.OrgName : e.Proforma.BuyerNavigation.OrgName,
+                    "Proforma_Number" => e => e.Proforma.ProformaNumber,
+                    _ => e => e.DeliveryId,
+                };
+                return orderBy;
+            }
+        }
+        public static Expression<Func<Organization, Object>> GetClientSort(string? sort)
+        {
+            Expression<Func<Organization, Object>> orderBy;
+            if (sort == null)
+            {
+                orderBy = e => e.OrganizationId;
+                return orderBy;
+            }
+            else
+            {
+                var changedSort = sort[1..];
+                orderBy = changedSort switch
+                {
+                    "Name" => e => e.OrgName,
+                    "Country" => e => e.Country.CountryName,
+                    _ => e => e.OrganizationId,
+                };
+                return orderBy;
+            }
+        }
+        public static Expression<Func<Proforma, Object>> GetProformaSort(string? sort, bool isYourProforma)
+        {
+            Expression<Func<Proforma, Object>> orderBy;
+            if (sort == null)
+            {
+                orderBy = e => e.ProformaId;
+                return orderBy;
+            }
+            else
+            {
+                var changedSort = sort[1..];
+                orderBy = changedSort switch
+                {
+                    "Number" => e => e.ProformaNumber,
+                    "Date" => e => e.ProformaDate,
+                    "Recipient" => e => isYourProforma ? e.SellerNavigation.OrgName : e.BuyerNavigation.OrgName,
+                    "Qty" => e => isYourProforma ?  e.ProformaFutureItems.Count : e.ProformaOwnedItems.Count,
+                    "Total" => e => isYourProforma ? e.ProformaFutureItems.Select(d => d.PurchasePrice).Sum() : e.ProformaOwnedItems.Select(d => d.SellingPrice).Sum(),
+                    _ => e => e.ProformaId,
+                };
+                return orderBy;
+            }
+        }
         public static Expression<Func<Offer, Object>> GetPricelistSort(string? sort)
         {
             Expression<Func<Offer, Object>> orderBy;

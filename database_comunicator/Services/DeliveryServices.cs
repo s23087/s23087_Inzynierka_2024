@@ -1,7 +1,11 @@
 ﻿using database_comunicator.Data;
 using database_comunicator.Models;
 using database_comunicator.Models.DTOs;
+using database_comunicator.Utils;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Metrics;
+using System.Linq.Expressions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace database_comunicator.Services
@@ -13,11 +17,16 @@ namespace database_comunicator.Services
         public Task<int> AddDelivery(AddDelivery data);
         public Task<bool> DeliveryProformaExist(int proformaId);
         public Task<bool> DeliveryExist(int deliveryId);
-        public Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser);
-        public Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, int userId);
-        public Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, string search);
-        public Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, int userId, string search);
+        public Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, string? sort,
+            string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill);
+        public Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, int userId, string? sort,
+            string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill);
+        public Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, string search, string? sort,
+            string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill);
+        public Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, int userId, string search, string? sort,
+            string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill);
         public Task<IEnumerable<GetDeliveryCompany>> GetDeliveryCompanies();
+        public Task<IEnumerable<GetDeliveryStatus>> GetDeliveryStatuses();
         public Task<IEnumerable<GetProformaList>> GetProformaListWithoutDelivery(bool IsDeliveryToUser, int userId);
         public Task<bool> DeleteDelivery(int deliveryId);
         public Task<int> GetDeliveryOwnerId(int deliveryId);
@@ -98,10 +107,61 @@ namespace database_comunicator.Services
         {
             return await _handlerContext.Deliveries.AnyAsync(x => x.DeliveryId == deliveryId);
         }
-        public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser)
+        public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, string? sort,
+            string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill)
         {
+            var sortFunc = SortFilterUtils.GetDeliverySort(sort, IsDeliveryToUser);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Delivery, bool>> estimatedLCond = estimatedL == null ?
+                e => true
+                : e => e.EstimatedDeliveryDate <= DateTime.Parse(estimatedL);
+
+            Expression<Func<Delivery, bool>> estimatedGCond = estimatedG == null ?
+                e => true
+                : e => e.EstimatedDeliveryDate >= DateTime.Parse(estimatedG);
+
+            Expression<Func<Delivery, bool>> deliveredLCond = deliveredL == null ?
+                e => true
+                : e => e.DeliveryDate <= DateTime.Parse(deliveredL);
+
+            Expression<Func<Delivery, bool>> deliveredGCond = deliveredG == null ?
+                e => true
+                : e => e.DeliveryDate >= DateTime.Parse(deliveredG);
+
+            Expression<Func<Delivery, bool>> recipientCond = recipient == null ?
+                e => true
+                : e => IsDeliveryToUser ? e.Proforma.Seller == recipient : e.Proforma.Buyer == recipient;
+
+            Expression<Func<Delivery, bool>> statusCond = status == null ?
+                e => true
+                : e => e.DeliveryStatusId == status;
+
+            Expression<Func<Delivery, bool>> companyCond = company == null ?
+                e => true
+                : e => e.DeliveryCompanyId == company;
+
+            Expression<Func<Delivery, bool>> waybillCond = waybill == null ?
+                e => true
+                : e => e.Waybills.Any(x => x.WaybillValue == waybill);
             return await _handlerContext.Deliveries
                 .Where(e => IsDeliveryToUser ? e.Proforma.ProformaFutureItems.Any() : e.Proforma.ProformaOwnedItems.Any())
+                .Where(estimatedLCond)
+                .Where(estimatedGCond)
+                .Where(deliveredLCond)
+                .Where(deliveredGCond)
+                .Where(recipientCond)
+                .Where(statusCond)
+                .Where(companyCond)
+                .Where(waybillCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(e => new GetDelivery
                 {
                     User = e.Proforma.User.Username + " " + e.Proforma.User.Surname,
@@ -115,11 +175,62 @@ namespace database_comunicator.Services
                     Delivered = e.DeliveryDate
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, int userId)
+        public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, int userId, string? sort,
+            string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill)
         {
+            var sortFunc = SortFilterUtils.GetDeliverySort(sort, IsDeliveryToUser);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Delivery, bool>> estimatedLCond = estimatedL == null ?
+                e => true
+                : e => e.EstimatedDeliveryDate <= DateTime.Parse(estimatedL);
+
+            Expression<Func<Delivery, bool>> estimatedGCond = estimatedG == null ?
+                e => true
+                : e => e.EstimatedDeliveryDate >= DateTime.Parse(estimatedG);
+
+            Expression<Func<Delivery, bool>> deliveredLCond = deliveredL == null ?
+                e => true
+                : e => e.DeliveryDate <= DateTime.Parse(deliveredL);
+
+            Expression<Func<Delivery, bool>> deliveredGCond = deliveredG == null ?
+                e => true
+                : e => e.DeliveryDate >= DateTime.Parse(deliveredG);
+
+            Expression<Func<Delivery, bool>> recipientCond = recipient == null ?
+                e => true
+                : e => IsDeliveryToUser ? e.Proforma.Seller == recipient : e.Proforma.Buyer == recipient;
+
+            Expression<Func<Delivery, bool>> statusCond = status == null ?
+            e => true
+            : e => e.DeliveryStatusId == status;
+
+            Expression<Func<Delivery, bool>> companyCond = company == null ?
+                e => true
+                : e => e.DeliveryCompanyId == company;
+
+            Expression<Func<Delivery, bool>> waybillCond = waybill == null ?
+                e => true
+                : e => e.Waybills.Any(x => x.WaybillValue == waybill);
             return await _handlerContext.Deliveries
                 .Where(e => IsDeliveryToUser ? e.Proforma.ProformaFutureItems.Any() : e.Proforma.ProformaOwnedItems.Any())
                 .Where(e => e.Proforma.UserId == userId)
+                .Where(estimatedLCond)
+                .Where(estimatedGCond)
+                .Where(deliveredLCond)
+                .Where(deliveredGCond)
+                .Where(recipientCond)
+                .Where(statusCond)
+                .Where(companyCond)
+                .Where(waybillCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(obj => new GetDelivery
                 {
                     DeliveryId = obj.DeliveryId,
@@ -132,11 +243,62 @@ namespace database_comunicator.Services
                     Delivered = obj.DeliveryDate
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, string search)
+        public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, string search, string? sort,
+            string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill)
         {
+            var sortFunc = SortFilterUtils.GetDeliverySort(sort, IsDeliveryToUser);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Delivery, bool>> estimatedLCond = estimatedL == null ?
+                e => true
+                : e => e.EstimatedDeliveryDate <= DateTime.Parse(estimatedL);
+
+            Expression<Func<Delivery, bool>> estimatedGCond = estimatedG == null ?
+                e => true
+                : e => e.EstimatedDeliveryDate >= DateTime.Parse(estimatedG);
+
+            Expression<Func<Delivery, bool>> deliveredLCond = deliveredL == null ?
+                e => true
+                : e => e.DeliveryDate <= DateTime.Parse(deliveredL);
+
+            Expression<Func<Delivery, bool>> deliveredGCond = deliveredG == null ?
+                e => true
+                : e => e.DeliveryDate >= DateTime.Parse(deliveredG);
+
+            Expression<Func<Delivery, bool>> recipientCond = recipient == null ?
+                e => true
+                : e => IsDeliveryToUser ? e.Proforma.Seller == recipient : e.Proforma.Buyer == recipient;
+
+            Expression<Func<Delivery, bool>> statusCond = status == null ?
+                e => true
+                : e => e.DeliveryStatusId == status;
+
+            Expression<Func<Delivery, bool>> companyCond = company == null ?
+                e => true
+                : e => e.DeliveryCompanyId == company;
+
+            Expression<Func<Delivery, bool>> waybillCond = waybill == null ?
+                e => true
+                : e => e.Waybills.Any(x => x.WaybillValue == waybill);
             return await _handlerContext.Deliveries
                 .Where(e => IsDeliveryToUser ? e.Proforma.ProformaFutureItems.Any() : e.Proforma.ProformaOwnedItems.Any())
                 .Where(e => e.Proforma.ProformaNumber.ToLower().Contains(search.ToLower()) || search.Contains((char)e.DeliveryId))
+                .Where(estimatedLCond)
+                .Where(estimatedGCond)
+                .Where(deliveredLCond)
+                .Where(deliveredGCond)
+                .Where(recipientCond)
+                .Where(statusCond)
+                .Where(companyCond)
+                .Where(waybillCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(ent => new GetDelivery
                 {
                     User = ent.Proforma.User.Username + " " + ent.Proforma.User.Surname,
@@ -150,12 +312,63 @@ namespace database_comunicator.Services
                     Delivered = ent.DeliveryDate
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, int userId, string search)
+        public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, int userId, string search, string? sort,
+            string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill)
         {
+            var sortFunc = SortFilterUtils.GetDeliverySort(sort, IsDeliveryToUser);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Delivery, bool>> estimatedLCond = estimatedL == null ?
+                e => true
+                : e => e.EstimatedDeliveryDate <= DateTime.Parse(estimatedL);
+
+            Expression<Func<Delivery, bool>> estimatedGCond = estimatedG == null ?
+                e => true
+                : e => e.EstimatedDeliveryDate >= DateTime.Parse(estimatedG);
+
+            Expression<Func<Delivery, bool>> deliveredLCond = deliveredL == null ?
+                e => true
+                : e => e.DeliveryDate <= DateTime.Parse(deliveredL);
+
+            Expression<Func<Delivery, bool>> deliveredGCond = deliveredG == null ?
+                e => true
+                : e => e.DeliveryDate >= DateTime.Parse(deliveredG);
+
+            Expression<Func<Delivery, bool>> recipientCond = recipient == null ?
+                e => true
+                : e => IsDeliveryToUser ? e.Proforma.Seller == recipient : e.Proforma.Buyer == recipient;
+
+            Expression<Func<Delivery, bool>> statusCond = status == null ?
+                e => true
+                : e => e.DeliveryStatusId == status;
+
+            Expression<Func<Delivery, bool>> companyCond = company == null ?
+                e => true
+                : e => e.DeliveryCompanyId == company;
+
+            Expression<Func<Delivery, bool>> waybillCond = waybill == null ?
+                e => true
+                : e => e.Waybills.Any(x => x.WaybillValue == waybill);
             return await _handlerContext.Deliveries
                 .Where(e => IsDeliveryToUser ? e.Proforma.ProformaFutureItems.Any() : e.Proforma.ProformaOwnedItems.Any())
                 .Where(e => e.Proforma.UserId == userId)
                 .Where(e => e.Proforma.ProformaNumber.ToLower().Contains(search.ToLower()) || search.Contains((char)e.DeliveryId))
+                .Where(estimatedLCond)
+                .Where(estimatedGCond)
+                .Where(deliveredLCond)
+                .Where(deliveredGCond)
+                .Where(recipientCond)
+                .Where(statusCond)
+                .Where(companyCond)
+                .Where(waybillCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(deliv => new GetDelivery
                 {
                     DeliveryId = deliv.DeliveryId,
@@ -174,6 +387,14 @@ namespace database_comunicator.Services
             {
                 Id = e.DeliveryCompanyId,
                 Name = e.DeliveryCompanyName
+            }).ToListAsync();
+        }
+        public async Task<IEnumerable<GetDeliveryStatus>> GetDeliveryStatuses()
+        {
+            return await _handlerContext.DeliveryStatuses.Select(e => new GetDeliveryStatus
+            {
+                Id = e.DeliveryStatusId,
+                Name = e.StatusName
             }).ToListAsync();
         }
         public async Task<IEnumerable<GetProformaList>> GetProformaListWithoutDelivery(bool IsDeliveryToUser, int userId)

@@ -50,54 +50,58 @@ namespace database_comunicator.Controllers
         }
         [HttpGet]
         [Route("get/yours/{userId}")]
-        public async Task<IActionResult> GetYoursProformas(int userId, string? search)
+        public async Task<IActionResult> GetYoursProformas(int userId, string? search, string? sort,
+            int? qtyL, int? qtyG, int? totalL, int? totalG, string? dateL, string? dateG, int? recipient, string? currency)
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("User not found.");
             if (search != null)
             {
-                var sResult = await _proformaServices.GetProformas(true, userId, search);
+                var sResult = await _proformaServices.GetProformas(true, userId, search, sort, qtyL, qtyG, totalL, totalG, dateL, dateG, recipient, currency);
                 return Ok(sResult);
             }
-            var result = await _proformaServices.GetProformas(true, userId);
+            var result = await _proformaServices.GetProformas(true, userId, sort, qtyL, qtyG, totalL, totalG, dateL, dateG, recipient, currency);
             return Ok(result);
         }
         [HttpGet]
         [Route("get/yours")]
-        public async Task<IActionResult> GetYoursProformas(string? search)
+        public async Task<IActionResult> GetYoursProformas(string? search, string? sort,
+            int? qtyL, int? qtyG, int? totalL, int? totalG, string? dateL, string? dateG, int? recipient, string? currency)
         {
             if (search != null)
             {
-                var sResult = await _proformaServices.GetProformas(true, search);
+                var sResult = await _proformaServices.GetProformas(true, search, sort, qtyL, qtyG, totalL, totalG, dateL, dateG, recipient, currency);
                 return Ok(sResult);
             }
-            var result = await _proformaServices.GetProformas(true);
+            var result = await _proformaServices.GetProformas(true, sort, qtyL, qtyG, totalL, totalG, dateL, dateG, recipient, currency);
             return Ok(result);
         }
         [HttpGet]
         [Route("get/clients/{userId}")]
-        public async Task<IActionResult> GetClientProformas(int userId, string? search)
+        public async Task<IActionResult> GetClientProformas(int userId, string? search, string? sort,
+            int? qtyL, int? qtyG, int? totalL, int? totalG, string? dateL, string? dateG, int? recipient, string? currency)
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("User not found.");
             if (search != null)
             {
-                var sResult = await _proformaServices.GetProformas(false, userId, search);
+                var sResult = await _proformaServices.GetProformas(false, userId, search, sort, qtyL, qtyG, totalL, totalG, dateL, dateG, recipient, currency);
                 return Ok(sResult);
             }
-            var result = await _proformaServices.GetProformas(false, userId);
+            var result = await _proformaServices.GetProformas(false, userId, sort, qtyL, qtyG, totalL, totalG, dateL, dateG, recipient, currency);
             return Ok(result);
         }
         [HttpGet]
         [Route("get/clients")]
-        public async Task<IActionResult> GetClientProformas(string? search)
+        public async Task<IActionResult> GetClientProformas(string? search, string? sort,
+            int? qtyL, int? qtyG, int? totalL, int? totalG, string? dateL, string? dateG, int? recipient, string? currency)
         {
             if (search != null)
             {
-                var sResult = await _proformaServices.GetProformas(false, search);
+                var sResult = await _proformaServices.GetProformas(false, search, sort, qtyL, qtyG, totalL, totalG, dateL, dateG, recipient, currency);
                 return Ok(sResult);
             }
-            var result = await _proformaServices.GetProformas(false);
+            var result = await _proformaServices.GetProformas(false, sort, qtyL, qtyG, totalL, totalG, dateL, dateG, recipient, currency);
             return Ok(result);
         }
         [HttpGet]

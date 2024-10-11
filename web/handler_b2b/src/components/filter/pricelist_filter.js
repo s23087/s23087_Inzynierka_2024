@@ -106,9 +106,9 @@ function PricelistFilterOffcanvas({
                 })}
               </Form.Select>
             </Container>
-            <Container className="px-1 ms-0">
+            <Container className="px-1 ms-0 pb-5">
               <p className="mb-3 blue-main-text">Filters:</p>
-              <Stack>
+              <Stack className="mb-2">
                 <p className="mb-1 blue-sec-text">Total products:</p>
                 <Container className="px-0">
                   <Row className="gy-2">
@@ -153,6 +153,72 @@ function PricelistFilterOffcanvas({
                   </Row>
                 </Container>
               </Stack>
+              <Stack className="mb-2">
+                <p className="mb-1 blue-sec-text">Created:</p>
+                <Container className="px-0">
+                  <Row className="gy-2">
+                    <Col xs="12" md="3">
+                      <InputGroup>
+                        <InputGroup.Text className="main-blue-bg main-text">
+                          {"<="}
+                        </InputGroup.Text>
+                        <Form.Control
+                          type="date"
+                          id="createdL"
+                          defaultValue={newParams.get("createdL") ?? ""}
+                          className="main-grey-bg"
+                        />
+                      </InputGroup>
+                    </Col>
+                    <Col xs="12" md="3">
+                      <InputGroup>
+                        <InputGroup.Text className="main-blue-bg main-text">
+                          {">="}
+                        </InputGroup.Text>
+                        <Form.Control
+                          type="date"
+                          id="createdG"
+                          defaultValue={newParams.get("createdG") ?? ""}
+                          className="main-grey-bg"
+                        />
+                      </InputGroup>
+                    </Col>
+                  </Row>
+                </Container>
+              </Stack>
+              <Stack className="mb-2">
+                <p className="mb-1 blue-sec-text">Modified:</p>
+                <Container className="px-0">
+                  <Row className="gy-2">
+                    <Col xs="12" md="3">
+                      <InputGroup>
+                        <InputGroup.Text className="main-blue-bg main-text">
+                          {"<="}
+                        </InputGroup.Text>
+                        <Form.Control
+                          type="date"
+                          id="modifiedL"
+                          defaultValue={newParams.get("modifiedL") ?? ""}
+                          className="main-grey-bg"
+                        />
+                      </InputGroup>
+                    </Col>
+                    <Col xs="12" md="3">
+                      <InputGroup>
+                        <InputGroup.Text className="main-blue-bg main-text">
+                          {">="}
+                        </InputGroup.Text>
+                        <Form.Control
+                          type="date"
+                          id="modifiedG"
+                          defaultValue={newParams.get("modifiedG") ?? ""}
+                          className="main-grey-bg"
+                        />
+                      </InputGroup>
+                    </Col>
+                  </Row>
+                </Container>
+              </Stack>
               <Stack className="mt-2">
                 <p className="mb-1 blue-sec-text">Status:</p>
                 <Container className="px-0">
@@ -175,7 +241,7 @@ function PricelistFilterOffcanvas({
                     className="input-style"
                     style={maxStyle}
                     id="currencyFilter"
-                    defaultValue={newParams.get("currencyFilter") ?? "none"}
+                    defaultValue={newParams.get("currency") ?? "none"}
                   >
                     <option value="none">None</option>
                     <option value="PLN">PLN</option>
@@ -231,6 +297,18 @@ function PricelistFilterOffcanvas({
                     if (validators.haveOnlyNumbers(totalG) && totalG)
                       newParams.set("totalG", totalG);
                     if (!totalG) newParams.delete("totalG");
+                    let createdG = document.getElementById("createdG").value;
+                    if (createdG) newParams.set("createdG", createdG);
+                    if (!createdG) newParams.delete("createdG");
+                    let createdL = document.getElementById("createdL").value;
+                    if (createdL) newParams.set("createdL", createdL);
+                    if (!createdL) newParams.delete("createdL");
+                    let modifiedL = document.getElementById("modifiedL").value;
+                    if (modifiedL) newParams.set("modifiedL", modifiedL);
+                    if (!modifiedL) newParams.delete("modifiedL");
+                    let modifiedG = document.getElementById("modifiedG").value;
+                    if (modifiedG) newParams.set("modifiedG", modifiedG);
+                    if (!modifiedG) newParams.delete("modifiedG");
 
                     let sort = document.getElementById("sortValue").value;
                     if (sort != "None") {
@@ -255,6 +333,10 @@ function PricelistFilterOffcanvas({
                     newParams.delete("status");
                     newParams.delete("totalL");
                     newParams.delete("totalG");
+                    newParams.delete("createdL");
+                    newParams.delete("createdG");
+                    newParams.delete("modifiedL");
+                    newParams.delete("modifiedG");
                     newParams.delete("type");
                     newParams.delete("currency");
                     router.replace(`${pathName}?${newParams}`);

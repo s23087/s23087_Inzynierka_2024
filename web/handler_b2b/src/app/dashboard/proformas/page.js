@@ -15,6 +15,25 @@ export default async function ProformasPage({ searchParams }) {
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
   const is_org_switch_needed = current_role == "Admin";
+  let currentSort = searchParams.orderBy ?? ".None";
+  let qtyL = searchParams.qtyL;
+  let qtyG = searchParams.qtyG;
+  let totalL = searchParams.totalL;
+  let totalG = searchParams.totalG;
+  let dateL = searchParams.dateL;
+  let dateG = searchParams.dateG;
+  let recipient = searchParams.recipient;
+  let currency = searchParams.currency;
+  let filterActivated =
+    searchParams.orderBy ||
+    qtyL ||
+    qtyG ||
+    totalL ||
+    totalG ||
+    dateL ||
+    dateG ||
+    recipient ||
+    currency;
   let type = searchParams.proformaType
     ? searchParams.proformaType
     : "Yours proformas";
@@ -27,10 +46,32 @@ export default async function ProformasPage({ searchParams }) {
         org_view,
         type === "Yours proformas",
         searchParams.searchQuery,
+        currentSort,
+        qtyL,
+        qtyG,
+        totalL,
+        totalG,
+        dateL,
+        dateG,
+        recipient,
+        currency,
       )
-    : await getProformas(org_view, type === "Yours proformas");
+    : await getProformas(
+        org_view,
+        type === "Yours proformas",
+        currentSort,
+        qtyL,
+        qtyG,
+        totalL,
+        totalG,
+        dateL,
+        dateG,
+        recipient,
+        currency,
+      );
+  let proformasLength = proformas ? proformas.length : 0;
   let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
-  let pageQty = Math.ceil(proformas.length / maxInstanceOnPage);
+  let pageQty = Math.ceil(proformasLength / maxInstanceOnPage);
   pageQty = pageQty === 0 ? 1 : pageQty;
   let currentPage = parseInt(searchParams.page)
     ? parseInt(searchParams.page)
@@ -57,6 +98,8 @@ export default async function ProformasPage({ searchParams }) {
           orgView={org_view}
           proformasStart={proformasStart}
           proformasEnd={proformasEnd}
+          currentSort={currentSort}
+          filterActive={filterActivated}
         />
       </section>
 

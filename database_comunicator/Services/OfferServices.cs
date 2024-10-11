@@ -13,8 +13,10 @@ namespace database_comunicator.Services
 {
     public interface IOfferServices
     {
-        public Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG);
-        public Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string serach, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG);
+        public Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG,
+            string? createdL, string? createdG, string? modifiedL, string? modifiedG);
+        public Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string serach, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG,
+            string? createdL, string? createdG, string? modifiedL, string? modifiedG);
         public Task<bool> DoesPricelistExist(int offerId);
         public Task<bool> DoesPricelistExist(string offerName, int userId);
         public Task<bool> DeletePricelist(int offerId);
@@ -41,7 +43,8 @@ namespace database_comunicator.Services
         {
             _handlerContext = handlerContext;
         }
-        public async Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG)
+        public async Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG,
+            string? createdL, string? createdG, string? modifiedL, string? modifiedG)
         {
             var sortFunc = SortFilterUtils.GetPricelistSort(sort);
             bool direction;
@@ -56,18 +59,38 @@ namespace database_comunicator.Services
             Expression<Func<Offer, bool>> statusCond = status == null ?
                 e => true
                 : e => e.OfferStatus.StatusName == status;
+
             Expression<Func<Offer, bool>> currencyCond = currency == null ?
                 e => true
                 : e => e.CurrencyName == currency;
+
             Expression<Func<Offer, bool>> typeCond = type == null ?
                 e => true
                 : e => e.PathToFile.EndsWith(type);
+
             Expression<Func<Offer, bool>> totalLCond = totalL == null ?
                 e => true
                 : e => e.OfferItems.Count < totalL;
+
             Expression<Func<Offer, bool>> totalGCond = totalG == null ?
                 e => true
                 : e => e.OfferItems.Count < totalG;
+
+            Expression<Func<Offer, bool>> createdLCond = createdL == null ?
+                e => true
+                : e => e.CreationDate <= DateTime.Parse(createdL);
+
+            Expression<Func<Offer, bool>> createdGCond = createdG == null ?
+                e => true
+                : e => e.CreationDate >= DateTime.Parse(createdG);
+
+            Expression<Func<Offer, bool>> modifiedLCond = modifiedL == null ?
+                e => true
+                : e => e.ModificationDate <= DateTime.Parse(modifiedL);
+
+            Expression<Func<Offer, bool>> modifiedGCond = modifiedG == null ?
+                e => true
+                : e => e.ModificationDate >= DateTime.Parse(modifiedG);
             return await _handlerContext.Offers
                 .Where(e => e.UserId == userId)
                 .Where(statusCond)
@@ -75,6 +98,10 @@ namespace database_comunicator.Services
                 .Where(currencyCond)
                 .Where(totalLCond)
                 .Where(totalGCond)
+                .Where(createdLCond)
+                .Where(createdGCond)
+                .Where(modifiedLCond)
+                .Where(modifiedGCond)
                 .OrderByWithDirection(sortFunc, direction)
                 .Select(obj => new GetPriceList
                 {
@@ -88,7 +115,8 @@ namespace database_comunicator.Services
                     Currency = obj.CurrencyName
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string serach, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG)
+        public async Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string serach, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG,
+            string? createdL, string? createdG, string? modifiedL, string? modifiedG)
         {
             var sortFunc = SortFilterUtils.GetPricelistSort(sort);
             bool direction;
@@ -103,18 +131,38 @@ namespace database_comunicator.Services
             Expression<Func<Offer, bool>> statusCond = status == null ?
                 e => true
                 : e => e.OfferStatus.StatusName == status;
+
             Expression<Func<Offer, bool>> currencyCond = currency == null ?
                 e => true
                 : e => e.CurrencyName == currency;
+
             Expression<Func<Offer, bool>> typeCond = type == null ?
                 e => true
                 : e => e.PathToFile.EndsWith(type);
+
             Expression<Func<Offer, bool>> totalLCond = totalL == null ?
                 e => true
-                : e => e.OfferItems.Count < totalL;
+                : e => e.OfferItems.Count <= totalL;
+
             Expression<Func<Offer, bool>> totalGCond = totalG == null ?
                 e => true
-                : e => e.OfferItems.Count < totalG;
+                : e => e.OfferItems.Count >= totalG;
+
+            Expression<Func<Offer, bool>> createdLCond = createdL == null ?
+                e => true
+                : e => e.CreationDate <= DateTime.Parse(createdL);
+
+            Expression<Func<Offer, bool>> createdGCond = createdG == null ?
+                e => true
+                : e => e.CreationDate >= DateTime.Parse(createdG);
+
+            Expression<Func<Offer, bool>> modifiedLCond = modifiedL == null ?
+                e => true
+                : e => e.ModificationDate <= DateTime.Parse(modifiedL);
+
+            Expression<Func<Offer, bool>> modifiedGCond = modifiedG == null ?
+                e => true
+                : e => e.ModificationDate >= DateTime.Parse(modifiedG);
             return await _handlerContext.Offers
                 .Where(e => e.UserId == userId)
                 .Where(e => e.OfferName.ToLower().Contains(serach.ToLower()))
@@ -123,6 +171,10 @@ namespace database_comunicator.Services
                 .Where(currencyCond)
                 .Where(totalLCond)
                 .Where(totalGCond)
+                .Where(createdLCond)
+                .Where(createdGCond)
+                .Where(modifiedLCond)
+                .Where(modifiedGCond)
                 .OrderByWithDirection(sortFunc, direction)
                 .Select(ent => new GetPriceList
                 {

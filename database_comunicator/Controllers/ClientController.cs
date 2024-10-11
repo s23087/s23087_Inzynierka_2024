@@ -23,31 +23,31 @@ namespace database_comunicator.Controllers
         }
         [HttpGet]
         [Route("clients")]
-        public async Task<IActionResult> GetClients(int userId, string? search)
+        public async Task<IActionResult> GetClients(int userId, string? search, string? sort, int? country)
         {
             var isOrg = await _userServices.IsOrgUser(userId);
             var orgId = await _userServices.GetOrgId(userId, isOrg);
             IEnumerable<GetClient> result;
             if (search == null)
             {
-                result = await _organizationServices.GetClients(orgId);
+                result = await _organizationServices.GetClients(orgId, sort: sort, country);
                 return Ok(result);
             }
-            result = await _organizationServices.GetClients(orgId, search);
+            result = await _organizationServices.GetClients(orgId, search, sort: sort, country);
             return Ok(result);
         }
         [HttpGet]
         [Route("orgClients")]
-        public async Task<IActionResult> GetOrgClients(int userId, string? search)
+        public async Task<IActionResult> GetOrgClients(int userId, string? search, string? sort, int? country)
         {
             var orgId = await _userServices.GetOrgId(userId, true);
             IEnumerable<GetOrgClient> result;
             if (search == null)
             {
-                result = await _organizationServices.GetOrgClients(orgId);
+                result = await _organizationServices.GetOrgClients(orgId, sort: sort, country);
                 return Ok(result);
             }
-            result = await _organizationServices.GetOrgClients(orgId, search);
+            result = await _organizationServices.GetOrgClients(orgId, search, sort: sort, country);
             return Ok(result);
         }
         [HttpGet]

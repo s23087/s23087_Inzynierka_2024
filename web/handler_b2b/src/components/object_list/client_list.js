@@ -15,8 +15,16 @@ import { useRouter } from "next/navigation";
 import ModifyClientOffcanvas from "../offcanvas/modify/modify_client";
 import SelectComponent from "../smaller_components/select_compontent";
 import getPagationInfo from "@/utils/flexible/get_page_info";
+import ClientFilterOffcanvas from "../filter/client_filter";
 
-function ClientsList({ clients, orgView, clientsStart, clientsEnd }) {
+function ClientsList({
+  clients,
+  orgView,
+  clientsStart,
+  clientsEnd,
+  filterActive,
+  currentSort,
+}) {
   // View client
   const [showViewClient, setShowViewClient] = useState(false);
   const [clientToView, setClientToView] = useState({
@@ -38,6 +46,8 @@ function ClientsList({ clients, orgView, clientsStart, clientsEnd }) {
   // Seleted
   const [selectedQty, setSelectedQty] = useState(0);
   const [selectedClients] = useState([]);
+  // Filter
+  const [showFilter, setShowFilter] = useState(false);
   // Nav
   const router = useRouter();
   const params = useSearchParams();
@@ -46,23 +56,34 @@ function ClientsList({ clients, orgView, clientsStart, clientsEnd }) {
   };
   return (
     <Container className="p-0 middleSectionPlacement position-relative" fluid>
+      <ClientFilterOffcanvas
+        showOffcanvas={showFilter}
+        hideFunction={() => setShowFilter(false)}
+        currentSort={currentSort}
+        currentDirection={
+          currentSort.startsWith("A") || currentSort.startsWith(".")
+        }
+      />
       <Container
         className="fixed-top middleSectionPlacement-no-footer p-0"
         fluid
       >
         <SearchFilterBar
-          filter_icon_bool="false"
+          filter_icon_bool={filterActive}
           moreButtonAction={() => setShowMoreAction(true)}
+          filterAction={() => setShowFilter(true)}
         />
       </Container>
       <SelectComponent selectedQty={selectedQty} />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
-      {Object.keys(clients).length === 0 ? (
+      {Object.keys(clients ?? []).length === 0 ? (
         <Container className="text-center" fluid>
-          <p className="mt-5 pt-5 blue-main-text h2">Clients not found :/</p>
+          <p className="mt-5 pt-5 blue-main-text h2">
+            {clients ? "Clients not found :/" : "Could not connect to server."}
+          </p>
         </Container>
       ) : (
-        Object.values(clients)
+        Object.values(clients ?? [])
           .slice(clientsStart, clientsEnd)
           .map((value) => {
             return (
@@ -175,6 +196,8 @@ ClientsList.PropTypes = {
   orgView: PropTypes.bool.isRequired,
   clientsStart: PropTypes.number.isRequired,
   clientsEnd: PropTypes.number.isRequired,
+  filterActive: PropTypes.bool.isRequired,
+  currentSort: PropTypes.string.isRequired,
 };
 
 export default ClientsList;
