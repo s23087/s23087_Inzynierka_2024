@@ -4,26 +4,48 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 
-export default async function getSearchOutsideItems(role, search) {
+export default async function getSearchOutsideItems(
+  role,
+  search,
+  sort,
+  qtyL,
+  qtyG,
+  priceL,
+  priceG,
+  source,
+  currency,
+) {
   const dbName = await getDbName();
   const userId = await getUserId();
   let url = "";
+  let params = [];
+  if (sort !== ".None") params.push(`sort=${sort}`);
+  if (qtyL) params.push(`qtyL=${qtyL}`);
+  if (qtyG) params.push(`qtyG=${qtyG}`);
+  if (priceL) params.push(`priceL=${priceL}`);
+  if (priceG) params.push(`priceG=${priceG}`);
+  if (source) params.push(`source=${source}`);
+  if (currency) params.push(`currency=${currency}`);
   if (role === "Admin") {
-    url = `${process.env.API_DEST}/${dbName}/OutsideItem/get/items/${userId}?search=${search}`;
+    url = `${process.env.API_DEST}/${dbName}/OutsideItem/get/items/${userId}?search=${search}${params.length > 0 ? "&" : ""}${params.join("&")}`;
   } else {
-    url = `${process.env.API_DEST}/${dbName}/OutsideItem/get/items?search=${search}`;
+    url = `${process.env.API_DEST}/${dbName}/OutsideItem/get/items?search=${search}${params.length > 0 ? "&" : ""}${params.join("&")}`;
   }
-  const info = await fetch(url, {
-    method: "GET",
-  });
-  if (info.status === 404) {
-    logout();
+  try {
+    const info = await fetch(url, {
+      method: "GET",
+    });
+    if (info.status === 404) {
+      logout();
+      return [];
+    }
+
+    if (info.ok) {
+      return await info.json();
+    }
+
     return [];
+  } catch {
+    return null;
   }
-
-  if (info.ok) {
-    return await info.json();
-  }
-
-  return [];
 }

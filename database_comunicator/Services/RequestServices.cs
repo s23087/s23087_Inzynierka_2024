@@ -1,7 +1,9 @@
 ﻿using database_comunicator.Data;
 using database_comunicator.Models;
 using database_comunicator.Models.DTOs;
+using database_comunicator.Utils;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace database_comunicator.Services
 {
@@ -9,10 +11,14 @@ namespace database_comunicator.Services
     {
         public Task<int> GetStatusId(string status);
         public Task<int> AddRequest(AddRequest data);
-        public Task<IEnumerable<GetRequest>> GetMyRequests(int userId);
-        public Task<IEnumerable<GetRequest>> GetMyRequests(int userId, string search);
-        public Task<IEnumerable<GetRequest>> GetRecivedRequests(int userId);
-        public Task<IEnumerable<GetRequest>> GetRecivedRequests(int userId, string search);
+        public Task<IEnumerable<GetRequest>> GetMyRequests(int userId, string? sort, string? dateL, string? dateG,
+            string? type, int? status);
+        public Task<IEnumerable<GetRequest>> GetMyRequests(int userId, string search, string? sort, string? dateL, string? dateG,
+            string? type, int? status);
+        public Task<IEnumerable<GetRequest>> GetRecivedRequests(int userId, string? sort, string? dateL, string? dateG,
+            string? type, int? status);
+        public Task<IEnumerable<GetRequest>> GetRecivedRequests(int userId, string search, string? sort, string? dateL, string? dateG,
+            string? type, int? status);
         public Task<GetRestRequest> GetRestRequest(int requestId);
         public Task<bool> RequestExist(int requestId);
         public Task DeleteRequest(int requestId);
@@ -21,6 +27,8 @@ namespace database_comunicator.Services
         public Task<string?> GetRequestPath(int requestId);
         public Task<int> GetRecevierId(int requestId);
         public Task<GetRestModifyRequest> GetRestModifyRequest(int requestId);
+
+        public Task<IEnumerable<GetRequestStatus>> GetRequestStatuses();
     }
     public class RequestServices : IRequestServices
     {
@@ -65,10 +73,42 @@ namespace database_comunicator.Services
                 return 0;
             }
         }
-        public async Task<IEnumerable<GetRequest>> GetMyRequests(int userId)
+        public async Task<IEnumerable<GetRequest>> GetMyRequests(int userId, string? sort, string? dateL, string? dateG,
+            string? type, int? status)
         {
+            var sortFunc = SortFilterUtils.GetRequestSort(sort);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Request, bool>> dateLCond = dateL == null ?
+                e => true
+                : e => e.CreationDate <= DateTime.Parse(dateL);
+
+            Expression<Func<Request, bool>> dateGCond = dateG == null ?
+                e => true
+                : e => e.CreationDate >= DateTime.Parse(dateG);
+
+            Expression<Func<Request, bool>> typeCond = type == null ?
+                e => true
+                : e => e.ObjectType.ObjectTypeName == type;
+
+            Expression<Func<Request, bool>> statusCond = status == null ?
+                e => true
+                : e => e.RequestStatusId == status;
+
             return await _handlerContext.Requests
                 .Where(e => e.IdUserCreator == userId)
+                .Where(dateLCond)
+                .Where(dateGCond)
+                .Where(typeCond)
+                .Where(statusCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(e => new GetRequest
                 {
                     Id = e.RequestId,
@@ -79,10 +119,42 @@ namespace database_comunicator.Services
                     Title = e.Title
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetRequest>> GetMyRequests(int userId, string search)
+        public async Task<IEnumerable<GetRequest>> GetMyRequests(int userId, string search, string? sort, string? dateL, string? dateG,
+            string? type, int? status)
         {
+            var sortFunc = SortFilterUtils.GetRequestSort(sort);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Request, bool>> dateLCond = dateL == null ?
+                e => true
+                : e => e.CreationDate <= DateTime.Parse(dateL);
+
+            Expression<Func<Request, bool>> dateGCond = dateG == null ?
+                e => true
+                : e => e.CreationDate >= DateTime.Parse(dateG);
+
+            Expression<Func<Request, bool>> typeCond = type == null ?
+                e => true
+                : e => e.ObjectType.ObjectTypeName == type;
+
+            Expression<Func<Request, bool>> statusCond = status == null ?
+                e => true
+                : e => e.RequestStatusId == status;
+
             return await _handlerContext.Requests
                 .Where(e => e.IdUserCreator == userId && e.Title.ToLower().Contains(search.ToLower()))
+                .Where(dateLCond)
+                .Where(dateGCond)
+                .Where(typeCond)
+                .Where(statusCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(e => new GetRequest
                 {
                     Id = e.RequestId,
@@ -93,10 +165,42 @@ namespace database_comunicator.Services
                     Title = e.Title
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetRequest>> GetRecivedRequests(int userId)
+        public async Task<IEnumerable<GetRequest>> GetRecivedRequests(int userId, string? sort, string? dateL, string? dateG,
+            string? type, int? status)
         {
+            var sortFunc = SortFilterUtils.GetRequestSort(sort);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Request, bool>> dateLCond = dateL == null ?
+                e => true
+                : e => e.CreationDate <= DateTime.Parse(dateL);
+
+            Expression<Func<Request, bool>> dateGCond = dateG == null ?
+                e => true
+                : e => e.CreationDate >= DateTime.Parse(dateG);
+
+            Expression<Func<Request, bool>> typeCond = type == null ?
+                e => true
+                : e => e.ObjectType.ObjectTypeName == type;
+
+            Expression<Func<Request, bool>> statusCond = status == null ?
+                e => true
+                : e => e.RequestStatusId == status;
+
             return await _handlerContext.Requests
                 .Where(e => e.IdUserReciver == userId)
+                .Where(dateLCond)
+                .Where(dateGCond)
+                .Where(typeCond)
+                .Where(statusCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(e => new GetRequest
                 {
                     Id = e.RequestId,
@@ -107,10 +211,41 @@ namespace database_comunicator.Services
                     Title = e.Title
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetRequest>> GetRecivedRequests(int userId, string search)
+        public async Task<IEnumerable<GetRequest>> GetRecivedRequests(int userId, string search, string? sort, string? dateL, string? dateG,
+            string? type, int? status)
         {
+            var sortFunc = SortFilterUtils.GetRequestSort(sort);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Request, bool>> dateLCond = dateL == null ?
+                e => true
+                : e => e.CreationDate <= DateTime.Parse(dateL);
+
+            Expression<Func<Request, bool>> dateGCond = dateG == null ?
+                e => true
+                : e => e.CreationDate >= DateTime.Parse(dateG);
+
+            Expression<Func<Request, bool>> typeCond = type == null ?
+                e => true
+                : e => e.ObjectType.ObjectTypeName == type;
+
+            Expression<Func<Request, bool>> statusCond = status == null ?
+                e => true
+                : e => e.RequestStatusId == status;
             return await _handlerContext.Requests
                 .Where(e => e.IdUserReciver == userId && e.Title.ToLower().Contains(search.ToLower()))
+                .Where(dateLCond)
+                .Where(dateGCond)
+                .Where(typeCond)
+                .Where(statusCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(e => new GetRequest
                 {
                     Id = e.RequestId,
@@ -244,6 +379,14 @@ namespace database_comunicator.Services
                     RecevierId = e.IdUserReciver,
                     Note = e.Note,
                 }).FirstAsync();
+        }
+        public async Task<IEnumerable<GetRequestStatus>> GetRequestStatuses()
+        {
+            return await _handlerContext.RequestStatuses.Select(e => new GetRequestStatus
+            {
+                Id = e.RequestStatusId,
+                Name = e.StatusName
+            }).ToListAsync();
         }
     }
 }

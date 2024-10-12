@@ -16,34 +16,188 @@ import getCreditNotes from "@/utils/documents/get_credit_note";
 import getRequests from "@/utils/documents/get_requests";
 import getSearchRequests from "@/utils/documents/get_search_request";
 
-async function getDocuments(type, org_view, search) {
-  switch (type) {
+async function getDocuments(
+  docType,
+  org_view,
+  search,
+  currentSort,
+  dateL,
+  dateG,
+  dueL,
+  dueG,
+  qtyL,
+  qtyG,
+  totalL,
+  totalG,
+  recipient,
+  currency,
+  paymentStatus,
+  status,
+  type,
+  requestStatus,
+) {
+  switch (docType) {
     case "Sales invoices":
       if (search) {
-        return await getSearchSalesInvoices(org_view, search);
+        return await getSearchSalesInvoices(
+          org_view,
+          search,
+          currentSort,
+          dateL,
+          dateG,
+          dueL,
+          dueG,
+          qtyL,
+          qtyG,
+          totalL,
+          totalG,
+          recipient,
+          currency,
+          paymentStatus,
+          status,
+        );
       }
-      return await getSalesInvoices(org_view);
+      return await getSalesInvoices(
+        org_view,
+        currentSort,
+        dateL,
+        dateG,
+        dueL,
+        dueG,
+        qtyL,
+        qtyG,
+        totalL,
+        totalG,
+        recipient,
+        currency,
+        paymentStatus,
+        status,
+      );
     case "Yours credit notes":
       if (search) {
-        return await getSearchCreditNotes(org_view, true, search);
+        return await getSearchCreditNotes(
+          org_view,
+          true,
+          search,
+          currentSort,
+          dateL,
+          dateG,
+          qtyL,
+          qtyG,
+          totalL,
+          totalG,
+          recipient,
+          currency,
+          paymentStatus,
+          status,
+        );
       }
-      return await getCreditNotes(org_view, true);
+      return await getCreditNotes(
+        org_view,
+        true,
+        currentSort,
+        dateL,
+        dateG,
+        qtyL,
+        qtyG,
+        totalL,
+        totalG,
+        recipient,
+        currency,
+        paymentStatus,
+        status,
+      );
     case "Client credit notes":
       if (search) {
-        return await getSearchCreditNotes(org_view, false, search);
+        return await getSearchCreditNotes(
+          org_view,
+          false,
+          search,
+          currentSort,
+          dateL,
+          dateG,
+          qtyL,
+          qtyG,
+          totalL,
+          totalG,
+          recipient,
+          currency,
+          paymentStatus,
+          status,
+        );
       }
-      return await getCreditNotes(org_view, false);
+      return await getCreditNotes(
+        org_view,
+        false,
+        currentSort,
+        dateL,
+        dateG,
+        qtyL,
+        qtyG,
+        totalL,
+        totalG,
+        recipient,
+        currency,
+        paymentStatus,
+        status,
+      );
     case "Requests":
       if (search) {
-        return await getSearchRequests(org_view, search);
+        return await getSearchRequests(
+          org_view,
+          search,
+          currentSort,
+          dateL,
+          dateG,
+          type,
+          requestStatus,
+        );
       }
-      return await getRequests(org_view);
+      return await getRequests(
+        org_view,
+        currentSort,
+        dateL,
+        dateG,
+        type,
+        requestStatus,
+      );
   }
   if (search) {
-    return await getSearchYoursInvoices(org_view, search);
+    return await getSearchYoursInvoices(
+      org_view,
+      search,
+      currentSort,
+      dateL,
+      dateG,
+      dueL,
+      dueG,
+      qtyL,
+      qtyG,
+      totalL,
+      totalG,
+      recipient,
+      currency,
+      paymentStatus,
+      status,
+    );
   }
 
-  return await getYoursInvoices(org_view, search);
+  return await getYoursInvoices(
+    org_view,
+    currentSort,
+    dateL,
+    dateG,
+    dueL,
+    dueG,
+    qtyL,
+    qtyG,
+    totalL,
+    totalG,
+    recipient,
+    currency,
+    paymentStatus,
+    status,
+  );
 }
 
 export default async function InvoicesPage({ searchParams }) {
@@ -51,16 +205,88 @@ export default async function InvoicesPage({ searchParams }) {
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
   const is_org_switch_needed = current_role == "Admin";
+  // Filters
+  let currentSort = searchParams.orderBy ?? ".None";
+  let dateL = searchParams.dateL;
+  let dateG = searchParams.dateG;
+  let dueL = searchParams.dueL;
+  let dueG = searchParams.dueG;
+  let qtyL = searchParams.qtyL;
+  let qtyG = searchParams.qtyG;
+  let totalL = searchParams.totalL;
+  let totalG = searchParams.totalG;
+  let recipient = searchParams.recipient;
+  let currency = searchParams.currency;
+  let paymentStatus = searchParams.paymentStatus;
+  let status = searchParams.status;
+  let type = searchParams.type;
+  let requestStatus = searchParams.requestStatus;
+  let filterActivated =
+    searchParams.orderBy ||
+    dateL ||
+    dateG ||
+    dueL ||
+    dueG ||
+    qtyL ||
+    qtyG ||
+    totalL ||
+    totalG ||
+    recipient ||
+    currency ||
+    paymentStatus ||
+    status ||
+    requestStatus ||
+    type;
+  // Rest
   let orgActivated =
     searchParams.isOrg !== undefined ? searchParams.isOrg : false;
   let org_view = getOrgView(current_role, orgActivated === "true");
   let isSearchTrue = searchParams.searchQuery !== undefined;
   let docType = searchParams.docType ? searchParams.docType : "Yours invoices";
   let invoices = isSearchTrue
-    ? await getDocuments(docType, org_view, searchParams.searchQuery)
-    : await getDocuments(docType, org_view);
+    ? await getDocuments(
+        docType,
+        org_view,
+        searchParams.searchQuery,
+        currentSort,
+        dateL,
+        dateG,
+        dueL,
+        dueG,
+        qtyL,
+        qtyG,
+        totalL,
+        totalG,
+        recipient,
+        currency,
+        paymentStatus,
+        status,
+        type,
+        requestStatus,
+      )
+    : await getDocuments(
+        docType,
+        org_view,
+        null,
+        currentSort,
+        dateL,
+        dateG,
+        dueL,
+        dueG,
+        qtyL,
+        qtyG,
+        totalL,
+        totalG,
+        recipient,
+        currency,
+        paymentStatus,
+        status,
+        type,
+        requestStatus,
+      );
+  let invoiceLength = invoices ? invoices.length : 0;
   let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
-  let pageQty = Math.ceil(invoices.length / maxInstanceOnPage);
+  let pageQty = Math.ceil(invoiceLength / maxInstanceOnPage);
   pageQty = pageQty === 0 ? 1 : pageQty;
   let currentPage = parseInt(searchParams.page)
     ? parseInt(searchParams.page)
@@ -88,6 +314,8 @@ export default async function InvoicesPage({ searchParams }) {
           invoiceStart={invoiceStart}
           invoiceEnd={invoiceEnd}
           role={current_role}
+          filterActive={filterActivated}
+          currentSort={currentSort}
         />
       </section>
 

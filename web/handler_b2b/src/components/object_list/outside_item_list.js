@@ -13,8 +13,15 @@ import getPagationInfo from "@/utils/flexible/get_page_info";
 import AbstractItemContainer from "../object_container/abstrac_item_container";
 import AddOutsideItemsOffcanvas from "../offcanvas/create/create_outside_item";
 import deleteOutsideItem from "@/utils/outside_items/delete_outside_item";
+import OutsideItemsFilterOffcanvas from "../filter/outside_items_filter";
 
-function OutsideItemList({ items, itemsStart, itemsEnd }) {
+function OutsideItemList({
+  items,
+  itemsStart,
+  itemsEnd,
+  filterActive,
+  currentSort,
+}) {
   // Delete item
   const [showDeleteItem, setShowDeleteItem] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
@@ -26,6 +33,8 @@ function OutsideItemList({ items, itemsStart, itemsEnd }) {
   // Seleted
   const [selectedQty, setSelectedQty] = useState(0);
   const [selectedItems] = useState([]);
+  // Filter
+  const [showFilter, setShowFilter] = useState(false);
   // Nav
   const router = useRouter();
   const params = useSearchParams();
@@ -35,23 +44,32 @@ function OutsideItemList({ items, itemsStart, itemsEnd }) {
   };
   return (
     <Container className="p-0 middleSectionPlacement position-relative" fluid>
+      <OutsideItemsFilterOffcanvas
+        showOffcanvas={showFilter}
+        hideFunction={() => setShowFilter(false)}
+        currentSort={currentSort}
+        currentDirection={
+          currentSort.startsWith("A") || currentSort.startsWith(".")
+        }
+      />
       <Container
         className="fixed-top middleSectionPlacement-no-footer p-0"
         fluid
       >
         <SearchFilterBar
-          filter_icon_bool="false"
+          filter_icon_bool={filterActive}
           moreButtonAction={() => setShowMoreAction(true)}
+          filterAction={() => setShowFilter(true)}
         />
       </Container>
       <SelectComponent selectedQty={selectedQty} additonalMargin={true} />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
-      {Object.keys(items).length === 0 ? (
+      {Object.keys(items ?? []).length === 0 ? (
         <Container className="text-center" fluid>
-          <p className="mt-5 pt-5 blue-main-text h2">Items not found :/</p>
+          <p className="mt-5 pt-5 blue-main-text h2">{"Items not found :/"}</p>
         </Container>
       ) : (
-        Object.values(items)
+        Object.values(items ?? [])
           .slice(itemsStart, itemsEnd)
           .map((value) => {
             return (
@@ -157,6 +175,8 @@ OutsideItemList.PropTypes = {
   items: PropTypes.object.isRequired,
   itemsStart: PropTypes.number.isRequired,
   itemsEnd: PropTypes.number.isRequired,
+  filterActive: PropTypes.bool.isRequired,
+  currentSort: PropTypes.string.isRequired,
 };
 
 export default OutsideItemList;

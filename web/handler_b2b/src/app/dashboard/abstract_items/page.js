@@ -12,10 +12,44 @@ export default async function AbstractItemsPage({ searchParams }) {
   const current_role = await getRole();
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
+  let currentSort = searchParams.orderBy ?? ".None";
+  let qtyL = searchParams.qtyL;
+  let qtyG = searchParams.qtyG;
+  let priceL = searchParams.priceL;
+  let priceG = searchParams.priceG;
+  let source = searchParams.source;
+  let currency = searchParams.currency;
+  let filterActivated =
+    searchParams.orderBy ||
+    qtyL ||
+    qtyG ||
+    priceL ||
+    priceG ||
+    source ||
+    currency;
   let isSearchTrue = searchParams.searchQuery !== undefined;
   let outsideItems = isSearchTrue
-    ? await getSearchOutsideItems(current_role, searchParams.searchQuery)
-    : await getOutsideItems(current_role);
+    ? await getSearchOutsideItems(
+        current_role,
+        searchParams.searchQuery,
+        currentSort,
+        qtyL,
+        qtyG,
+        priceL,
+        priceG,
+        source,
+        currency,
+      )
+    : await getOutsideItems(
+        current_role,
+        currentSort,
+        qtyL,
+        qtyG,
+        priceL,
+        priceG,
+        source,
+        currency,
+      );
   let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
   let pageQty = Math.ceil(outsideItems.length / maxInstanceOnPage);
   pageQty = pageQty === 0 ? 1 : pageQty;
@@ -38,6 +72,8 @@ export default async function AbstractItemsPage({ searchParams }) {
           items={outsideItems}
           itemsStart={outsideItemsStart}
           itemsEnd={outsideItemsEnd}
+          filterActive={filterActivated}
+          currentSort={currentSort}
         />
       </section>
 

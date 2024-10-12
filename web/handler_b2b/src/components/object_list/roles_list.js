@@ -10,8 +10,16 @@ import RoleContainer from "../object_container/role_container";
 import ModifyUserRole from "../windows/modify_user_roles";
 import SelectComponent from "../smaller_components/select_compontent";
 import getPagationInfo from "@/utils/flexible/get_page_info";
+import RoleFilterOffcanvas from "../filter/role_filter";
 
-function RolesList({ roles, rolesStart, rolesEnd, rolesToChoose }) {
+function RolesList({
+  roles,
+  rolesStart,
+  rolesEnd,
+  rolesToChoose,
+  filterActive,
+  currentSort,
+}) {
   // Modify role
   const [showModifyRole, setShowModifyRole] = useState(false);
   const [userToModify, setUserToModify] = useState({});
@@ -20,6 +28,8 @@ function RolesList({ roles, rolesStart, rolesEnd, rolesToChoose }) {
   // Seleted
   const [selectedQty, setSelectedQty] = useState(0);
   const [selectedRoles] = useState([]);
+  // Filter
+  const [showFilter, setShowFilter] = useState(false);
   // Nav
   const params = useSearchParams();
   // Styles
@@ -28,23 +38,35 @@ function RolesList({ roles, rolesStart, rolesEnd, rolesToChoose }) {
   };
   return (
     <Container className="p-0 middleSectionPlacement position-relative" fluid>
+      <RoleFilterOffcanvas
+        showOffcanvas={showFilter}
+        hideFunction={() => setShowFilter(false)}
+        currentSort={currentSort}
+        currentDirection={
+          currentSort.startsWith("A") || currentSort.startsWith(".")
+        }
+        rolesToChoose={rolesToChoose ?? []}
+      />
       <Container
         className="fixed-top middleSectionPlacement-no-footer p-0"
         fluid
       >
         <SearchFilterBar
-          filter_icon_bool="false"
+          filter_icon_bool={filterActive}
           moreButtonAction={() => setShowMoreAction(true)}
+          filterAction={() => setShowFilter(true)}
         />
       </Container>
       <SelectComponent selectedQty={selectedQty} />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
-      {Object.keys(roles).length === 0 ? (
+      {Object.keys(roles ?? []).length === 0 ? (
         <Container className="text-center" fluid>
-          <p className="mt-5 pt-5 blue-main-text h2">Users not found :/</p>
+          <p className="mt-5 pt-5 blue-main-text h2">
+            {roles ? "Users not found :/" : "Could not connect to server."}
+          </p>
         </Container>
       ) : (
-        Object.values(roles)
+        Object.values(roles ?? [])
           .slice(rolesStart, rolesEnd)
           .map((value) => {
             return (
@@ -113,6 +135,8 @@ RolesList.PropTypes = {
   productStart: PropTypes.number.isRequired,
   productEnd: PropTypes.number.isRequired,
   rolesToChoose: PropTypes.object.isRequired,
+  filterActive: PropTypes.bool.isRequired,
+  currentSort: PropTypes.string.isRequired,
 };
 
 export default RolesList;

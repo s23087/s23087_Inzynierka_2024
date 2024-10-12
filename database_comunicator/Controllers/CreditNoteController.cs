@@ -62,33 +62,39 @@ namespace database_comunicator.Controllers
             return Ok();
         }
         [HttpGet]
-        [Route("getCreditNote/{isYourInvoice}/{userId}")]
-        public async Task<IActionResult> GetUserCreditNote(bool isYourInvoice, int userId, string? search)
+        [Route("get/{isYourCredit}/{userId}")]
+        public async Task<IActionResult> GetUserCreditNote(bool isYourCredit, int userId, string? search, string? sort, string? dateL, string? dateG,
+            int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, bool? paymentStatus, bool? status)
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound();
             if (search != null)
             {
-                var result = await _creditNoteServices.GetCreditNotes(isYourInvoice, search, userId);
+                var result = await _creditNoteServices.GetCreditNotes(isYourCredit, search, userId, sort: sort, dateL, dateG, qtyL, qtyG, totalL, totalG, recipient,
+                    currency, paymentStatus, status);
                 return Ok(result);
             } else
             {
-                var result = await _creditNoteServices.GetCreditNotes(isYourInvoice, userId);
+                var result = await _creditNoteServices.GetCreditNotes(isYourCredit, userId, sort: sort, dateL, dateG, qtyL, qtyG, totalL, totalG, recipient,
+                    currency, paymentStatus, status);
                 return Ok(result);
             }
         }
         [HttpGet]
-        [Route("getCreditNote/{isYourInvoice}")]
-        public async Task<IActionResult> GetCreditNote(bool isYourInvoice, string? search)
+        [Route("get/{isYourCredit}")]
+        public async Task<IActionResult> GetCreditNote(bool isYourCredit, string? search, string? sort, string? dateL, string? dateG,
+            int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, bool? paymentStatus, bool? status)
         {
             if (search != null)
             {
-                var result = await _creditNoteServices.GetCreditNotes(isYourInvoice, search);
+                var result = await _creditNoteServices.GetCreditNotes(isYourCredit, search, sort: sort, dateL, dateG, qtyL, qtyG, totalL, totalG, recipient,
+                    currency, paymentStatus, status);
                 return Ok(result);
             }
             else
             {
-                var result = await _creditNoteServices.GetCreditNotes(isYourInvoice);
+                var result = await _creditNoteServices.GetCreditNotes(isYourCredit, sort: sort, dateL, dateG, qtyL, qtyG, totalL, totalG, recipient,
+                    currency, paymentStatus, status);
                 return Ok(result);
             }
         }

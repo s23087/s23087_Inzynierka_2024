@@ -1,8 +1,10 @@
 ﻿using database_comunicator.Data;
 using database_comunicator.Models;
 using database_comunicator.Models.DTOs;
+using database_comunicator.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Linq.Expressions;
 
 namespace database_comunicator.Services
 {
@@ -14,14 +16,22 @@ namespace database_comunicator.Services
         public Task<IEnumerable<GetPaymentStatuses>> GetPaymentStatuses();
         public Task<int> AddPurchaseInvoice(AddPurchaseInvoice data);
         public Task<int> AddSalesInvoice(AddSalesInvoice data);
-        public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices();
-        public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string search);
-        public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId);
-        public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string search);
-        public Task<IEnumerable<GetInvoices>> GetSalesInvocies();
-        public Task<IEnumerable<GetInvoices>> GetSalesInvocies(string search);
-        public Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId);
-        public Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId, string search);
+        public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
+        public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string search, string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
+        public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
+        public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string search, string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
+        public Task<IEnumerable<GetInvoices>> GetSalesInvocies(string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
+        public Task<IEnumerable<GetInvoices>> GetSalesInvocies(string search, string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
+        public Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId, string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
+        public Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId, string search, string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
         public Task<IEnumerable<GetInvoicesList>> GetPurchaseInvoicesList();
         public Task<IEnumerable<GetInvoicesList>> GetSalesInvoicesList();
         public Task<IEnumerable<GetInvoiceItems>> GetInvoiceItems(int invoiceId, bool isPurchaseInvoice);
@@ -270,10 +280,82 @@ namespace database_comunicator.Services
             }
         }
 
-        public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices()
+        public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
+            var sortFunc = SortFilterUtils.GetInvoiceSort(sort, true);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Invoice, bool>> dateLCond = dateL == null ?
+                e => true
+                : e => e.InvoiceDate <= DateTime.Parse(dateL);
+
+            Expression<Func<Invoice, bool>> dateGCond = dateG == null ?
+                e => true
+                : e => e.InvoiceDate >= DateTime.Parse(dateG);
+
+            Expression<Func<Invoice, bool>> dueLCond = dueL == null ?
+                e => true
+                : e => e.DueDate <= DateTime.Parse(dueL);
+
+            Expression<Func<Invoice, bool>> dueGCond = dueG == null ?
+                e => true
+                : e => e.DueDate >= DateTime.Parse(dueG);
+
+            Expression<Func<Invoice, bool>> qtyLCond = qtyL == null ?
+                e => true
+                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum() <= qtyL;
+
+            Expression<Func<Invoice, bool>> qtyGCond = qtyG == null ?
+                e => true
+                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum() >= qtyG;
+
+            Expression<Func<Invoice, bool>> totalLCond = totalL == null ?
+                e => true
+                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty * d.Price).Sum() <= totalL;
+
+            Expression<Func<Invoice, bool>> totalGCond = totalG == null ?
+                e => true
+                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty * d.Price).Sum() >= totalG;
+
+            Expression<Func<Invoice, bool>> recipientCond = recipient == null ?
+                e => true
+                : e => e.Seller == recipient;
+
+            Expression<Func<Invoice, bool>> currencyCond = currency == null ?
+                e => true
+                : e => e.CurrencyName == currency;
+
+            Expression<Func<Invoice, bool>> paymentStatusCond = paymentStatus == null ?
+                e => true
+                : e => e.PaymentsStatusId == paymentStatus;
+
+            Expression<Func<Invoice, bool>> statusCond = status == null ?
+                e => true
+                : e => e.InSystem == status;
+
             return await _handlerContext.Invoices
                 .Where(e => !e.SellingPrices.Any())
+                .Where(dateLCond)
+                .Where(dateGCond)
+                .Where(dueLCond)
+                .Where(dueGCond)
+                .Where(qtyLCond)
+                .Where(qtyGCond)
+                .Where(totalLCond)
+                .Where(totalGCond)
+                .Where(recipientCond)
+                .Where(currencyCond)
+                .Where(paymentStatusCond)
+                .Where(statusCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(inv => new GetInvoices
                 {
                     Users = inv.OwnedItems.SelectMany(d => d.ItemOwners)
@@ -292,10 +374,81 @@ namespace database_comunicator.Services
                     + (inv.CurrencyName == "PLN" ? inv.TransportCost : inv.TransportCost * inv.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetInvoices>> GetSalesInvocies()
+        public async Task<IEnumerable<GetInvoices>> GetSalesInvocies(string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
+            var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Invoice, bool>> dateLCond = dateL == null ?
+                e => true
+                : e => e.InvoiceDate <= DateTime.Parse(dateL);
+
+            Expression<Func<Invoice, bool>> dateGCond = dateG == null ?
+                e => true
+                : e => e.InvoiceDate >= DateTime.Parse(dateG);
+
+            Expression<Func<Invoice, bool>> dueLCond = dueL == null ?
+                e => true
+                : e => e.DueDate <= DateTime.Parse(dueL);
+
+            Expression<Func<Invoice, bool>> dueGCond = dueG == null ?
+                e => true
+                : e => e.DueDate >= DateTime.Parse(dueG);
+
+            Expression<Func<Invoice, bool>> qtyLCond = qtyL == null ?
+                e => true
+                : e => e.SellingPrices.Select(d => d.Qty).Sum() <= qtyL;
+
+            Expression<Func<Invoice, bool>> qtyGCond = qtyG == null ?
+                e => true
+                : e => e.SellingPrices.Select(d => d.Qty).Sum() >= qtyG;
+
+            Expression<Func<Invoice, bool>> totalLCond = totalL == null ?
+                e => true
+                : e => e.SellingPrices.Select(d => d.Qty * d.Price).Sum() <= totalL;
+
+            Expression<Func<Invoice, bool>> totalGCond = totalG == null ?
+                e => true
+                : e => e.SellingPrices.Select(d => d.Qty * d.Price).Sum() >= totalG;
+
+            Expression<Func<Invoice, bool>> recipientCond = recipient == null ?
+                e => true
+                : e => e.Buyer == recipient;
+
+            Expression<Func<Invoice, bool>> currencyCond = currency == null ?
+                e => true
+                : e => e.CurrencyName == currency;
+
+            Expression<Func<Invoice, bool>> paymentStatusCond = paymentStatus == null ?
+                e => true
+                : e => e.PaymentsStatusId == paymentStatus;
+
+            Expression<Func<Invoice, bool>> statusCond = status == null ?
+                e => true
+                : e => e.InSystem == status;
             var result = await _handlerContext.Invoices
                 .Where(e => e.SellingPrices.Any())
+                .Where(dateLCond)
+                .Where(dateGCond)
+                .Where(dueLCond)
+                .Where(dueGCond)
+                .Where(qtyLCond)
+                .Where(qtyGCond)
+                .Where(totalLCond)
+                .Where(totalGCond)
+                .Where(recipientCond)
+                .Where(currencyCond)
+                .Where(paymentStatusCond)
+                .Where(statusCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(obj => new GetInvoices
                 {
                     Users = obj.SellingPrices.Select(e => e.User).GroupBy(e => new {e.IdUser, e.Username, e.Surname}).Select(e => e.Key.Username + " " + e.Key.Surname).ToList(),
@@ -311,18 +464,82 @@ namespace database_comunicator.Services
                 }).ToListAsync();
             return result;
         }
-        public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string search)
+        public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string search, string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
+            var sortFunc = SortFilterUtils.GetInvoiceSort(sort, true);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Invoice, bool>> dateLCond = dateL == null ?
+                e => true
+                : e => e.InvoiceDate <= DateTime.Parse(dateL);
+
+            Expression<Func<Invoice, bool>> dateGCond = dateG == null ?
+                e => true
+                : e => e.InvoiceDate >= DateTime.Parse(dateG);
+
+            Expression<Func<Invoice, bool>> dueLCond = dueL == null ?
+                e => true
+                : e => e.DueDate <= DateTime.Parse(dueL);
+
+            Expression<Func<Invoice, bool>> dueGCond = dueG == null ?
+                e => true
+                : e => e.DueDate >= DateTime.Parse(dueG);
+
+            Expression<Func<Invoice, bool>> qtyLCond = qtyL == null ?
+                e => true
+                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum() <= qtyL;
+
+            Expression<Func<Invoice, bool>> qtyGCond = qtyG == null ?
+                e => true
+                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum() >= qtyG;
+
+            Expression<Func<Invoice, bool>> totalLCond = totalL == null ?
+                e => true
+                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty * d.Price).Sum() <= totalL;
+
+            Expression<Func<Invoice, bool>> totalGCond = totalG == null ?
+                e => true
+                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty * d.Price).Sum() >= totalG;
+
+            Expression<Func<Invoice, bool>> recipientCond = recipient == null ?
+                e => true
+                : e => e.Seller == recipient;
+
+            Expression<Func<Invoice, bool>> currencyCond = currency == null ?
+                e => true
+                : e => e.CurrencyName == currency;
+
+            Expression<Func<Invoice, bool>> paymentStatusCond = paymentStatus == null ?
+                e => true
+                : e => e.PaymentsStatusId == paymentStatus;
+
+            Expression<Func<Invoice, bool>> statusCond = status == null ?
+                e => true
+                : e => e.InSystem == status;
             return await _handlerContext.Invoices
-                .Include(e => e.SellerNavigation)
-                .Include(e => e.PaymentsStatus)
-                .Include(e => e.OwnedItems)
-                    .ThenInclude(e => e.PurchasePrices)
-                .Include(e => e.OwnedItems)
-                    .ThenInclude(e => e.ItemOwners)
-                        .ThenInclude(e => e.IdUserNavigation)
                 .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))
                 .Where(e => !e.SellingPrices.Any())
+                .Where(dateLCond)
+                .Where(dateGCond)
+                .Where(dueLCond)
+                .Where(dueGCond)
+                .Where(qtyLCond)
+                .Where(qtyGCond)
+                .Where(totalLCond)
+                .Where(totalGCond)
+                .Where(recipientCond)
+                .Where(currencyCond)
+                .Where(paymentStatusCond)
+                .Where(statusCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(ent => new GetInvoices
                 {
                     Users = ent.OwnedItems.SelectMany(d => d.ItemOwners)
@@ -341,13 +558,82 @@ namespace database_comunicator.Services
                     + (ent.CurrencyName == "PLN" ? ent.TransportCost : ent.TransportCost * ent.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetInvoices>> GetSalesInvocies(string search)
+        public async Task<IEnumerable<GetInvoices>> GetSalesInvocies(string search, string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
+            var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Invoice, bool>> dateLCond = dateL == null ?
+                e => true
+                : e => e.InvoiceDate <= DateTime.Parse(dateL);
+
+            Expression<Func<Invoice, bool>> dateGCond = dateG == null ?
+                e => true
+                : e => e.InvoiceDate >= DateTime.Parse(dateG);
+
+            Expression<Func<Invoice, bool>> dueLCond = dueL == null ?
+                e => true
+                : e => e.DueDate <= DateTime.Parse(dueL);
+
+            Expression<Func<Invoice, bool>> dueGCond = dueG == null ?
+                e => true
+                : e => e.DueDate >= DateTime.Parse(dueG);
+
+            Expression<Func<Invoice, bool>> qtyLCond = qtyL == null ?
+                e => true
+                : e => e.SellingPrices.Select(d => d.Qty).Sum() <= qtyL;
+
+            Expression<Func<Invoice, bool>> qtyGCond = qtyG == null ?
+                e => true
+                : e => e.SellingPrices.Select(d => d.Qty).Sum() >= qtyG;
+
+            Expression<Func<Invoice, bool>> totalLCond = totalL == null ?
+                e => true
+                : e => e.SellingPrices.Select(d => d.Qty * d.Price).Sum() <= totalL;
+
+            Expression<Func<Invoice, bool>> totalGCond = totalG == null ?
+                e => true
+                : e => e.SellingPrices.Select(d => d.Qty * d.Price).Sum() >= totalG;
+
+            Expression<Func<Invoice, bool>> recipientCond = recipient == null ?
+                e => true
+                : e => e.Buyer == recipient;
+
+            Expression<Func<Invoice, bool>> currencyCond = currency == null ?
+                e => true
+                : e => e.CurrencyName == currency;
+
+            Expression<Func<Invoice, bool>> paymentStatusCond = paymentStatus == null ?
+                e => true
+                : e => e.PaymentsStatusId == paymentStatus;
+
+            Expression<Func<Invoice, bool>> statusCond = status == null ?
+                e => true
+                : e => e.InSystem == status;
             return await _handlerContext.Invoices
-                .Include(e => e.BuyerNavigation)
-                .Include(e => e.PaymentsStatus)
                 .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))
                 .Where(e => e.SellingPrices.Any())
+                .Where(dateLCond)
+                .Where(dateGCond)
+                .Where(dueLCond)
+                .Where(dueGCond)
+                .Where(qtyLCond)
+                .Where(qtyGCond)
+                .Where(totalLCond)
+                .Where(totalGCond)
+                .Where(recipientCond)
+                .Where(currencyCond)
+                .Where(paymentStatusCond)
+                .Where(statusCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(inst => new GetInvoices
                 {
                     Users = inst.SellingPrices.Select(e => e.User).GroupBy(e => new { e.IdUser, e.Username, e.Surname }).Select(e => e.Key.Username + " " + e.Key.Surname).ToList(),
@@ -362,16 +648,81 @@ namespace database_comunicator.Services
                     Price = inst.SellingPrices.Select(d => d.Price * d.Qty).Sum() + inst.TransportCost,
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId)
+        public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
+            var sortFunc = SortFilterUtils.GetInvoiceSort(sort, true);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Invoice, bool>> dateLCond = dateL == null ?
+                e => true
+                : e => e.InvoiceDate <= DateTime.Parse(dateL);
+
+            Expression<Func<Invoice, bool>> dateGCond = dateG == null ?
+                e => true
+                : e => e.InvoiceDate >= DateTime.Parse(dateG);
+
+            Expression<Func<Invoice, bool>> dueLCond = dueL == null ?
+                e => true
+                : e => e.DueDate <= DateTime.Parse(dueL);
+
+            Expression<Func<Invoice, bool>> dueGCond = dueG == null ?
+                e => true
+                : e => e.DueDate >= DateTime.Parse(dueG);
+
+            Expression<Func<Invoice, bool>> qtyLCond = qtyL == null ?
+                e => true
+                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum() <= qtyL;
+
+            Expression<Func<Invoice, bool>> qtyGCond = qtyG == null ?
+                e => true
+                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum() >= qtyG;
+
+            Expression<Func<Invoice, bool>> totalLCond = totalL == null ?
+                e => true
+                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty * d.Price).Sum() <= totalL;
+
+            Expression<Func<Invoice, bool>> totalGCond = totalG == null ?
+                e => true
+                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty * d.Price).Sum() >= totalG;
+
+            Expression<Func<Invoice, bool>> recipientCond = recipient == null ?
+                e => true
+                : e => e.Seller == recipient;
+
+            Expression<Func<Invoice, bool>> currencyCond = currency == null ?
+                e => true
+                : e => e.CurrencyName == currency;
+
+            Expression<Func<Invoice, bool>> paymentStatusCond = paymentStatus == null ?
+                e => true
+                : e => e.PaymentsStatusId == paymentStatus;
+
+            Expression<Func<Invoice, bool>> statusCond = status == null ?
+                e => true
+                : e => e.InSystem == status;
             return await _handlerContext.Invoices
-                .Include(e => e.SellerNavigation)
-                .Include(e => e.PaymentsStatus)
-                .Include(e => e.OwnedItems)
-                    .ThenInclude(e => e.ItemOwners)
-                .Include(e => e.OwnedItems)
-                .ThenInclude(e => e.PurchasePrices)
                 .Where(e => !e.SellingPrices.Any() && e.OwnedItems.SelectMany(d => d.ItemOwners).Any(d => d.IdUser == userId))
+                .Where(dateLCond)
+                .Where(dateGCond)
+                .Where(dueLCond)
+                .Where(dueGCond)
+                .Where(qtyLCond)
+                .Where(qtyGCond)
+                .Where(totalLCond)
+                .Where(totalGCond)
+                .Where(recipientCond)
+                .Where(currencyCond)
+                .Where(paymentStatusCond)
+                .Where(statusCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(instc => new GetInvoices
                 {
                     InvoiceId = instc.InvoiceId,
@@ -386,20 +737,87 @@ namespace database_comunicator.Services
                     + (instc.CurrencyName == "PLN" ? instc.TransportCost : instc.TransportCost * instc.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId)
+        public async Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId, string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
+            var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Invoice, bool>> dateLCond = dateL == null ?
+                e => true
+                : e => e.InvoiceDate <= DateTime.Parse(dateL);
+
+            Expression<Func<Invoice, bool>> dateGCond = dateG == null ?
+                e => true
+                : e => e.InvoiceDate >= DateTime.Parse(dateG);
+
+            Expression<Func<Invoice, bool>> dueLCond = dueL == null ?
+                e => true
+                : e => e.DueDate <= DateTime.Parse(dueL);
+
+            Expression<Func<Invoice, bool>> dueGCond = dueG == null ?
+                e => true
+                : e => e.DueDate >= DateTime.Parse(dueG);
+
+            Expression<Func<Invoice, bool>> qtyLCond = qtyL == null ?
+                e => true
+                : e => e.SellingPrices.Select(d => d.Qty).Sum() <= qtyL;
+
+            Expression<Func<Invoice, bool>> qtyGCond = qtyG == null ?
+                e => true
+                : e => e.SellingPrices.Select(d => d.Qty).Sum() >= qtyG;
+
+            Expression<Func<Invoice, bool>> totalLCond = totalL == null ?
+                e => true
+                : e => e.SellingPrices.Select(d => d.Qty * d.Price).Sum() <= totalL;
+
+            Expression<Func<Invoice, bool>> totalGCond = totalG == null ?
+                e => true
+                : e => e.SellingPrices.Select(d => d.Qty * d.Price).Sum() >= totalG;
+
+            Expression<Func<Invoice, bool>> recipientCond = recipient == null ?
+                e => true
+                : e => e.Buyer == recipient;
+
+            Expression<Func<Invoice, bool>> currencyCond = currency == null ?
+                e => true
+                : e => e.CurrencyName == currency;
+
+            Expression<Func<Invoice, bool>> paymentStatusCond = paymentStatus == null ?
+                e => true
+                : e => e.PaymentsStatusId == paymentStatus;
+
+            Expression<Func<Invoice, bool>> statusCond = status == null ?
+                e => true
+                : e => e.InSystem == status;
             return await _handlerContext.Invoices
-                .Include(e => e.SellerNavigation)
-                .Include(e => e.PaymentsStatus)
-                .Include(e => e.SellingPrices)
-                    .ThenInclude(e => e.PurchasePrice)
                 .Where(e => e.SellingPrices.Any())
                 .Where(e => e.SellingPrices.Select(e => e.PurchasePrice).Select(d => d.OwnedItem).SelectMany(d => d.ItemOwners).Where(d => d.IdUser == userId).Any())
+                .Where(dateLCond)
+                .Where(dateGCond)
+                .Where(dueLCond)
+                .Where(dueGCond)
+                .Where(qtyLCond)
+                .Where(qtyGCond)
+                .Where(totalLCond)
+                .Where(totalGCond)
+                .Where(recipientCond)
+                .Where(currencyCond)
+                .Where(paymentStatusCond)
+                .Where(statusCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(entity => new GetInvoices
                 {
                     InvoiceId = entity.InvoiceId,
                     InvoiceNumber = entity.InvoiceNumber,
-                    ClientName = entity.SellerNavigation.OrgName,
+                    ClientName = entity.BuyerNavigation.OrgName,
                     InvoiceDate = entity.InvoiceDate,
                     DueDate = entity.DueDate,
                     PaymentStatus = entity.PaymentsStatus.StatusName,
@@ -408,17 +826,82 @@ namespace database_comunicator.Services
                     Price = entity.SellingPrices.Select(d => d.Price * d.Qty).Sum() + entity.TransportCost,
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string search)
+        public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string search, string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
+            var sortFunc = SortFilterUtils.GetInvoiceSort(sort, true);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Invoice, bool>> dateLCond = dateL == null ?
+                e => true
+                : e => e.InvoiceDate <= DateTime.Parse(dateL);
+
+            Expression<Func<Invoice, bool>> dateGCond = dateG == null ?
+                e => true
+                : e => e.InvoiceDate >= DateTime.Parse(dateG);
+
+            Expression<Func<Invoice, bool>> dueLCond = dueL == null ?
+                e => true
+                : e => e.DueDate <= DateTime.Parse(dueL);
+
+            Expression<Func<Invoice, bool>> dueGCond = dueG == null ?
+                e => true
+                : e => e.DueDate >= DateTime.Parse(dueG);
+
+            Expression<Func<Invoice, bool>> qtyLCond = qtyL == null ?
+                e => true
+                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum() <= qtyL;
+
+            Expression<Func<Invoice, bool>> qtyGCond = qtyG == null ?
+                e => true
+                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum() >= qtyG;
+
+            Expression<Func<Invoice, bool>> totalLCond = totalL == null ?
+                e => true
+                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty * d.Price).Sum() <= totalL;
+
+            Expression<Func<Invoice, bool>> totalGCond = totalG == null ?
+                e => true
+                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty * d.Price).Sum() >= totalG;
+
+            Expression<Func<Invoice, bool>> recipientCond = recipient == null ?
+                e => true
+                : e => e.Seller == recipient;
+
+            Expression<Func<Invoice, bool>> currencyCond = currency == null ?
+                e => true
+                : e => e.CurrencyName == currency;
+
+            Expression<Func<Invoice, bool>> paymentStatusCond = paymentStatus == null ?
+                e => true
+                : e => e.PaymentsStatusId == paymentStatus;
+
+            Expression<Func<Invoice, bool>> statusCond = status == null ?
+                e => true
+                : e => e.InSystem == status;
             return await _handlerContext.Invoices
-                .Include(e => e.SellerNavigation)
-                .Include(e => e.PaymentsStatus)
-                .Include(e => e.OwnedItems)
-                    .ThenInclude(e => e.ItemOwners)
-                .Include(e => e.OwnedItems)
-                .ThenInclude(e => e.PurchasePrices)
                 .Where(e => !e.SellingPrices.Any() && e.OwnedItems.SelectMany(d => d.ItemOwners).Any(d => d.IdUser == userId))
                 .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))
+                .Where(dateLCond)
+                .Where(dateGCond)
+                .Where(dueLCond)
+                .Where(dueGCond)
+                .Where(qtyLCond)
+                .Where(qtyGCond)
+                .Where(totalLCond)
+                .Where(totalGCond)
+                .Where(recipientCond)
+                .Where(currencyCond)
+                .Where(paymentStatusCond)
+                .Where(statusCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(objs => new GetInvoices
                 {
                     InvoiceId = objs.InvoiceId,
@@ -433,21 +916,88 @@ namespace database_comunicator.Services
                     + (objs.CurrencyName == "PLN" ? objs.TransportCost : objs.TransportCost * objs.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId, string search)
+        public async Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId, string search, string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
+            var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith("D");
+            }
+            Expression<Func<Invoice, bool>> dateLCond = dateL == null ?
+                e => true
+                : e => e.InvoiceDate <= DateTime.Parse(dateL);
+
+            Expression<Func<Invoice, bool>> dateGCond = dateG == null ?
+                e => true
+                : e => e.InvoiceDate >= DateTime.Parse(dateG);
+
+            Expression<Func<Invoice, bool>> dueLCond = dueL == null ?
+                e => true
+                : e => e.DueDate <= DateTime.Parse(dueL);
+
+            Expression<Func<Invoice, bool>> dueGCond = dueG == null ?
+                e => true
+                : e => e.DueDate >= DateTime.Parse(dueG);
+
+            Expression<Func<Invoice, bool>> qtyLCond = qtyL == null ?
+                e => true
+                : e => e.SellingPrices.Select(d => d.Qty).Sum() <= qtyL;
+
+            Expression<Func<Invoice, bool>> qtyGCond = qtyG == null ?
+                e => true
+                : e => e.SellingPrices.Select(d => d.Qty).Sum() >= qtyG;
+
+            Expression<Func<Invoice, bool>> totalLCond = totalL == null ?
+                e => true
+                : e => e.SellingPrices.Select(d => d.Qty * d.Price).Sum() <= totalL;
+
+            Expression<Func<Invoice, bool>> totalGCond = totalG == null ?
+                e => true
+                : e => e.SellingPrices.Select(d => d.Qty * d.Price).Sum() >= totalG;
+
+            Expression<Func<Invoice, bool>> recipientCond = recipient == null ?
+                e => true
+                : e => e.Buyer == recipient;
+
+            Expression<Func<Invoice, bool>> currencyCond = currency == null ?
+                e => true
+                : e => e.CurrencyName == currency;
+
+            Expression<Func<Invoice, bool>> paymentStatusCond = paymentStatus == null ?
+                e => true
+                : e => e.PaymentsStatusId == paymentStatus;
+
+            Expression<Func<Invoice, bool>> statusCond = status == null ?
+                e => true
+                : e => e.InSystem == status;
             return await _handlerContext.Invoices
-                .Include(e => e.SellerNavigation)
-                .Include(e => e.PaymentsStatus)
-                .Include(e => e.SellingPrices)
-                        .ThenInclude(e => e.PurchasePrice)
                 .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))
                 .Where(e => e.SellingPrices.Any())
                 .Where(e => e.SellingPrices.Select(e => e.PurchasePrice).Select(d => d.OwnedItem).SelectMany(d => d.ItemOwners).Any(d => d.IdUser == userId))
+                .Where(dateLCond)
+                .Where(dateGCond)
+                .Where(dueLCond)
+                .Where(dueGCond)
+                .Where(qtyLCond)
+                .Where(qtyGCond)
+                .Where(totalLCond)
+                .Where(totalGCond)
+                .Where(recipientCond)
+                .Where(currencyCond)
+                .Where(paymentStatusCond)
+                .Where(statusCond)
+                .OrderByWithDirection(sortFunc, direction)
                 .Select(en => new GetInvoices
                 {
                     InvoiceId = en.InvoiceId,
                     InvoiceNumber = en.InvoiceNumber,
-                    ClientName = en.SellerNavigation.OrgName,
+                    ClientName = en.BuyerNavigation.OrgName,
                     InvoiceDate = en.InvoiceDate,
                     DueDate = en.DueDate,
                     PaymentStatus = en.PaymentsStatus.StatusName,

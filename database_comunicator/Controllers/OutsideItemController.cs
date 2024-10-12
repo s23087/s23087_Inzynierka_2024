@@ -25,28 +25,28 @@ namespace database_comunicator.Controllers
         }
         [HttpGet]
         [Route("get/items/{userId}")]
-        public async Task<IActionResult> GetOutsideItems(int userId, string? search)
+        public async Task<IActionResult> GetOutsideItems(int userId, string? search, string? sort, int? qtyL, int? qtyG, int? priceL, int? priceG, int? source, string? currency)
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("User not found.");
             if (search != null)
             {
-                var sResult = await _outsideItemServices.GetItems(userId, search);
+                var sResult = await _outsideItemServices.GetItems(userId, search, sort: sort, qtyL, qtyG, priceL, priceG, source, currency);
                 return Ok(sResult);
             }
-            var result = await _outsideItemServices.GetItems(userId);
+            var result = await _outsideItemServices.GetItems(userId, sort: sort, qtyL, qtyG, priceL, priceG, source, currency);
             return Ok(result);
         }
         [HttpGet]
         [Route("get/items")]
-        public async Task<IActionResult> GetOutsideItems(string? search)
+        public async Task<IActionResult> GetOutsideItems(string? search, string? sort, int? qtyL, int? qtyG, int? priceL, int? priceG, int? source, string? currency)
         {
             if (search != null)
             {
-                var sResult = await _outsideItemServices.GetItems(search);
+                var sResult = await _outsideItemServices.GetItems(search, sort: sort, qtyL, qtyG, priceL, priceG, source, currency);
                 return Ok(sResult);
             }
-            var result = await _outsideItemServices.GetItems();
+            var result = await _outsideItemServices.GetItems(sort: sort, qtyL, qtyG, priceL, priceG, source, currency);
             return Ok(result);
         }
         [HttpDelete]

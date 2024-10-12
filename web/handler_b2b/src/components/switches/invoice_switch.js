@@ -31,8 +31,24 @@ function InvoiceSwitch({ type, is_role_solo }) {
   const router = useRouter();
   const pathName = usePathname();
   const params = useSearchParams();
+  const newParams = new URLSearchParams(params);
   const changeDoc = (type) => {
     const newParams = new URLSearchParams(params);
+    newParams.delete("orderBy");
+    newParams.delete("totalL");
+    newParams.delete("totalG");
+    newParams.delete("qtyL");
+    newParams.delete("qtyG");
+    newParams.delete("dateL");
+    newParams.delete("dateG");
+    newParams.delete("dueL");
+    newParams.delete("dueG");
+    newParams.delete("recipient");
+    newParams.delete("currency");
+    newParams.delete("status");
+    newParams.delete("paymentStatus");
+    newParams.delete("type");
+    newParams.delete("requestStatus");
     newParams.set("docType", type);
     router.replace(`${pathName}?${newParams}`);
   };

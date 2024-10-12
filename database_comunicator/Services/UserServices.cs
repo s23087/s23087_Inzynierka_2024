@@ -20,8 +20,6 @@ namespace database_comunicator.Services
         public Task<int> GetCountNotification(int userId);
         public Task<BasicInfo> GetBasicInfo(int userId, bool isOrg);
         public Task SetOrgUserRole(int orgUserId, int roleId);
-        public Task<IEnumerable<GetOrgUsersWithRoles>> GetOrgUsersWithRoles(int userId);
-        public Task<IEnumerable<GetOrgUsersWithRoles>> GetOrgUsersWithRoles(int userId, string search);
         public Task ModifyPassword(int userId, string password);
         public Task ModifyUserData(int userId, string? email, string? username, string? surname);
         public Task<bool> SwitchToOrg(int userId, int roleId, int orgId);
@@ -105,39 +103,6 @@ namespace database_comunicator.Services
         {
             var result = await _handlerContext.UserNotifications.Where(e => e.UsersId == userId && !e.IsRead).CountAsync();
             return result;
-        }
-
-        public async Task<IEnumerable<GetOrgUsersWithRoles>> GetOrgUsersWithRoles(int userId)
-        {
-            return await _handlerContext.AppUsers
-                .Where(e => e.IdUser != userId && e.OrgUser != null)
-                .Include(e => e.OrgUser)
-                    .ThenInclude(e => e!.Role)
-                .Select(e => new GetOrgUsersWithRoles
-                {
-                    UserId = e.IdUser,
-                    Username = e.Username,
-                    Surname = e.Surname,
-                    RoleName = e.OrgUser!.Role.RoleName
-                }).ToListAsync();
-        }
-
-        public async Task<IEnumerable<GetOrgUsersWithRoles>> GetOrgUsersWithRoles(int userId, string search)
-        {
-            return await _handlerContext.AppUsers
-                .Where(ent => ent.IdUser != userId 
-                && (EF.Functions.FreeText(ent.Surname, search) || EF.Functions.FreeText(ent.Username, search))
-                && ent.OrgUser != null
-                )
-                .Include(ent => ent.OrgUser)
-                    .ThenInclude(ad => ad!.Role)
-                .Select(ent => new GetOrgUsersWithRoles
-                {
-                    UserId = ent.IdUser,
-                    Username = ent.Username,
-                    Surname = ent.Surname,
-                    RoleName = ent.OrgUser!.Role.RoleName
-                }).ToListAsync();
         }
 
         public async Task<bool> IsOrgUser(string email)

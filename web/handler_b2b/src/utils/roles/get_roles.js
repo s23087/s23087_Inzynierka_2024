@@ -13,5 +13,5 @@ export default async function getRoles() {
     return await data.json();
   }
 
-  return {};
+  return [];
 }

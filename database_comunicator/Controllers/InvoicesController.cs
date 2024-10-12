@@ -95,59 +95,71 @@ namespace database_comunicator.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("getPurchaseInvoices")]
-        public async Task<IActionResult> GetPurchaseInvoices(int userId, string? search)
+        [Route("get/purchase/{userId}")]
+        public async Task<IActionResult> GetPurchaseInvoices(int userId, string? search, string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
             IEnumerable<GetInvoices> result;
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("User not found.");
             if (search != null)
             {
-                result = await _invoicesService.GetPurchaseInvoices(userId, search);
+                result = await _invoicesService.GetPurchaseInvoices(userId, search, sort: sort, dateL, dateG, dueL, dueG,
+                    qtyL, qtyG, totalL, totalG, recipient, currency, paymentStatus, status);
                 return Ok(result);
             }
-            result = await _invoicesService.GetPurchaseInvoices(userId);
+            result = await _invoicesService.GetPurchaseInvoices(userId, sort: sort, dateL, dateG, dueL, dueG,
+                    qtyL, qtyG, totalL, totalG, recipient, currency, paymentStatus, status);
             return Ok(result);
         }
         [HttpGet]
-        [Route("getPurchaseInvoicesOrg")]
-        public async Task<IActionResult> GetPurchaseInvoicesOrg(string? search)
+        [Route("get/purchase/org")]
+        public async Task<IActionResult> GetPurchaseInvoicesOrg(string? search, string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
             IEnumerable<GetInvoices> result;
             if (search != null)
             {
-                result = await _invoicesService.GetPurchaseInvoices(search);
+                result = await _invoicesService.GetPurchaseInvoices(search, sort: sort, dateL, dateG, dueL, dueG,
+                    qtyL, qtyG, totalL, totalG, recipient, currency, paymentStatus, status);
                 return Ok(result);
             }
-            result = await _invoicesService.GetPurchaseInvoices();
+            result = await _invoicesService.GetPurchaseInvoices(sort: sort, dateL, dateG, dueL, dueG,
+                    qtyL, qtyG, totalL, totalG, recipient, currency, paymentStatus, status);
             return Ok(result);
         }
         [HttpGet]
-        [Route("getSalesInvoices")]
-        public async Task<IActionResult> GetSalesInvoices(int userId, string? search)
+        [Route("get/sales/{userId}")]
+        public async Task<IActionResult> GetSalesInvoices(int userId, string? search, string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
             IEnumerable<GetInvoices> result;
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("User not found.");
             if (search != null)
             {
-                result = await _invoicesService.GetSalesInvocies(userId, search);
+                result = await _invoicesService.GetSalesInvocies(userId, search, sort: sort, dateL, dateG, dueL, dueG,
+                    qtyL, qtyG, totalL, totalG, recipient, currency, paymentStatus, status);
                 return Ok(result);
             }
-            result = await _invoicesService.GetSalesInvocies(userId);
+            result = await _invoicesService.GetSalesInvocies(userId, sort: sort, dateL, dateG, dueL, dueG,
+                    qtyL, qtyG, totalL, totalG, recipient, currency, paymentStatus, status);
             return Ok(result);
         }
         [HttpGet]
-        [Route("getSalesInvoicesOrg")]
-        public async Task<IActionResult> GetSalesInvoicesOrg(string? search)
+        [Route("get/sales/org")]
+        public async Task<IActionResult> GetSalesInvoicesOrg(string? search, string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
             IEnumerable<GetInvoices> result;
             if (search != null)
             {
-                result = await _invoicesService.GetSalesInvocies(search);
+                result = await _invoicesService.GetSalesInvocies(search, sort: sort, dateL, dateG, dueL, dueG,
+                    qtyL, qtyG, totalL, totalG, recipient, currency, paymentStatus, status);
                 return Ok(result);
             }
-            result = await _invoicesService.GetSalesInvocies();
+            result = await _invoicesService.GetSalesInvocies(sort: sort, dateL, dateG, dueL, dueG,
+                    qtyL, qtyG, totalL, totalG, recipient, currency, paymentStatus, status);
             return Ok(result);
         }
         [HttpPost]

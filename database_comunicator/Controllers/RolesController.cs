@@ -17,18 +17,20 @@ namespace database_comunicator.Controllers
             _userServices = userServices;
         }
         [HttpGet]
-        [Route("getUserRoles")]
-        public async Task<IActionResult> GetUserWithRoles(int userId, string? search)
+        [Route("get/{userId}")]
+        public async Task<IActionResult> GetUserWithRoles(int userId, string? search, string? sort, string? role)
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound();
+            var isOrgUser = await _userServices.IsOrgUser(userId);
+            if (!isOrgUser) return BadRequest();
             IEnumerable<GetOrgUsersWithRoles> result;
             if (search == null)
             {
-                result = await _userServices.GetOrgUsersWithRoles(userId);
+                result = await _rolesServices.GetOrgUsersWithRoles(userId, sort: sort, role);
             } else
             {
-                result = await _userServices.GetOrgUsersWithRoles(userId, search);
+                result = await _rolesServices.GetOrgUsersWithRoles(userId, search, sort: sort, role);
             }
             return Ok(result);
         }

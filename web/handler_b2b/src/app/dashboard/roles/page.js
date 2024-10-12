@@ -14,13 +14,17 @@ export default async function RolesPage({ searchParams }) {
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
   const rolesToChoose = await getRoles();
+  let currentSort = searchParams.orderBy ?? ".None";
+  let role = searchParams.role;
+  let filterActivated = searchParams.orderBy || role;
   let isSearchTrue =
     searchParams.searchQuery !== undefined && searchParams.searchQuery !== "";
   let roles = isSearchTrue
-    ? await getUserRoles(searchParams.searchQuery)
-    : await getUserRoles();
+    ? await getUserRoles(searchParams.searchQuery, currentSort, role)
+    : await getUserRoles(null, currentSort, role);
+  let rolesLength = roles ? roles.length : 0;
   let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
-  let pageQty = Math.ceil(roles.length / maxInstanceOnPage);
+  let pageQty = Math.ceil(rolesLength / maxInstanceOnPage);
   pageQty = pageQty === 0 ? 1 : pageQty;
   let currentPage = parseInt(searchParams.page)
     ? parseInt(searchParams.page)
@@ -43,6 +47,8 @@ export default async function RolesPage({ searchParams }) {
           rolesStart={rolesStart}
           rolesEnd={rolesEnd}
           rolesToChoose={rolesToChoose}
+          filterActive={filterActivated}
+          currentSort={currentSort}
         />
       </section>
 

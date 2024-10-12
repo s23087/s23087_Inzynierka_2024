@@ -28,6 +28,7 @@ import ModifyRequestOffcanvas from "../offcanvas/modify/documents/modify_request
 import ChangeStatusWindow from "../windows/set_status_Window";
 import setRequestStatus from "@/utils/documents/set_request_status";
 import Toastes from "../smaller_components/toast";
+import InvoiceFilterOffcanvas from "../filter/document_filter";
 
 function getIfSelected(type, document, selected) {
   if (type.includes("note")) {
@@ -92,7 +93,7 @@ function getDocument(
       invoice={document}
       is_org={is_org}
       selected={selected}
-      is_user_type={true}
+      is_user_type={type.includes("Yours")}
       selectAction={selectAction}
       unselectAction={unselectAction}
       deleteAction={deleteAction}
@@ -109,6 +110,8 @@ function InvoiceList({
   invoiceStart,
   invoiceEnd,
   role,
+  filterActive,
+  currentSort,
 }) {
   // View invoice
   const [showViewInvoice, setShowViewInvoice] = useState(false);
@@ -187,6 +190,8 @@ function InvoiceList({
   // Seleted
   const [selectedQty, setSelectedQty] = useState(0);
   const [selectedDocuments] = useState([]);
+  // Filter
+  const [showFilter, setShowFilter] = useState(false);
   // Nav
   const router = useRouter();
   const params = useSearchParams();
@@ -200,23 +205,35 @@ function InvoiceList({
   };
   return (
     <Container className="p-0 middleSectionPlacement position-relative" fluid>
+      <InvoiceFilterOffcanvas
+        showOffcanvas={showFilter}
+        hideFunction={() => setShowFilter(false)}
+        currentSort={currentSort}
+        currentDirection={
+          currentSort.startsWith("A") || currentSort.startsWith(".")
+        }
+        type={type}
+      />
       <Container
         className="fixed-top middleSectionPlacement-no-footer p-0"
         fluid
       >
         <SearchFilterBar
-          filter_icon_bool="false"
+          filter_icon_bool={filterActive}
           moreButtonAction={() => setShowMoreAction(true)}
+          filterAction={() => setShowFilter(true)}
         />
       </Container>
       <SelectComponent selectedQty={selectedQty} />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
-      {Object.keys(invoices).length === 0 ? (
+      {Object.keys(invoices ?? []).length === 0 ? (
         <Container className="text-center" fluid>
-          <p className="mt-5 pt-5 blue-main-text h2">{type} not found :/</p>
+          <p className="mt-5 pt-5 blue-main-text h2">
+            {invoices ? `${type} not found :/` : "Could not connect to server."}
+          </p>
         </Container>
       ) : (
-        Object.values(invoices)
+        Object.values(invoices ?? [])
           .slice(invoiceStart, invoiceEnd)
           .map((value) => {
             return getDocument(
@@ -534,6 +551,8 @@ InvoiceList.PropTypes = {
   invoiceStart: PropTypes.number.isRequired,
   invoiceEnd: PropTypes.number.isRequired,
   role: PropTypes.string.isRequired,
+  filterActive: PropTypes.bool.isRequired,
+  currentSort: PropTypes.string.isRequired,
 };
 
 export default InvoiceList;

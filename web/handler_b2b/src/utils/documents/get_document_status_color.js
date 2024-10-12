@@ -10,7 +10,7 @@ export default function getDocumentStatusStyle(statusName) {
       };
     case "Due to":
       return {
-        backgroundColor: "var(-sec-red)",
+        backgroundColor: "var(--sec-red)",
         color: "var(--text-main-color)",
       };
     case "In system":

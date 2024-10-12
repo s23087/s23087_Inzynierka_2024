@@ -56,30 +56,32 @@ namespace database_comunicator.Controllers
         }
         [HttpGet]
         [Route("get/created/{userId}")]
-        public async Task<IActionResult> GetMyRequests(int userId, string? search)
+        public async Task<IActionResult> GetMyRequests(int userId, string? search, string? sort, string? dateL, string? dateG,
+            string? type, int? status)
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("User not found.");
             if (search != null)
             {
-                var sResult = await _requestServices.GetMyRequests(userId,search);
+                var sResult = await _requestServices.GetMyRequests(userId,search, sort: sort, dateL, dateG, type, status);
                 return Ok(sResult);
             }
-            var result = await _requestServices.GetMyRequests(userId);
+            var result = await _requestServices.GetMyRequests(userId, sort: sort, dateL, dateG, type, status);
             return Ok(result);
         }
         [HttpGet]
         [Route("get/recived/{userId}")]
-        public async Task<IActionResult> GetRecivedRequests(int userId, string? search)
+        public async Task<IActionResult> GetRecivedRequests(int userId, string? search, string? sort, string? dateL, string? dateG,
+            string? type, int? status)
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("User not found.");
             if (search != null)
             {
-                var sResult = await _requestServices.GetRecivedRequests(userId, search);
+                var sResult = await _requestServices.GetRecivedRequests(userId, search, sort: sort, dateL, dateG, type, status);
                 return Ok(sResult);
             }
-            var result = await _requestServices.GetRecivedRequests(userId);
+            var result = await _requestServices.GetRecivedRequests(userId, sort: sort, dateL, dateG, type, status);
             return Ok(result);
         }
         [HttpGet]
@@ -172,6 +174,13 @@ namespace database_comunicator.Controllers
             var exist = await _requestServices.RequestExist(requestId);
             if (!exist) return NotFound("Requests not found.");
             var result = await _requestServices.GetRestModifyRequest(requestId);
+            return Ok(result);
+        }
+        [HttpGet]
+        [Route("get/statuses")]
+        public async Task<IActionResult> GetStatuses()
+        {
+            var result = await _requestServices.GetRequestStatuses();
             return Ok(result);
         }
     }

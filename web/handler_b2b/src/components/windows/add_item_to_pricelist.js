@@ -58,7 +58,7 @@ function AddItemToPricelistWindow({
   const [chosenPrice, setChosenPrice] = useState(0);
   const [chosenMargin, setChosenMargin] = useState(0);
   let getMargin = () => {
-    if (parseFloat(chosenPrice) === NaN || !products[currentProduct]) {
+    if (isNaN(parseFloat(chosenPrice)) || !products[currentProduct]) {
       return "Error";
     } else {
       let result =
@@ -167,7 +167,7 @@ function AddItemToPricelistWindow({
               onInput={(e) => {
                 StringValidtor.decimalValidator(e.target.value, setMarginError);
                 if (!e.target.value) return;
-                if (parseFloat(e.target.value) !== NaN) {
+                if (!isNaN(parseFloat(e.target.value))) {
                   setChosenPrice(
                     products[currentProduct].purchasePrice +
                       products[currentProduct].purchasePrice *

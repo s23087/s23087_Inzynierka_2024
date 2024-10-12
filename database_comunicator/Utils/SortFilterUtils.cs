@@ -28,6 +28,94 @@ namespace database_comunicator.Utils
                 return orderBy;
             }
         }
+        public static Expression<Func<Request, Object>> GetRequestSort(string? sort)
+        {
+            Expression<Func<Request, Object>> orderBy;
+            if (sort == null)
+            {
+                orderBy = e => e.RequestId;
+                return orderBy;
+            }
+            else
+            {
+                var changedSort = sort[1..];
+                orderBy = changedSort switch
+                {
+                    "Title" => e => e.Title,
+                    "Date" => e => e.CreationDate,
+                    _ => e => e.RequestId,
+                };
+                return orderBy;
+            }
+        }
+        public static Expression<Func<CreditNote, Object>> GetCreditNoteSort(string? sort)
+        {
+            Expression<Func<CreditNote, Object>> orderBy;
+            if (sort == null)
+            {
+                orderBy = e => e.IdCreditNote;
+                return orderBy;
+            }
+            else
+            {
+                var changedSort = sort[1..];
+                orderBy = changedSort switch
+                {
+                    "Number" => e => e.CreditNoteNumber,
+                    "Date" => e => e.CreditNoteDate,
+                    "Qty" => e => e.CreditNoteItems.Any(d => d.Qty > 0) ? e.CreditNoteItems.Where(d => d.Qty > 0).Select(d => d.Qty).Sum() : e.CreditNoteItems.Sum(d => d.Qty),
+                    "Total" => e => e.CreditNoteItems.Sum(d => d.NewPrice * d.Qty),
+                    _ => e => e.InvoiceId,
+                };
+                return orderBy;
+            }
+        }
+        public static Expression<Func<Invoice, Object>> GetInvoiceSort(string? sort, bool isYourInvoice)
+        {
+            Expression<Func<Invoice, Object>> orderBy;
+            if (sort == null)
+            {
+                orderBy = e => e.InvoiceId;
+                return orderBy;
+            }
+            else
+            {
+                var changedSort = sort[1..];
+                orderBy = changedSort switch
+                {
+                    "Number" => e => e.InvoiceNumber,
+                    "Date" => e => e.InvoiceDate,
+                    "Qty" => e => isYourInvoice ? e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum() : e.SellingPrices.Select(d => d.Qty).Sum(),
+                    "Total" => e => isYourInvoice ? e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty * d.Price).Sum() : e.SellingPrices.Select(d => d.Qty * d.Price).Sum(),
+                    "Due" => e => e.DueDate,
+                    _ => e => e.InvoiceId,
+                };
+                return orderBy;
+            }
+        }
+        public static Expression<Func<OutsideItem, Object>> GetOutsideItemSort(string? sort)
+        {
+            Expression<Func<OutsideItem, Object>> orderBy;
+            if (sort == null)
+            {
+                orderBy = e => e.ItemId;
+                return orderBy;
+            }
+            else
+            {
+                var changedSort = sort[1..];
+                orderBy = changedSort switch
+                {
+                    "Id" => e => e.ItemId,
+                    "Source" => e => e.Organization.OrgName,
+                    "Qty" => e => e.Qty,
+                    "Price" => e => e.PurchasePrice,
+                    "Partnumber" => e => e.Item.PartNumber,
+                    _ => e => e.ItemId,
+                };
+                return orderBy;
+            }
+        }
         public static Expression<Func<Delivery, Object>> GetDeliverySort(string? sort, bool isDeliveryToUser)
         {
             Expression<Func<Delivery, Object>> orderBy;
