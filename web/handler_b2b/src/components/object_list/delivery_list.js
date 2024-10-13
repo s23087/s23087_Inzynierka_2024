@@ -16,6 +16,7 @@ import deleteDelivery from "@/utils/deliveries/delete_delivery";
 import ViewDeliveryOffcanvas from "../offcanvas/view/view_delivery";
 import ModifyDeliveryOffcanvas from "../offcanvas/modify/modify_delivery";
 import DeliveryFilterOffcanvas from "../filter/delivery_filter";
+import DeleteSelectedWindow from "../windows/delete_selected";
 
 function DeliveryList({
   deliveries,
@@ -62,6 +63,9 @@ function DeliveryList({
   const [selectedDelivery] = useState([]);
   // Filter
   const [showFilter, setShowFilter] = useState(false);
+  // mass action
+  const [showDeleteSelected, setShowDeleteSelected] = useState(false);
+  const [deleteSelectedErrorMess, setDeleteSelectedErrorMess] = useState("");
   // Nav
   const router = useRouter();
   const params = useSearchParams();
@@ -88,7 +92,11 @@ function DeliveryList({
           filterAction={() => setShowFilter(true)}
         />
       </Container>
-      <SelectComponent selectedQty={selectedQty} />
+      <SelectComponent 
+        selectedQty={selectedQty}
+        actionOneName="Delete selected"
+        actionOne={()  => setShowDeleteSelected(true)} 
+      />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
       {Object.keys(deliveries ?? []).length === 0 ? (
         <Container className="text-center" fluid>
@@ -195,6 +203,38 @@ function DeliveryList({
         }}
         isError={isErrorDelete}
         errorMessage={errorMessage}
+      />
+      <DeleteSelectedWindow
+        modalShow={showDeleteSelected}
+        onHideFunction={() => {
+          setShowDeleteSelected(false)
+          setDeleteSelectedErrorMess("")
+          setIsErrorDelete(false)
+        }}
+        instanceName="delivery"
+        deleteItemFunc={async () => {
+          let failures = [];
+          for (let index = 0; index < selectedDelivery.length; index++) {
+            let result = await deleteDelivery(type === "Deliveries to user", selectedDelivery[index])
+            if (result.error) {
+              failures.push(selectedDelivery[index])
+            } else {
+              selectedDelivery.splice(index, 1)
+              setSelectedQty(selectedDelivery.length)
+            }
+          }
+          if (failures.length === 0) {
+            setShowDeleteSelected(false);
+            setDeleteSelectedErrorMess("")
+            router.refresh();
+          } else {
+            setDeleteSelectedErrorMess(`Error: Could not delete this deliveries (${failures.join(",")}).`)
+            setIsErrorDelete(true);
+            router.refresh();
+          }
+        }}
+        isError={isErrorDelete}
+        errorMessage={deleteSelectedErrorMess}
       />
       <ModifyDeliveryOffcanvas
         showOffcanvas={showModifyDelivery}
