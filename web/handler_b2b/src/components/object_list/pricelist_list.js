@@ -150,7 +150,7 @@ function PricelistList({
           let pagationInfo = getPagationInfo(params);
           Object.values(pricelist)
             .slice(pagationInfo.start, pagationInfo.end)
-            .forEach((e) => selectedPricelist.push(e.pricelistId));
+            .forEach((e) => selectedPricelist.push([e.pricelistId, e.path]));
           setSelectedQty(selectedPricelist.length);
           setShowMoreAction(false);
         }}
@@ -158,7 +158,7 @@ function PricelistList({
           selectedPricelist.splice(0, selectedPricelist.length);
           setSelectedQty(0);
           Object.values(pricelist).forEach((e) =>
-            selectedPricelist.push(e.pricelistId),
+            selectedPricelist.push([e.pricelistId, e.path])
           );
           setSelectedQty(selectedPricelist.length);
           setShowMoreAction(false);

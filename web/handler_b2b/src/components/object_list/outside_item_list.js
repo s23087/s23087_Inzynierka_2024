@@ -14,6 +14,7 @@ import AbstractItemContainer from "../object_container/abstrac_item_container";
 import AddOutsideItemsOffcanvas from "../offcanvas/create/create_outside_item";
 import deleteOutsideItem from "@/utils/outside_items/delete_outside_item";
 import OutsideItemsFilterOffcanvas from "../filter/outside_items_filter";
+import DeleteSelectedWindow from "../windows/delete_selected";
 
 function OutsideItemList({
   items,
@@ -35,6 +36,9 @@ function OutsideItemList({
   const [selectedItems] = useState([]);
   // Filter
   const [showFilter, setShowFilter] = useState(false);
+  // mass action
+  const [showDeleteSelected, setShowDeleteSelected] = useState(false);
+  const [deleteSelectedErrorMess, setDeleteSelectedErrorMess] = useState("");
   // Nav
   const router = useRouter();
   const params = useSearchParams();
@@ -62,7 +66,12 @@ function OutsideItemList({
           filterAction={() => setShowFilter(true)}
         />
       </Container>
-      <SelectComponent selectedQty={selectedQty} additonalMargin={true} />
+      <SelectComponent 
+        selectedQty={selectedQty} 
+        additonalMargin={true} 
+        actionOneName="Delete selected"
+        actionOne={()  => setShowDeleteSelected(true)} 
+      />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
       {Object.keys(items ?? []).length === 0 ? (
         <Container className="text-center" fluid>
@@ -77,22 +86,19 @@ function OutsideItemList({
                 key={[value.itemId, value.orgId]}
                 abstract_item={value}
                 selected={
-                  selectedItems.filter(
-                    (e) => e.itemId === value.itemId && e.orgId === value.orgId,
-                  ).length !== 0
+                  selectedItems.findIndex(
+                    (e) => e[0] === value.itemId && e[1] === value.orgId
+                  ) !== -1
                 }
                 selectAction={() => {
-                  selectedItems.push({
-                    itemId: value.itemId,
-                    orgId: value.orgId,
-                  });
+                  selectedItems.push([
+                    value.itemId,
+                    value.orgId
+                  ]);
                   setSelectedQty(selectedQty + 1);
                 }}
                 unselectAction={() => {
-                  let index = selectedItems.indexOf({
-                    itemId: value.itemId,
-                    orgId: value.orgId,
-                  });
+                  let index = selectedItems.findIndex((e) => e[0] === value.itemId && e[1] === value.orgId);
                   selectedItems.splice(index, 1);
                   setSelectedQty(selectedQty - 1);
                 }}
@@ -119,7 +125,7 @@ function OutsideItemList({
           Object.values(items)
             .slice(pagationInfo.start, pagationInfo.end)
             .forEach((e) =>
-              selectedItems.push({ itemId: e.itemId, orgId: e.orgId }),
+              selectedItems.push([ e.itemId, e.orgId ]),
             );
           setSelectedQty(selectedItems.length);
           setShowMoreAction(false);
@@ -128,7 +134,7 @@ function OutsideItemList({
           selectedItems.splice(0, selectedItems.length);
           setSelectedQty(0);
           Object.values(items).forEach((e) =>
-            selectedItems.push({ itemId: e.itemId, orgId: e.orgId }),
+            selectedItems.push([ e.itemId, e.orgId ]),
           );
           setSelectedQty(selectedItems.length);
           setShowMoreAction(false);
@@ -166,6 +172,38 @@ function OutsideItemList({
         }}
         isError={isErrorDelete}
         errorMessage={errorMessage}
+      />
+      <DeleteSelectedWindow
+        modalShow={showDeleteSelected}
+        onHideFunction={() => {
+          setShowDeleteSelected(false)
+          setDeleteSelectedErrorMess("")
+          setIsErrorDelete(false)
+        }}
+        instanceName="outside item"
+        deleteItemFunc={async () => {
+          let failures = [];
+          for (let index = 0; index < selectedItems.length; index++) {
+            let result = await deleteOutsideItem(selectedItems[index][0], selectedItems[index][1])
+            if (result.error) {
+              failures.push(selectedItems[index])
+            } else {
+              selectedItems.splice(index, 1)
+              setSelectedQty(selectedItems.length)
+            }
+          }
+          if (failures.length === 0) {
+            setShowDeleteSelected(false);
+            setDeleteSelectedErrorMess("")
+            router.refresh();
+          } else {
+            setDeleteSelectedErrorMess(`Error: Could not delete this proformas (${failures.join(",")}).`)
+            setIsErrorDelete(true);
+            router.refresh();
+          }
+        }}
+        isError={isErrorDelete}
+        errorMessage={deleteSelectedErrorMess}
       />
     </Container>
   );
