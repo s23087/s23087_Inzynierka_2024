@@ -16,6 +16,7 @@ import deletePricelist from "@/utils/pricelist/delete_pricelist";
 import ViewPricelistOffcanvas from "../offcanvas/view/view_pricelist";
 import ModifyPricelistOffcanvas from "../offcanvas/modify/modify_pricelist";
 import PricelistFilterOffcanvas from "../filter/pricelist_filter";
+import DeleteAllWindow from "../windows/delete_all";
 
 function PricelistList({
   pricelist,
@@ -58,6 +59,9 @@ function PricelistList({
   const [selectedPricelist] = useState([]);
   // Filter
   const [showFilter, setShowFilter] = useState(false);
+  // mass action
+  const [showDeleteAll, setDeleteAll] = useState(false);
+  const [deleteAllErrorMessage, setDeleteAllErrorMessage] = useState("");
   // Nav
   const router = useRouter();
   const params = useSearchParams();
@@ -84,7 +88,11 @@ function PricelistList({
           filterAction={() => setShowFilter(true)}
         />
       </Container>
-      <SelectComponent selectedQty={selectedQty} />
+      <SelectComponent 
+        selectedQty={selectedQty} 
+        actionOneName="Delete selected"
+        actionOne={()  => setDeleteAll(true)} 
+      />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
       {Object.keys(pricelist ?? []).length === 0 ? (
         <Container className="text-center" fluid>
@@ -102,13 +110,13 @@ function PricelistList({
               <PricelistContainer
                 key={value.pricelistId}
                 pricelist={value}
-                selected={selectedPricelist.indexOf(value.pricelistId) !== -1}
+                selected={selectedPricelist.findIndex(e => e[0] === value.pricelistId) !== -1}
                 selectAction={() => {
-                  selectedPricelist.push(value.pricelistId);
+                  selectedPricelist.push([value.pricelistId, value.path]);
                   setSelectedQty(selectedQty + 1);
                 }}
                 unselectAction={() => {
-                  let index = selectedPricelist.indexOf(value.pricelistId);
+                  let index = selectedPricelist.findIndex(e => e[0] === value.pricelistId);
                   selectedPricelist.splice(index, 1);
                   setSelectedQty(selectedQty - 1);
                 }}
@@ -188,6 +196,38 @@ function PricelistList({
         }}
         isError={isErrorDelete}
         errorMessage={errorMessage}
+      />
+      <DeleteAllWindow
+        modalShow={showDeleteAll}
+        onHideFunction={() => {
+          setDeleteAll(false)
+          setDeleteAllErrorMessage("")
+          setIsErrorDelete(false)
+        }}
+        instanceName="pricelist"
+        deleteItemFunc={async () => {
+          let failures = [];
+          for (let index = 0; index < selectedPricelist.length; index++) {
+            let result = await deletePricelist(selectedPricelist[index][0], selectedPricelist[index][1])
+            if (result.error) {
+              failures.push(selectedPricelist[index][0])
+            } else {
+              selectedPricelist.splice(index, 1)
+              setSelectedQty(selectedPricelist.length)
+            }
+          }
+          if (failures.length === 0) {
+            setDeleteAll(false);
+            setDeleteAllErrorMessage("")
+            router.refresh();
+          } else {
+            setDeleteAllErrorMessage(`Error: Could not delete this pricelists (${failures.join(",")}).`)
+            setIsErrorDelete(true);
+            router.refresh();
+          }
+        }}
+        isError={isErrorDelete}
+        errorMessage={deleteAllErrorMessage}
       />
       <ModifyPricelistOffcanvas
         showOffcanvas={showModifyPricelist}

@@ -70,7 +70,7 @@ namespace database_comunicator.Controllers
         }
         [HttpDelete]
         [Route("delete/{offerId}")]
-        public async Task<IActionResult> DeleteYourProforma(int offerId, int userId)
+        public async Task<IActionResult> DeleteOffer(int offerId, int userId)
         {
             var userExist = await _userServices.UserExist(userId);
             if (!userExist) return NotFound("User not found.");

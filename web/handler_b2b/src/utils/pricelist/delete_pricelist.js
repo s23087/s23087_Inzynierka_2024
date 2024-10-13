@@ -9,43 +9,50 @@ export default async function deletePricelist(pricelistId, path) {
   const userId = await getUserId();
 
   let url = `${process.env.API_DEST}/${dbName}/Offer/delete/${pricelistId}?userId=${userId}`;
-  const info = await fetch(url, {
-    method: "Delete",
-  });
-
-  if (info.status === 404) {
-    let text = await info.text();
-    if (text === "User not found.") {
-      logout();
+  try {
+    const info = await fetch(url, {
+      method: "Delete",
+    });
+  
+    if (info.status === 404) {
+      let text = await info.text();
+      if (text === "User not found.") {
+        logout();
+        return {
+          error: true,
+          message: "Your account does not exist.",
+        };
+      }
       return {
         error: true,
-        message: "Your account doe not exist.",
+        message: text,
       };
+    }
+  
+    if (info.ok) {
+      const fs = require("node:fs");
+      try {
+        fs.rmSync(path);
+        return {
+          error: false,
+          message: "Success!",
+        };
+      } catch (error) {
+        console.log(error);
+        return {
+          error: true,
+          message: "Success with error. Could not delete file on server.",
+        };
+      }
     }
     return {
       error: true,
-      message: text,
+      message: "Critical error.",
+    };
+  } catch {
+    return {
+      error: true,
+      message: "Could not connect to server.",
     };
   }
-
-  if (info.ok) {
-    const fs = require("node:fs");
-    try {
-      fs.rmSync(path);
-      return {
-        error: false,
-        message: "Success!",
-      };
-    } catch (error) {
-      console.log(error);
-      return {
-        error: true,
-        message: "Success with error. Could not delete file on server.",
-      };
-    }
-  }
-  return {
-    error: true,
-    message: await info.text(),
-  };
 }
