@@ -139,13 +139,15 @@ namespace database_comunicator.Controllers
             return Ok(result);
         }
         [HttpDelete]
-        [Route("deleteOrg/{orgId}")]
-        public async Task<IActionResult> DeleteOrg(int orgId, int userId)
+        [Route("delete/{orgId}/{userId}")]
+        public async Task<IActionResult> DeleteClient(int orgId, int userId)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound();
+            if (!exist) return NotFound("User not found.");
+            var clientExist = await _organizationServices.OrgExist(orgId);
+            if (!clientExist) return NotFound("Client not found.");
             var relationExist = await _organizationServices.OrgHaveRelations(orgId);
-            if (relationExist) return BadRequest();
+            if (relationExist) return BadRequest("This organization is included in exsisting objects (Invoice, proforma etc.).");
             await _organizationServices.DeleteOrg(orgId);
             var logTypeId = await _logServices.getLogTypeId("Delete");
             await _logServices.CreateActionLog($"Organization with  id {orgId} had been deleted by user with id {userId}.", userId, logTypeId);

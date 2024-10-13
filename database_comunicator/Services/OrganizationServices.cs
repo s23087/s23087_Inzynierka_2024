@@ -352,14 +352,14 @@ namespace database_comunicator.Services
         }
         public async Task<bool> OrgHaveRelations(int orgId)
         {
-            var invoicesCheck = await _handlerContext.Invoices.Where(e => e.Buyer == orgId || e.Seller == orgId).AnyAsync();
-            var proformaCheck = await _handlerContext.Proformas.Where(e => e.Buyer == orgId || e.Seller == orgId).AnyAsync();
-            var soloUserCheck = await _handlerContext.SoloUsers.Where(e => e.OrganizationsId == orgId).AnyAsync();
-            var orgUserCheck = await _handlerContext.OrgUsers.Where(e => e.OrganizationsId == orgId).AnyAsync();
-            var outsideItemsCheck = await _handlerContext.OutsideItems.Where(e => e.OrganizationId == orgId).AnyAsync();
-            var userClientCheck = await _handlerContext.Database.ExecuteSqlAsync($"Select 1 from User_Client where organization_id = {orgId}");
+            var invoicesCheck = await _handlerContext.Invoices.AnyAsync(e => e.Buyer == orgId || e.Seller == orgId);
+            var proformaCheck = await _handlerContext.Proformas.AnyAsync(e => e.Buyer == orgId || e.Seller == orgId);
+            var soloUserCheck = await _handlerContext.SoloUsers.AnyAsync(e => e.OrganizationsId == orgId);
+            var orgUserCheck = await _handlerContext.OrgUsers.AnyAsync(e => e.OrganizationsId == orgId);
+            var outsideItemsCheck = await _handlerContext.OutsideItems.AnyAsync(e => e.OrganizationId == orgId);
+            var userClientCheck = await _handlerContext.AppUsers.AnyAsync(e => e.Clients.Any(x => x.OrganizationId == orgId));
 
-            return invoicesCheck || proformaCheck || soloUserCheck || orgUserCheck || outsideItemsCheck || userClientCheck.ToString().Contains('1');
+            return invoicesCheck || proformaCheck || soloUserCheck || orgUserCheck || outsideItemsCheck || userClientCheck;
         }
         public async Task DeleteOrg(int orgId)
         {

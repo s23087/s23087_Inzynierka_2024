@@ -16,6 +16,7 @@ import ModifyClientOffcanvas from "../offcanvas/modify/modify_client";
 import SelectComponent from "../smaller_components/select_compontent";
 import getPagationInfo from "@/utils/flexible/get_page_info";
 import ClientFilterOffcanvas from "../filter/client_filter";
+import DeleteSelectedWindow from "../windows/delete_selected";
 
 function ClientsList({
   clients,
@@ -48,6 +49,9 @@ function ClientsList({
   const [selectedClients] = useState([]);
   // Filter
   const [showFilter, setShowFilter] = useState(false);
+  // mass action
+  const [showDeleteSelected, setShowDeleteSelected] = useState(false);
+  const [deleteSelectedErrorMess, setDeleteSelectedErrorMess] = useState("");
   // Nav
   const router = useRouter();
   const params = useSearchParams();
@@ -74,7 +78,11 @@ function ClientsList({
           filterAction={() => setShowFilter(true)}
         />
       </Container>
-      <SelectComponent selectedQty={selectedQty} />
+      <SelectComponent 
+        selectedQty={selectedQty}
+        actionOneName="Delete selected"
+        actionOne={()  => setShowDeleteSelected(true)} 
+      />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
       {Object.keys(clients ?? []).length === 0 ? (
         <Container className="text-center" fluid>
@@ -174,6 +182,38 @@ function ClientsList({
         }}
         isError={isErrorDelete}
         errorMessage={errorMessage}
+      />
+      <DeleteSelectedWindow
+        modalShow={showDeleteSelected}
+        onHideFunction={() => {
+          setShowDeleteSelected(false)
+          setDeleteSelectedErrorMess("")
+          setIsErrorDelete(false)
+        }}
+        instanceName="client"
+        deleteItemFunc={async () => {
+          let failures = [];
+          for (let index = 0; index < selectedClients.length; index++) {
+            let result = await deleteClient(selectedClients[index])
+            if (result.error) {
+              failures.push(selectedClients[index])
+            } else {
+              selectedClients.splice(index, 1)
+              setSelectedQty(selectedClients.length)
+            }
+          }
+          if (failures.length === 0) {
+            setShowDeleteSelected(false);
+            setDeleteSelectedErrorMess("")
+            router.refresh();
+          } else {
+            setDeleteSelectedErrorMess(`Error: Could not delete this clients (${failures.join(",")}).`)
+            setIsErrorDelete(true);
+            router.refresh();
+          }
+        }}
+        isError={isErrorDelete}
+        errorMessage={deleteSelectedErrorMess}
       />
       <ModifyClientOffcanvas
         showOffcanvas={showModifyClient}

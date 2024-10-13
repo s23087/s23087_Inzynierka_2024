@@ -8,23 +8,31 @@ import logout from "../auth/logout";
 export default async function deleteClient(orgId) {
   const dbName = await getDbName();
   const userId = await getUserId();
-  let url = `${process.env.API_DEST}/${dbName}/Client/deleteOrg/${orgId}?userId=${userId}`;
+  let url = `${process.env.API_DEST}/${dbName}/Client/delete/${orgId}/${userId}`;
   const info = await fetch(url, {
     method: "DELETE",
   });
 
-  console.log(info.status);
-
   if (info.status == 404) {
-    logout();
-    redirect("/");
+    let text = await info.text()
+    if (text === "User not found.") {
+      logout();
+      return {
+        error: true,
+        message:
+          "Your account does not exists.",
+      };
+    }
+    return {
+      error: true,
+      message: text,
+    };
   }
 
   if (info.status == 400) {
     return {
       error: true,
-      message:
-        "This object have relation. Please delete all binded objects to this enitity.",
+      message: await info.text(),
     };
   }
   if (info.ok) {
