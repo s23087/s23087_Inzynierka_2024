@@ -247,7 +247,7 @@ namespace database_comunicator.Controllers
             return Ok(result);
         }
         [HttpDelete]
-        [Route("deleteInvoice/{invoiceId}")]
+        [Route("delete/{invoiceId}/{isYourInvoice}/{userId}")]
         public async Task<IActionResult> DeleteInvoice(int invoiceId, int userId, bool isYourInvoice)
         {
             var exist = await _userServices.UserExist(userId);

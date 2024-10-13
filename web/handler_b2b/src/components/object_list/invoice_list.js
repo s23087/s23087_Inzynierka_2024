@@ -29,6 +29,7 @@ import ChangeStatusWindow from "../windows/set_status_Window";
 import setRequestStatus from "@/utils/documents/set_request_status";
 import Toastes from "../smaller_components/toast";
 import InvoiceFilterOffcanvas from "../filter/document_filter";
+import DeleteSelectedWindow from "../windows/delete_selected";
 
 function getIfSelected(type, document, selected) {
   if (type.includes("note")) {
@@ -192,6 +193,9 @@ function InvoiceList({
   const [selectedDocuments] = useState([]);
   // Filter
   const [showFilter, setShowFilter] = useState(false);
+  // mass action
+  const [showDeleteSelected, setShowDeleteSelected] = useState(false);
+  const [deleteSelectedErrorMess, setDeleteSelectedErrorMess] = useState("");
   // Nav
   const router = useRouter();
   const params = useSearchParams();
@@ -224,7 +228,11 @@ function InvoiceList({
           filterAction={() => setShowFilter(true)}
         />
       </Container>
-      <SelectComponent selectedQty={selectedQty} />
+      <SelectComponent 
+        selectedQty={selectedQty} 
+        actionOneName="Delete selected"
+        actionOne={() => setShowDeleteSelected(true)}
+      />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
       {Object.keys(invoices ?? []).length === 0 ? (
         <Container className="text-center" fluid>
@@ -465,6 +473,41 @@ function InvoiceList({
         }}
         isError={isErrorDelete}
         errorMessage={errorMessage}
+      />
+      <DeleteSelectedWindow
+        modalShow={showDeleteSelected}
+        onHideFunction={() => {
+          setShowDeleteSelected(false)
+          setDeleteSelectedErrorMess("")
+          setIsErrorDelete(false)
+        }}
+        instanceName={type.substring(0, type.length - 1)}
+        deleteItemFunc={async () => {
+          let failures = [];
+          for (let index = 0; index < selectedDocuments.length; index++) {
+            let result;
+            if (type.includes("invoice")) result = await deleteInvoice(selectedDocuments[index], type === "Yours invoices");
+            if (type.includes("note")) result = await deleteCreditNote(selectedDocuments[index], type === "Yours credit notes");
+            if (type.includes("Requests")) result = await deleteRequest(selectedDocuments[index]);
+            if (result.error) {
+              failures.push(selectedDocuments[index])
+            } else {
+              selectedDocuments.splice(index, 1)
+              setSelectedQty(selectedDocuments.length)
+            }
+          }
+          if (failures.length === 0) {
+            setShowDeleteSelected(false);
+            setDeleteSelectedErrorMess("")
+            router.refresh();
+          } else {
+            setDeleteSelectedErrorMess(`Error: Could not delete this ${type} (${failures.join(",")}).`)
+            setIsErrorDelete(true);
+            router.refresh();
+          }
+        }}
+        isError={isErrorDelete}
+        errorMessage={deleteSelectedErrorMess}
       />
       <ModifyInvoiceOffcanvas
         showOffcanvas={showModifyInvoice}

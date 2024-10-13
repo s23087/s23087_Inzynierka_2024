@@ -21,7 +21,7 @@ function DeleteSelectedWindow({
         <Container>
           <Row>
             <Col xs="auto">
-              <h5 className="mb-0 mt-3">Delete all {instanceName}</h5>
+              <h5 className="mb-0 mt-3">Delete selected objects</h5>
             </Col>
             <Col className="d-flex justify-content-end pe-0">
               <Button variant="as-link" className="p-0">

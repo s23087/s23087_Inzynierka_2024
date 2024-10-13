@@ -496,6 +496,9 @@ namespace database_comunicator.Services
         }
         public async Task<bool> CreditDeductionCanBeApplied(int userId, int invoiceid, int itemId, int qty)
         {
+            var exist = await _handlerContext.ItemOwners
+                .AnyAsync(e => e.IdUser == userId && e.InvoiceId == invoiceid && e.OwnedItemId == itemId);
+            if (!exist) return false;
             var currentResult = await _handlerContext.ItemOwners
                 .Where(e => e.IdUser == userId && e.InvoiceId == invoiceid && e.OwnedItemId == itemId)
                 .Select(e => e.Qty).FirstAsync();

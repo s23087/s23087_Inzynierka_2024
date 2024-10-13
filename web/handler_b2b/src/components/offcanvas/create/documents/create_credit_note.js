@@ -59,7 +59,8 @@ function AddCreditNoteOffcanvas({
     documentError ||
     dateError ||
     choosenClient === "Is loading" ||
-    userOrg === "Is loading";
+    userOrg === "Is loading" ||
+    products.length === 0;
   // Misc
   const [isLoading, setIsLoading] = useState(false);
   // Form

@@ -55,8 +55,8 @@ export default async function updateCreditNote(
       }
       if (creditNoteNumber !== prevState.invoiceNumber) {
         let newPath = prevPath.replace(
-          prevState.creditNoteNumber.replaceAll("/", ""),
-          creditNoteNumber.replaceAll("/", ""),
+          prevState.creditNoteNumber.replaceAll(/[\/\\\.]/g, "").replaceAll(" ","_"),
+          creditNoteNumber.replaceAll(/[\/\\\.]/g, "").replaceAll(" ","_"),
         );
         path = newPath;
       }
@@ -83,7 +83,7 @@ export default async function updateCreditNote(
 
   const userId = await getUserId();
   const info = await fetch(
-    `${process.env.API_DEST}/${dbName}/CreditNote/modify?userId=${userId}`,
+    `${process.env.API_DEST}/${dbName}/CreditNote/modify/${userId}`,
     {
       method: "POST",
       body: JSON.stringify(data),

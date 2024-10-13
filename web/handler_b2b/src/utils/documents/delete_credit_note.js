@@ -26,7 +26,7 @@ export default async function deleteCreditNote(creditNoteId, isYourCredit) {
   let creditPath = await path.text();
   const userId = await getUserId();
 
-  let url = `${process.env.API_DEST}/${dbName}/CreditNote/delete/${creditNoteId}?userId=${userId}&isYourCredit=${isYourCredit}`;
+  let url = `${process.env.API_DEST}/${dbName}/CreditNote/delete/${creditNoteId}/${isYourCredit}/${userId}`;
   const info = await fetch(url, {
     method: "Delete",
   });

@@ -62,8 +62,8 @@ export default async function updateInvoice(
       }
       if (invoiceNumber !== prevState.invoiceNumber) {
         let newPath = prevPath.replace(
-          prevState.invoiceNumber.replaceAll("/", ""),
-          invoiceNumber.replaceAll("/", ""),
+          prevState.invoiceNumber.replaceAll(/[\/\\\.]/g, "").replaceAll(" ","_"),
+          invoiceNumber.replaceAll(/[\/\\\.]/g, "").replaceAll(" ","_"),
         );
         path = newPath;
       }

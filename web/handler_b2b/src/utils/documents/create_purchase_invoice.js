@@ -39,7 +39,7 @@ export default async function CreatePurchaseInvoice(
   let choosenUser = formData.get("user");
   let seller = formData.get("org");
   let invoiceDate = formData.get("date").replaceAll("-", "_");
-  let fileName = `../../database/${dbName}/documents/${invoiceNumber.replaceAll("/", "")}_${choosenUser}${orgs.userOrgId}${seller}_${invoiceDate}.pdf`;
+  let fileName = `../../database/${dbName}/documents/${invoiceNumber.replaceAll(/[\/\\\.]/g, "").replaceAll(" ","_")}_${choosenUser}${orgs.userOrgId}${seller}_${invoiceDate}${Date.now().toString()}.pdf`;
   let transformProducts = [];
   products.forEach((element) => {
     transformProducts.push({

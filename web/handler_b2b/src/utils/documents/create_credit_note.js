@@ -44,7 +44,7 @@ export default async function CreateCreditNote(
   let choosenUser = parseInt(formData.get("user"));
 
   let creditDate = formData.get("date").replaceAll("-", "_");
-  let fileName = `../../database/${dbName}/documents/cn_${creditNumber.replaceAll("/", "")}_${userId}${userOrg}${choosenClient}_${creditDate}_${Date.now()}.pdf`;
+  let fileName = `../../database/${dbName}/documents/cn_${creditNumber.replaceAll(/[\/\\\.]/g, "").replaceAll(" ","_")}_${userId}${userOrg}${choosenClient}_${creditDate}_${Date.now()}.pdf`;
   let transformProducts = [];
   products.forEach((element) => {
     transformProducts.push({
@@ -101,7 +101,7 @@ export default async function CreateCreditNote(
   }
 
   const info = await fetch(
-    `${process.env.API_DEST}/${dbName}/CreditNote/addCreditNote?userId=${userId}`,
+    `${process.env.API_DEST}/${dbName}/CreditNote/add/${userId}`,
     {
       method: "POST",
       body: JSON.stringify(creditNoteData),

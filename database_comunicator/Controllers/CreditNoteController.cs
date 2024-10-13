@@ -24,7 +24,7 @@ namespace database_comunicator.Controllers
 
         }
         [HttpPost]
-        [Route("addCreditNote")]
+        [Route("add/{userId}")]
         public async Task<IActionResult> AddCreditNote(AddCreditNote data, int userId)
         {
             var exist = await _userServices.UserExist(userId);
@@ -117,7 +117,7 @@ namespace database_comunicator.Controllers
             return Ok(result);
         }
         [HttpDelete]
-        [Route("delete/{creditId}")]
+        [Route("delete/{creditId}/{isYourCredit}/{userId}")]
         public async Task<IActionResult> DeleteCreditNote(int creditId, int userId, bool isYourCredit)
         {
             var exist = await _creditNoteServices.CreditNoteExist(creditId);
@@ -152,7 +152,7 @@ namespace database_comunicator.Controllers
             return Ok(result);
         }
         [HttpPost]
-        [Route("modify")]
+        [Route("modify/{userId}")]
         public async Task<IActionResult> ModifyCreditNote(ModifyCreditNote data, int userId)
         {
             var exist = await _userServices.UserExist(userId);
