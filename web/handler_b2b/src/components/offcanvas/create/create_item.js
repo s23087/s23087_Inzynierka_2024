@@ -222,7 +222,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                         addForm.requestSubmit();
                       }}
                     >
-                      {isLoading && !state.complete ? (
+                      {isLoading && !state.completed ? (
                         <div className="spinner-border main-text"></div>
                       ) : (
                         "Create"
@@ -253,14 +253,14 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
 
         <Toastes.ErrorToast
           showToast={state.completed && state.error}
-          message="Could not create item"
+          message={state.message}
           onHideFun={() => {
             resetState();
           }}
         />
         <Toastes.SuccessToast
           showToast={state.completed && !state.error}
-          message="Item succesfuly created."
+          message={state.message}
           onHideFun={() => {
             resetState();
             hideFunction();

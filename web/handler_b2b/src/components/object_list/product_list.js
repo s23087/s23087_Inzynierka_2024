@@ -16,6 +16,7 @@ import ModifyItemOffcanvas from "../offcanvas/modify/modify_item";
 import SelectComponent from "../smaller_components/select_compontent";
 import getPagationInfo from "@/utils/flexible/get_page_info";
 import ProductFilterOffcanvas from "../filter/product_filter_offcanvas";
+import DeleteAllWindow from "../windows/delete_all";
 
 function ProductList({
   products,
@@ -42,6 +43,7 @@ function ProductList({
   const [showDeleteItem, setShowDeleteItem] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [isErrorDelete, setIsErrorDelete] = useState(false);
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
   // More action
   const [showMoreAction, setShowMoreAction] = useState(false);
   const [isShowAddItem, setShowAddItem] = useState(false);
@@ -50,6 +52,9 @@ function ProductList({
   const [selectedProducts] = useState([]);
   // Filter
   const [showFilter, setShowFilter] = useState(false);
+  // mass action
+  const [showDeleteAll, setDeleteAll] = useState(false);
+  const [deleteAllErrorMessage, setDeleteAllErrorMessage] = useState("");
   // Nav
   const router = useRouter();
   const params = useSearchParams();
@@ -77,7 +82,11 @@ function ProductList({
           filterAction={() => setShowFilter(true)}
         />
       </Container>
-      <SelectComponent selectedQty={selectedQty} />
+      <SelectComponent 
+        selectedQty={selectedQty}
+        actionOneName="Delete selected"
+        actionOne={()  => setDeleteAll(true)} 
+      />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
       {Object.keys(products ?? []).length === 0 ? (
         <Container className="text-center" fluid>
@@ -160,20 +169,57 @@ function ProductList({
       />
       <DeleteObjectWindow
         modalShow={showDeleteItem}
-        onHideFunction={() => setShowDeleteItem(false)}
+        onHideFunction={() => {
+          setShowDeleteItem(false)
+          setDeleteErrorMessage("")
+          setIsErrorDelete(false)
+        }}
         instanceName="item"
         instanceId={itemToDelete}
         deleteItemFunc={async () => {
           let result = await deleteItem(itemToDelete);
-          if (result) {
+          if (result.result) {
             setShowDeleteItem(false);
             router.refresh();
           } else {
+            setDeleteErrorMessage(result.message)
             setIsErrorDelete(true);
           }
         }}
         isError={isErrorDelete}
-        errorMessage="Error: Could not delete this item. Check if invoice with this item exist."
+        errorMessage={deleteErrorMessage}
+      />
+      <DeleteAllWindow
+        modalShow={showDeleteAll}
+        onHideFunction={() => {
+          setDeleteAll(false)
+          setDeleteAllErrorMessage("")
+          setIsErrorDelete(false)
+        }}
+        instanceName="item"
+        deleteItemFunc={async () => {
+          let failures = [];
+          for (let index = 0; index < selectedProducts.length; index++) {
+            let result = await deleteItem(selectedProducts[index])
+            if (!result.result) {
+              failures.push(selectedProducts[index])
+            } else {
+              selectedProducts.splice(index, 1)
+              setSelectedQty(selectedProducts.length)
+            }
+          }
+          if (failures.length === 0) {
+            setDeleteAll(false);
+            setDeleteAllErrorMessage("")
+            router.refresh();
+          } else {
+            setDeleteAllErrorMessage(`Error: Could not delete this items (${failures.join(",")}).`)
+            setIsErrorDelete(true);
+            router.refresh();
+          }
+        }}
+        isError={isErrorDelete}
+        errorMessage={deleteAllErrorMessage}
       />
       <ViewItemOffcanvas
         showOffcanvas={showViewItem}

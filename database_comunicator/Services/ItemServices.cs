@@ -11,7 +11,7 @@ namespace database_comunicator.Services
 {
     public interface IItemServices
     {
-        public Task<Item?> AddItem(AddItem newItem);
+        public Task<int?> AddItem(AddItem newItem);
         public Task UpdateItem(UpdateItem postItem);
         public Task<bool> RemoveItem(int id);
         public Task<bool> ItemExist(int id);
@@ -33,6 +33,7 @@ namespace database_comunicator.Services
         public Task<IEnumerable<GetSalesItemList>> GetSalesItemList(int userId, string currency);
         public Task<IEnumerable<GetUsers>> GetItemOwners(int itemId);
         public Task<bool> ChangeBindings(IEnumerable<ModifyBinding> data);
+        public Task<bool> ItemHaveRelations(int itemId);
     }
     public class ItemServices : IItemServices
     {
@@ -42,7 +43,7 @@ namespace database_comunicator.Services
             _handlerContext = handlerContext;
         }
 
-        public async Task<Item?> AddItem(AddItem newItem)
+        public async Task<int?> AddItem(AddItem newItem)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
             try
@@ -64,7 +65,7 @@ namespace database_comunicator.Services
                 await _handlerContext.SaveChangesAsync();
 
                 await trans.CommitAsync();
-                return item;
+                return item.ItemId;
             } catch (Exception)
             {
                 await trans.RollbackAsync();
@@ -1073,6 +1074,10 @@ namespace database_comunicator.Services
                 return false;
             }
 
+        }
+        public async Task<bool> ItemHaveRelations(int itemId)
+        {
+            return await _handlerContext.Items.AnyAsync(x => x.ItemId == itemId && (x.OwnedItems.Any() || x.OfferItems.Any() || x.ProformaFutureItems.Any() || x.OutsideItems.Any()));
         }
     }
 }

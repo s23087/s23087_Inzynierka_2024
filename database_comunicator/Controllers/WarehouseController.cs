@@ -24,34 +24,34 @@ namespace database_comunicator.Controllers
         }
 
         [HttpPost]
-        [Route("addItem")]
+        [Route("add/item")]
         public async Task<IActionResult> AddItem(AddItem newItem)
         {
             var userExist = await _userServices.UserExist(newItem.UserId);
-            if (!userExist) return NotFound();
+            if (!userExist) return NotFound("User not found.");
             var exist = await _itemServices.EanExist(newItem.Eans) || await _itemServices.ItemExist(newItem.PartNumber);
             if (exist)
             {
-                return BadRequest();
+                return BadRequest("Item with this partnumber or ean alredy exists.");
             }
 
             var item = await _itemServices.AddItem(newItem);
-            if (item == null) return BadRequest();
+            if (item == null) return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             var logId = await _logServices.getLogTypeId("Create");
-            var desc = $"The item with id {item.ItemId} has been created, by user with id {newItem.UserId}.";
+            var desc = $"The item with id {item} has been created, by user with id {newItem.UserId}.";
             await _logServices.CreateActionLog(desc, newItem.UserId, logId);
-
             return Ok();
         }
         [HttpDelete]
-        [Route("deleteItem")]
+        [Route("delete/item/{itemId}/{userId}")]
         public async Task<IActionResult> DeleteItem(int itemId, int userId)
         {
             var userExist = await _userServices.UserExist(userId);
-            if (!userExist) return NotFound();
+            if (!userExist) return NotFound("User not found.");
             var exist = await _itemServices.ItemExist(itemId);
-            if (!exist) return NotFound();
-
+            if (!exist) return NotFound("Item not found.");
+            var relationExist = await _itemServices.ItemHaveRelations(itemId);
+            if (relationExist) return BadRequest("This item is included in other objects like invoice, proforma or offer.");
             await _itemServices.RemoveItem(itemId);
             var logId = await _logServices.getLogTypeId("Delete");
             var desc = $"The item with id {itemId} has been deleted, by user with id {userId}.";

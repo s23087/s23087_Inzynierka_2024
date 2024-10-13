@@ -31,7 +31,6 @@ function InvoiceSwitch({ type, is_role_solo }) {
   const router = useRouter();
   const pathName = usePathname();
   const params = useSearchParams();
-  const newParams = new URLSearchParams(params);
   const changeDoc = (type) => {
     const newParams = new URLSearchParams(params);
     newParams.delete("orderBy");

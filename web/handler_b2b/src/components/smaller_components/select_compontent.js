@@ -11,7 +11,11 @@ import {
   Button,
 } from "react-bootstrap";
 
-function SelectComponent({ selectedQty }) {
+function SelectComponent({ 
+  selectedQty,
+  actionOneName,
+  actionOne
+}) {
   const [isClicked, setIsClicked] = useState(false);
   const containerStyle = {
     height: "67px",
@@ -44,7 +48,9 @@ function SelectComponent({ selectedQty }) {
             bsPrefix="w-100 btn"
           >
             <Dropdown.Item>
-              <Button variant="as-link">Change attribute</Button>
+              {actionOne ? (
+                <Button variant="as-link" onClick={actionOne}>{actionOneName}</Button>
+              ) : null}
             </Dropdown.Item>
           </DropdownButton>
         </Col>
@@ -55,6 +61,8 @@ function SelectComponent({ selectedQty }) {
 
 SelectComponent.PropTypes = {
   selectedQty: PropTypes.number.isRequired,
+  actionOneName: PropTypes.string.isRequired,
+  actionOne: PropTypes.func.isRequired,
 };
 
 export default SelectComponent;
