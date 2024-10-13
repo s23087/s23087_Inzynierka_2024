@@ -8,6 +8,7 @@ import getProformaPath from "./get_proforma_path";
 
 export default async function updateProforma(
   file,
+  orgs,
   prevState,
   proformaId,
   isYourProforma,
@@ -53,15 +54,17 @@ export default async function updateProforma(
     try {
       if (file) {
         if (prevPath === "")
-          prevPath = `../../database/${dbName}/documents/pr_${proformaNumber.replaceAll("/", "")}_${user}${org}${seller}_${userId}${Date.now().toString()}.pdf`;
+          prevPath = `../../database/${dbName}/documents/pr_${proformaNumber.replaceAll("/", "")}_${user}${orgs.userOrgId}${org}_${userId}${Date.now().toString()}.pdf`;
         let buffArray = await file.get("file").arrayBuffer();
         let buff = new Uint8Array(buffArray);
         fs.writeFileSync(prevPath, buff);
       }
       if (proformaNumber !== prevState.proformaNumber) {
         let newPath = prevPath.replace(
-          prevState.objectType.replaceAll(" ", ""),
-          objectType.replaceAll(" ", ""),
+          prevState.proformaNumber
+            .replaceAll(/[\\./]/g, "")
+            .replaceAll(" ", "_"),
+          proformaNumber.replaceAll(/[\\./]/g, "").replaceAll(" ", "_"),
         );
         path = newPath;
       }
@@ -122,7 +125,7 @@ export default async function updateProforma(
   }
 
   if (info.ok) {
-    if (data.objectType && prevPath !== path) {
+    if (data.proformaNumber && prevPath !== path) {
       try {
         fs.renameSync(prevPath, data.path);
       } catch (error) {

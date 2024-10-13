@@ -62,7 +62,7 @@ function ModifyInvoiceOffcanvas({
   // Misc
   const [isLoading, setIsLoading] = useState(false);
   // Form
-  const [prevState, setPrevState] = useState({
+  const [prevState] = useState({
     invoiceNumber: "",
     client: -1,
     transport: 0.0,

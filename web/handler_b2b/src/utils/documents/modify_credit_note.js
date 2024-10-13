@@ -55,8 +55,10 @@ export default async function updateCreditNote(
       }
       if (creditNoteNumber !== prevState.invoiceNumber) {
         let newPath = prevPath.replace(
-          prevState.creditNoteNumber.replaceAll(/[\/\\\.]/g, "").replaceAll(" ","_"),
-          creditNoteNumber.replaceAll(/[\/\\\.]/g, "").replaceAll(" ","_"),
+          prevState.creditNoteNumber
+            .replaceAll(/[\\./]/g, "")
+            .replaceAll(" ", "_"),
+          creditNoteNumber.replaceAll(/[\\./]/g, "").replaceAll(" ", "_"),
         );
         path = newPath;
       }

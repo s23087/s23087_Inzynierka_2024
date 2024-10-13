@@ -114,7 +114,7 @@ export default async function updateRequest(
           {
             method: "POST",
             body: JSON.stringify({
-              requestId: invoiceId,
+              requestId: requestId,
               path: prevPath,
             }),
             headers: {

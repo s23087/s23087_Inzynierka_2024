@@ -82,10 +82,10 @@ function ProductList({
           filterAction={() => setShowFilter(true)}
         />
       </Container>
-      <SelectComponent 
+      <SelectComponent
         selectedQty={selectedQty}
         actionOneName="Delete selected"
-        actionOne={()  => setShowDeleteSelected(true)} 
+        actionOne={() => setShowDeleteSelected(true)}
       />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
       {Object.keys(products ?? []).length === 0 ? (
@@ -170,9 +170,9 @@ function ProductList({
       <DeleteObjectWindow
         modalShow={showDeleteItem}
         onHideFunction={() => {
-          setShowDeleteItem(false)
-          setDeleteErrorMessage("")
-          setIsErrorDelete(false)
+          setShowDeleteItem(false);
+          setDeleteErrorMessage("");
+          setIsErrorDelete(false);
         }}
         instanceName="item"
         instanceId={itemToDelete}
@@ -182,7 +182,7 @@ function ProductList({
             setShowDeleteItem(false);
             router.refresh();
           } else {
-            setDeleteErrorMessage(result.message)
+            setDeleteErrorMessage(result.message);
             setIsErrorDelete(true);
           }
         }}
@@ -192,28 +192,30 @@ function ProductList({
       <DeleteSelectedWindow
         modalShow={showDeleteSelected}
         onHideFunction={() => {
-          setShowDeleteSelected(false)
-          setDeleteSelectedErrorMess("")
-          setIsErrorDelete(false)
+          setShowDeleteSelected(false);
+          setDeleteSelectedErrorMess("");
+          setIsErrorDelete(false);
         }}
         instanceName="item"
         deleteItemFunc={async () => {
           let failures = [];
           for (let index = 0; index < selectedProducts.length; index++) {
-            let result = await deleteItem(selectedProducts[index])
+            let result = await deleteItem(selectedProducts[index]);
             if (!result.result) {
-              failures.push(selectedProducts[index])
+              failures.push(selectedProducts[index]);
             } else {
-              selectedProducts.splice(index, 1)
-              setSelectedQty(selectedProducts.length)
+              selectedProducts.splice(index, 1);
+              setSelectedQty(selectedProducts.length);
             }
           }
           if (failures.length === 0) {
             setShowDeleteSelected(false);
-            setDeleteSelectedErrorMess("")
+            setDeleteSelectedErrorMess("");
             router.refresh();
           } else {
-            setDeleteSelectedErrorMess(`Error: Could not delete this items (${failures.join(",")}).`)
+            setDeleteSelectedErrorMess(
+              `Error: Could not delete this items (${failures.join(",")}).`,
+            );
             setIsErrorDelete(true);
             router.refresh();
           }

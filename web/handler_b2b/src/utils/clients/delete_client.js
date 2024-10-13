@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
@@ -14,13 +13,12 @@ export default async function deleteClient(orgId) {
   });
 
   if (info.status == 404) {
-    let text = await info.text()
+    let text = await info.text();
     if (text === "User not found.") {
       logout();
       return {
         error: true,
-        message:
-          "Your account does not exists.",
+        message: "Your account does not exists.",
       };
     }
     return {

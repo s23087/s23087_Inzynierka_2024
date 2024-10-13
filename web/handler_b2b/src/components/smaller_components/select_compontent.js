@@ -11,11 +11,7 @@ import {
   Button,
 } from "react-bootstrap";
 
-function SelectComponent({ 
-  selectedQty,
-  actionOneName,
-  actionOne
-}) {
+function SelectComponent({ selectedQty, actionOneName, actionOne }) {
   const [isClicked, setIsClicked] = useState(false);
   const containerStyle = {
     height: "67px",
@@ -49,7 +45,9 @@ function SelectComponent({
           >
             <Dropdown.Item>
               {actionOne ? (
-                <Button variant="as-link" onClick={actionOne}>{actionOneName}</Button>
+                <Button variant="as-link" onClick={actionOne}>
+                  {actionOneName}
+                </Button>
               ) : null}
             </Dropdown.Item>
           </DropdownButton>

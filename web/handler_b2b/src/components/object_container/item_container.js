@@ -39,13 +39,6 @@ function ItemContainer({
     if (index === -1) return ean;
     return ean.substring(0, index) + " ...";
   };
-  const getShortUsers = () => {
-    let users = item.users.join(", ");
-    users = users.substring(0, 40);
-    let index = users.lastIndexOf(",");
-    if (index === -1) return users;
-    return users.substring(0, index) + " ...";
-  };
   const getShortSources = () => {
     let sources = item.sources.join(", ");
     sources = sources.substring(0, 15);

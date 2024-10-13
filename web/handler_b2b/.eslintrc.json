@@ -1,9 +1,14 @@
 {
   "extends": ["next", "next/core-web-vitals", "eslint:recommended"],
+  "env": {
+    "browser": "true",
+    "es6": "true"
+  },
   "globals": {
     "React": "readonly"
   },
   "rules": {
-    "no-unused-vars": "warn"
+    "no-unused-vars": "warn",
+    "react-hooks/exhaustive-deps": "off"
   }
 }

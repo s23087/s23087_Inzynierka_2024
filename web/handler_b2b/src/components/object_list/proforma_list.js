@@ -91,10 +91,10 @@ function ProformaList({
           filterAction={() => setShowFilter(true)}
         />
       </Container>
-      <SelectComponent 
-        selectedQty={selectedQty} 
+      <SelectComponent
+        selectedQty={selectedQty}
         actionOneName="Delete selected"
-        actionOne={()  => setShowDeleteSelected(true)} 
+        actionOne={() => setShowDeleteSelected(true)}
       />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
       {Object.keys(proformas ?? []).length === 0 ? (
@@ -206,28 +206,33 @@ function ProformaList({
       <DeleteSelectedWindow
         modalShow={showDeleteSelected}
         onHideFunction={() => {
-          setShowDeleteSelected(false)
-          setDeleteSelectedErrorMess("")
-          setIsErrorDelete(false)
+          setShowDeleteSelected(false);
+          setDeleteSelectedErrorMess("");
+          setIsErrorDelete(false);
         }}
         instanceName="Proforma"
         deleteItemFunc={async () => {
           let failures = [];
           for (let index = 0; index < selectedProforma.length; index++) {
-            let result = await deleteProforma(type === "Yours proformas", selectedProforma[index])
+            let result = await deleteProforma(
+              type === "Yours proformas",
+              selectedProforma[index],
+            );
             if (result.error) {
-              failures.push(selectedProforma[index])
+              failures.push(selectedProforma[index]);
             } else {
-              selectedProforma.splice(index, 1)
-              setSelectedQty(selectedProforma.length)
+              selectedProforma.splice(index, 1);
+              setSelectedQty(selectedProforma.length);
             }
           }
           if (failures.length === 0) {
             setShowDeleteSelected(false);
-            setDeleteSelectedErrorMess("")
+            setDeleteSelectedErrorMess("");
             router.refresh();
           } else {
-            setDeleteSelectedErrorMess(`Error: Could not delete this proformas (${failures.join(",")}).`)
+            setDeleteSelectedErrorMess(
+              `Error: Could not delete this proformas (${failures.join(",")}).`,
+            );
             setIsErrorDelete(true);
             router.refresh();
           }

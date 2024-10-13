@@ -20,6 +20,7 @@ export default async function getSearchCreditNotes(
   status,
 ) {
   let url = "";
+  let params = [];
   if (sort !== ".None") params.push(`sort=${sort}`);
   if (dateL) params.push(`dateL=${dateL}`);
   if (dateG) params.push(`dateG=${dateG}`);

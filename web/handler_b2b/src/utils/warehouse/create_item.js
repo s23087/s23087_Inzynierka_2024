@@ -19,16 +19,26 @@ export default async function createItem(eans, state, formData) {
     !validators.lengthSmallerThen(data.itemName, 250) ||
     !validators.stringIsNotEmpty(data.itemName)
   )
-    return { error: true, completed: true, message: "Item name must not be empty or exceed 250 chars." };
-  if (
-    !validators.lengthSmallerThen(data.itemDescription ?? "", 500)
-  )
-    return { error: true, completed: true, message: "Item description must not exceed 500 chars." };
+    return {
+      error: true,
+      completed: true,
+      message: "Item name must not be empty or exceed 250 chars.",
+    };
+  if (!validators.lengthSmallerThen(data.itemDescription ?? "", 500))
+    return {
+      error: true,
+      completed: true,
+      message: "Item description must not exceed 500 chars.",
+    };
   if (
     !validators.lengthSmallerThen(data.partNumber, 150) ||
     !validators.stringIsNotEmpty(data.partNumber)
   )
-    return { error: true, completed: true, message: "Item partnumber must not be empty or exceed 150 chars." };
+    return {
+      error: true,
+      completed: true,
+      message: "Item partnumber must not be empty or exceed 150 chars.",
+    };
 
   const dbName = await getDbName();
   try {
@@ -42,59 +52,59 @@ export default async function createItem(eans, state, formData) {
         },
       },
     );
-  
-    if (info.status === 404){
-      let text = await info.text()
-      if (text === "User not found."){
-        logout()
+
+    if (info.status === 404) {
+      let text = await info.text();
+      if (text === "User not found.") {
+        logout();
         return {
           error: true,
           completed: true,
-          message: "Your account does not exists."
+          message: "Your account does not exists.",
         };
       }
       return {
         error: true,
         completed: true,
-        message: text
+        message: text,
       };
     }
-  
-    if (info.status === 400){
-      let text = await info.text()
+
+    if (info.status === 400) {
+      let text = await info.text();
       return {
         error: true,
         completed: true,
-        message: text
+        message: text,
       };
     }
-  
-    if (info.status === 500){
+
+    if (info.status === 500) {
       return {
         error: true,
         completed: true,
-        message: "Server error."
+        message: "Server error.",
       };
     }
-  
+
     if (info.ok) {
       return {
         error: false,
         completed: true,
-        message: "Success! You have created the item."
+        message: "Success! You have created the item.",
       };
     } else {
       return {
         error: true,
         completed: true,
-        message: "Critical error."
+        message: "Critical error.",
       };
     }
   } catch {
     return {
       error: true,
       completed: true,
-      message: "Could not connect to server."
+      message: "Could not connect to server.",
     };
   }
 }

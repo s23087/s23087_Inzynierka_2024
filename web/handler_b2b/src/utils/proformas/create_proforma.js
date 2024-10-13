@@ -49,7 +49,7 @@ export default async function createProforma(
   const userId = await getUserId();
   const dbName = await getDbName();
   let proformaDate = formData.get("date").replaceAll("-", "_");
-  let fileName = `../../database/${dbName}/documents/pr_${proformaNumber.replaceAll("/", "")}_${chosenUser}${orgs.userOrgId}${seller}_${proformaDate}${userId}${Date.now().toString()}.pdf`;
+  let fileName = `../../database/${dbName}/documents/pr_${proformaNumber.replaceAll(/[\\./]/g, "").replaceAll(" ", "_")}_${chosenUser}${orgs.userOrgId}${seller}_${proformaDate}${userId}${Date.now().toString()}.pdf`;
   let transformProducts = [];
   products.forEach((element) => {
     transformProducts.push({

@@ -2,6 +2,7 @@
 
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
+import logout from "../auth/logout";
 
 export default async function getSearchDeliveries(
   isOrg,

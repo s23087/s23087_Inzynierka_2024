@@ -4,12 +4,6 @@ function PricelistTable({ items, currency }) {
   if (items.length === 0) {
     return <></>;
   }
-  let sumPrice = 0;
-  if (items.length > 0) {
-    items.forEach((element) => {
-      sumPrice += element.price * element.qty;
-    });
-  }
   return (
     <Table className="text-start overflow-x-scroll align-middle" bordered>
       <thead>

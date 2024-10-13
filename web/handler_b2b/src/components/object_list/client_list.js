@@ -78,10 +78,10 @@ function ClientsList({
           filterAction={() => setShowFilter(true)}
         />
       </Container>
-      <SelectComponent 
+      <SelectComponent
         selectedQty={selectedQty}
         actionOneName="Delete selected"
-        actionOne={()  => setShowDeleteSelected(true)} 
+        actionOne={() => setShowDeleteSelected(true)}
       />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
       {Object.keys(clients ?? []).length === 0 ? (
@@ -186,28 +186,30 @@ function ClientsList({
       <DeleteSelectedWindow
         modalShow={showDeleteSelected}
         onHideFunction={() => {
-          setShowDeleteSelected(false)
-          setDeleteSelectedErrorMess("")
-          setIsErrorDelete(false)
+          setShowDeleteSelected(false);
+          setDeleteSelectedErrorMess("");
+          setIsErrorDelete(false);
         }}
         instanceName="client"
         deleteItemFunc={async () => {
           let failures = [];
           for (let index = 0; index < selectedClients.length; index++) {
-            let result = await deleteClient(selectedClients[index])
+            let result = await deleteClient(selectedClients[index]);
             if (result.error) {
-              failures.push(selectedClients[index])
+              failures.push(selectedClients[index]);
             } else {
-              selectedClients.splice(index, 1)
-              setSelectedQty(selectedClients.length)
+              selectedClients.splice(index, 1);
+              setSelectedQty(selectedClients.length);
             }
           }
           if (failures.length === 0) {
             setShowDeleteSelected(false);
-            setDeleteSelectedErrorMess("")
+            setDeleteSelectedErrorMess("");
             router.refresh();
           } else {
-            setDeleteSelectedErrorMess(`Error: Could not delete this clients (${failures.join(",")}).`)
+            setDeleteSelectedErrorMess(
+              `Error: Could not delete this clients (${failures.join(",")}).`,
+            );
             setIsErrorDelete(true);
             router.refresh();
           }

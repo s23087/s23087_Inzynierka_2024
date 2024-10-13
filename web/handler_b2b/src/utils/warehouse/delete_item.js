@@ -12,31 +12,31 @@ export default async function deleteItem(itemId) {
     method: "Delete",
   });
 
-  if (info.status == 404){
-    let text = await info.text()
-    if (text === "User not found.") logout()
+  if (info.status == 404) {
+    let text = await info.text();
+    if (text === "User not found.") logout();
     return {
       result: false,
-      message: text
-    }
+      message: text,
+    };
   }
 
-  if (info.status == 400){
-    let text = await info.text()
+  if (info.status == 400) {
+    let text = await info.text();
     return {
       result: false,
-      message: text
-    }
+      message: text,
+    };
   }
 
-  if (info.ok){
+  if (info.ok) {
     return {
-      result: true
-    }
+      result: true,
+    };
   }
 
   return {
     result: true,
-    message: "Critical error."
+    message: "Critical error.",
   };
 }

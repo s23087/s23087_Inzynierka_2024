@@ -83,6 +83,7 @@ function ModifyProformaOffcanvas({
   const [state, formPurchaseAction] = useFormState(
     updateProforma
       .bind(null, file)
+      .bind(null, orgs)
       .bind(null, prevState)
       .bind(null, proforma.proformaId)
       .bind(null, isYourProforma),

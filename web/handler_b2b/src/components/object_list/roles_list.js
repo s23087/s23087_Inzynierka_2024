@@ -60,8 +60,8 @@ function RolesList({
           filterAction={() => setShowFilter(true)}
         />
       </Container>
-      <SelectComponent 
-        selectedQty={selectedQty} 
+      <SelectComponent
+        selectedQty={selectedQty}
         actionOneName="Change role"
         actionOne={() => setShowModifySelectedRole(true)}
       />

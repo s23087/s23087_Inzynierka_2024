@@ -13,7 +13,7 @@ export default async function deletePricelist(pricelistId, path) {
     const info = await fetch(url, {
       method: "Delete",
     });
-  
+
     if (info.status === 404) {
       let text = await info.text();
       if (text === "User not found.") {
@@ -28,7 +28,7 @@ export default async function deletePricelist(pricelistId, path) {
         message: text,
       };
     }
-  
+
     if (info.ok) {
       const fs = require("node:fs");
       try {

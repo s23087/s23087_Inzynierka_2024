@@ -39,7 +39,7 @@ function AddDeliveryOffcanvas({
   const [proformas, setProformas] = useState([]);
   const [deliveryCompanies, setDeliveryCompanies] = useState([]);
   // Waybills
-  const [waybills, setWaybills] = useState([]);
+  const [waybills] = useState([]);
   const [isAddWaybillShow, setIsAddWaybillShow] = useState(false);
   const waybillExist = (variable) => {
     return waybills.findIndex((item) => item === variable) != -1;

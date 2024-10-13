@@ -66,11 +66,11 @@ function OutsideItemList({
           filterAction={() => setShowFilter(true)}
         />
       </Container>
-      <SelectComponent 
-        selectedQty={selectedQty} 
-        additonalMargin={true} 
+      <SelectComponent
+        selectedQty={selectedQty}
+        additonalMargin={true}
         actionOneName="Delete selected"
-        actionOne={()  => setShowDeleteSelected(true)} 
+        actionOne={() => setShowDeleteSelected(true)}
       />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
       {Object.keys(items ?? []).length === 0 ? (
@@ -87,18 +87,17 @@ function OutsideItemList({
                 abstract_item={value}
                 selected={
                   selectedItems.findIndex(
-                    (e) => e[0] === value.itemId && e[1] === value.orgId
+                    (e) => e[0] === value.itemId && e[1] === value.orgId,
                   ) !== -1
                 }
                 selectAction={() => {
-                  selectedItems.push([
-                    value.itemId,
-                    value.orgId
-                  ]);
+                  selectedItems.push([value.itemId, value.orgId]);
                   setSelectedQty(selectedQty + 1);
                 }}
                 unselectAction={() => {
-                  let index = selectedItems.findIndex((e) => e[0] === value.itemId && e[1] === value.orgId);
+                  let index = selectedItems.findIndex(
+                    (e) => e[0] === value.itemId && e[1] === value.orgId,
+                  );
                   selectedItems.splice(index, 1);
                   setSelectedQty(selectedQty - 1);
                 }}
@@ -124,9 +123,7 @@ function OutsideItemList({
           let pagationInfo = getPagationInfo(params);
           Object.values(items)
             .slice(pagationInfo.start, pagationInfo.end)
-            .forEach((e) =>
-              selectedItems.push([ e.itemId, e.orgId ]),
-            );
+            .forEach((e) => selectedItems.push([e.itemId, e.orgId]));
           setSelectedQty(selectedItems.length);
           setShowMoreAction(false);
         }}
@@ -134,7 +131,7 @@ function OutsideItemList({
           selectedItems.splice(0, selectedItems.length);
           setSelectedQty(0);
           Object.values(items).forEach((e) =>
-            selectedItems.push([ e.itemId, e.orgId ]),
+            selectedItems.push([e.itemId, e.orgId]),
           );
           setSelectedQty(selectedItems.length);
           setShowMoreAction(false);
@@ -176,28 +173,33 @@ function OutsideItemList({
       <DeleteSelectedWindow
         modalShow={showDeleteSelected}
         onHideFunction={() => {
-          setShowDeleteSelected(false)
-          setDeleteSelectedErrorMess("")
-          setIsErrorDelete(false)
+          setShowDeleteSelected(false);
+          setDeleteSelectedErrorMess("");
+          setIsErrorDelete(false);
         }}
         instanceName="outside item"
         deleteItemFunc={async () => {
           let failures = [];
           for (let index = 0; index < selectedItems.length; index++) {
-            let result = await deleteOutsideItem(selectedItems[index][0], selectedItems[index][1])
+            let result = await deleteOutsideItem(
+              selectedItems[index][0],
+              selectedItems[index][1],
+            );
             if (result.error) {
-              failures.push(selectedItems[index])
+              failures.push(selectedItems[index]);
             } else {
-              selectedItems.splice(index, 1)
-              setSelectedQty(selectedItems.length)
+              selectedItems.splice(index, 1);
+              setSelectedQty(selectedItems.length);
             }
           }
           if (failures.length === 0) {
             setShowDeleteSelected(false);
-            setDeleteSelectedErrorMess("")
+            setDeleteSelectedErrorMess("");
             router.refresh();
           } else {
-            setDeleteSelectedErrorMess(`Error: Could not delete this proformas (${failures.join(",")}).`)
+            setDeleteSelectedErrorMess(
+              `Error: Could not delete this proformas (${failures.join(",")}).`,
+            );
             setIsErrorDelete(true);
             router.refresh();
           }

@@ -4,13 +4,11 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import { useFormState } from "react-dom";
 import { Modal, Container, Row, Col, Form, Button } from "react-bootstrap";
-import { useRouter } from "next/navigation";
 import ErrorMessage from "../smaller_components/error_message";
 import StringValidtor from "@/utils/validators/form_validator/stringValidator";
 import createNote from "@/utils/deliveries/create_note";
 
 function AddNoteWindow({ modalShow, onHideFunction, deliveryId, successFun }) {
-  const router = useRouter();
   const [noteError, setNoteError] = useState(false);
   const [state, formAction] = useFormState(createNote.bind(null, deliveryId), {
     error: false,

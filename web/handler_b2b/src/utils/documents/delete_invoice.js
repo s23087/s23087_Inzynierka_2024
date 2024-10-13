@@ -26,11 +26,11 @@ export default async function deleteInvoice(invoiceId, isYourInvoice) {
     const info = await fetch(url, {
       method: "Delete",
     });
-  
-    if (info.status === 404){
+
+    if (info.status === 404) {
       let text = await info.text();
-      if (text === "User not found."){
-        logout()
+      if (text === "User not found.") {
+        logout();
         return {
           error: true,
           message: "Your account does not exsist.",
@@ -38,10 +38,10 @@ export default async function deleteInvoice(invoiceId, isYourInvoice) {
       }
       return {
         error: true,
-        message:text,
+        message: text,
       };
     }
-  
+
     if (info.ok) {
       const fs = require("node:fs");
       try {

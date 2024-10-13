@@ -38,7 +38,7 @@ export default async function CreateSalesInvoice(
   let choosenUser = formData.get("user");
   let org = formData.get("org");
   let date = formData.get("date").replaceAll("-", "_");
-  let fileName = `../../database/${dbName}/documents/${invoice.replaceAll(/[\/\\\.]/g, "").replaceAll(" ","_")}_${choosenUser}${orgs.userOrgId}${org}_${date}${Date.now().toString()}.pdf`;
+  let fileName = `../../database/${dbName}/documents/${invoice.replaceAll(/[\\./]/g, "").replaceAll(" ", "_")}_${choosenUser}${orgs.userOrgId}${org}_${date}${Date.now().toString()}.pdf`;
   let transformProducts = [];
   products.forEach((element) => {
     transformProducts.push({

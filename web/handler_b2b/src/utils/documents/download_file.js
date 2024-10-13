@@ -7,6 +7,6 @@ export default async function getFileFormServer(path) {
     return JSON.stringify(file);
   } catch (ex) {
     console.log(ex);
-    return JSON.stringify(file);
+    return null;
   }
 }

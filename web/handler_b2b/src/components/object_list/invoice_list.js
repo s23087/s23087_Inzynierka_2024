@@ -228,8 +228,8 @@ function InvoiceList({
           filterAction={() => setShowFilter(true)}
         />
       </Container>
-      <SelectComponent 
-        selectedQty={selectedQty} 
+      <SelectComponent
+        selectedQty={selectedQty}
         actionOneName="Delete selected"
         actionOne={() => setShowDeleteSelected(true)}
       />
@@ -477,31 +477,42 @@ function InvoiceList({
       <DeleteSelectedWindow
         modalShow={showDeleteSelected}
         onHideFunction={() => {
-          setShowDeleteSelected(false)
-          setDeleteSelectedErrorMess("")
-          setIsErrorDelete(false)
+          setShowDeleteSelected(false);
+          setDeleteSelectedErrorMess("");
+          setIsErrorDelete(false);
         }}
         instanceName={type.substring(0, type.length - 1)}
         deleteItemFunc={async () => {
           let failures = [];
           for (let index = 0; index < selectedDocuments.length; index++) {
             let result;
-            if (type.includes("invoice")) result = await deleteInvoice(selectedDocuments[index], type === "Yours invoices");
-            if (type.includes("note")) result = await deleteCreditNote(selectedDocuments[index], type === "Yours credit notes");
-            if (type.includes("Requests")) result = await deleteRequest(selectedDocuments[index]);
+            if (type.includes("invoice"))
+              result = await deleteInvoice(
+                selectedDocuments[index],
+                type === "Yours invoices",
+              );
+            if (type.includes("note"))
+              result = await deleteCreditNote(
+                selectedDocuments[index],
+                type === "Yours credit notes",
+              );
+            if (type.includes("Requests"))
+              result = await deleteRequest(selectedDocuments[index]);
             if (result.error) {
-              failures.push(selectedDocuments[index])
+              failures.push(selectedDocuments[index]);
             } else {
-              selectedDocuments.splice(index, 1)
-              setSelectedQty(selectedDocuments.length)
+              selectedDocuments.splice(index, 1);
+              setSelectedQty(selectedDocuments.length);
             }
           }
           if (failures.length === 0) {
             setShowDeleteSelected(false);
-            setDeleteSelectedErrorMess("")
+            setDeleteSelectedErrorMess("");
             router.refresh();
           } else {
-            setDeleteSelectedErrorMess(`Error: Could not delete this ${type} (${failures.join(",")}).`)
+            setDeleteSelectedErrorMess(
+              `Error: Could not delete this ${type} (${failures.join(",")}).`,
+            );
             setIsErrorDelete(true);
             router.refresh();
           }

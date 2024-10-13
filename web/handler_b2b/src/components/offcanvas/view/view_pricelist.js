@@ -5,7 +5,6 @@ import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { Offcanvas, Container, Row, Col, Button, Stack } from "react-bootstrap";
 import dropdown_big_down from "../../../../public/icons/dropdown_big_down.png";
-import CreditNoteTable from "@/components/tables/credit_table";
 import getPricelistItems from "@/utils/pricelist/get_pricelist_items";
 import PricelistTable from "@/components/tables/pricelist_table";
 function ViewPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {

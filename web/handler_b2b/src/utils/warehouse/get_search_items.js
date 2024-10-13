@@ -10,9 +10,14 @@ export default async function getSearchItems(
   sort,
   status,
   ean,
+  qtyL,
+  qtyG,
+  priceL,
+  priceG,
 ) {
   let url = "";
   const dbName = await getDbName();
+  let params = [];
   if (sort !== ".None") params.push(`sort=${sort}`);
   if (qtyL) params.push(`qtyL=${qtyL}`);
   if (qtyG) params.push(`totalR=${qtyG}`);

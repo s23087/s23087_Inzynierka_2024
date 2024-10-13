@@ -92,10 +92,10 @@ function DeliveryList({
           filterAction={() => setShowFilter(true)}
         />
       </Container>
-      <SelectComponent 
+      <SelectComponent
         selectedQty={selectedQty}
         actionOneName="Delete selected"
-        actionOne={()  => setShowDeleteSelected(true)} 
+        actionOne={() => setShowDeleteSelected(true)}
       />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
       {Object.keys(deliveries ?? []).length === 0 ? (
@@ -207,28 +207,33 @@ function DeliveryList({
       <DeleteSelectedWindow
         modalShow={showDeleteSelected}
         onHideFunction={() => {
-          setShowDeleteSelected(false)
-          setDeleteSelectedErrorMess("")
-          setIsErrorDelete(false)
+          setShowDeleteSelected(false);
+          setDeleteSelectedErrorMess("");
+          setIsErrorDelete(false);
         }}
         instanceName="delivery"
         deleteItemFunc={async () => {
           let failures = [];
           for (let index = 0; index < selectedDelivery.length; index++) {
-            let result = await deleteDelivery(type === "Deliveries to user", selectedDelivery[index])
+            let result = await deleteDelivery(
+              type === "Deliveries to user",
+              selectedDelivery[index],
+            );
             if (result.error) {
-              failures.push(selectedDelivery[index])
+              failures.push(selectedDelivery[index]);
             } else {
-              selectedDelivery.splice(index, 1)
-              setSelectedQty(selectedDelivery.length)
+              selectedDelivery.splice(index, 1);
+              setSelectedQty(selectedDelivery.length);
             }
           }
           if (failures.length === 0) {
             setShowDeleteSelected(false);
-            setDeleteSelectedErrorMess("")
+            setDeleteSelectedErrorMess("");
             router.refresh();
           } else {
-            setDeleteSelectedErrorMess(`Error: Could not delete this deliveries (${failures.join(",")}).`)
+            setDeleteSelectedErrorMess(
+              `Error: Could not delete this deliveries (${failures.join(",")}).`,
+            );
             setIsErrorDelete(true);
             router.refresh();
           }

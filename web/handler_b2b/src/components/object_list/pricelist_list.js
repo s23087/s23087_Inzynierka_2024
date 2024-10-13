@@ -88,10 +88,10 @@ function PricelistList({
           filterAction={() => setShowFilter(true)}
         />
       </Container>
-      <SelectComponent 
-        selectedQty={selectedQty} 
+      <SelectComponent
+        selectedQty={selectedQty}
         actionOneName="Delete selected"
-        actionOne={()  => setDeleteAll(true)} 
+        actionOne={() => setDeleteAll(true)}
       />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
       {Object.keys(pricelist ?? []).length === 0 ? (
@@ -110,13 +110,19 @@ function PricelistList({
               <PricelistContainer
                 key={value.pricelistId}
                 pricelist={value}
-                selected={selectedPricelist.findIndex(e => e[0] === value.pricelistId) !== -1}
+                selected={
+                  selectedPricelist.findIndex(
+                    (e) => e[0] === value.pricelistId,
+                  ) !== -1
+                }
                 selectAction={() => {
                   selectedPricelist.push([value.pricelistId, value.path]);
                   setSelectedQty(selectedQty + 1);
                 }}
                 unselectAction={() => {
-                  let index = selectedPricelist.findIndex(e => e[0] === value.pricelistId);
+                  let index = selectedPricelist.findIndex(
+                    (e) => e[0] === value.pricelistId,
+                  );
                   selectedPricelist.splice(index, 1);
                   setSelectedQty(selectedQty - 1);
                 }}
@@ -158,7 +164,7 @@ function PricelistList({
           selectedPricelist.splice(0, selectedPricelist.length);
           setSelectedQty(0);
           Object.values(pricelist).forEach((e) =>
-            selectedPricelist.push([e.pricelistId, e.path])
+            selectedPricelist.push([e.pricelistId, e.path]),
           );
           setSelectedQty(selectedPricelist.length);
           setShowMoreAction(false);
@@ -200,28 +206,33 @@ function PricelistList({
       <DeleteSelectedWindow
         modalShow={showDeleteAll}
         onHideFunction={() => {
-          setDeleteAll(false)
-          setDeleteAllErrorMessage("")
-          setIsErrorDelete(false)
+          setDeleteAll(false);
+          setDeleteAllErrorMessage("");
+          setIsErrorDelete(false);
         }}
         instanceName="pricelist"
         deleteItemFunc={async () => {
           let failures = [];
           for (let index = 0; index < selectedPricelist.length; index++) {
-            let result = await deletePricelist(selectedPricelist[index][0], selectedPricelist[index][1])
+            let result = await deletePricelist(
+              selectedPricelist[index][0],
+              selectedPricelist[index][1],
+            );
             if (result.error) {
-              failures.push(selectedPricelist[index][0])
+              failures.push(selectedPricelist[index][0]);
             } else {
-              selectedPricelist.splice(index, 1)
-              setSelectedQty(selectedPricelist.length)
+              selectedPricelist.splice(index, 1);
+              setSelectedQty(selectedPricelist.length);
             }
           }
           if (failures.length === 0) {
             setDeleteAll(false);
-            setDeleteAllErrorMessage("")
+            setDeleteAllErrorMessage("");
             router.refresh();
           } else {
-            setDeleteAllErrorMessage(`Error: Could not delete this pricelists (${failures.join(",")}).`)
+            setDeleteAllErrorMessage(
+              `Error: Could not delete this pricelists (${failures.join(",")}).`,
+            );
             setIsErrorDelete(true);
             router.refresh();
           }

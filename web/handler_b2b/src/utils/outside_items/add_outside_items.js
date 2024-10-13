@@ -46,7 +46,6 @@ export default async function addOutsideItems(file, state, formData) {
     return error === 0;
   };
 
-  const fs = require("node:fs");
   const { parse } = require("csv-parse");
   let buffArray = await file.get("file").arrayBuffer();
   let buff = new Uint8Array(buffArray);
