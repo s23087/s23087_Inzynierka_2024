@@ -11,6 +11,7 @@ import ModifyUserRole from "../windows/modify_user_roles";
 import SelectComponent from "../smaller_components/select_compontent";
 import getPagationInfo from "@/utils/flexible/get_page_info";
 import RoleFilterOffcanvas from "../filter/role_filter";
+import ModifySelectedUserRole from "../windows/modify_selected_users_roles";
 
 function RolesList({
   roles,
@@ -30,6 +31,8 @@ function RolesList({
   const [selectedRoles] = useState([]);
   // Filter
   const [showFilter, setShowFilter] = useState(false);
+  // more action
+  const [showModifySelectedRole, setShowModifySelectedRole] = useState(false);
   // Nav
   const params = useSearchParams();
   // Styles
@@ -57,7 +60,11 @@ function RolesList({
           filterAction={() => setShowFilter(true)}
         />
       </Container>
-      <SelectComponent selectedQty={selectedQty} />
+      <SelectComponent 
+        selectedQty={selectedQty} 
+        actionOneName="Change role"
+        actionOne={() => setShowModifySelectedRole(true)}
+      />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
       {Object.keys(roles ?? []).length === 0 ? (
         <Container className="text-center" fluid>
@@ -124,6 +131,12 @@ function RolesList({
         onHideFunction={() => setShowModifyRole(false)}
         roleList={rolesToChoose}
         user={userToModify}
+      />
+      <ModifySelectedUserRole
+        modalShow={showModifySelectedRole}
+        onHideFunction={() => setShowModifySelectedRole(false)}
+        roleList={rolesToChoose}
+        users={selectedRoles}
       />
     </Container>
   );

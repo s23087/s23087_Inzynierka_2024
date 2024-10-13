@@ -22,9 +22,6 @@ export default async function modifyUserRole(choosenUser, state, formData) {
     },
   });
 
-  console.log(data);
-  console.log(info.status);
-
   if (info.status == 404) {
     let text = await info.text();
     if (text === "User not found") {
