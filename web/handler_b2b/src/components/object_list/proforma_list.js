@@ -16,6 +16,7 @@ import ViewProformaOffcanvas from "../offcanvas/view/view_proforma";
 import deleteProforma from "@/utils/proformas/delete_proforma";
 import ModifyProformaOffcanvas from "../offcanvas/modify/modify_proforma";
 import ProformaFilterOffcanvas from "../filter/proforma_filter";
+import DeleteSelectedWindow from "../windows/delete_selected";
 
 function ProformaList({
   proformas,
@@ -61,6 +62,9 @@ function ProformaList({
   const [selectedProforma] = useState([]);
   // Filter
   const [showFilter, setShowFilter] = useState(false);
+  // mass action
+  const [showDeleteSelected, setShowDeleteSelected] = useState(false);
+  const [deleteSelectedErrorMess, setDeleteSelectedErrorMess] = useState("");
   // Nav
   const router = useRouter();
   const params = useSearchParams();
@@ -87,7 +91,11 @@ function ProformaList({
           filterAction={() => setShowFilter(true)}
         />
       </Container>
-      <SelectComponent selectedQty={selectedQty} />
+      <SelectComponent 
+        selectedQty={selectedQty} 
+        actionOneName="Delete selected"
+        actionOne={()  => setShowDeleteSelected(true)} 
+      />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
       {Object.keys(proformas ?? []).length === 0 ? (
         <Container className="text-center" fluid>
@@ -194,6 +202,38 @@ function ProformaList({
         }}
         isError={isErrorDelete}
         errorMessage={errorMessage}
+      />
+      <DeleteSelectedWindow
+        modalShow={showDeleteSelected}
+        onHideFunction={() => {
+          setShowDeleteSelected(false)
+          setDeleteSelectedErrorMess("")
+          setIsErrorDelete(false)
+        }}
+        instanceName="Proforma"
+        deleteItemFunc={async () => {
+          let failures = [];
+          for (let index = 0; index < selectedProforma.length; index++) {
+            let result = await deleteProforma(type === "Yours proformas", selectedProforma[index])
+            if (result.error) {
+              failures.push(selectedProforma[index])
+            } else {
+              selectedProforma.splice(index, 1)
+              setSelectedQty(selectedProforma.length)
+            }
+          }
+          if (failures.length === 0) {
+            setShowDeleteSelected(false);
+            setDeleteSelectedErrorMess("")
+            router.refresh();
+          } else {
+            setDeleteSelectedErrorMess(`Error: Could not delete this proformas (${failures.join(",")}).`)
+            setIsErrorDelete(true);
+            router.refresh();
+          }
+        }}
+        isError={isErrorDelete}
+        errorMessage={deleteSelectedErrorMess}
       />
       <ModifyProformaOffcanvas
         showOffcanvas={showModifyProforma}

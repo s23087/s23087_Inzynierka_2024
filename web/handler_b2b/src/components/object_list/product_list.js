@@ -16,7 +16,7 @@ import ModifyItemOffcanvas from "../offcanvas/modify/modify_item";
 import SelectComponent from "../smaller_components/select_compontent";
 import getPagationInfo from "@/utils/flexible/get_page_info";
 import ProductFilterOffcanvas from "../filter/product_filter_offcanvas";
-import DeleteAllWindow from "../windows/delete_all";
+import DeleteSelectedWindow from "../windows/delete_selected";
 
 function ProductList({
   products,
@@ -53,8 +53,8 @@ function ProductList({
   // Filter
   const [showFilter, setShowFilter] = useState(false);
   // mass action
-  const [showDeleteAll, setDeleteAll] = useState(false);
-  const [deleteAllErrorMessage, setDeleteAllErrorMessage] = useState("");
+  const [showDeleteSelected, setShowDeleteSelected] = useState(false);
+  const [deleteSelectedErrorMess, setDeleteSelectedErrorMess] = useState("");
   // Nav
   const router = useRouter();
   const params = useSearchParams();
@@ -85,7 +85,7 @@ function ProductList({
       <SelectComponent 
         selectedQty={selectedQty}
         actionOneName="Delete selected"
-        actionOne={()  => setDeleteAll(true)} 
+        actionOne={()  => setShowDeleteSelected(true)} 
       />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
       {Object.keys(products ?? []).length === 0 ? (
@@ -189,11 +189,11 @@ function ProductList({
         isError={isErrorDelete}
         errorMessage={deleteErrorMessage}
       />
-      <DeleteAllWindow
-        modalShow={showDeleteAll}
+      <DeleteSelectedWindow
+        modalShow={showDeleteSelected}
         onHideFunction={() => {
-          setDeleteAll(false)
-          setDeleteAllErrorMessage("")
+          setShowDeleteSelected(false)
+          setDeleteSelectedErrorMess("")
           setIsErrorDelete(false)
         }}
         instanceName="item"
@@ -209,17 +209,17 @@ function ProductList({
             }
           }
           if (failures.length === 0) {
-            setDeleteAll(false);
-            setDeleteAllErrorMessage("")
+            setShowDeleteSelected(false);
+            setDeleteSelectedErrorMess("")
             router.refresh();
           } else {
-            setDeleteAllErrorMessage(`Error: Could not delete this items (${failures.join(",")}).`)
+            setDeleteSelectedErrorMess(`Error: Could not delete this items (${failures.join(",")}).`)
             setIsErrorDelete(true);
             router.refresh();
           }
         }}
         isError={isErrorDelete}
-        errorMessage={deleteAllErrorMessage}
+        errorMessage={deleteSelectedErrorMess}
       />
       <ViewItemOffcanvas
         showOffcanvas={showViewItem}

@@ -16,7 +16,7 @@ import deletePricelist from "@/utils/pricelist/delete_pricelist";
 import ViewPricelistOffcanvas from "../offcanvas/view/view_pricelist";
 import ModifyPricelistOffcanvas from "../offcanvas/modify/modify_pricelist";
 import PricelistFilterOffcanvas from "../filter/pricelist_filter";
-import DeleteAllWindow from "../windows/delete_all";
+import DeleteSelectedWindow from "../windows/delete_selected";
 
 function PricelistList({
   pricelist,
@@ -197,7 +197,7 @@ function PricelistList({
         isError={isErrorDelete}
         errorMessage={errorMessage}
       />
-      <DeleteAllWindow
+      <DeleteSelectedWindow
         modalShow={showDeleteAll}
         onHideFunction={() => {
           setDeleteAll(false)

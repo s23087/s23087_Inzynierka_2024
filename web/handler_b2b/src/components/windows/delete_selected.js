@@ -6,7 +6,7 @@ import { Modal, Container, Row, Col, Button } from "react-bootstrap";
 import CloseIcon from "../../../public/icons/close_black.png";
 import { useState } from "react";
 
-function DeleteAllWindow({
+function DeleteSelectedWindow({
   modalShow,
   onHideFunction,
   deleteItemFunc,
@@ -75,7 +75,7 @@ function DeleteAllWindow({
   );
 }
 
-DeleteAllWindow.PropTypes = {
+DeleteSelectedWindow.PropTypes = {
   modalShow: PropTypes.bool.isRequired,
   onHideFunction: PropTypes.func.isRequired,
   deleteItemFunc: PropTypes.func.isRequired,
@@ -84,4 +84,4 @@ DeleteAllWindow.PropTypes = {
   errorMessage: PropTypes.string,
 };
 
-export default DeleteAllWindow;
+export default DeleteSelectedWindow;
