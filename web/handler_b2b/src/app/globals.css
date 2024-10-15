@@ -91,7 +91,7 @@ body {
 }
 
 .minScalableWidth {
-  min-width: 360px;
+  min-width: 393px;
 }
 
 .maxInputWidth {
@@ -105,13 +105,17 @@ body {
 /* Placement */
 
 .middleSectionPlacement {
-  margin-bottom: 66px;
+  padding-bottom: 66px;
   margin-top: 206px;
 }
 
 .middleSectionPlacement-no-footer {
-  margin-bottom: 66px;
+  padding-bottom: 66px;
   margin-top: 140px;
+}
+
+.middleSectionPlacement-selected {
+  margin-top: 206px;
 }
 
 .logo-spacing {

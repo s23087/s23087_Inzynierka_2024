@@ -1,24 +1,25 @@
-﻿using database_comunicator.Data;
-using database_comunicator.Models;
-using database_comunicator.Models.DTOs;
-using database_comunicator.Utils;
+﻿using database_communicator.Data;
+using database_communicator.Models;
+using database_communicator.Models.DTOs;
+using database_communicator.Utils;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace database_comunicator.Services
+namespace database_communicator.Services
 {
     public interface IOrganizationServices
     {
-        public Task<int> AddOrganization(AddOrganization org);
+        public Task<int> AddOrganization(AddOrganization org, int? userId);
         public Task<int> GetCountryId(string countryName);
         public Task<bool> CountryExist(string countryName);
         public Task<GetOrg> GetOrg(int orgId);
         public Task ModifyOrg(ModifyOrg data);
-        public Task<IEnumerable<GetClient>> GetClients(int userOrgId, string? sort, int? country);
-        public Task<IEnumerable<GetClient>> GetClients(int userOrgId, string search, string? sort, int? country);
+        public Task<IEnumerable<GetClient>> GetClients(int userId, int userOrgId, string? sort, int? country);
+        public Task<IEnumerable<GetClient>> GetClients(int userId, int userOrgId, string search, string? sort, int? country);
         public Task<IEnumerable<GetOrgClient>> GetOrgClients(int userOrgId, string? sort, int? country);
         public Task<IEnumerable<GetOrgClient>> GetOrgClients(int userOrgId, string search, string? sort, int? country);
         public Task<GetClientRestInfo> GetClientsRestInfo(int orgId);
@@ -30,8 +31,8 @@ namespace database_comunicator.Services
         public Task<bool> ManyUserExist(IEnumerable<int> users);
         public Task<bool> StatusExist(int statusId);
         public Task<IEnumerable<GetClientBindings>> GetClientBindings(int orgId);
-        public Task<bool> OrgHaveRelations(int orgId);
-        public Task DeleteOrg(int orgId);
+        public Task<bool> OrgHaveRelations(int orgId, int userId);
+        public Task<bool> DeleteOrg(int orgId);
     }
     public class OrganizationServices : IOrganizationServices
     {
@@ -41,24 +42,37 @@ namespace database_comunicator.Services
             _handlerContext = handlerContext;
         }
 
-        public async Task<int> AddOrganization(AddOrganization org)
+        public async Task<int> AddOrganization(AddOrganization org, int? userId)
         {
-            var newOrg = new Organization
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
             {
-                OrgName = org.OrgName,
-                Nip = org.Nip,
-                Street = org.Street,
-                City = org.City,
-                PostalCode = org.PostalCode,
-                CreditLimit = org.CreditLimit,
-                CountryId = org.CountryId,
-                AvailabilityStatus = null
-            };
-            _handlerContext.Add<Organization>(newOrg);
-
-            await _handlerContext.SaveChangesAsync();
-
-            return newOrg.OrganizationId;
+                var newOrg = new Organization
+                {
+                    OrgName = org.OrgName,
+                    Nip = org.Nip,
+                    Street = org.Street,
+                    City = org.City,
+                    PostalCode = org.PostalCode,
+                    CreditLimit = org.CreditLimit,
+                    CountryId = org.CountryId,
+                    AvailabilityStatus = null
+                };
+                await _handlerContext.AddAsync<Organization>(newOrg);
+                await _handlerContext.SaveChangesAsync();
+                if (userId != null)
+                {
+                    await _handlerContext.Database.ExecuteSqlAsync($"insert into User_client (users_id, organization_id) Values ({userId}, {newOrg.OrganizationId})");
+                    await _handlerContext.SaveChangesAsync();
+                }
+                await trans.CommitAsync();
+                return newOrg.OrganizationId;
+            } catch (Exception error)
+            {
+                Console.WriteLine(error.ToString());
+                await trans.RollbackAsync();
+                return 0;
+            }
         }
 
         public async Task<bool> CountryExist(string countryName)
@@ -127,7 +141,7 @@ namespace database_comunicator.Services
 
             await _handlerContext.SaveChangesAsync();
         }
-        public async Task<IEnumerable<GetClient>> GetClients(int userOrgId, string? sort, int? country)
+        public async Task<IEnumerable<GetClient>> GetClients(int userId, int userOrgId, string? sort, int? country)
         {
             var sortFunc = SortFilterUtils.GetClientSort(sort);
             bool direction;
@@ -142,7 +156,8 @@ namespace database_comunicator.Services
             Expression<Func<Organization, bool>> countryCond = country == null ?
                 e => true
                 : e => e.CountryId == country;
-            return await _handlerContext.Organizations.Where(d => d.OrganizationId != userOrgId)
+            return await _handlerContext.Organizations
+                .Where(d => d.OrganizationId != userOrgId && d.AppUsers.Any(x => x.IdUser == userId))
                 .Where(countryCond)
                 .OrderByWithDirection(sortFunc, direction)
                 .Select(d => new GetClient
@@ -157,7 +172,7 @@ namespace database_comunicator.Services
 
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetClient>> GetClients(int userOrgId, string search, string? sort, int? country)
+        public async Task<IEnumerable<GetClient>> GetClients(int userId, int userOrgId, string search, string? sort, int? country)
         {
             var sortFunc = SortFilterUtils.GetClientSort(sort);
             bool direction;
@@ -172,7 +187,8 @@ namespace database_comunicator.Services
             Expression<Func<Organization, bool>> countryCond = country == null ?
                 e => true
                 : e => e.CountryId == country;
-            return await _handlerContext.Organizations.Where(e => e.OrganizationId != userOrgId)
+            return await _handlerContext.Organizations
+                .Where(e => e.OrganizationId != userOrgId && e.AppUsers.Any(x => x.IdUser == userId))
                 .Where(e => EF.Functions.FreeText(e.OrgName, search) || EF.Functions.FreeText(e.Street, search) || EF.Functions.FreeText(e.City, search))
                 .Where(countryCond)
                 .OrderByWithDirection(sortFunc, direction)
@@ -350,20 +366,33 @@ namespace database_comunicator.Services
                 Surname = e.Surname
             }).ToListAsync();
         }
-        public async Task<bool> OrgHaveRelations(int orgId)
+        public async Task<bool> OrgHaveRelations(int orgId, int userId)
         {
             var invoicesCheck = await _handlerContext.Invoices.AnyAsync(e => e.Buyer == orgId || e.Seller == orgId);
             var proformaCheck = await _handlerContext.Proformas.AnyAsync(e => e.Buyer == orgId || e.Seller == orgId);
             var soloUserCheck = await _handlerContext.SoloUsers.AnyAsync(e => e.OrganizationsId == orgId);
             var orgUserCheck = await _handlerContext.OrgUsers.AnyAsync(e => e.OrganizationsId == orgId);
             var outsideItemsCheck = await _handlerContext.OutsideItems.AnyAsync(e => e.OrganizationId == orgId);
-            var userClientCheck = await _handlerContext.AppUsers.AnyAsync(e => e.Clients.Any(x => x.OrganizationId == orgId));
+            var userClientCheck = await _handlerContext.AppUsers.AnyAsync(e => e.IdUser != userId && e.Clients.Any(x => x.OrganizationId == orgId));
 
             return invoicesCheck || proformaCheck || soloUserCheck || orgUserCheck || outsideItemsCheck || userClientCheck;
         }
-        public async Task DeleteOrg(int orgId)
+        public async Task<bool> DeleteOrg(int orgId)
         {
-            await _handlerContext.Organizations.Where(e => e.OrganizationId == orgId).ExecuteDeleteAsync();
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
+            {
+                await _handlerContext.Database.ExecuteSqlAsync($"Delete from User_client where organization_id = {orgId}");
+                await _handlerContext.Organizations.Where(e => e.OrganizationId == orgId).ExecuteDeleteAsync();
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+                return true;
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                await trans.RollbackAsync();
+                return false;
+            }
         }
     }
 }

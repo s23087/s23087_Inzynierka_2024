@@ -1,4 +1,4 @@
-﻿namespace database_comunicator.Models.DTOs
+﻿namespace database_communicator.Models.DTOs
 {
     public class ModifyOrg
     {

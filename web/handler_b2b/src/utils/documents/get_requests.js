@@ -21,7 +21,7 @@ export default async function getRequests(
   if (type) params.push(`type=${type}`);
   if (status) params.push(`status=${status}`);
   if (isOrg) {
-    url = `${process.env.API_DEST}/${dbName}/Requests/get/recived/${userId}${params.length > 0 ? "?" : ""}${params.join("&")}`;
+    url = `${process.env.API_DEST}/${dbName}/Requests/get/received/${userId}${params.length > 0 ? "?" : ""}${params.join("&")}`;
   } else {
     url = `${process.env.API_DEST}/${dbName}/Requests/get/created/${userId}${params.length > 0 ? "?" : ""}${params.join("&")}`;
   }

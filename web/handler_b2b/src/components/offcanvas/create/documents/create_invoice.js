@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { useFormState } from "react-dom";
 import Toastes from "@/components/smaller_components/toast";
 import { useRouter } from "next/navigation";
-import validators from "@/utils/validators/validator";
 import getUsers from "@/utils/flexible/get_users";
 import getOrgsList from "@/utils/documents/get_orgs_list";
 import getTaxes from "@/utils/documents/get_taxes";
@@ -19,24 +18,63 @@ import getCurrencyValuesList from "@/utils/flexible/get_currency_values_list";
 import AddSaleProductWindow from "@/components/windows/add_Sales_product";
 import CreateSalesInvoice from "@/utils/documents/create_sales_invoice";
 import ErrorMessage from "@/components/smaller_components/error_message";
+import StringValidtor from "@/utils/validators/form_validator/stringValidator";
 
 function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
   const router = useRouter();
+  const [userDownloadError, setUserDownloadError] = useState(false);
+  const [orgDownloadError, setOrgDownloadError] = useState(false);
+  const [taxesDownloadError, setTaxesDownloadError] = useState(false);
+  const [methodsDownloadError, setMethodsDownloadError] = useState(false);
+  const [statusesDownloadError, setStatusesDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      const users = getUsers();
-      users.then((data) => {
-        setUsers(data);
-        setChoosenUser(data[0].idUser);
-      });
-      const orgs = getOrgsList();
-      orgs.then((data) => setOrgs(data));
-      const taxes = getTaxes();
-      taxes.then((data) => setTaxes(data));
-      const paymentMethods = getPaymentMethods();
-      paymentMethods.then((data) => setPaymentMethods(data));
-      const paymentStatuses = getPaymentStatuses();
-      paymentStatuses.then((data) => setPaymentStatuses(data));
+      getUsers()
+        .then((data) => {
+          if (data === null) return;
+          setUsers(data);
+          setChoosenUser(data[0].idUser);
+        })
+        .catch(() => setUserDownloadError(true))
+        .finally(() => {
+          if (choosenUser) setUserDownloadError(false);
+        });
+
+      getOrgsList()
+        .then((data) => {
+          if (data !== null) setOrgs(data);
+        })
+        .catch(() => setOrgDownloadError(true))
+        .finally(() => {
+          if (orgs.orgName) setOrgDownloadError(false);
+        });
+
+      getTaxes()
+        .then((data) => {
+          if (data !== null) setTaxes(data);
+        })
+        .catch(() => setTaxesDownloadError(true))
+        .finally(() => {
+          if (taxes.length > 0) setTaxesDownloadError(false);
+        });
+
+      getPaymentMethods()
+        .then((data) => {
+          if (data !== null) setPaymentMethods(data);
+        })
+        .catch(() => setMethodsDownloadError(true))
+        .finally(() => {
+          if (paymentMethods.length > 0) setMethodsDownloadError(false);
+        });
+
+      getPaymentStatuses()
+        .then((data) => {
+          if (data !== null) setPaymentStatuses(data);
+        })
+        .catch(() => setStatusesDownloadError(true))
+        .finally(() => {
+          if (paymentStatuses.length > 0) setStatusesDownloadError(false);
+        });
     }
   }, [showOffcanvas]);
   // options
@@ -108,7 +146,14 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
     transportError ||
     documentError ||
     currencyList.error ||
-    dateError;
+    dateError ||
+    products.length === 0 ||
+    orgs.restOrgs.length === 0 ||
+    orgDownloadError ||
+    userDownloadError ||
+    taxesDownloadError ||
+    methodsDownloadError ||
+    statusesDownloadError;
   // Misc
   const [isLoading, setIsLoading] = useState(false);
   // Form
@@ -181,19 +226,30 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0" style={vhStyle} fluid>
             <Form
-              className="mx-1 mx-xl-4"
+              className="mx-1 mx-xl-3"
               id="invoiceForm"
               action={formPurchaseAction}
             >
+              <ErrorMessage
+                message="Error: could not download all necessary info."
+                messageStatus={
+                  orgDownloadError ||
+                  userDownloadError ||
+                  taxesDownloadError ||
+                  methodsDownloadError ||
+                  statusesDownloadError
+                }
+              />
               <Form.Group className="mb-4">
                 <Form.Label className="blue-main-text">User:</Form.Label>
                 <Form.Select
                   id="userSelect"
                   className="input-style shadow-sm maxInputWidth"
                   name="user"
+                  disabled={products.length > 0}
                   onChange={(e) => {
                     setChoosenUser(e.target.value);
                   }}
@@ -222,14 +278,11 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                   placeholder="invoice"
                   isInvalid={invoiceError}
                   onInput={(e) => {
-                    if (
-                      validators.lengthSmallerThen(e.target.value, 40) &&
-                      validators.stringIsNotEmpty(e.target.value)
-                    ) {
-                      setInvoiceError(false);
-                    } else {
-                      setInvoiceError(true);
-                    }
+                    StringValidtor.normalStringValidtor(
+                      e.target.value,
+                      setInvoiceError,
+                      40,
+                    );
                   }}
                   maxLength={40}
                 />
@@ -269,7 +322,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                         }}
                       />
                       <ErrorMessage
-                        message="Date excceed today's date."
+                        message="Date exceed today's date."
                         messageStatus={dateError}
                       />
                     </Form.Group>
@@ -407,14 +460,10 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                   placeholder="transport cost"
                   isInvalid={transportError}
                   onInput={(e) => {
-                    if (
-                      validators.isPriceFormat(e.target.value) &&
-                      validators.stringIsNotEmpty(e.target.value)
-                    ) {
-                      setTransportError(false);
-                    } else {
-                      setTransportError(true);
-                    }
+                    StringValidtor.decimalValidator(
+                      e.target.value,
+                      setTransportError,
+                    );
                   }}
                 />
               </Form.Group>
@@ -544,7 +593,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                   }}
                 />
               </Form.Group>
-              <Form.Group className="mb-5" controlId="formDescription">
+              <Form.Group className="mb-5 pb-5" controlId="formDescription">
                 <Form.Label className="blue-main-text maxInputWidth-desc">
                   Note:
                 </Form.Label>

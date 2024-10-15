@@ -54,7 +54,12 @@ function AddCreditProductWindow({
   // Misc
   const [showSuccess, setShowSuccess] = useState(false);
   return (
-    <Modal size="sm" show={modalShow} centered className="px-4">
+    <Modal
+      size="md"
+      show={modalShow}
+      centered
+      className="px-4 minScalableWidth"
+    >
       <Modal.Body>
         <Container>
           <Row>

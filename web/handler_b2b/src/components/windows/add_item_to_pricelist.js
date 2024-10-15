@@ -43,14 +43,14 @@ function AddItemToPricelistWindow({
           );
           setProducts(newData);
           if (newData[0]) {
-            setChosenPrice(newData[0].purchasePrice);
+            setChosenPrice(newData[0].purchasePrice.toFixed(2));
             setChosenMargin((0.0).toFixed(2));
           }
         }
       });
     } else {
       if (products[0]) {
-        setChosenPrice(products[0].purchasePrice);
+        setChosenPrice(products[0].purchasePrice.toFixed(2));
         setChosenMargin((0.0).toFixed(2));
       }
     }
@@ -62,7 +62,7 @@ function AddItemToPricelistWindow({
       return "Error";
     } else {
       let result =
-        ((chosenPrice - products[currentProduct].purchasePrice) /
+        ((chosenPrice - products[currentProduct].purchasePrice.toFixed(2)) /
           products[currentProduct].purchasePrice) *
         100;
       return result.toFixed(2);
@@ -100,7 +100,9 @@ function AddItemToPricelistWindow({
               id="product"
               onChange={(e) => {
                 setCurrentProduct(e.target.value);
-                setChosenPrice(products[e.target.value].purchasePrice);
+                setChosenPrice(
+                  products[e.target.value].purchasePrice.toFixed(2),
+                );
                 setChosenMargin(getMargin());
               }}
             >
@@ -112,7 +114,7 @@ function AddItemToPricelistWindow({
                         " - " +
                         val.qty +
                         " pcs " +
-                        val.purchasePrice +
+                        val.purchasePrice.toFixed(2) +
                         " " +
                         currency}
                     </option>
@@ -169,9 +171,11 @@ function AddItemToPricelistWindow({
                 if (!e.target.value) return;
                 if (!isNaN(parseFloat(e.target.value))) {
                   setChosenPrice(
-                    products[currentProduct].purchasePrice +
+                    (
+                      products[currentProduct].purchasePrice +
                       products[currentProduct].purchasePrice *
-                        (parseFloat(e.target.value) / 100),
+                        (parseFloat(e.target.value) / 100)
+                    ).toFixed(2),
                   );
                 }
               }}

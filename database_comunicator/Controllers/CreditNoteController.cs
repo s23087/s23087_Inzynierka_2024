@@ -1,11 +1,11 @@
-﻿using database_comunicator.Models;
-using database_comunicator.Models.DTOs;
-using database_comunicator.Services;
+﻿using database_communicator.Models;
+using database_communicator.Models.DTOs;
+using database_communicator.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace database_comunicator.Controllers
+namespace database_communicator.Controllers
 {
     [Route("{db_name}/[controller]")]
     [ApiController]
@@ -30,7 +30,7 @@ namespace database_comunicator.Controllers
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("This user does not exists.");
             var creditExist = await _creditNoteServices.CreditNoteExist(data.CreditNotenumber, data.InvoiceId);
-            if (creditExist) return BadRequest("Credit note with that number alredy exist.");
+            if (creditExist) return BadRequest("Credit note with that number already exist.");
             foreach (var item in data.CreditNoteItems.Select(e => new {e.ItemId, e.InvoiceId, e.UserId, e.Qty}))
             {
                 if (item.Qty > 0)
@@ -163,7 +163,7 @@ namespace database_comunicator.Controllers
             {
                 var invoiceId = await _creditNoteServices.GetCreditNoteInvoiceId(data.Id);
                 var newNumberExist = await _creditNoteServices.CreditNoteExist(data.CreditNumber, invoiceId);
-                if (newNumberExist) return BadRequest("Credit note with this number and invoice alredy exist.");
+                if (newNumberExist) return BadRequest("Credit note with this number and invoice already exist.");
             }
             var creditUser = await _creditNoteServices.GetCreditNoteUser(data.Id);
             var result = await _creditNoteServices.ModifyCreditNote(data);

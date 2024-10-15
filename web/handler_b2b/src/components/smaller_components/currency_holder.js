@@ -30,7 +30,7 @@ function CurrencyHolder({
         <Col xs="auto" className="ps-1">
           <p className="mb-0">{currency_name}</p>
         </Col>
-        <Col xs="auto">
+        <Col xs="auto" className="me-auto">
           <span className="d-flex" style={spanStyle}>
             <p className="mb-0">1 {currency_name}</p>
             <Image className="mx-3" src={currency_arrow} alt="arrow" />
@@ -39,8 +39,12 @@ function CurrencyHolder({
             </p>
           </span>
         </Col>
-        <Col className="px-0 text-end">
-          <Button className="px-0" variant="as-link" onClick={buttonAction}>
+        <Col xs="1" className="px-0 text-end">
+          <Button
+            className="px-0 pe-md-1"
+            variant="as-link"
+            onClick={buttonAction}
+          >
             <Image src={currency_button} alt="button" />
           </Button>
         </Col>

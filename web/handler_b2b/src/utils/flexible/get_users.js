@@ -1,6 +1,8 @@
 "use server";
 
 import getDbName from "../auth/get_db_name";
+import getRole from "../auth/get_role";
+import getUserId from "../auth/get_user_id";
 
 export default async function getUsers() {
   const dbName = await getDbName();
@@ -10,8 +12,14 @@ export default async function getUsers() {
   });
 
   if (info.ok) {
-    return await info.json();
+    let result = await info.json();
+    const role = await getRole();
+    const userId = await getUserId();
+    if (role === "Merchant") {
+      result = Object.values(result).filter((e) => e.idUser === userId);
+    }
+    return result;
   }
 
-  return {};
+  return [];
 }

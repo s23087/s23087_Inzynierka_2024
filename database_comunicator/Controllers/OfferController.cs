@@ -1,10 +1,10 @@
-﻿using database_comunicator.Models;
-using database_comunicator.Models.DTOs;
-using database_comunicator.Services;
+﻿using database_communicator.Models;
+using database_communicator.Models.DTOs;
+using database_communicator.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace database_comunicator.Controllers
+namespace database_communicator.Controllers
 {
     [Route("{db_name}/[controller]")]
     [ApiController]
@@ -29,9 +29,9 @@ namespace database_comunicator.Controllers
             if (proExist) return BadRequest("This pricelist already exist.");
             var offerId = await _offerServices.CreateOffer(data);
             if (offerId == 0) return new StatusCodeResult(StatusCodes.Status500InternalServerError);
-            var deactivedId = await _offerServices.GetDeactivatedStatusId();
+            var deactivateId = await _offerServices.GetDeactivatedStatusId();
             bool fileCreated;
-            if (data.OfferStatusId != deactivedId)
+            if (data.OfferStatusId != deactivateId)
             {
                 if (data.Path.EndsWith("csv"))
                 {

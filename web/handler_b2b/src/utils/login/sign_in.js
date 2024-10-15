@@ -9,7 +9,23 @@ export default async function signIn(state, formData) {
     email: formData.get("email"),
     password: formData.get("password"),
   };
-  let dbName = formData.get("companyId");
+  let dbName = formData.get("companyId").replaceAll(/[\\./=+]/g, "");
+  if (!dbName) return { error: true, message: "Company id is invalid." };
+  const fs = require("node:fs");
+  try {
+    if (!fs.existsSync(`src/app/api/pricelist/${dbName}`)) {
+      return {
+        error: true,
+        message: "Invalid company id.",
+      };
+    }
+  } catch (error) {
+    console.log(error);
+    return {
+      error: true,
+      message: "Server error.",
+    };
+  }
 
   if (
     !validators.isEmail(data.email) ||
@@ -20,30 +36,37 @@ export default async function signIn(state, formData) {
       message: "Invalid email.",
     };
   }
+  let response;
+  try {
+    response = await fetch(`${process.env.API_DEST}/${dbName}/User/sign_in`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
 
-  let response = await fetch(`${process.env.API_DEST}/${dbName}/User/sign_in`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+    if (!response.ok) {
+      return {
+        error: true,
+        message: "Your email or password is wrong.",
+      };
+    }
 
-  if (response.ok) {
-    const body = await response.json();
-    await SessionManagment.createSession(body.id, body.role, dbName);
-    redirect("dashboard/warehouse");
-  }
-
-  if (response.status == 500) {
+    if (response.status == 500) {
+      return {
+        error: true,
+        message: "The company id is incorrect.",
+      };
+    }
+  } catch {
     return {
       error: true,
-      message: "The company id is incorrect.",
+      message: "Server error.",
     };
   }
-
-  return {
-    error: true,
-    message: "Your email or password is wrong.",
-  };
+  const body = await response.json();
+  await SessionManagment.createSession(body.id, body.role, dbName);
+  if (body.role === "Warehouse Manager") redirect("dashboard/deliveries");
+  redirect("dashboard/warehouse");
 }

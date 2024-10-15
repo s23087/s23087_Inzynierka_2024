@@ -8,7 +8,7 @@ export default function CountryOptions() {
   const { data, error, isLoading } = useSWR("/api/countries", fetcher);
 
   if (error) return <option>Critical Error</option>;
-  if (isLoading) return <option>Loading...r</option>;
+  if (isLoading) return <option>Loading...</option>;
 
   let values = Object.values(data.countries);
 

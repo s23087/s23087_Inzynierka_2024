@@ -1,12 +1,12 @@
-﻿using database_comunicator.Data;
-using database_comunicator.Models;
-using database_comunicator.Models.DTOs;
-using database_comunicator.Utils;
+﻿using database_communicator.Data;
+using database_communicator.Models;
+using database_communicator.Models.DTOs;
+using database_communicator.Utils;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 
-namespace database_comunicator.Services
+namespace database_communicator.Services
 {
     public interface IUserServices
     {
@@ -275,7 +275,7 @@ namespace database_comunicator.Services
         public async Task<IEnumerable<GetUsers>> GetAccountantUser()
         {
             return await _handlerContext.AppUsers
-                .Where(e => e.OrgUser!.Role.RoleName == "Merchant" || e.OrgUser!.Role.RoleName == "Admin")
+                .Where(e => e.OrgUser!.Role.RoleName == "Accountant" || e.OrgUser!.Role.RoleName == "Admin")
                 .Select(e => new GetUsers
             {
                 IdUser = e.IdUser,

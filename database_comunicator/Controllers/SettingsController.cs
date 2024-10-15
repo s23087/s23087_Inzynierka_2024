@@ -1,10 +1,10 @@
-﻿using database_comunicator.Models.DTOs;
-using database_comunicator.Services;
+﻿using database_communicator.Models.DTOs;
+using database_communicator.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace database_comunicator.Controllers
+namespace database_communicator.Controllers
 {
     [Route("{db_name}/[controller]")]
     [ApiController]

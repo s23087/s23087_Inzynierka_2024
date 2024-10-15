@@ -30,15 +30,14 @@ function ClientFilterOffcanvas({
   const [countries, setCountries] = useState([]);
   const [errorDownload, setDownloadError] = useState(false);
   useEffect(() => {
-    const countries = getCountries();
-    countries.then((data) => {
-      if (data === null) {
-        setDownloadError(true);
-      } else {
-        setCountries(data);
-        setDownloadError(false);
-      }
-    });
+    getCountries()
+      .then((data) => {
+        if (data !== null) setCountries(data);
+      })
+      .catch(() => setDownloadError(true))
+      .finally(() => {
+        if (countries.length > 0) setDownloadError(false);
+      });
   }, []);
   // Styles
   const vhStyle = {
@@ -75,8 +74,8 @@ function ClientFilterOffcanvas({
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
-          <Container className="p-0" style={vhStyle} fluid>
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
+          <Container className="p-0 mx-1 mx-xl-3" style={vhStyle} fluid>
             <ErrorMessage
               message="Could not download countries."
               messageStatus={errorDownload}

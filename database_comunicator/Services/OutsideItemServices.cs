@@ -1,19 +1,17 @@
-﻿using database_comunicator.Data;
-using database_comunicator.Models;
-using database_comunicator.Models.DTOs;
-using database_comunicator.Utils;
+﻿using database_communicator.Data;
+using database_communicator.Models;
+using database_communicator.Models.DTOs;
+using database_communicator.Utils;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace database_comunicator.Services
+namespace database_communicator.Services
 {
     public interface IOutsideItemServices
     {
 
         public Task<IEnumerable<GetOutsideItem>> GetItems(string? sort, int? qtyL, int? qtyG, int? priceL, int? priceG, int? source, string? currency);
-        public Task<IEnumerable<GetOutsideItem>> GetItems(int userId, string? sort, int? qtyL, int? qtyG, int? priceL, int? priceG, int? source, string? currency);
         public Task<IEnumerable<GetOutsideItem>> GetItems(string search, string? sort, int? qtyL, int? qtyG, int? priceL, int? priceG, int? source, string? currency);
-        public Task<IEnumerable<GetOutsideItem>> GetItems(int userId, string search, string? sort, int? qtyL, int? qtyG, int? priceL, int? priceG, int? source, string? currency);
         public Task<bool> ItemExist(int itemId, int orgId);
         public Task DeleteItem(int itemId, int orgId);
         public Task<IEnumerable<string>> AddItems(CreateOutsideItems data);
@@ -81,61 +79,6 @@ namespace database_comunicator.Services
                     Currency = e.CurrencyName
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetOutsideItem>> GetItems(int userId, string? sort, int? qtyL, int? qtyG, int? priceL, int? priceG, int? source, string? currency)
-        {
-            var sortFunc = SortFilterUtils.GetOutsideItemSort(sort);
-            bool direction;
-            if (sort == null)
-            {
-                direction = true;
-            }
-            else
-            {
-                direction = sort.StartsWith("D");
-            }
-            Expression<Func<OutsideItem, bool>> qtyLCond = qtyL == null ?
-                e => true
-                : e => e.Qty <= qtyL;
-
-            Expression<Func<OutsideItem, bool>> qtyGCond = qtyG == null ?
-                e => true
-                : e => e.Qty >= qtyG;
-
-            Expression<Func<OutsideItem, bool>> priceLCond = priceL == null ?
-                e => true
-                : e => e.PurchasePrice <= priceL;
-
-            Expression<Func<OutsideItem, bool>> priceGCond = priceG == null ?
-                e => true
-                : e => e.PurchasePrice >= priceG;
-
-            Expression<Func<OutsideItem, bool>> sourceCond = source == null ?
-                e => true
-                : e => e.OrganizationId == source;
-
-            Expression<Func<OutsideItem, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.CurrencyName == currency;
-            return await _handlerContext.OutsideItems
-                .Where(e => e.Organization.AppUsers.Any(x => x.IdUser == userId))
-                .Where(qtyLCond)
-                .Where(qtyGCond)
-                .Where(priceLCond)
-                .Where(priceGCond)
-                .Where(sourceCond)
-                .Where(currencyCond)
-                .OrderByWithDirection(sortFunc, direction)
-                .Select(obj => new GetOutsideItem
-                {
-                    Partnumber = obj.Item.PartNumber,
-                    ItemId = obj.ItemId,
-                    OrgId = obj.OrganizationId,
-                    OrgName = obj.Organization.OrgName,
-                    Price = obj.PurchasePrice,
-                    Qty = obj.Qty,
-                    Currency = obj.CurrencyName
-                }).ToListAsync();
-        }
         public async Task<IEnumerable<GetOutsideItem>> GetItems(string search, string? sort, int? qtyL, int? qtyG, int? priceL, int? priceG, int? source, string? currency)
         {
             var sortFunc = SortFilterUtils.GetOutsideItemSort(sort);
@@ -190,62 +133,6 @@ namespace database_comunicator.Services
                     Price = ent.PurchasePrice,
                     Qty = ent.Qty,
                     Currency = ent.CurrencyName
-                }).ToListAsync();
-        }
-        public async Task<IEnumerable<GetOutsideItem>> GetItems(int userId, string search, string? sort, int? qtyL, int? qtyG, int? priceL, int? priceG, int? source, string? currency)
-        {
-            var sortFunc = SortFilterUtils.GetOutsideItemSort(sort);
-            bool direction;
-            if (sort == null)
-            {
-                direction = true;
-            }
-            else
-            {
-                direction = sort.StartsWith("D");
-            }
-            Expression<Func<OutsideItem, bool>> qtyLCond = qtyL == null ?
-                e => true
-                : e => e.Qty <= qtyL;
-
-            Expression<Func<OutsideItem, bool>> qtyGCond = qtyG == null ?
-                e => true
-                : e => e.Qty >= qtyG;
-
-            Expression<Func<OutsideItem, bool>> priceLCond = priceL == null ?
-                e => true
-                : e => e.PurchasePrice <= priceL;
-
-            Expression<Func<OutsideItem, bool>> priceGCond = priceG == null ?
-                e => true
-                : e => e.PurchasePrice >= priceG;
-
-            Expression<Func<OutsideItem, bool>> sourceCond = source == null ?
-                e => true
-                : e => e.OrganizationId == source;
-
-            Expression<Func<OutsideItem, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.CurrencyName == currency;
-            return await _handlerContext.OutsideItems
-                .Where(e => e.Organization.AppUsers.Any(x => x.IdUser == userId))
-                .Where(e => e.Item.PartNumber.ToLower().Contains(search.ToLower()) || e.Item.ItemName.ToLower().Contains(search.ToLower()))
-                .Where(qtyLCond)
-                .Where(qtyGCond)
-                .Where(priceLCond)
-                .Where(priceGCond)
-                .Where(sourceCond)
-                .Where(currencyCond)
-                .OrderByWithDirection(sortFunc, direction)
-                .Select(item => new GetOutsideItem
-                {
-                    Partnumber = item.Item.PartNumber,
-                    ItemId = item.ItemId,
-                    OrgId = item.OrganizationId,
-                    OrgName = item.Organization.OrgName,
-                    Price = item.PurchasePrice,
-                    Qty = item.Qty,
-                    Currency = item.CurrencyName
                 }).ToListAsync();
         }
         public async Task<bool> ItemExist(int itemId, int orgId)

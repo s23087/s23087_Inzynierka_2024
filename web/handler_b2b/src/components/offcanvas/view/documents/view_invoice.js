@@ -117,7 +117,7 @@ function ViewInvoiceOffcanvas({
                 onClick={() => {
                   hideFunction();
                 }}
-                className="ps-2"
+                className="ps-2 pe-0"
               >
                 <Image src={dropdown_big_down} alt="Hide" />
               </Button>
@@ -127,7 +127,7 @@ function ViewInvoiceOffcanvas({
       </Offcanvas.Header>
       <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
         <Container className="p-0" fluid>
-          <Row>
+          <Row className="ps-1">
             <p className="h5 my-2">{invoice.invoiceNumber}</p>
           </Row>
           <Row>
@@ -212,7 +212,10 @@ function ViewInvoiceOffcanvas({
               </Stack>
             </Col>
             <Col xs="12" md="6" lg="4" className="px-0 offset-lg-2">
-              <Container className="pt-5 text-center overflow-x-scroll">
+              <Container
+                className="pt-5 pt-md-0 text-center overflow-x-scroll"
+                fluid
+              >
                 {restInfo.items.length > 0 ? (
                   <InvoiceTable
                     items={restInfo.items}

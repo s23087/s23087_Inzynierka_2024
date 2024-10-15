@@ -10,6 +10,11 @@ function isPriceFormat(str) {
   return reg.test(str);
 }
 
+function noPathCharacters(str) {
+  const reg = /^[0-9a-zA-Z]*$/;
+  return reg.test(str);
+}
+
 function haveNoNumbers(str) {
   const reg = /^[a-zA-Z]+$/;
   return reg.test(str);
@@ -56,6 +61,7 @@ const validators = {
   validate,
   isPriceFormat,
   haveOnlyIntegers,
+  noPathCharacters,
 };
 
 export default validators;

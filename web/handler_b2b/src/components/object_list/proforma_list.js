@@ -72,7 +72,7 @@ function ProformaList({
     height: "67px",
   };
   return (
-    <Container className="p-0 middleSectionPlacement position-relative" fluid>
+    <Container className="px-0 middleSectionPlacement position-relative" fluid>
       <ProformaFilterOffcanvas
         showOffcanvas={showFilter}
         hideFunction={() => setShowFilter(false)}
@@ -153,7 +153,7 @@ function ProformaList({
           selectedProforma.splice(0, selectedProforma.length);
           setSelectedQty(0);
           let pagationInfo = getPagationInfo(params);
-          Object.values(proformas)
+          Object.values(proformas ?? [])
             .slice(pagationInfo.start, pagationInfo.end)
             .forEach((e) => selectedProforma.push(e.proformaId));
           setSelectedQty(selectedProforma.length);
@@ -162,7 +162,7 @@ function ProformaList({
         selectAll={() => {
           selectedProforma.splice(0, selectedProforma.length);
           setSelectedQty(0);
-          Object.values(proformas).forEach((e) =>
+          Object.values(proformas ?? []).forEach((e) =>
             selectedProforma.push(e.proformaId),
           );
           setSelectedQty(selectedProforma.length);

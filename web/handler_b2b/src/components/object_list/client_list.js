@@ -59,7 +59,7 @@ function ClientsList({
     height: "67px",
   };
   return (
-    <Container className="p-0 middleSectionPlacement position-relative" fluid>
+    <Container className="px-0 middleSectionPlacement position-relative" fluid>
       <ClientFilterOffcanvas
         showOffcanvas={showFilter}
         hideFunction={() => setShowFilter(false)}
@@ -137,7 +137,7 @@ function ClientsList({
           selectedClients.splice(0, selectedClients.length);
           setSelectedQty(0);
           let pagationInfo = getPagationInfo(params);
-          Object.values(clients)
+          Object.values(clients ?? [])
             .slice(pagationInfo.start, pagationInfo.end)
             .forEach((e) => selectedClients.push(e.clientId));
           setSelectedQty(selectedClients.length);
@@ -146,7 +146,7 @@ function ClientsList({
         selectAll={() => {
           selectedClients.splice(0, selectedClients.length);
           setSelectedQty(0);
-          Object.values(clients).forEach((e) =>
+          Object.values(clients ?? []).forEach((e) =>
             selectedClients.push(e.clientId),
           );
           setSelectedQty(selectedClients.length);

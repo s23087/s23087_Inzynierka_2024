@@ -1,9 +1,9 @@
-﻿using database_comunicator.Models;
-using database_comunicator.Models.DTOs;
+﻿using database_communicator.Models;
+using database_communicator.Models.DTOs;
 using System;
 using System.Linq.Expressions;
 
-namespace database_comunicator.Utils
+namespace database_communicator.Utils
 {
     public static class SortFilterUtils
     {

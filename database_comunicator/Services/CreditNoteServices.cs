@@ -1,11 +1,11 @@
-﻿using database_comunicator.Data;
-using database_comunicator.Models;
-using database_comunicator.Models.DTOs;
-using database_comunicator.Utils;
+﻿using database_communicator.Data;
+using database_communicator.Models;
+using database_communicator.Models.DTOs;
+using database_communicator.Utils;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace database_comunicator.Services
+namespace database_communicator.Services
 {
     public interface ICreditNoteServices
     {
@@ -18,7 +18,7 @@ namespace database_comunicator.Services
             int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, bool? paymentStatus, bool? status);
         public Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string search, int userId, string? sort, string? dateL, string? dateG,
             int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, bool? paymentStatus, bool? status);
-        public Task<bool> CreditDeductionCanBeApplied(int userId, int invoiceid, int itemId, int qty);
+        public Task<bool> CreditDeductionCanBeApplied(int userId, int invoiced, int itemId, int qty);
         public Task<bool> CreditNoteExist(string creditNoteNumber, int invoiceId);
         public Task<bool> CreditNoteExist(int creditNoteId);
         public Task<GetRestCreditNote> GetRestCreditNote(int creditNoteId);

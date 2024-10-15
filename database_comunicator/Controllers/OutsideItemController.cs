@@ -1,12 +1,12 @@
-﻿using database_comunicator.Models;
-using database_comunicator.Models.DTOs;
-using database_comunicator.Services;
+﻿using database_communicator.Models;
+using database_communicator.Models.DTOs;
+using database_communicator.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 using System;
 
-namespace database_comunicator.Controllers
+namespace database_communicator.Controllers
 {
     [Route("{db_name}/[controller]")]
     [ApiController]
@@ -22,20 +22,6 @@ namespace database_comunicator.Controllers
             _outsideItemServices = outsideItemServices;
             _notificationServices = notificationServices;
             _userServices = userServices;
-        }
-        [HttpGet]
-        [Route("get/items/{userId}")]
-        public async Task<IActionResult> GetOutsideItems(int userId, string? search, string? sort, int? qtyL, int? qtyG, int? priceL, int? priceG, int? source, string? currency)
-        {
-            var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
-            if (search != null)
-            {
-                var sResult = await _outsideItemServices.GetItems(userId, search, sort: sort, qtyL, qtyG, priceL, priceG, source, currency);
-                return Ok(sResult);
-            }
-            var result = await _outsideItemServices.GetItems(userId, sort: sort, qtyL, qtyG, priceL, priceG, source, currency);
-            return Ok(result);
         }
         [HttpGet]
         [Route("get/items")]

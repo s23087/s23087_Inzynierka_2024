@@ -19,10 +19,14 @@ function ViewRequestOffcanvas({ showOffcanvas, hideFunction, request, isOrg }) {
   useEffect(() => {
     if (showOffcanvas) {
       let restInfo = getRestRequest(request.id);
-      restInfo.then((data) => {
-        setNote(data.note);
-        setRequestPath(data.path);
-      });
+      restInfo
+        .then((data) => {
+          setNote(data.note);
+          setRequestPath(data.path);
+        })
+        .catch(() => {
+          setNote("Error: could not download");
+        });
     }
   }, [showOffcanvas]);
   // Download bool
@@ -171,8 +175,11 @@ function ViewRequestOffcanvas({ showOffcanvas, hideFunction, request, isOrg }) {
                   </p>
                 </Container>
                 {isOrg && request.status === "In progress" ? (
-                  <Container className="main-grey-bg p-3 fixed-bottom w-100">
-                    <Row className="mx-auto minScalableWidth">
+                  <Container
+                    className="main-grey-bg p-3 fixed-bottom w-100"
+                    fluid
+                  >
+                    <Row className="mx-auto minScalableWidth maxFormWidth">
                       <Col>
                         <Button
                           variant="green"

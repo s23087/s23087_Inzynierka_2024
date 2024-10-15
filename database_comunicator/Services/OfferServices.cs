@@ -1,7 +1,7 @@
-﻿using database_comunicator.Data;
-using database_comunicator.Models;
-using database_comunicator.Models.DTOs;
-using database_comunicator.Utils;
+﻿using database_communicator.Data;
+using database_communicator.Models;
+using database_communicator.Models.DTOs;
+using database_communicator.Utils;
 using LINQtoCSV;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -9,13 +9,13 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Xml.Linq;
 
-namespace database_comunicator.Services
+namespace database_communicator.Services
 {
     public interface IOfferServices
     {
         public Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG,
             string? createdL, string? createdG, string? modifiedL, string? modifiedG);
-        public Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string serach, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG,
+        public Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string search, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG,
             string? createdL, string? createdG, string? modifiedL, string? modifiedG);
         public Task<bool> DoesPricelistExist(int offerId);
         public Task<bool> DoesPricelistExist(string offerName, int userId);
@@ -115,7 +115,7 @@ namespace database_comunicator.Services
                     Currency = obj.CurrencyName
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string serach, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG,
+        public async Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string search, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG,
             string? createdL, string? createdG, string? modifiedL, string? modifiedG)
         {
             var sortFunc = SortFilterUtils.GetPricelistSort(sort);
@@ -165,7 +165,7 @@ namespace database_comunicator.Services
                 : e => e.ModificationDate >= DateTime.Parse(modifiedG);
             return await _handlerContext.Offers
                 .Where(e => e.UserId == userId)
-                .Where(e => e.OfferName.ToLower().Contains(serach.ToLower()))
+                .Where(e => e.OfferName.ToLower().Contains(search.ToLower()))
                 .Where(statusCond)
                 .Where(typeCond)
                 .Where(currencyCond)

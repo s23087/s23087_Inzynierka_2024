@@ -40,7 +40,7 @@ function RolesList({
     height: "67px",
   };
   return (
-    <Container className="p-0 middleSectionPlacement position-relative" fluid>
+    <Container className="px-0 middleSectionPlacement position-relative" fluid>
       <RoleFilterOffcanvas
         showOffcanvas={showFilter}
         hideFunction={() => setShowFilter(false)}
@@ -106,7 +106,7 @@ function RolesList({
           selectedRoles.splice(0, selectedRoles.length);
           setSelectedQty(0);
           let pagationInfo = getPagationInfo(params);
-          Object.values(roles)
+          Object.values(roles ?? [])
             .slice(pagationInfo.start, pagationInfo.end)
             .forEach((e) => selectedRoles.push(e.userId));
           setSelectedQty(selectedRoles.length);
@@ -115,7 +115,9 @@ function RolesList({
         selectAll={() => {
           selectedRoles.splice(0, selectedRoles.length);
           setSelectedQty(0);
-          Object.values(roles).forEach((e) => selectedRoles.push(e.userId));
+          Object.values(roles ?? []).forEach((e) =>
+            selectedRoles.push(e.userId),
+          );
           setSelectedQty(selectedRoles.length);
           setShowMoreAction(false);
         }}

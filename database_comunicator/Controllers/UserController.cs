@@ -1,9 +1,9 @@
-﻿using database_comunicator.Models.DTOs;
-using database_comunicator.Services;
+﻿using database_communicator.Models.DTOs;
+using database_communicator.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace database_comunicator.Controllers
+namespace database_communicator.Controllers
 {
     [Route("{db_name}/[controller]")]
     [ApiController]
@@ -26,7 +26,6 @@ namespace database_comunicator.Controllers
             int userId = await _userServices.GetUserId(loginInfo.Email);
             if (!isOrg)
             {
-                Console.WriteLine("Solo");
                 return Ok(new SuccesLogin
                 {
                     Id = userId,
@@ -34,7 +33,6 @@ namespace database_comunicator.Controllers
                 });
             }
             string role = await _userServices.GetUserRole(userId);
-            Console.WriteLine(role);
 
             return Ok(new SuccesLogin
             {

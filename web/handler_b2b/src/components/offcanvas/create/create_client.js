@@ -16,12 +16,24 @@ import ErrorMessage from "@/components/smaller_components/error_message";
 function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
   const router = useRouter();
   // Get country and statuses
+  const [countriesDownloadError, setCountriesDownloadError] = useState(false);
+  const [statusesDownloadError, setStatusesDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      const countries = getCountries();
-      countries.then((data) => setCountries(data));
-      const statuses = getAvailabilityStatuses();
-      statuses.then((data) => setStatuses(data));
+      getCountries()
+        .then((data) => {
+          if (data !== null) setCountries(data);
+        })
+        .catch(() => setCountriesDownloadError(true))
+        .finally(() => {
+          if (countries.length > 0) setCountriesDownloadError(false);
+        });
+      getAvailabilityStatuses()
+        .then((data) => setStatuses(data))
+        .catch(() => setStatusesDownloadError(true))
+        .finally(() => {
+          if (statues.length > 0) setStatusesDownloadError(false);
+        });
     }
   }, [showOffcanvas]);
   const [countries, setCountries] = useState([]);
@@ -48,7 +60,9 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
       clientStreetError ||
       cityClientError ||
       clientPostalError ||
-      creditError
+      creditError ||
+      countriesDownloadError ||
+      statusesDownloadError
     );
   };
   const anyErrorActive = getIsErrorActive();
@@ -108,6 +122,10 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
               id="clientModify"
               action={formAction}
             >
+              <ErrorMessage
+                message="Error: could not download all necessary info."
+                messageStatus={countriesDownloadError || statusesDownloadError}
+              />
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Name:</Form.Label>
                 <ErrorMessage

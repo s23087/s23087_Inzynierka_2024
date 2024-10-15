@@ -37,17 +37,15 @@ function DeliveryFilterOffcanvas({
   const [errorDownloadDeli, setDownloadErrorDeli] = useState(false);
   const [errorDownloadStatus, setDownloadErrorStatus] = useState(false);
   useEffect(() => {
-    const orgs = getOrgsList();
-    orgs.then((data) => {
-      if (data === null) {
-        setDownloadErrorOrgs(true);
-      } else {
-        setOrgs(data.restOrgs);
-        setDownloadErrorOrgs(false);
-      }
-    });
-    const deliveries = getDeliveryCompany();
-    deliveries.then((data) => {
+    getOrgsList()
+      .then((data) => {
+        if (data !== null) setOrgs(data.restOrgs);
+      })
+      .catch(() => setDownloadErrorOrgs(true))
+      .finally(() => {
+        if (orgs.orgName) setDownloadErrorOrgs(false);
+      });
+    getDeliveryCompany().then((data) => {
       if (data === null) {
         setDownloadErrorDeli(true);
       } else {
@@ -55,8 +53,7 @@ function DeliveryFilterOffcanvas({
         setDownloadErrorDeli(false);
       }
     });
-    const getStatuses = getDeliveryStatuses();
-    getStatuses.then((data) => {
+    getDeliveryStatuses().then((data) => {
       if (data === null) {
         setDownloadErrorStatus(true);
       } else {
@@ -100,8 +97,8 @@ function DeliveryFilterOffcanvas({
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
-          <Container className="p-0" style={vhStyle} fluid>
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
+          <Container className="p-0 mx-1 mx-xl-3" style={vhStyle} fluid>
             <ErrorMessage
               message="Could not download recipients."
               messageStatus={errorDownloadOrgs}
@@ -162,7 +159,7 @@ function DeliveryFilterOffcanvas({
                 <p className="mb-1 blue-sec-text">Estimated:</p>
                 <Container className="px-0">
                   <Row className="gy-2">
-                    <Col xs="12" md="3">
+                    <Col xs="12" md="4" lg="3">
                       <InputGroup>
                         <InputGroup.Text className="main-blue-bg main-text">
                           {"<="}
@@ -175,7 +172,7 @@ function DeliveryFilterOffcanvas({
                         />
                       </InputGroup>
                     </Col>
-                    <Col xs="12" md="3">
+                    <Col xs="12" md="4" lg="3">
                       <InputGroup>
                         <InputGroup.Text className="main-blue-bg main-text">
                           {">="}
@@ -195,7 +192,7 @@ function DeliveryFilterOffcanvas({
                 <p className="mb-1 blue-sec-text">Delivered:</p>
                 <Container className="px-0">
                   <Row className="gy-2">
-                    <Col xs="12" md="3">
+                    <Col xs="12" md="4" lg="3">
                       <InputGroup>
                         <InputGroup.Text className="main-blue-bg main-text">
                           {"<="}
@@ -208,7 +205,7 @@ function DeliveryFilterOffcanvas({
                         />
                       </InputGroup>
                     </Col>
-                    <Col xs="12" md="3">
+                    <Col xs="12" md="4" lg="3">
                       <InputGroup>
                         <InputGroup.Text className="main-blue-bg main-text">
                           {">="}

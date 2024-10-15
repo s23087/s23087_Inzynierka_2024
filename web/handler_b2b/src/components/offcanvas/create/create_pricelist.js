@@ -92,9 +92,9 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0" style={vhStyle} fluid>
-            <Form className="mx-1 mx-xl-4" id="offerForm" action={formAction}>
+            <Form className="mx-1 mx-xl-3" id="offerForm" action={formAction}>
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Offer name:</Form.Label>
                 <ErrorMessage

@@ -1,14 +1,14 @@
-﻿using database_comunicator.Data;
-using database_comunicator.Models;
-using database_comunicator.Models.DTOs;
-using database_comunicator.Utils;
+﻿using database_communicator.Data;
+using database_communicator.Models;
+using database_communicator.Models.DTOs;
+using database_communicator.Utils;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.Metrics;
 using System.Linq.Expressions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace database_comunicator.Services
+namespace database_communicator.Services
 {
     public interface IDeliveryServices
     {
@@ -34,6 +34,7 @@ namespace database_comunicator.Services
         public Task<bool> AddNote(AddNote data);
         public Task SetDeliveryStatus(SetDeliveryStatus data);
         public Task<bool> ModifyDelivery(ModifyDelivery data);
+        public Task<IEnumerable<int>> GetWarehouseManagerIds();
     }
     public class DeliveryServices : IDeliveryServices
     {
@@ -71,12 +72,12 @@ namespace database_comunicator.Services
                 };
                 await _handlerContext.Deliveries.AddAsync(newDelivery);
                 await _handlerContext.SaveChangesAsync();
-                var waybils = data.Waybills.Select(e => new Waybill
+                var waybills = data.Waybills.Select(e => new Waybill
                 {
                     WaybillValue = e,
                     DeliveriesId = newDelivery.DeliveryId
                 }).ToList();
-                await _handlerContext.Waybills.AddRangeAsync(waybils);
+                await _handlerContext.Waybills.AddRangeAsync(waybills);
                 if (data.Note != null)
                 {
                     var newNote = new Note
@@ -287,9 +288,20 @@ namespace database_comunicator.Services
             Expression<Func<Delivery, bool>> waybillCond = waybill == null ?
                 e => true
                 : e => e.Waybills.Any(x => x.WaybillValue == waybill);
+
+            int searchById;
+
+            try
+            {
+                searchById = Int32.Parse(search);
+            } catch
+            {
+                searchById = -1;
+            }
+
             return await _handlerContext.Deliveries
                 .Where(e => IsDeliveryToUser ? e.Proforma.ProformaFutureItems.Any() : e.Proforma.ProformaOwnedItems.Any())
-                .Where(e => e.Proforma.ProformaNumber.ToLower().Contains(search.ToLower()) || search.Contains((char)e.DeliveryId))
+                .Where(e => e.Proforma.ProformaNumber.ToLower().Contains(search.ToLower()) || (searchById == -1 || e.DeliveryId == searchById))
                 .Where(estimatedLCond)
                 .Where(estimatedGCond)
                 .Where(deliveredLCond)
@@ -356,10 +368,22 @@ namespace database_comunicator.Services
             Expression<Func<Delivery, bool>> waybillCond = waybill == null ?
                 e => true
                 : e => e.Waybills.Any(x => x.WaybillValue == waybill);
+
+            int searchById;
+
+            try
+            {
+                searchById = Int32.Parse(search);
+            }
+            catch
+            {
+                searchById = -1;
+            }
+
             return await _handlerContext.Deliveries
                 .Where(e => IsDeliveryToUser ? e.Proforma.ProformaFutureItems.Any() : e.Proforma.ProformaOwnedItems.Any())
                 .Where(e => e.Proforma.UserId == userId)
-                .Where(e => e.Proforma.ProformaNumber.ToLower().Contains(search.ToLower()) || search.Contains((char)e.DeliveryId))
+                .Where(e => e.Proforma.ProformaNumber.ToLower().Contains(search.ToLower()) || (searchById == -1 || e.DeliveryId == searchById))
                 .Where(estimatedLCond)
                 .Where(estimatedGCond)
                 .Where(deliveredLCond)
@@ -578,6 +602,10 @@ namespace database_comunicator.Services
                 await trans.RollbackAsync();
                 return false;
             }
+        }
+        public async Task<IEnumerable<int>> GetWarehouseManagerIds()
+        {
+            return await _handlerContext.OrgUsers.Where(e => e.Role.RoleName == "Warehouse Manager").SelectMany(e => e.AppUsers).Select(e => e.IdUser).ToListAsync();
         }
     }
 }

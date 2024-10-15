@@ -20,7 +20,7 @@ function ProformaContainer({
   };
   return (
     <Container
-      className="py-3 black-text medium-text border-bottom-grey"
+      className="py-3 px-4 px-xl-5 black-text medium-text border-bottom-grey"
       style={selected ? containerBg : null}
       fluid
     >

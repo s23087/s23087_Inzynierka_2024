@@ -7,6 +7,8 @@ import registerUser from "@/utils/registration/submit_registration";
 import CountryOptions from "./country_options";
 import validators from "@/utils/validators/validator";
 import PolicyOffcanvas from "./policy_offcanvas";
+import ErrorMessage from "../smaller_components/error_message";
+import StringValidtor from "@/utils/validators/form_validator/stringValidator";
 
 function RegistrationForm() {
   // Variable that tell if user choose Org option or Individual one
@@ -113,14 +115,10 @@ function RegistrationForm() {
                   className="mb-4 position-relative"
                   controlId="formEmail"
                 >
-                  <Row>
-                    <p
-                      className="text-start mb-0 px-3 red-sec-text small-text"
-                      style={getInputInvailidStyle(emailError)}
-                    >
-                      Invalid email.
-                    </p>
-                  </Row>
+                  <ErrorMessage
+                    message="Invalid email."
+                    messageStatus={emailError}
+                  />
                   <Form.Control
                     className="input-style shadow-sm"
                     type="email"
@@ -128,31 +126,22 @@ function RegistrationForm() {
                     placeholder="email"
                     required
                     isInvalid={emailError}
-                    onInput={(event) => {
-                      if (
-                        validators.validate(
-                          event.target.value,
-                          validators.isEmail,
-                          350,
-                        )
-                      ) {
-                        setEmailError(false);
-                      } else {
-                        setEmailError(true);
-                      }
+                    maxLength={350}
+                    onInput={(e) => {
+                      StringValidtor.emailValidator(
+                        e.target.value,
+                        setEmailError,
+                        350,
+                      );
                     }}
                   />
                 </Form.Group>
 
                 <Form.Group className="mb-4" controlId="formName">
-                  <Row>
-                    <p
-                      className="text-start mb-0 px-3 red-sec-text small-text"
-                      style={getInputInvailidStyle(nameError)}
-                    >
-                      Must contain only letters and not be empty
-                    </p>
-                  </Row>
+                  <ErrorMessage
+                    message="Must contain only letters and not be empty"
+                    messageStatus={nameError}
+                  />
                   <Form.Control
                     className="input-style shadow-sm"
                     type="text"
@@ -160,31 +149,22 @@ function RegistrationForm() {
                     placeholder="name"
                     required
                     isInvalid={nameError}
-                    onInput={(event) => {
-                      if (
-                        validators.validate(
-                          event.target.value,
-                          validators.haveNoNumbers,
-                          250,
-                        )
-                      ) {
-                        setNameError(false);
-                      } else {
-                        setNameError(true);
-                      }
+                    maxLength={250}
+                    onInput={(e) => {
+                      StringValidtor.noNumberStringValidtor(
+                        e.target.value,
+                        setNameError,
+                        250,
+                      );
                     }}
                   />
                 </Form.Group>
 
                 <Form.Group className="mb-4" controlId="formSurname">
-                  <Row>
-                    <p
-                      className="text-start mb-0 px-3 red-sec-text small-text"
-                      style={getInputInvailidStyle(surnameError)}
-                    >
-                      Must contain only letters and not be empty
-                    </p>
-                  </Row>
+                  <ErrorMessage
+                    message="Must contain only letters and not be empty"
+                    messageStatus={surnameError}
+                  />
                   <Form.Control
                     className="input-style shadow-sm"
                     type="text"
@@ -192,18 +172,13 @@ function RegistrationForm() {
                     placeholder="surname"
                     required
                     isInvalid={surnameError}
-                    onInput={(event) => {
-                      if (
-                        validators.validate(
-                          event.target.value,
-                          validators.haveNoNumbers,
-                          250,
-                        )
-                      ) {
-                        setSurnameError(false);
-                      } else {
-                        setSurnameError(true);
-                      }
+                    maxLength={250}
+                    onInput={(e) => {
+                      StringValidtor.noNumberStringValidtor(
+                        e.target.value,
+                        setSurnameError,
+                        250,
+                      );
                     }}
                   />
                 </Form.Group>
@@ -215,14 +190,10 @@ function RegistrationForm() {
                 style={step === 2 ? unhidden : hidden}
               >
                 <Form.Group className="mb-4" controlId="formCompanyName">
-                  <Row>
-                    <p
-                      className="text-start mb-0 px-3 red-sec-text small-text"
-                      style={getInputInvailidStyle(companyError)}
-                    >
-                      Max 50 letters and must not be empty
-                    </p>
-                  </Row>
+                  <ErrorMessage
+                    message="Max 50 letters and must not be empty"
+                    messageStatus={companyError}
+                  />
                   <Form.Control
                     className="input-style shadow-sm"
                     type="text"
@@ -230,44 +201,35 @@ function RegistrationForm() {
                     placeholder="company name"
                     required
                     isInvalid={companyError}
-                    onInput={(event) => {
-                      if (
-                        validators.validate(
-                          event.target.value,
-                          validators.stringIsNotEmpty,
-                          50,
-                        )
-                      ) {
-                        setCompanyError(false);
-                      } else {
-                        setCompanyError(true);
-                      }
+                    maxLength={50}
+                    onInput={(e) => {
+                      StringValidtor.normalStringValidtor(
+                        e.target.value,
+                        setCompanyError,
+                        50,
+                      );
                     }}
                   />
                 </Form.Group>
 
                 <Form.Group className="mb-4" controlId="formNip">
-                  <Row>
-                    <p
-                      className="text-start mb-0 px-3 red-sec-text small-text"
-                      style={getInputInvailidStyle(nipError)}
-                    >
-                      Must contain only numbers.
-                    </p>
-                  </Row>
+                  <ErrorMessage
+                    message="Must contain only numbers."
+                    messageStatus={nipError}
+                  />
                   <Form.Control
                     className="input-style shadow-sm"
                     type="text"
                     name="nip"
                     placeholder="nip"
                     isInvalid={nipError}
-                    onInput={(event) => {
-                      if (validators.haveOnlyNumbers(event.target.value)) {
+                    onInput={(e) => {
+                      if (validators.haveOnlyNumbers(e.target.value)) {
                         setNipError(false);
                       } else {
                         setNipError(true);
                       }
-                      if (!validators.stringIsNotEmpty(event.target.value)) {
+                      if (!validators.stringIsNotEmpty(e.target.value)) {
                         setNipError(false);
                       }
                     }}
@@ -275,14 +237,10 @@ function RegistrationForm() {
                 </Form.Group>
 
                 <Form.Group className="mb-4" controlId="formStreet">
-                  <Row>
-                    <p
-                      className="text-start mb-0 px-3 red-sec-text small-text"
-                      style={getInputInvailidStyle(streetError)}
-                    >
-                      Max 200 letters and must not be empty.
-                    </p>
-                  </Row>
+                  <ErrorMessage
+                    message="Max 200 letters and must not be empty."
+                    messageStatus={streetError}
+                  />
                   <Form.Control
                     className="input-style shadow-sm"
                     type="text"
@@ -290,31 +248,22 @@ function RegistrationForm() {
                     name="street"
                     required
                     isInvalid={streetError}
-                    onInput={(event) => {
-                      if (
-                        validators.validate(
-                          event.target.value,
-                          validators.stringIsNotEmpty,
-                          200,
-                        )
-                      ) {
-                        setStreetError(false);
-                      } else {
-                        setStreetError(true);
-                      }
+                    maxLength={200}
+                    onInput={(e) => {
+                      StringValidtor.normalStringValidtor(
+                        e.target.value,
+                        setStreetError,
+                        200,
+                      );
                     }}
                   />
                 </Form.Group>
 
                 <Form.Group className="mb-4" controlId="formCity">
-                  <Row>
-                    <p
-                      className="text-start mb-0 px-3 red-sec-text small-text"
-                      style={getInputInvailidStyle(cityError)}
-                    >
-                      Max 200 letters and must not be empty.
-                    </p>
-                  </Row>
+                  <ErrorMessage
+                    message="Max 200 letters and must not be empty."
+                    messageStatus={cityError}
+                  />
                   <Form.Control
                     className="input-style shadow-sm"
                     type="text"
@@ -322,31 +271,22 @@ function RegistrationForm() {
                     name="city"
                     required
                     isInvalid={cityError}
-                    onInput={(event) => {
-                      if (
-                        validators.validate(
-                          event.target.value,
-                          validators.stringIsNotEmpty,
-                          200,
-                        )
-                      ) {
-                        setCityError(false);
-                      } else {
-                        setCityError(true);
-                      }
+                    maxLength={250}
+                    onInput={(e) => {
+                      StringValidtor.normalStringValidtor(
+                        e.target.value,
+                        setCityError,
+                        250,
+                      );
                     }}
                   />
                 </Form.Group>
 
                 <Form.Group className="mb-4" controlId="formPostalCode">
-                  <Row>
-                    <p
-                      className="text-start mb-0 px-3 red-sec-text small-text"
-                      style={getInputInvailidStyle(postalError)}
-                    >
-                      Max 25 characters and must not be empty.
-                    </p>
-                  </Row>
+                  <ErrorMessage
+                    message="Max 25 characters and must not be empty."
+                    messageStatus={postalError}
+                  />
                   <Form.Control
                     className="input-style shadow-sm"
                     type="text"
@@ -354,18 +294,13 @@ function RegistrationForm() {
                     placeholder="postal code"
                     required
                     isInvalid={postalError}
-                    onInput={(event) => {
-                      if (
-                        validators.validate(
-                          event.target.value,
-                          validators.stringIsNotEmpty,
-                          25,
-                        )
-                      ) {
-                        setPostalError(false);
-                      } else {
-                        setPostalError(true);
-                      }
+                    maxLength={25}
+                    onInput={(e) => {
+                      StringValidtor.normalStringValidtor(
+                        e.target.value,
+                        setPostalError,
+                        25,
+                      );
                     }}
                   />
                 </Form.Group>
@@ -387,14 +322,10 @@ function RegistrationForm() {
                 style={step === 3 ? unhidden : hidden}
               >
                 <Form.Group className="mb-4" controlId="formPassword">
-                  <Row>
-                    <p
-                      className="text-start mb-0 px-3 red-sec-text small-text"
-                      style={passError || repPassError ? unhidden : hidden}
-                    >
-                      Password must be the same and not empty.
-                    </p>
-                  </Row>
+                  <ErrorMessage
+                    message="Password must be the same and not empty."
+                    messageStatus={passError || repPassError}
+                  />
                   <Form.Control
                     className="input-style shadow-sm"
                     type="password"
@@ -441,14 +372,10 @@ function RegistrationForm() {
                         </Button>
                       </Col>
                     </Row>
-                    <Row>
-                      <p
-                        className="text-start mb-0 px-0 red-sec-text small-text"
-                        style={policyError ? unhidden : hidden}
-                      >
-                        You must agree to our policy.
-                      </p>
-                    </Row>
+                    <ErrorMessage
+                      message="You must agree to our policy."
+                      messageStatus={policyError}
+                    />
                   </Form.Group>
                 </Container>
 
@@ -519,10 +446,6 @@ function RegistrationForm() {
       </Container>
     </Container>
   );
-
-  function getInputInvailidStyle(errorBool) {
-    return errorBool ? unhidden : hidden;
-  }
 }
 
 export default RegistrationForm;

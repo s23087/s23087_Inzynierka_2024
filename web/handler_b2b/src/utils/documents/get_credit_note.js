@@ -38,13 +38,17 @@ export default async function getCreditNotes(
     const userId = await getUserId();
     url = `${process.env.API_DEST}/${dbName}/CreditNote/get/${isYourCredit}/${userId}${params.length > 0 ? "?" : ""}${params.join("&")}`;
   }
-  const items = await fetch(url, {
-    method: "GET",
-  });
+  try {
+    const items = await fetch(url, {
+      method: "GET",
+    });
 
-  if (items.ok) {
-    return await items.json();
+    if (items.ok) {
+      return await items.json();
+    }
+
+    return [];
+  } catch {
+    return null;
   }
-
-  return [];
 }

@@ -38,7 +38,7 @@ function RequestContainer({
       fluid
     >
       <Row>
-        <Col xs="12" md="7" lg="7" xl="4">
+        <Col xs="12" md="12" lg="7" xl="5">
           <Row className="mb-2">
             <Col className="d-flex">
               <Image
@@ -88,7 +88,12 @@ function RequestContainer({
             </Col>
           </Row>
         </Col>
-        <Col xs="12" xl="4" className="px-0 pt-4 pt-xl-2 pb-2">
+        <Col
+          xs="12"
+          lg="5"
+          xl="4"
+          className="px-0 pt-4 pt-xl-2 pb-2 ms-xl-auto"
+        >
           <ContainerButtons
             selected={selected}
             is_request={is_org}

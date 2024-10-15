@@ -10,17 +10,19 @@ function NotificationList({ notifs, notifStart, notifEnd }) {
   const router = useRouter();
   return (
     <Container
-      className="p-0 middleSectionPlacement-no-footer position-relative"
+      className="px-0 middleSectionPlacement-no-footer position-relative"
       fluid
     >
-      {Object.keys(notifs).length === 0 ? (
+      {Object.keys(notifs ?? []).length === 0 ? (
         <Container className="text-center" fluid>
           <p className="mt-5 pt-5 blue-main-text h2">
-            Notifications not found :/
+            {notifs
+              ? "Notifications not found :/"
+              : "Could not connect to server."}
           </p>
         </Container>
       ) : (
-        Object.values(notifs)
+        Object.values(notifs ?? [])
           .slice(notifStart, notifEnd)
           .map((value) => {
             return (

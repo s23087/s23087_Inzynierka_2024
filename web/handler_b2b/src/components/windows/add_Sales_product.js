@@ -14,6 +14,7 @@ import validators from "@/utils/validators/validator";
 import { useEffect, useState } from "react";
 import getItemsList from "@/utils/documents/get_products";
 import SuccesFadeAway from "../smaller_components/succes_fade_away";
+import ErrorMessage from "../smaller_components/error_message";
 
 function AddSaleProductWindow({
   modalShow,
@@ -26,10 +27,16 @@ function AddSaleProductWindow({
   // Products
   const [products, setProducts] = useState([]);
   const [currentProduct, setCurrentProduct] = useState(0);
+  const [downloadError, setDownloadError] = useState(false);
   useEffect(() => {
     if (modalShow && addedProductsQty === 0) {
-      const products = getItemsList(userId, currency);
-      products.then((data) => setProducts(data));
+      getItemsList(userId, currency)
+        .then((data) => {
+          if (data !== null) setProducts(data);
+        })
+        .catch(() => setDownloadError(true));
+    } else {
+      setDownloadError(false);
     }
   }, [modalShow, addedProductsQty, userId, currency]);
   // Errors
@@ -37,15 +44,13 @@ function AddSaleProductWindow({
   const [qtyError, setQtyError] = useState(false);
   // Misc
   const [showSuccess, setShowSuccess] = useState(false);
-  // styles
-  const hidden = {
-    display: "none",
-  };
-  const unhidden = {
-    display: "block",
-  };
   return (
-    <Modal size="sm" show={modalShow} centered className="px-4">
+    <Modal
+      size="md"
+      show={modalShow}
+      centered
+      className="px-4 minScalableWidth"
+    >
       <Modal.Body>
         <Container>
           <Row>
@@ -59,6 +64,10 @@ function AddSaleProductWindow({
           </Row>
         </Container>
         <Container className="mt-3 mb-2">
+          <ErrorMessage
+            message="Could not download products."
+            messageStatus={downloadError}
+          />
           <Form.Group className="mb-3">
             <Form.Label className="blue-main-text">Product:</Form.Label>
             <Form.Select
@@ -86,12 +95,10 @@ function AddSaleProductWindow({
 
           <Form.Group className="mb-2">
             <Form.Label className="blue-main-text">Qty:</Form.Label>
-            <p
-              className="text-start mb-1 red-sec-text small-text"
-              style={qtyError ? unhidden : hidden}
-            >
-              Must not be bigger then chosen product qty. Must be a number.
-            </p>
+            <ErrorMessage
+              message="Must not be bigger then chosen product qty. Must be a number."
+              messageStatus={qtyError}
+            />
             <Form.Control
               className="input-style shadow-sm"
               type="number"
@@ -117,12 +124,10 @@ function AddSaleProductWindow({
           </Form.Group>
           <Form.Group className="mb-2">
             <Form.Label className="blue-main-text">Price:</Form.Label>
-            <p
-              className="text-start mb-1 red-sec-text small-text"
-              style={salesPriceError ? unhidden : hidden}
-            >
-              Is empty or is not a number.
-            </p>
+            <ErrorMessage
+              message="Is empty or is not a number."
+              messageStatus={salesPriceError}
+            />
             <Form.Control
               className="input-style shadow-sm maxInputWidth"
               type="text"
@@ -150,10 +155,21 @@ function AddSaleProductWindow({
             <Button
               variant="mainBlue"
               className="me-2 w-100"
+              disabled={
+                salesPriceError ||
+                qtyError ||
+                downloadError ||
+                products.length === 0
+              }
               onClick={() => {
                 setShowSuccess(false);
                 if (products.filter((e) => e.qty > 0).length <= 0) return;
-                if (salesPriceError || qtyError) {
+                if (
+                  salesPriceError ||
+                  qtyError ||
+                  downloadError ||
+                  products.length === 0
+                ) {
                   return;
                 }
                 let productKey = document.getElementById("product").value;

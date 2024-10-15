@@ -62,8 +62,8 @@ function PricelistFilterOffcanvas({
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
-          <Container className="p-0" style={vhStyle} fluid>
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
+          <Container className="p-0 mx-1 mx-xl-3" style={vhStyle} fluid>
             <Container className="px-1 ms-0 pb-3">
               <p className="mb-1 blue-main-text">Sort order</p>
               <Stack
@@ -112,7 +112,7 @@ function PricelistFilterOffcanvas({
                 <p className="mb-1 blue-sec-text">Total products:</p>
                 <Container className="px-0">
                   <Row className="gy-2">
-                    <Col xs="6" md="2">
+                    <Col xs="6" md="3">
                       <InputGroup>
                         <InputGroup.Text className="main-blue-bg main-text">
                           {"<="}
@@ -131,7 +131,7 @@ function PricelistFilterOffcanvas({
                         />
                       </InputGroup>
                     </Col>
-                    <Col xs="6" md="2">
+                    <Col xs="6" md="3">
                       <InputGroup>
                         <InputGroup.Text className="main-blue-bg main-text">
                           {">="}

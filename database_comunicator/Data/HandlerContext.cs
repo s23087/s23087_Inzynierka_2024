@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using database_comunicator.Models;
+using database_communicator.Models;
 using System.Security.Claims;
 
-namespace database_comunicator.Data;
+namespace database_communicator.Data;
 
 public partial class HandlerContext : DbContext
 {

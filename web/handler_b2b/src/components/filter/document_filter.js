@@ -47,36 +47,35 @@ function InvoiceFilterOffcanvas({
   const [errorDownloadReq, setDownloadErrorReq] = useState(false);
   useEffect(() => {
     if (!type.includes("Request")) {
-      const orgs = getOrgsList();
-      orgs.then((data) => {
-        if (data === null) {
-          setDownloadErrorOrg(true);
-        } else {
-          setOrgs(data.restOrgs);
-          setDownloadErrorOrg(false);
-        }
-      });
-      if (type.includes("invoice")) {
-        const paymentStatuses = getPaymentStatuses();
-        paymentStatuses.then((data) => {
-          if (data === null) {
-            setDownloadErrorPay(true);
-          } else {
-            setPaymentStatuses(data);
-            setDownloadErrorPay(false);
-          }
+      getOrgsList()
+        .then((data) => {
+          if (data !== null) setOrgs(data.restOrgs);
+        })
+        .catch(() => setDownloadErrorOrg(true))
+        .finally(() => {
+          if (orgs.orgName) setDownloadErrorOrg(false);
         });
+
+      if (type.includes("invoice")) {
+        getPaymentStatuses()
+          .then((data) => {
+            if (data !== null) setPaymentStatuses(data);
+          })
+          .catch(() => setDownloadErrorPay(true))
+          .finally(() => {
+            if (paymentStatuses.length > 0) setDownloadErrorPay(false);
+          });
       }
     } else {
       const reqStatuses = getRequestStatuses();
-      reqStatuses.then((data) => {
-        if (data === null) {
-          setDownloadErrorReq(true);
-        } else {
-          setRequestStatuses(data);
-          setDownloadErrorReq(false);
-        }
-      });
+      reqStatuses
+        .then((data) => {
+          if (data !== null) setRequestStatuses(data);
+        })
+        .catch(() => setDownloadErrorReq(true))
+        .finally(() => {
+          if (reqStatuses.lenght > 0) setDownloadErrorReq(false);
+        });
     }
   }, [type]);
   // Styles
@@ -114,8 +113,8 @@ function InvoiceFilterOffcanvas({
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
-          <Container className="p-0" style={vhStyle} fluid>
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
+          <Container className="p-0 mx-1 mx-xl-3" style={vhStyle} fluid>
             <ErrorMessage
               message="Could not download recipients."
               messageStatus={errorDownloadOrg}
@@ -178,7 +177,7 @@ function InvoiceFilterOffcanvas({
                     <p className="mb-1 blue-sec-text">Date:</p>
                     <Container className="px-0">
                       <Row className="gy-2">
-                        <Col xs="12" md="3">
+                        <Col xs="12" md="4" lg="3">
                           <InputGroup>
                             <InputGroup.Text className="main-blue-bg main-text">
                               {"<="}
@@ -191,7 +190,7 @@ function InvoiceFilterOffcanvas({
                             />
                           </InputGroup>
                         </Col>
-                        <Col xs="12" md="3">
+                        <Col xs="12" md="4" lg="3">
                           <InputGroup>
                             <InputGroup.Text className="main-blue-bg main-text">
                               {">="}
@@ -211,7 +210,7 @@ function InvoiceFilterOffcanvas({
                     <p className="mb-1 blue-sec-text">Due date:</p>
                     <Container className="px-0">
                       <Row className="gy-2">
-                        <Col xs="12" md="3">
+                        <Col xs="12" md="4" lg="3">
                           <InputGroup>
                             <InputGroup.Text className="main-blue-bg main-text">
                               {"<="}
@@ -224,7 +223,7 @@ function InvoiceFilterOffcanvas({
                             />
                           </InputGroup>
                         </Col>
-                        <Col xs="12" md="3">
+                        <Col xs="12" md="4" lg="3">
                           <InputGroup>
                             <InputGroup.Text className="main-blue-bg main-text">
                               {">="}
@@ -244,7 +243,7 @@ function InvoiceFilterOffcanvas({
                     <p className="mb-1 blue-sec-text">Qty:</p>
                     <Container className="px-0">
                       <Row className="gy-2">
-                        <Col xs="6" md="2">
+                        <Col xs="6" md="3">
                           <InputGroup>
                             <InputGroup.Text className="main-blue-bg main-text">
                               {"<="}
@@ -263,7 +262,7 @@ function InvoiceFilterOffcanvas({
                             />
                           </InputGroup>
                         </Col>
-                        <Col xs="6" md="2">
+                        <Col xs="6" md="3">
                           <InputGroup>
                             <InputGroup.Text className="main-blue-bg main-text">
                               {">="}
@@ -289,7 +288,7 @@ function InvoiceFilterOffcanvas({
                     <p className="mb-1 blue-sec-text">Total price:</p>
                     <Container className="px-0">
                       <Row className="gy-2">
-                        <Col xs="6" md="2">
+                        <Col xs="6" md="3">
                           <InputGroup>
                             <InputGroup.Text className="main-blue-bg main-text">
                               {"<="}
@@ -308,7 +307,7 @@ function InvoiceFilterOffcanvas({
                             />
                           </InputGroup>
                         </Col>
-                        <Col xs="6" md="2">
+                        <Col xs="6" md="3">
                           <InputGroup>
                             <InputGroup.Text className="main-blue-bg main-text">
                               {">="}
@@ -412,7 +411,7 @@ function InvoiceFilterOffcanvas({
                     <p className="mb-1 blue-sec-text">Date:</p>
                     <Container className="px-0">
                       <Row className="gy-2">
-                        <Col xs="12" md="3">
+                        <Col xs="12" md="4" lg="3">
                           <InputGroup>
                             <InputGroup.Text className="main-blue-bg main-text">
                               {"<="}
@@ -425,7 +424,7 @@ function InvoiceFilterOffcanvas({
                             />
                           </InputGroup>
                         </Col>
-                        <Col xs="12" md="3">
+                        <Col xs="12" md="4" lg="3">
                           <InputGroup>
                             <InputGroup.Text className="main-blue-bg main-text">
                               {">="}
@@ -445,7 +444,7 @@ function InvoiceFilterOffcanvas({
                     <p className="mb-1 blue-sec-text">Qty:</p>
                     <Container className="px-0">
                       <Row className="gy-2">
-                        <Col xs="6" md="2">
+                        <Col xs="6" md="3">
                           <InputGroup>
                             <InputGroup.Text className="main-blue-bg main-text">
                               {"<="}
@@ -464,7 +463,7 @@ function InvoiceFilterOffcanvas({
                             />
                           </InputGroup>
                         </Col>
-                        <Col xs="6" md="2">
+                        <Col xs="6" md="3">
                           <InputGroup>
                             <InputGroup.Text className="main-blue-bg main-text">
                               {">="}
@@ -490,7 +489,7 @@ function InvoiceFilterOffcanvas({
                     <p className="mb-1 blue-sec-text">Total value:</p>
                     <Container className="px-0">
                       <Row className="gy-2">
-                        <Col xs="6" md="2">
+                        <Col xs="6" md="3">
                           <InputGroup>
                             <InputGroup.Text className="main-blue-bg main-text">
                               {"<="}
@@ -509,7 +508,7 @@ function InvoiceFilterOffcanvas({
                             />
                           </InputGroup>
                         </Col>
-                        <Col xs="6" md="2">
+                        <Col xs="6" md="3">
                           <InputGroup>
                             <InputGroup.Text className="main-blue-bg main-text">
                               {">="}
@@ -690,6 +689,9 @@ function InvoiceFilterOffcanvas({
                 <Button
                   variant="green"
                   className="w-100"
+                  disabled={
+                    errorDownloadOrg || errorDownloadPay || errorDownloadReq
+                  }
                   onClick={() => {
                     if (type.includes("Requests")) {
                       let requestStatus =

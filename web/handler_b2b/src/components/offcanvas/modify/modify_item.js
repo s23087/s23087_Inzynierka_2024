@@ -182,7 +182,7 @@ function ModifyItemOffcanvas({
                     resetErrors();
                     hideFunction();
                   }}
-                  className="ps-2"
+                  className="ps-2 pe-0"
                 >
                   <Image src={CloseIcon} alt="Hide" />
                 </Button>

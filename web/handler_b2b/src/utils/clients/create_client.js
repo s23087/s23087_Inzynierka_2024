@@ -75,7 +75,7 @@ export default async function createClient(state, formData) {
   const dbName = await getDbName();
   const userId = await getUserId();
   const info = await fetch(
-    `${process.env.API_DEST}/${dbName}/Client/addOrg?userId=${userId}`,
+    `${process.env.API_DEST}/${dbName}/Client/add/${userId}`,
     {
       method: "POST",
       body: JSON.stringify(orgData),

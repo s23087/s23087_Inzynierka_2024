@@ -99,7 +99,7 @@ function ViewItemOffcanvas({
                 onClick={() => {
                   hideFunction();
                 }}
-                className="ps-2"
+                className="ps-2 pe-0"
               >
                 <Image src={dropdown_big_down} alt="Hide" />
               </Button>
@@ -163,8 +163,9 @@ function ViewItemOffcanvas({
             </Col>
             <Col xs="12" md="6" lg="4" className="px-0 offset-lg-2">
               <Container
-                className="pt-5 text-center overflow-x-scroll"
+                className="pt-5 pt-md-3 text-center overflow-x-scroll"
                 key={choosenUser}
+                fluid
               >
                 {restInfo ? (
                   <ItemTable

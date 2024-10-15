@@ -11,9 +11,9 @@ export default async function getClients(isOrg, sort, country) {
   if (sort !== ".None") params.push(`sort=${sort}`);
   if (country) params.push(`country=${country}`);
   if (isOrg) {
-    url = `${process.env.API_DEST}/${dbName}/Client/orgClients?userId=${userId}${params.length > 0 ? "&" : ""}${params.join("&")}`;
+    url = `${process.env.API_DEST}/${dbName}/Client/get/org/${userId}${params.length > 0 ? "?" : ""}${params.join("&")}`;
   } else {
-    url = `${process.env.API_DEST}/${dbName}/Client/clients?userId=${userId}${params.length > 0 ? "&" : ""}${params.join("&")}`;
+    url = `${process.env.API_DEST}/${dbName}/Client/get/${userId}${params.length > 0 ? "?" : ""}${params.join("&")}`;
   }
   try {
     const items = await fetch(url, {

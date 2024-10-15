@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace database_comunicator.Models;
+namespace database_communicator.Models;
 
 public partial class CalculatedCreditNotePrice
 {

@@ -1,9 +1,9 @@
-﻿using database_comunicator.Models.DTOs;
-using database_comunicator.Services;
+﻿using database_communicator.Models.DTOs;
+using database_communicator.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace database_comunicator.Controllers
+namespace database_communicator.Controllers
 {
     [Route("{db_name}/[controller]")]
     [ApiController]
@@ -36,7 +36,7 @@ namespace database_comunicator.Controllers
         }
         [HttpPost]
         [Route("createNotifcation")]
-        public async Task<IActionResult> CreateNotifcation(CreateNotification data)
+        public async Task<IActionResult> CreateNotification(CreateNotification data)
         {
             var exist = await _userServices.UserExist(data.UserId);
             if (!exist) return NotFound();

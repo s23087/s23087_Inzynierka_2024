@@ -7,5 +7,5 @@ export default async function getRole() {
   const cookie = cookies().get("session")?.value;
   const session = await SessionManagment.decrypt(cookie);
 
-  return session.role;
+  return session.role ? session.role : "";
 }

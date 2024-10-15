@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace database_comunicator.Utils
+namespace database_communicator.Utils
 {
     public static class Extensions
     {

@@ -1,11 +1,11 @@
-﻿using database_comunicator.Models;
-using database_comunicator.Models.DTOs;
-using database_comunicator.Services;
+﻿using database_communicator.Models;
+using database_communicator.Models.DTOs;
+using database_communicator.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace database_comunicator.Controllers
+namespace database_communicator.Controllers
 {
     [Route("{db_name}/[controller]")]
     [ApiController]
@@ -91,7 +91,7 @@ namespace database_comunicator.Controllers
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("User not found.");
-            var result = await _invoicesService.GetOrgsForInvocie(userId);
+            var result = await _invoicesService.GetOrgsForInvoice(userId);
             return Ok(result);
         }
         [HttpGet]
@@ -138,11 +138,11 @@ namespace database_comunicator.Controllers
             if (!exist) return NotFound("User not found.");
             if (search != null)
             {
-                result = await _invoicesService.GetSalesInvocies(userId, search, sort: sort, dateL, dateG, dueL, dueG,
+                result = await _invoicesService.GetSalesInvoices(userId, search, sort: sort, dateL, dateG, dueL, dueG,
                     qtyL, qtyG, totalL, totalG, recipient, currency, paymentStatus, status);
                 return Ok(result);
             }
-            result = await _invoicesService.GetSalesInvocies(userId, sort: sort, dateL, dateG, dueL, dueG,
+            result = await _invoicesService.GetSalesInvoices(userId, sort: sort, dateL, dateG, dueL, dueG,
                     qtyL, qtyG, totalL, totalG, recipient, currency, paymentStatus, status);
             return Ok(result);
         }
@@ -154,11 +154,11 @@ namespace database_comunicator.Controllers
             IEnumerable<GetInvoices> result;
             if (search != null)
             {
-                result = await _invoicesService.GetSalesInvocies(search, sort: sort, dateL, dateG, dueL, dueG,
+                result = await _invoicesService.GetSalesInvoices(search, sort: sort, dateL, dateG, dueL, dueG,
                     qtyL, qtyG, totalL, totalG, recipient, currency, paymentStatus, status);
                 return Ok(result);
             }
-            result = await _invoicesService.GetSalesInvocies(sort: sort, dateL, dateG, dueL, dueG,
+            result = await _invoicesService.GetSalesInvoices(sort: sort, dateL, dateG, dueL, dueG,
                     qtyL, qtyG, totalL, totalG, recipient, currency, paymentStatus, status);
             return Ok(result);
         }
@@ -255,7 +255,7 @@ namespace database_comunicator.Controllers
             var invoiceExist = await _invoicesService.InvoiceExist(invoiceId);
             if (!invoiceExist) return NotFound("Invoice not found.");
             var cantBeDeleted = await _invoicesService.CheckIfCreditNoteExist(invoiceId) || await _invoicesService.CheckIfSellingPriceExist(invoiceId);
-            if (cantBeDeleted) return BadRequest("That invoice has refereances to other document. Please delete them first.");
+            if (cantBeDeleted) return BadRequest("That invoice has references to other document. Please delete them first.");
             var invoiceUsers = await _invoicesService.GetInvoiceUser(invoiceId);
             var invoiceNumber = await _invoicesService.GetInvoiceNumber(invoiceId);
             var result = await _invoicesService.DeleteInvoice(invoiceId);

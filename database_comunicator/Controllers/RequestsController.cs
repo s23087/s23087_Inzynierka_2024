@@ -1,10 +1,10 @@
-﻿using database_comunicator.Models.DTOs;
-using database_comunicator.Services;
+﻿using database_communicator.Models.DTOs;
+using database_communicator.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace database_comunicator.Controllers
+namespace database_communicator.Controllers
 {
     [Route("{db_name}/[controller]")]
     [ApiController]
@@ -35,7 +35,7 @@ namespace database_comunicator.Controllers
             var exist = await _userServices.UserExist(data.CreatorId);
             if (!exist) return NotFound("Creator not found.");
             var recExist = await _userServices.UserExist(data.ReceiverId);
-            if (!recExist) return NotFound("Reciver not found.");
+            if (!recExist) return NotFound("Receiver not found.");
             var requestId = await _requestServices.AddRequest(data);
             if (requestId == 0) return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             var logId = await _logServices.getLogTypeId("Create");
@@ -70,18 +70,18 @@ namespace database_comunicator.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("get/recived/{userId}")]
-        public async Task<IActionResult> GetRecivedRequests(int userId, string? search, string? sort, string? dateL, string? dateG,
+        [Route("get/received/{userId}")]
+        public async Task<IActionResult> GetReceivedRequests(int userId, string? search, string? sort, string? dateL, string? dateG,
             string? type, int? status)
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("User not found.");
             if (search != null)
             {
-                var sResult = await _requestServices.GetRecivedRequests(userId, search, sort: sort, dateL, dateG, type, status);
+                var sResult = await _requestServices.GetReceivedRequests(userId, search, sort: sort, dateL, dateG, type, status);
                 return Ok(sResult);
             }
-            var result = await _requestServices.GetRecivedRequests(userId, sort: sort, dateL, dateG, type, status);
+            var result = await _requestServices.GetReceivedRequests(userId, sort: sort, dateL, dateG, type, status);
             return Ok(result);
         }
         [HttpGet]
@@ -101,17 +101,17 @@ namespace database_comunicator.Controllers
             if (!userExist) return NotFound("User not found.");
             var exist = await _requestServices.RequestExist(requestId);
             if (!exist) return NotFound("Requests not found.");
-            var recevier = await _requestServices.GetRecevierId(requestId);
+            var receiver = await _requestServices.GetReceiverId(requestId);
             await _requestServices.DeleteRequest(requestId);
             var logId = await _logServices.getLogTypeId("Delete");
             var desc = $"User with id {userId} has deleted the request.";
             await _logServices.CreateActionLog(desc, userId, logId);
-            if (userId != recevier)
+            if (userId != receiver)
             {
                 var userFull = await _userServices.GetUserFullName(userId);
                 await _notificationServices.CreateNotification(new CreateNotification
                 {
-                    UserId = recevier,
+                    UserId = receiver,
                     Info = $"{userFull} has deleted a request with id {requestId}.",
                     ObjectType = "Requests",
                     Referance = $"{requestId}"
@@ -128,7 +128,7 @@ namespace database_comunicator.Controllers
             if (data.RecevierId != null)
             {
                 var recExist = await _userServices.UserExist((int)data.RecevierId);
-                if (!recExist) return NotFound("Reciver not found.");
+                if (!recExist) return NotFound("Receiver not found.");
             }
             var result = await _requestServices.ModifyRequest(data);
             if (!result) return new StatusCodeResult(StatusCodes.Status500InternalServerError);

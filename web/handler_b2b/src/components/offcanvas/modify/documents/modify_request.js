@@ -14,16 +14,27 @@ import updateRequest from "@/utils/documents/modify_request";
 
 function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
   const router = useRouter();
+  const [userDownloadError, setUserDownloadError] = useState(false);
+  const [restDownloadError, setRestDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      const getUsers = getReceviers();
-      getUsers.then((data) => setUsers(data));
-      const getRest = getRestModifyRequest(request.id);
-      getRest.then((data) => {
-        setRestInfo(data);
-        prevState.recevierId = data.recevierId;
-        prevState.note = data.note;
-      });
+      getReceviers()
+        .then((data) => setUsers(data))
+        .catch(() => setUserDownloadError(true))
+        .finally(() => {
+          if (users.length > 0) setUserDownloadError(false);
+        });
+      getRestModifyRequest(request.id)
+        .then((data) => {
+          if (data === null) return;
+          setRestInfo(data);
+          prevState.recevierId = data.recevierId;
+          prevState.note = data.note;
+        })
+        .catch(() => setRestDownloadError(true))
+        .finally(() => {
+          if (restInfo.note !== "is loading") setRestDownloadError(false);
+        });
       prevState.objectType = request.objectType;
       prevState.title = request.title;
     }
@@ -53,7 +64,9 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
     titleError ||
     users.length === 0 ||
     request.status !== "In progress" ||
-    restInfo.recevierId === 0;
+    restInfo.recevierId === 0 ||
+    userDownloadError ||
+    restDownloadError;
   // Misc
   const [isLoading, setIsLoading] = useState(false);
   // Form
@@ -105,13 +118,17 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0" style={vhStyle} fluid>
             <Form
-              className="mx-1 mx-xl-4"
+              className="mx-1 mx-xl-3"
               id="requestModifyForm"
               action={formAction}
             >
+              <ErrorMessage
+                message="Error: could not download all necessary info."
+                messageStatus={userDownloadError || restDownloadError}
+              />
               <ErrorMessage
                 message="You can't modify request if the status is diffrent then 'In progress.'"
                 messageStatus={request.status !== "In progress"}

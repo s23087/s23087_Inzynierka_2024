@@ -110,7 +110,7 @@ function SettingMenu({ role }) {
           })}
         </>
       );
-    case "Warehouse manager":
+    case "Warehouse Manager":
       return (
         <>
           {Object.entries(warehouseManagerLinksMap).map(([key, value]) => {

@@ -21,26 +21,48 @@ import createProforma from "@/utils/proformas/create_proforma";
 
 function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
   const router = useRouter();
+  const [userDownloadError, setUserDownloadError] = useState(false);
+  const [orgDownloadError, setOrgDownloadError] = useState(false);
+  const [taxesDownloadError, setTaxesDownloadError] = useState(false);
+  const [methodsDownloadError, setMethodsDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      const users = getUsers();
-      users.then((data) => {
-        setUsers(data);
-        setChoosenUser(data[0].idUser);
-      });
-      const orgs = getOrgsList();
-      orgs.then((data) => {
-        setOrgs(
-          data ?? {
-            orgName: "",
-            restOrgs: [],
-          },
-        );
-      });
-      const taxes = getTaxes();
-      taxes.then((data) => setTaxes(data));
-      const paymentMethods = getPaymentMethods();
-      paymentMethods.then((data) => setPaymentMethods(data));
+      getUsers()
+        .then((data) => {
+          if (data === null) return;
+          setUsers(data);
+          setChoosenUser(data[0].idUser);
+        })
+        .catch(() => setUserDownloadError(true))
+        .finally(() => {
+          if (choosenUser) setUserDownloadError(false);
+        });
+
+      getOrgsList()
+        .then((data) => {
+          if (data !== null) setOrgs(data);
+        })
+        .catch(() => setOrgDownloadError(true))
+        .finally(() => {
+          if (orgs.orgName) setOrgDownloadError(false);
+        });
+      getTaxes()
+        .then((data) => {
+          if (data !== null) setTaxes(data);
+        })
+        .catch(() => setTaxesDownloadError(true))
+        .finally(() => {
+          if (taxes.length > 0) setTaxesDownloadError(false);
+        });
+
+      getPaymentMethods()
+        .then((data) => {
+          if (data !== null) setPaymentMethods(data);
+        })
+        .catch(() => setMethodsDownloadError(true))
+        .finally(() => {
+          if (paymentMethods.length > 0) setMethodsDownloadError(false);
+        });
     }
   }, [showOffcanvas]);
   // options
@@ -111,7 +133,13 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
     transportError ||
     documentError ||
     currencyList.error ||
-    dateError;
+    dateError ||
+    orgDownloadError ||
+    userDownloadError ||
+    taxesDownloadError ||
+    methodsDownloadError ||
+    orgs.restOrgs.length === 0 ||
+    products.length === 0;
   // Misc
   const [isLoading, setIsLoading] = useState(false);
   // Form
@@ -182,19 +210,29 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0" style={vhStyle} fluid>
             <Form
-              className="mx-1 mx-xl-4"
+              className="mx-1 mx-xl-3"
               id="proformaForm"
               action={createProformaAction}
             >
+              <ErrorMessage
+                message="Error: could not download all necessary info."
+                messageStatus={
+                  orgDownloadError ||
+                  userDownloadError ||
+                  taxesDownloadError ||
+                  methodsDownloadError
+                }
+              />
               <Form.Group className="mb-4">
                 <Form.Label className="blue-main-text">User:</Form.Label>
                 <Form.Select
                   id="userSelect"
                   className="input-style shadow-sm maxInputWidth"
                   name="user"
+                  disabled={products.length > 0}
                   onChange={(e) => {
                     setChoosenUser(e.target.value);
                   }}
@@ -506,7 +544,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
                   }}
                 />
               </Form.Group>
-              <Form.Group className="mb-5" controlId="formDescription">
+              <Form.Group className="mb-5 pb-5" controlId="formDescription">
                 <Form.Label className="blue-main-text maxInputWidth-desc">
                   Note:
                 </Form.Label>

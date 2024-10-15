@@ -189,14 +189,14 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container
             className="p-0"
             style={isBindingView ? vhStyleHidden : vhStyleUnhidden}
             fluid
           >
             <Form
-              className="mx-1 mx-xl-4"
+              className="mx-1 mx-xl-3"
               id="clientModify"
               action={formAction}
             >
@@ -446,7 +446,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
             </Form>
           </Container>
           <Container
-            className="p-0 pt-3"
+            className="p-0 pt-3 px-1 px-xl-3"
             style={isBindingView ? vhStyleUnhidden : vhStyleHidden}
             fluid
           >

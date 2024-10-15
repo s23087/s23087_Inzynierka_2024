@@ -1,9 +1,9 @@
-﻿using database_comunicator.Models.DTOs;
-using database_comunicator.Services;
+﻿using database_communicator.Models.DTOs;
+using database_communicator.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace database_comunicator.Controllers
+namespace database_communicator.Controllers
 {
     [Route("{db_name}/[controller]")]
     [ApiController]
@@ -27,7 +27,7 @@ namespace database_comunicator.Controllers
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("User not found.");
             var proUser = await _userServices.UserExist(data.UserId);
-            if (!proUser) return NotFound("Choosen user not found.");
+            if (!proUser) return NotFound("Chosen user not found.");
             var proExist = await _proformaServices.ProformaExist(data.ProformaNumber, data.SellerId, data.BuyerId);
             if (proExist) return BadRequest("This proforma already exist.");
             var proformaId = await _proformaServices.AddProforma(data);
@@ -115,7 +115,7 @@ namespace database_comunicator.Controllers
         }
         [HttpGet]
         [Route("get/yours/rest/{proformaId}")]
-        public async Task<IActionResult> GetRestYourtProforma(int proformaId)
+        public async Task<IActionResult> GetRestYourProforma(int proformaId)
         {
             var exist = await _proformaServices.ProformaExist(proformaId);
             if (!exist) return NotFound("Proforma not found.");

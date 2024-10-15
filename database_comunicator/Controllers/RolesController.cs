@@ -1,9 +1,9 @@
-﻿using database_comunicator.Models.DTOs;
-using database_comunicator.Services;
+﻿using database_communicator.Models.DTOs;
+using database_communicator.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace database_comunicator.Controllers
+namespace database_communicator.Controllers
 {
     [Route("{db_name}/[controller]")]
     [ApiController]
@@ -52,7 +52,7 @@ namespace database_comunicator.Controllers
             var orgUserId = await _userServices.GetOrgUserId(data.ChoosenUserId);
             if (orgUserId == null)
             {
-                return NotFound("Choosen user not found.");
+                return NotFound("Chosen user not found.");
             }
             await _userServices.ModifyUserRole((int)orgUserId, roleId);
             return Ok();

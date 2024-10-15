@@ -63,7 +63,7 @@ function ProductList({
     height: "67px",
   };
   return (
-    <Container className="p-0 middleSectionPlacement position-relative" fluid>
+    <Container className="px-0 middleSectionPlacement position-relative" fluid>
       <ProductFilterOffcanvas
         showOffcanvas={showFilter}
         hideFunction={() => setShowFilter(false)}
@@ -95,7 +95,7 @@ function ProductList({
           </p>
         </Container>
       ) : (
-        Object.values(products)
+        Object.values(products ?? [])
           .slice(productStart, productEnd)
           .map((value) => {
             return (
@@ -142,7 +142,7 @@ function ProductList({
           selectedProducts.splice(0, selectedProducts.length);
           setSelectedQty(0);
           let pagationInfo = getPagationInfo(params);
-          Object.values(products)
+          Object.values(products ?? [])
             .slice(pagationInfo.start, pagationInfo.end)
             .forEach((e) => selectedProducts.push(e.itemId));
           setSelectedQty(selectedProducts.length);
@@ -151,7 +151,7 @@ function ProductList({
         selectAll={() => {
           selectedProducts.splice(0, selectedProducts.length);
           setSelectedQty(0);
-          Object.values(products).forEach((e) =>
+          Object.values(products ?? []).forEach((e) =>
             selectedProducts.push(e.itemId),
           );
           setSelectedQty(selectedProducts.length);

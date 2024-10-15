@@ -11,6 +11,18 @@ function normalStringValidtor(string, setter, maxLenght) {
   }
 }
 
+function noNumberStringValidtor(string, setter, maxLenght) {
+  if (
+    validators.lengthSmallerThen(string, maxLenght) &&
+    validators.stringIsNotEmpty(string) &&
+    validators.haveNoNumbers(string)
+  ) {
+    setter(false);
+  } else {
+    setter(true);
+  }
+}
+
 function onlyNumberStringValidtor(string, setter, maxLenght) {
   if (
     validators.lengthSmallerThen(string, maxLenght) &&
@@ -65,6 +77,17 @@ function decimalValidator(string, setter) {
   }
 }
 
+function noPathCharactersValidator(string, setter) {
+  if (
+    validators.noPathCharacters(string) &&
+    validators.stringIsNotEmpty(string)
+  ) {
+    setter(false);
+  } else {
+    setter(true);
+  }
+}
+
 const StringValidtor = {
   normalStringValidtor,
   onlyNumberStringValidtor,
@@ -72,6 +95,8 @@ const StringValidtor = {
   emailValidator,
   decimalValidator,
   onlyNumberValidtor,
+  noPathCharactersValidator,
+  noNumberStringValidtor,
 };
 
 export default StringValidtor;

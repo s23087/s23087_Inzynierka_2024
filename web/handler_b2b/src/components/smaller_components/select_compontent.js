@@ -23,7 +23,7 @@ function SelectComponent({ selectedQty, actionOneName, actionOne }) {
   };
   return (
     <Container
-      className="border-bottom-grey fixed-top middleSectionPlacement main-bg minScalableWidth"
+      className="border-bottom-grey fixed-top middleSectionPlacement-selected main-bg minScalableWidth"
       style={containerStyle}
       fluid
     >

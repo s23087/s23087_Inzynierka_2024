@@ -32,7 +32,7 @@ export default function ChangePasswordPage() {
   };
   return (
     <Container className="px-4 pt-4" fluid>
-      <Form className="mx-1 mx-xl-4" id="changePassForm" action={formAction}>
+      <Form className="mx-1 mx-xl-3" id="changePassForm" action={formAction}>
         <Form.Group className="mb-3" style={maxInputWidth}>
           <Form.Label className="blue-main-text">Old Password:</Form.Label>
           <p
@@ -115,7 +115,7 @@ export default function ChangePasswordPage() {
           </Button>
         </Stack>
       </Form>
-      <Stack>
+      <Stack className="mx-1 mx-xl-3">
         <Button
           className="mt-3 mx-auto ms-sm-0"
           variant="secBlue"

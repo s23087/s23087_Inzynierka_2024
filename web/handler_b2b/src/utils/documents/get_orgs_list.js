@@ -7,20 +7,15 @@ export default async function getOrgsList() {
   const dbName = await getDbName();
   const userId = await getUserId();
   let url = `${process.env.API_DEST}/${dbName}/Invoices/getOrgs/${userId}`;
-  try {
-    const info = await fetch(url, {
-      method: "GET",
-    });
+  const info = await fetch(url, {
+    method: "GET",
+  });
 
-    if (info.ok) {
-      return await info.json();
-    }
-
-    return {
-      restOrgs: [],
-    };
-  } catch (error) {
-    console.log(error);
-    return null;
+  if (info.ok) {
+    return await info.json();
   }
+
+  return {
+    restOrgs: [],
+  };
 }

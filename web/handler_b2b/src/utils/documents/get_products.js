@@ -7,11 +7,11 @@ export default async function getItemsList(userId, currency) {
   const dbName = await getDbName();
   let url = "";
   if (userId && currency) {
-    const userId = await getUserId();
     url = `${process.env.API_DEST}/${dbName}/Invoices/allSalesItems/${userId}?currency=${currency}`;
   } else {
     url = `${process.env.API_DEST}/${dbName}/Invoices/allItems`;
   }
+  console.log(url);
   const info = await fetch(url, {
     method: "GET",
   });

@@ -73,7 +73,7 @@ function DeliveryList({
     height: "67px",
   };
   return (
-    <Container className="p-0 middleSectionPlacement position-relative" fluid>
+    <Container className="px-0 middleSectionPlacement position-relative" fluid>
       <DeliveryFilterOffcanvas
         showOffcanvas={showFilter}
         hideFunction={() => setShowFilter(false)}
@@ -154,7 +154,7 @@ function DeliveryList({
           selectedDelivery.splice(0, selectedDelivery.length);
           setSelectedQty(0);
           let pagationInfo = getPagationInfo(params);
-          Object.values(deliveries)
+          Object.values(deliveries ?? [])
             .slice(pagationInfo.start, pagationInfo.end)
             .forEach((e) => selectedDelivery.push(e.deliveryId));
           setSelectedQty(selectedDelivery.length);
@@ -163,7 +163,7 @@ function DeliveryList({
         selectAll={() => {
           selectedDelivery.splice(0, selectedDelivery.length);
           setSelectedQty(0);
-          Object.values(deliveries).forEach((e) =>
+          Object.values(deliveries ?? []).forEach((e) =>
             selectedDelivery.push(e.deliveryId),
           );
           setSelectedQty(selectedDelivery.length);

@@ -28,10 +28,20 @@ function ViewCreditNoteOffcanvas({
   useEffect(() => {
     if (showOffcanvas) {
       let restInfo = getRestCreditNote(creditNote.creditNoteId);
-      restInfo.then((data) => {
-        setRestInfo(data);
-        setCreditPath(data.path);
-      });
+      restInfo
+        .then((data) => {
+          setRestInfo(data);
+          setCreditPath(data.path);
+        })
+        .catch(() =>
+          setRestInfo({
+            creditNoteNumber: "error",
+            currencyName: "error",
+            note: "error",
+            path: "error",
+            creditItems: [],
+          }),
+        );
     }
   }, [showOffcanvas]);
   // Download bool
@@ -100,7 +110,7 @@ function ViewCreditNoteOffcanvas({
                 onClick={() => {
                   hideFunction();
                 }}
-                className="ps-2"
+                className="ps-2 pe-0"
               >
                 <Image src={dropdown_big_down} alt="Hide" />
               </Button>
@@ -177,7 +187,10 @@ function ViewCreditNoteOffcanvas({
               </Stack>
             </Col>
             <Col xs="12" md="6" lg="4" className="px-0 offset-lg-2">
-              <Container className="pt-5 text-center overflow-x-scroll">
+              <Container
+                className="pt-5 pt-md-3 text-center overflow-x-scroll"
+                fluid
+              >
                 {restInfo.creditItems.length > 0 ? (
                   <CreditNoteTable
                     creditItems={restInfo.creditItems}

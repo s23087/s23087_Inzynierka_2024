@@ -1,10 +1,10 @@
-﻿using database_comunicator.Models.DTOs;
-using database_comunicator.Services;
+﻿using database_communicator.Models.DTOs;
+using database_communicator.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
 
-namespace database_comunicator.Controllers
+namespace database_communicator.Controllers
 {
     [Route("{db_name}/[controller]")]
     [ApiController]
@@ -79,7 +79,7 @@ namespace database_comunicator.Controllers
                 PostalCode = newUser.PostalCode,
                 CreditLimit = null,
                 CountryId = countryId
-            });
+            }, null);
 
             int roleId = -1;
 
@@ -92,13 +92,11 @@ namespace database_comunicator.Controllers
             {
                 Email = newUser.Email,
                 Username = newUser.Username,
-                Surname = newUser.Username,
+                Surname = newUser.Surname,
                 Password = newUser.Password
             }, orgId, roleId, newUser.IsOrg);
 
             return result ? Ok() : BadRequest();
-
-
 
         }
     }

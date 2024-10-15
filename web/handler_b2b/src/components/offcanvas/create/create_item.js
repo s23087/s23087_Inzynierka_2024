@@ -89,9 +89,9 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0" style={vhStyle} fluid>
-            <Form action={formAction} id="addItemForm">
+            <Form action={formAction} id="addItemForm" className="mx-1 mx-xl-3">
               <Form.Group className="mb-3 maxInputWidth">
                 <Form.Label className="blue-main-text">P/N:</Form.Label>
                 <ErrorMessage

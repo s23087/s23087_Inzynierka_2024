@@ -27,10 +27,16 @@ export default async function deleteClient(orgId) {
     };
   }
 
-  if (info.status == 400) {
+  if (info.status === 400) {
     return {
       error: true,
       message: await info.text(),
+    };
+  }
+  if (info.status === 500) {
+    return {
+      error: true,
+      message: "Server error.",
     };
   }
   if (info.ok) {

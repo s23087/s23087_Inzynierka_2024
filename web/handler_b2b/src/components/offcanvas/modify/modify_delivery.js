@@ -118,7 +118,7 @@ function ModifyDeliveryOffcanvas({
         <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0" style={vhStyle} fluid>
             <Form
-              className="mx-1 mx-xl-3"
+              className="mx-1 mx-xl-3 ps-1"
               id="createDelivery"
               action={formAction}
             >

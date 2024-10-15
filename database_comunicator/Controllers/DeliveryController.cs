@@ -1,10 +1,10 @@
-﻿using database_comunicator.Models;
-using database_comunicator.Models.DTOs;
-using database_comunicator.Services;
+﻿using database_communicator.Models;
+using database_communicator.Models.DTOs;
+using database_communicator.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace database_comunicator.Controllers
+namespace database_communicator.Controllers
 {
     [Route("{db_name}/[controller]")]
     [ApiController]
@@ -90,6 +90,18 @@ namespace database_comunicator.Controllers
             var logId = await _logServices.getLogTypeId("Create");
             var desc = $"User with id {data.UserId} has created the delivery with id {deliveryId}.";
             await _logServices.CreateActionLog(desc, data.UserId, logId);
+            var warehouseManagersId = await _deliveryService.GetWarehouseManagerIds();
+            foreach (var id in warehouseManagersId)
+            {
+                var userFull = await _userServices.GetUserFullName(data.UserId);
+                await _notificationServices.CreateNotification(new CreateNotification
+                {
+                    UserId = id,
+                    Info = $"{userFull} has created a delivery with id {deliveryId}.",
+                    ObjectType = data.IsDeliveryToUser ? "To user delivery" : "To client delivery",
+                    Referance = $"{deliveryId}"
+                });
+            }
             return Ok();
         }
         [HttpPost]
@@ -98,8 +110,8 @@ namespace database_comunicator.Controllers
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("User not found.");
-            var comapnyExist = await _deliveryService.DoesDeliveryCompanyExist(data.CompanyName);
-            if (comapnyExist) return BadRequest("This company already exists.");
+            var companyExist = await _deliveryService.DoesDeliveryCompanyExist(data.CompanyName);
+            if (companyExist) return BadRequest("This company already exists.");
             await _deliveryService.AddDeliveryCompany(data.CompanyName);
             var logId = await _logServices.getLogTypeId("Create");
             var desc = $"User with id {userId} has created the delivery company with name {data.CompanyName}.";

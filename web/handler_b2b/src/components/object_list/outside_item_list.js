@@ -47,7 +47,7 @@ function OutsideItemList({
     height: "67px",
   };
   return (
-    <Container className="p-0 middleSectionPlacement position-relative" fluid>
+    <Container className="px-0 middleSectionPlacement position-relative" fluid>
       <OutsideItemsFilterOffcanvas
         showOffcanvas={showFilter}
         hideFunction={() => setShowFilter(false)}
@@ -121,7 +121,7 @@ function OutsideItemList({
           selectedItems.splice(0, selectedItems.length);
           setSelectedQty(0);
           let pagationInfo = getPagationInfo(params);
-          Object.values(items)
+          Object.values(items ?? [])
             .slice(pagationInfo.start, pagationInfo.end)
             .forEach((e) => selectedItems.push([e.itemId, e.orgId]));
           setSelectedQty(selectedItems.length);
@@ -130,7 +130,7 @@ function OutsideItemList({
         selectAll={() => {
           selectedItems.splice(0, selectedItems.length);
           setSelectedQty(0);
-          Object.values(items).forEach((e) =>
+          Object.values(items ?? []).forEach((e) =>
             selectedItems.push([e.itemId, e.orgId]),
           );
           setSelectedQty(selectedItems.length);

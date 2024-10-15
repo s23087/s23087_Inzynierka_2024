@@ -1,11 +1,11 @@
-﻿using database_comunicator.Models;
-using database_comunicator.Models.DTOs;
-using database_comunicator.Services;
+﻿using database_communicator.Models;
+using database_communicator.Models.DTOs;
+using database_communicator.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
-namespace database_comunicator.Controllers
+namespace database_communicator.Controllers
 {
     [Route("{db_name}/[controller]")]
     [ApiController]
@@ -32,7 +32,7 @@ namespace database_comunicator.Controllers
             var exist = await _itemServices.EanExist(newItem.Eans) || await _itemServices.ItemExist(newItem.PartNumber);
             if (exist)
             {
-                return BadRequest("Item with this partnumber or ean alredy exists.");
+                return BadRequest("Item with this partnumber or ean already exists.");
             }
 
             var item = await _itemServices.AddItem(newItem);
@@ -180,7 +180,7 @@ namespace database_comunicator.Controllers
                 await _notificationServices.CreateNotification(new CreateNotification
                 {
                     UserId = user,
-                    Info = $"The item with id {data.Bindings.Select(e => e.ItemId).First()} has been binded to you by {userFull}.",
+                    Info = $"The item with id {data.Bindings.Select(e => e.ItemId).First()} has been bound to you by {userFull}.",
                     ObjectType = "Item",
                     Referance = $"{data.Bindings.Select(e => e.ItemId).First()}"
                 });

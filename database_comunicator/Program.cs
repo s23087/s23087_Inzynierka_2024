@@ -1,5 +1,5 @@
-using database_comunicator.Data;
-using database_comunicator.Services;
+using database_communicator.Data;
+using database_communicator.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 

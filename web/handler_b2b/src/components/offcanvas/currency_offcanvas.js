@@ -55,21 +55,26 @@ function CurrencyOffcanvas({ showOffcanvas, hideFunction, current_currency }) {
       onHide={hideFunction}
       placement="bottom"
     >
-      <Offcanvas.Header className="border-bottom-grey px-xl-5">
+      <Offcanvas.Header className="border-bottom-grey px-4 px-xl-5 mx-1 mx-xl-3">
         <Container className="px-3" fluid>
           <Row className="align-items-center">
-            <Col xs="7" lg="9" xl="10" className="d-flex align-items-center">
+            <Col
+              xs="7"
+              lg="9"
+              xl="10"
+              className="d-flex align-items-center p-0"
+            >
               <p className="blue-main-text h4 mb-0">Change currency</p>
             </Col>
-            <Col xs="3" lg="2" xl="1" className="ps-0">
+            <Col xs="4" lg="2" xl="1" className="p-0">
               <span
-                className="main-text main-blue-bg d-flex mx-auto"
+                className="main-text main-blue-bg d-flex mx-auto me-md-0"
                 style={spanStyle}
               >
                 {current_currency}
               </span>
             </Col>
-            <Col xs="2" lg="1" className="ps-1 text-end">
+            <Col xs="1" className="p-0 text-end">
               <Button
                 variant="as-link"
                 onClick={() => {

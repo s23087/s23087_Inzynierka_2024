@@ -1,16 +1,16 @@
-﻿using database_comunicator.Data;
-using database_comunicator.Models;
-using database_comunicator.Models.DTOs;
-using database_comunicator.Utils;
+﻿using database_communicator.Data;
+using database_communicator.Models;
+using database_communicator.Models.DTOs;
+using database_communicator.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq.Expressions;
 
-namespace database_comunicator.Services
+namespace database_communicator.Services
 {
     public interface IInvoiceServices
     {
-        public Task<GetOrgsForInvocie> GetOrgsForInvocie(int userId);
+        public Task<GetOrgsForInvocie> GetOrgsForInvoice(int userId);
         public Task<IEnumerable<GetTaxes>> GetTaxes();
         public Task<IEnumerable<GetPaymentMethods>> GetPaymentMethods();
         public Task<IEnumerable<GetPaymentStatuses>> GetPaymentStatuses();
@@ -24,19 +24,19 @@ namespace database_comunicator.Services
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
         public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string search, string? sort, string? dateL, string? dateG,
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
-        public Task<IEnumerable<GetInvoices>> GetSalesInvocies(string? sort, string? dateL, string? dateG,
+        public Task<IEnumerable<GetInvoices>> GetSalesInvoices(string? sort, string? dateL, string? dateG,
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
-        public Task<IEnumerable<GetInvoices>> GetSalesInvocies(string search, string? sort, string? dateL, string? dateG,
+        public Task<IEnumerable<GetInvoices>> GetSalesInvoices(string search, string? sort, string? dateL, string? dateG,
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
-        public Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId, string? sort, string? dateL, string? dateG,
+        public Task<IEnumerable<GetInvoices>> GetSalesInvoices(int userId, string? sort, string? dateL, string? dateG,
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
-        public Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId, string search, string? sort, string? dateL, string? dateG,
+        public Task<IEnumerable<GetInvoices>> GetSalesInvoices(int userId, string search, string? sort, string? dateL, string? dateG,
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
         public Task<IEnumerable<GetInvoicesList>> GetPurchaseInvoicesList();
         public Task<IEnumerable<GetInvoicesList>> GetSalesInvoicesList();
         public Task<IEnumerable<GetInvoiceItems>> GetInvoiceItems(int invoiceId, bool isPurchaseInvoice);
         public Task<bool> CheckIfSellingPriceExist(int invoiceId);
-        public Task<bool> CheckIfCreditNoteExist(int invocieId);
+        public Task<bool> CheckIfCreditNoteExist(int invoiceId);
         public Task<bool> DeleteInvoice(int invoiceId);
         public Task<bool> InvoiceExist(int invoiceId);
         public Task<IEnumerable<int>> GetInvoiceUser(int invoiceId);
@@ -55,22 +55,22 @@ namespace database_comunicator.Services
         {
             _handlerContext = handlerContext;
         }
-        public async Task<GetOrgsForInvocie> GetOrgsForInvocie(int userId)
+        public async Task<GetOrgsForInvocie> GetOrgsForInvoice(int userId)
         {
+            var userOrg = await _handlerContext.AppUsers
+                .Where(e => e.IdUser == userId)
+                .Select(e => new RestOrgs
+                {
+                    OrgId = e.SoloUserId != null ? e.SoloUser!.Organizations.OrganizationId : e.OrgUser!.Organizations.OrganizationId,
+                    OrgName = e.SoloUserId != null ? e.SoloUser!.Organizations.OrgName : e.OrgUser!.Organizations.OrgName,
+                }).FirstAsync();
             var result = await _handlerContext.Organizations
-                .Where(e => e.OrganizationId != userId)
+                .Where(e => !e.SoloUsers.Any() && !e.OrgUsers.Any())
                 .Select(e => new RestOrgs
                 {
                     OrgId = e.OrganizationId,
                     OrgName = e.OrgName
                 }).ToListAsync();
-            var userOrg = await _handlerContext.Organizations
-                .Where(e => e.OrganizationId == userId)
-                .Select(e => new RestOrgs
-                {
-                    OrgId = e.OrganizationId,
-                    OrgName = e.OrgName
-                }).FirstAsync();
             return new GetOrgsForInvocie
             {
                 UserOrgId = userOrg.OrgId,
@@ -374,7 +374,7 @@ namespace database_comunicator.Services
                     + (inv.CurrencyName == "PLN" ? inv.TransportCost : inv.TransportCost * inv.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetInvoices>> GetSalesInvocies(string? sort, string? dateL, string? dateG,
+        public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(string? sort, string? dateL, string? dateG,
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
             var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
@@ -558,7 +558,7 @@ namespace database_comunicator.Services
                     + (ent.CurrencyName == "PLN" ? ent.TransportCost : ent.TransportCost * ent.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetInvoices>> GetSalesInvocies(string search, string? sort, string? dateL, string? dateG,
+        public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(string search, string? sort, string? dateL, string? dateG,
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
             var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
@@ -737,7 +737,7 @@ namespace database_comunicator.Services
                     + (instc.CurrencyName == "PLN" ? instc.TransportCost : instc.TransportCost * instc.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId, string? sort, string? dateL, string? dateG,
+        public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(int userId, string? sort, string? dateL, string? dateG,
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
             var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
@@ -916,7 +916,7 @@ namespace database_comunicator.Services
                     + (objs.CurrencyName == "PLN" ? objs.TransportCost : objs.TransportCost * objs.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetInvoices>> GetSalesInvocies(int userId, string search, string? sort, string? dateL, string? dateG,
+        public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(int userId, string search, string? sort, string? dateL, string? dateG,
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
             var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
@@ -1100,9 +1100,9 @@ namespace database_comunicator.Services
         {
             return await _handlerContext.SellingPrices.Where(e => e.PurchasePrice.InvoiceId == invoiceId).AnyAsync();
         }
-        public async Task<bool> CheckIfCreditNoteExist(int invocieId)
+        public async Task<bool> CheckIfCreditNoteExist(int invoiceId)
         {
-            return await _handlerContext.CreditNotes.Where(e => e.InvoiceId == invocieId).AnyAsync();
+            return await _handlerContext.CreditNotes.Where(e => e.InvoiceId == invoiceId).AnyAsync();
         }
         public async Task<bool> DeleteInvoice(int invoiceId)
         {

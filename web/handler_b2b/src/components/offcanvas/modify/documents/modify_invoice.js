@@ -21,23 +21,54 @@ function ModifyInvoiceOffcanvas({
   invoice,
 }) {
   const router = useRouter();
+  const [orgDownloadError, setOrgDownloadError] = useState(false);
+  const [methodsDownloadError, setMethodsDownloadError] = useState(false);
+  const [statusesDownloadError, setStatusesDownloadError] = useState(false);
+  const [restDownloadError, setRestDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      const orgs = getOrgsList();
-      orgs.then((data) => setOrgs(data));
-      const paymentMethods = getPaymentMethods();
-      paymentMethods.then((data) => setPaymentMethods(data));
-      const paymentStatuses = getPaymentStatuses();
-      paymentStatuses.then((data) => setPaymentStatuses(data));
-      const restInfo = getRestModifyInvoice(invoice.invoiceId);
-      restInfo.then((data) => {
-        setRestInfo(data);
-        prevState.invoiceNumber = invoice.invoiceNumber;
-        prevState.transport = data.transport;
-        prevState.paymentMethod = data.paymentMethod;
-        prevState.note = data.note;
-        prevState.status = invoice.inSystem;
-      });
+      getOrgsList()
+        .then((data) => {
+          if (data !== null) setOrgs(data);
+        })
+        .catch(() => setOrgDownloadError(true))
+        .finally(() => {
+          if (orgs.orgName) setOrgDownloadError(false);
+        });
+
+      getPaymentMethods()
+        .then((data) => {
+          if (data !== null) setPaymentMethods(data);
+        })
+        .catch(() => setMethodsDownloadError(true))
+        .finally(() => {
+          if (paymentMethods.length > 0) setMethodsDownloadError(false);
+        });
+
+      getPaymentStatuses()
+        .then((data) => {
+          if (data !== null) setPaymentStatuses(data);
+        })
+        .catch(() => setStatusesDownloadError(true))
+        .finally(() => {
+          if (paymentStatuses.length > 0) setStatusesDownloadError(false);
+        });
+
+      getRestModifyInvoice(invoice.invoiceId)
+        .then((data) => {
+          if (data !== null) {
+            setRestInfo(data);
+            prevState.invoiceNumber = invoice.invoiceNumber;
+            prevState.transport = data.transport;
+            prevState.paymentMethod = data.paymentMethod;
+            prevState.note = data.note;
+            prevState.status = invoice.inSystem;
+          }
+        })
+        .catch(() => setRestDownloadError(true))
+        .finally(() => {
+          if (restInfo.transport !== "is loading") setRestDownloadError(false);
+        });
     }
   }, [showOffcanvas]);
   // rest info
@@ -58,7 +89,14 @@ function ModifyInvoiceOffcanvas({
   const [invoiceNumberError, setInvoiceNumberError] = useState(false);
   const [transportError, setTransportError] = useState(false);
   const [documentError, setDocumentError] = useState(false);
-  const anyErrorActive = invoiceNumberError || transportError || documentError;
+  const anyErrorActive =
+    invoiceNumberError ||
+    transportError ||
+    documentError ||
+    orgDownloadError ||
+    methodsDownloadError ||
+    statusesDownloadError ||
+    restDownloadError;
   // Misc
   const [isLoading, setIsLoading] = useState(false);
   // Form
@@ -123,13 +161,22 @@ function ModifyInvoiceOffcanvas({
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0" style={vhStyle} fluid>
             <Form
-              className="mx-1 mx-xl-4"
+              className="mx-1 mx-xl-3"
               id="invoiceForm"
               action={formPurchaseAction}
             >
+              <ErrorMessage
+                message="Error: could not download all necessary info."
+                messageStatus={
+                  orgDownloadError ||
+                  methodsDownloadError ||
+                  statusesDownloadError ||
+                  restDownloadError
+                }
+              />
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">
                   Invoice Number:
@@ -309,7 +356,7 @@ function ModifyInvoiceOffcanvas({
                   }}
                 />
               </Form.Group>
-              <Form.Group className="mb-5" controlId="formDescription">
+              <Form.Group className="mb-5 pb-5" controlId="formDescription">
                 <Form.Label className="blue-main-text maxInputWidth-desc">
                   Note:
                 </Form.Label>

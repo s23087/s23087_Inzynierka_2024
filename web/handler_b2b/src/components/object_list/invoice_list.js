@@ -208,7 +208,7 @@ function InvoiceList({
     height: "67px",
   };
   return (
-    <Container className="p-0 middleSectionPlacement position-relative" fluid>
+    <Container className="px-0 middleSectionPlacement position-relative" fluid>
       <InvoiceFilterOffcanvas
         showOffcanvas={showFilter}
         hideFunction={() => setShowFilter(false)}
@@ -230,8 +230,12 @@ function InvoiceList({
       </Container>
       <SelectComponent
         selectedQty={selectedQty}
-        actionOneName="Delete selected"
-        actionOne={() => setShowDeleteSelected(true)}
+        actionOneName={
+          type === "Requests" ? "Change status" : "Delete selected"
+        }
+        actionOne={
+          type === "Requests" ? null : () => setShowDeleteSelected(true)
+        }
       />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
       {Object.keys(invoices ?? []).length === 0 ? (
@@ -347,15 +351,28 @@ function InvoiceList({
         onHideFunction={() => setShowMoreAction(false)}
         instanceName={type !== "Requests" ? "document" : "request"}
         addAction={() => {
-          if ((orgView || role === "Admin") && type.includes("invoice")) {
+          if (
+            (orgView || role === "Admin" || role === "Solo") &&
+            type.includes("invoice")
+          ) {
             setShowMoreAction(false);
             setShowAddInvoice(true);
           }
-          if ((orgView || role === "Admin") && type.includes("note")) {
+          if (
+            (orgView || role === "Admin" || role === "Solo") &&
+            type.includes("note")
+          ) {
             setShowMoreAction(false);
             setShowAddCreditNote(true);
           }
           if ((!orgView || role === "Admin") && type === "Requests") {
+            setShowMoreAction(false);
+            setShowAddRequest(true);
+          }
+          if (
+            role === "Merchant" &&
+            (type.includes("invoice") || type.includes("note"))
+          ) {
             setShowMoreAction(false);
             setShowAddRequest(true);
           }
@@ -364,7 +381,7 @@ function InvoiceList({
           selectedDocuments.splice(0, selectedDocuments.length);
           setSelectedQty(0);
           let pagationInfo = getPagationInfo(params);
-          Object.values(invoices)
+          Object.values(invoices ?? [])
             .slice(pagationInfo.start, pagationInfo.end)
             .forEach((e) => {
               if (type.includes("invoice")) selectedDocuments.push(e.invoiceId);
@@ -377,7 +394,7 @@ function InvoiceList({
         selectAll={() => {
           selectedDocuments.splice(0, selectedDocuments.length);
           setSelectedQty(0);
-          Object.values(invoices).forEach((e) => {
+          Object.values(invoices ?? []).forEach((e) => {
             if (type.includes("invoice")) selectedDocuments.push(e.invoiceId);
             if (type.includes("note")) selectedDocuments.push(e.creditNoteId);
             if (type === "Requests") selectedDocuments.push(e.id);

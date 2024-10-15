@@ -30,7 +30,6 @@ export default async function AbstractItemsPage({ searchParams }) {
   let isSearchTrue = searchParams.searchQuery !== undefined;
   let outsideItems = isSearchTrue
     ? await getSearchOutsideItems(
-        current_role,
         searchParams.searchQuery,
         currentSort,
         qtyL,
@@ -41,7 +40,6 @@ export default async function AbstractItemsPage({ searchParams }) {
         currency,
       )
     : await getOutsideItems(
-        current_role,
         currentSort,
         qtyL,
         qtyG,

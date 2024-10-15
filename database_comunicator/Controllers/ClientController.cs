@@ -1,11 +1,11 @@
-﻿using database_comunicator.Models.DTOs;
-using database_comunicator.Services;
+﻿using database_communicator.Models.DTOs;
+using database_communicator.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace database_comunicator.Controllers
+namespace database_communicator.Controllers
 {
     [Route("{db_name}/[controller]")]
     [ApiController]
@@ -22,7 +22,7 @@ namespace database_comunicator.Controllers
 
         }
         [HttpGet]
-        [Route("clients")]
+        [Route("get/{userId}")]
         public async Task<IActionResult> GetClients(int userId, string? search, string? sort, int? country)
         {
             var isOrg = await _userServices.IsOrgUser(userId);
@@ -30,14 +30,14 @@ namespace database_comunicator.Controllers
             IEnumerable<GetClient> result;
             if (search == null)
             {
-                result = await _organizationServices.GetClients(orgId, sort: sort, country);
+                result = await _organizationServices.GetClients(userId, orgId, sort: sort, country);
                 return Ok(result);
             }
-            result = await _organizationServices.GetClients(orgId, search, sort: sort, country);
+            result = await _organizationServices.GetClients(userId, orgId, search, sort: sort, country);
             return Ok(result);
         }
         [HttpGet]
-        [Route("orgClients")]
+        [Route("get/org/{userId}")]
         public async Task<IActionResult> GetOrgClients(int userId, string? search, string? sort, int? country)
         {
             var orgId = await _userServices.GetOrgId(userId, true);
@@ -98,8 +98,8 @@ namespace database_comunicator.Controllers
             if (!exist) return NotFound();
             var orgExist = await _organizationServices.OrgExist(data.OrgId);
             if (!orgExist) return NotFound();
-            var statusExsits = await _organizationServices.StatusExist(data.StatusId);
-            if (!statusExsits) return NotFound();
+            var statusExists = await _organizationServices.StatusExist(data.StatusId);
+            if (!statusExists) return NotFound();
             var logTypeId = await _logServices.getLogTypeId("Modify");
             await _logServices.CreateActionLog($"Availability Status for client with id {data.OrgId} has been changed by user id {userId}.", userId, logTypeId);
             await _organizationServices.SetClientAvailabilityStatus(data.OrgId, data.StatusId);
@@ -119,12 +119,13 @@ namespace database_comunicator.Controllers
             return Ok();
         }
         [HttpPost]
-        [Route("addOrg")]
+        [Route("add/{userId}")]
         public async Task<IActionResult> AddOrganization(AddOrganization data, int userId)
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound();
-            var orgId = await _organizationServices.AddOrganization(data);
+            var orgId = await _organizationServices.AddOrganization(data, userId);
+            if (orgId == 0) return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             var logTypeId = await _logServices.getLogTypeId("Create");
             await _logServices.CreateActionLog($"Organization with name {data.OrgName} and id {orgId} had been added by user with id {userId}.", userId, logTypeId);
             return Ok(orgId);
@@ -146,9 +147,10 @@ namespace database_comunicator.Controllers
             if (!exist) return NotFound("User not found.");
             var clientExist = await _organizationServices.OrgExist(orgId);
             if (!clientExist) return NotFound("Client not found.");
-            var relationExist = await _organizationServices.OrgHaveRelations(orgId);
-            if (relationExist) return BadRequest("This organization is included in exsisting objects (Invoice, proforma etc.).");
-            await _organizationServices.DeleteOrg(orgId);
+            var relationExist = await _organizationServices.OrgHaveRelations(orgId, userId);
+            if (relationExist) return BadRequest("This organization is included in existing objects (Invoice, proforma etc.).");
+            var result = await _organizationServices.DeleteOrg(orgId);
+            if (!result) return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             var logTypeId = await _logServices.getLogTypeId("Delete");
             await _logServices.CreateActionLog($"Organization with  id {orgId} had been deleted by user with id {userId}.", userId, logTypeId);
             return Ok();

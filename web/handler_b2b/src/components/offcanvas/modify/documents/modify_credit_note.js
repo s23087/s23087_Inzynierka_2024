@@ -18,17 +18,21 @@ function ModifyCreditNoteOffcanvas({
   creditNote,
 }) {
   const router = useRouter();
+  const [restDownloadError, setRestDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      const restData = getRestModifyCredit(
-        creditNote.creditNoteId,
-        isYourCredit,
-      );
-      restData.then((data) => {
-        setRestInfo(data);
-        prevState.creditNoteNumber = data.creditNumber;
-        prevState.note = data.note;
-      });
+      getRestModifyCredit(creditNote.creditNoteId, isYourCredit)
+        .then((data) => {
+          if (data === null) return;
+          setRestInfo(data);
+          prevState.creditNoteNumber = data.creditNumber;
+          prevState.note = data.note;
+        })
+        .catch(() => setRestDownloadError(true))
+        .finally(() => {
+          if (restInfo.creditNumber !== "is loading")
+            setRestDownloadError(false);
+        });
     }
   }, [showOffcanvas]);
   // Rest info
@@ -47,7 +51,8 @@ function ModifyCreditNoteOffcanvas({
     creditNumberError ||
     documentError ||
     dateError ||
-    restInfo.creditNumber === "Is loading";
+    restInfo.creditNumber === "Is loading" ||
+    restDownloadError;
   // Misc
   const [isLoading, setIsLoading] = useState(false);
   // Form
@@ -110,13 +115,17 @@ function ModifyCreditNoteOffcanvas({
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0" style={vhStyle} fluid>
             <Form
-              className="mx-1 mx-xl-4"
+              className="mx-1 mx-xl-3"
               id="creditModifyForm"
               action={formPurchaseAction}
             >
+              <ErrorMessage
+                message="Error: could not download all necessary info."
+                messageStatus={restDownloadError}
+              />
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">
                   Credit Note Number:
@@ -250,7 +259,7 @@ function ModifyCreditNoteOffcanvas({
                   }}
                 />
               </Form.Group>
-              <Form.Group className="mb-5" controlId="formDescription">
+              <Form.Group className="mb-5 pb-5" controlId="formDescription">
                 <Form.Label className="blue-main-text maxInputWidth-desc">
                   Note:
                 </Form.Label>

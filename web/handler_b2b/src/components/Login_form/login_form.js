@@ -5,46 +5,52 @@ import { useFormState } from "react-dom";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import Link from "next/link";
 import signIn from "@/utils/login/sign_in";
+import ErrorMessage from "../smaller_components/error_message";
+import StringValidtor from "@/utils/validators/form_validator/stringValidator";
 
 export default function LoginForm() {
   const [state, formAction] = useFormState(signIn, {
     error: false,
     message: "",
   });
+  const [emailError, setEmailError] = useState(false);
+  const [companyIdError, setComapnyIdError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const hidden = {
-    display: "none",
-  };
-  const unhidden = {
-    display: "block",
-  };
   return (
     <Form action={formAction} id="loginFrom">
-      <Row>
-        <p
-          className="text-start mb-0 px-3 red-sec-text small-text"
-          style={state.error === true ? unhidden : hidden}
-        >
-          {state.message}
-        </p>
-      </Row>
+      <ErrorMessage message={state.message} messageStatus={state.error} />
       <Form.Group className="mb-3" controlId="formCompanyId">
+        <ErrorMessage
+          message="Company id is invalid"
+          messageStatus={companyIdError}
+        />
         <Form.Control
           className="input-style shadow-sm"
           type="text"
           name="companyId"
           placeholder="company id"
-          isInvalid={state.error}
+          isInvalid={state.error || companyIdError}
+          onInput={(e) =>
+            StringValidtor.noPathCharactersValidator(
+              e.target.value,
+              setComapnyIdError,
+            )
+          }
         />
       </Form.Group>
 
       <Form.Group className="mb-3" controlId="formEmail">
+        <ErrorMessage message="Email is invalid" messageStatus={emailError} />
         <Form.Control
           className="input-style shadow-sm"
           type="email"
           name="email"
           placeholder="email"
-          isInvalid={state.error}
+          onInput={(e) =>
+            StringValidtor.emailValidator(e.target.value, setEmailError, 350)
+          }
+          maxLength={350}
+          isInvalid={state.error || emailError}
         />
       </Form.Group>
 

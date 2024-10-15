@@ -59,16 +59,6 @@ function NotificationContainer({ notification, switch_read_action }) {
         >
           <Container className="h-100" fluid>
             <Row className="align-items-center justify-content-center justify-content-lg-end h-100">
-              <Col className="pe-2 text-end" xs="auto">
-                <Button
-                  variant="mainBlue"
-                  className="rounded-span w-100 p-0"
-                  disabled={notification.objectType === "User"}
-                  style={buttonStyle}
-                >
-                  Go to change
-                </Button>
-              </Col>
               <Col className="ps-2" xs="auto">
                 <Button
                   variant={notification.isRead ? "red" : "green"}

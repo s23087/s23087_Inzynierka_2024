@@ -12,10 +12,17 @@ import addOutsideItems from "@/utils/outside_items/add_outside_items";
 
 function AddOutsideItemsOffcanvas({ showOffcanvas, hideFunction }) {
   const router = useRouter();
+  const [errorDownload, setDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      const orgs = getOrgsList();
-      orgs.then((data) => setOrgs(data));
+      getOrgsList()
+        .then((data) => {
+          if (data !== null) setOrgs(data);
+        })
+        .catch(() => setDownloadError(true))
+        .finally(() => {
+          if (orgs.orgName) setDownloadError(false);
+        });
     }
   }, [showOffcanvas]);
   // options
@@ -75,13 +82,17 @@ function AddOutsideItemsOffcanvas({ showOffcanvas, hideFunction }) {
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0" style={vhStyle} fluid>
             <Form
-              className="mx-1 mx-xl-4"
+              className="mx-1 mx-xl-3"
               id="outsideItemForm"
               action={addItemsAction}
             >
+              <ErrorMessage
+                message="Could not download organizations."
+                messageStatus={errorDownload}
+              />
               <Form.Group className="mb-4">
                 <Form.Label className="blue-main-text">Organization</Form.Label>
                 <Form.Select
@@ -132,7 +143,7 @@ function AddOutsideItemsOffcanvas({ showOffcanvas, hideFunction }) {
                   }}
                 />
               </Form.Group>
-              <Container className="px-0 blue-main-text">
+              <Container className="px-0 blue-main-text" fluid>
                 <p>
                   The file must be a comma separated UTF-8 csv file and must
                   contain columns:
@@ -158,7 +169,7 @@ function AddOutsideItemsOffcanvas({ showOffcanvas, hideFunction }) {
                       variant="mainBlue"
                       className="w-100"
                       type="submit"
-                      disabled={documentError}
+                      disabled={documentError || errorDownload}
                       onClick={(e) => {
                         e.preventDefault();
                         if (!file) {

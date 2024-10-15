@@ -21,25 +21,55 @@ function ModifyProformaOffcanvas({
   proforma,
 }) {
   const router = useRouter();
+  const [userDownloadError, setUserDownloadError] = useState(false);
+  const [orgDownloadError, setOrgDownloadError] = useState(false);
+  const [methodsDownloadError, setMethodsDownloadError] = useState(false);
+  const [restDownloadError, setRestDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      const users = getUsers();
-      users.then((data) => {
-        setUsers(data);
-      });
-      const orgs = getOrgsList();
-      orgs.then((data) => setOrgs(data));
-      const paymentMethods = getPaymentMethods();
-      paymentMethods.then((data) => setPaymentMethods(data));
-      const restInfo = getRestModifyProforma(proforma.proformaId);
-      restInfo.then((data) => {
-        setRestInfo(data);
-        prevState.proformaNumber = proforma.proformaNumber;
-        prevState.transport = proforma.transport;
-        prevState.note = data.note;
-        prevState.status = data.inSystem;
-        prevState.userId = data.userId;
-      });
+      getUsers()
+        .then((data) => {
+          if (data === null) return;
+          setUsers(data);
+        })
+        .catch(() => setUserDownloadError(true))
+        .finally(() => {
+          if (users.length > 0) setUserDownloadError(false);
+        });
+
+      getOrgsList()
+        .then((data) => {
+          if (data !== null) setOrgs(data);
+        })
+        .catch(() => setOrgDownloadError(true))
+        .finally(() => {
+          if (orgs.orgName) setOrgDownloadError(false);
+        });
+
+      getPaymentMethods()
+        .then((data) => {
+          if (data !== null) setPaymentMethods(data);
+        })
+        .catch(() => setMethodsDownloadError(true))
+        .finally(() => {
+          if (paymentMethods.length > 0) setMethodsDownloadError(false);
+        });
+
+      getRestModifyProforma(proforma.proformaId)
+        .then((data) => {
+          if (data === null) return;
+          setRestInfo(data);
+          prevState.proformaNumber = proforma.proformaNumber;
+          prevState.transport = proforma.transport;
+          prevState.note = data.note;
+          prevState.status = data.inSystem;
+          prevState.userId = data.userId;
+        })
+        .catch(() => setRestDownloadError(true))
+        .finally(() => {
+          if (restInfo.paymentMethod !== "Is loading")
+            setRestDownloadError(false);
+        });
     }
   }, [showOffcanvas]);
   // rest info
@@ -67,7 +97,11 @@ function ModifyProformaOffcanvas({
     transportError ||
     documentError ||
     orgs.orgName === "Is loading" ||
-    restInfo.note === "Is loading";
+    restInfo.note === "Is loading" ||
+    userDownloadError ||
+    restDownloadError ||
+    methodsDownloadError ||
+    orgDownloadError;
   // Misc
   const [isLoading, setIsLoading] = useState(false);
   // Form
@@ -133,19 +167,29 @@ function ModifyProformaOffcanvas({
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0" style={vhStyle} fluid>
             <Form
-              className="mx-1 mx-xl-4"
+              className="mx-1 mx-xl-3"
               id="proformaInvoice"
               action={formPurchaseAction}
             >
+              <ErrorMessage
+                message="Error: could not download all necessary info."
+                messageStatus={
+                  userDownloadError ||
+                  restDownloadError ||
+                  methodsDownloadError ||
+                  orgDownloadError
+                }
+              />
               <Form.Group className="mb-4">
                 <Form.Label className="blue-main-text">User:</Form.Label>
                 <Form.Select
                   id="userSelect"
                   className="input-style shadow-sm maxInputWidth"
                   name="user"
+                  key={restInfo.userId}
                   defaultValue={restInfo.userId}
                 >
                   {Object.values(users).map((value) => {
@@ -304,7 +348,7 @@ function ModifyProformaOffcanvas({
                   }}
                 />
               </Form.Group>
-              <Form.Group className="mb-5" controlId="formDescription">
+              <Form.Group className="mb-5 pb-5" controlId="formDescription">
                 <Form.Label className="blue-main-text maxInputWidth-desc">
                   Note:
                 </Form.Label>

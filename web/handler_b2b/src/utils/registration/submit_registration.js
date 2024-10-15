@@ -46,21 +46,28 @@ async function registerUser(is_org, formData) {
   fileCreation = createFolders(dbFilePath, dbLogPath, docPath, pricelistFile);
 
   if (fileCreation) {
-    let creationResult = await initDb(folderName);
-    if (!creationResult) {
+    let registerResult = false;
+    try {
+      let creationResult = await initDb(folderName);
+      if (!creationResult) {
+        deleteFolders(dbFilePath, dbLogPath, docPath, pricelistFile);
+        redirect("failure");
+      }
+      registerResult = await createNewRegisteredUser(
+        formData,
+        folderName,
+        is_org,
+      );
+      if (!registerResult) {
+        redirect("failure");
+      }
+    } catch (error) {
+      deleteFolders(dbFilePath, dbLogPath, docPath, pricelistFile);
       redirect("failure");
     }
-    let registerResult = await createNewRegisteredUser(
-      formData,
-      folderName,
-      is_org,
-    );
-    if (registerResult) {
-      redirect("success");
-    }
-    deleteFolders(dbFilePath, dbLogPath, docPath, pricelistFile);
-    redirect("failure");
+    redirect("success");
   } else {
+    console.log("file failure");
     redirect("failure");
   }
 }

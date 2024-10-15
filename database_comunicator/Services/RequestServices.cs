@@ -1,11 +1,11 @@
-﻿using database_comunicator.Data;
-using database_comunicator.Models;
-using database_comunicator.Models.DTOs;
-using database_comunicator.Utils;
+﻿using database_communicator.Data;
+using database_communicator.Models;
+using database_communicator.Models.DTOs;
+using database_communicator.Utils;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace database_comunicator.Services
+namespace database_communicator.Services
 {
     public interface IRequestServices
     {
@@ -15,9 +15,9 @@ namespace database_comunicator.Services
             string? type, int? status);
         public Task<IEnumerable<GetRequest>> GetMyRequests(int userId, string search, string? sort, string? dateL, string? dateG,
             string? type, int? status);
-        public Task<IEnumerable<GetRequest>> GetRecivedRequests(int userId, string? sort, string? dateL, string? dateG,
+        public Task<IEnumerable<GetRequest>> GetReceivedRequests(int userId, string? sort, string? dateL, string? dateG,
             string? type, int? status);
-        public Task<IEnumerable<GetRequest>> GetRecivedRequests(int userId, string search, string? sort, string? dateL, string? dateG,
+        public Task<IEnumerable<GetRequest>> GetReceivedRequests(int userId, string search, string? sort, string? dateL, string? dateG,
             string? type, int? status);
         public Task<GetRestRequest> GetRestRequest(int requestId);
         public Task<bool> RequestExist(int requestId);
@@ -25,7 +25,7 @@ namespace database_comunicator.Services
         public Task<bool> ModifyRequest(ModifyRequest data);
         public Task<bool> SetRequestStatus(int requestId, int statusId, SetRequestStatus data);
         public Task<string?> GetRequestPath(int requestId);
-        public Task<int> GetRecevierId(int requestId);
+        public Task<int> GetReceiverId(int requestId);
         public Task<GetRestModifyRequest> GetRestModifyRequest(int requestId);
 
         public Task<IEnumerable<GetRequestStatus>> GetRequestStatuses();
@@ -165,7 +165,7 @@ namespace database_comunicator.Services
                     Title = e.Title
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetRequest>> GetRecivedRequests(int userId, string? sort, string? dateL, string? dateG,
+        public async Task<IEnumerable<GetRequest>> GetReceivedRequests(int userId, string? sort, string? dateL, string? dateG,
             string? type, int? status)
         {
             var sortFunc = SortFilterUtils.GetRequestSort(sort);
@@ -211,7 +211,7 @@ namespace database_comunicator.Services
                     Title = e.Title
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetRequest>> GetRecivedRequests(int userId, string search, string? sort, string? dateL, string? dateG,
+        public async Task<IEnumerable<GetRequest>> GetReceivedRequests(int userId, string search, string? sort, string? dateL, string? dateG,
             string? type, int? status)
         {
             var sortFunc = SortFilterUtils.GetRequestSort(sort);
@@ -363,7 +363,7 @@ namespace database_comunicator.Services
                 .Select(e => e.FilePath)
                 .FirstAsync();
         }
-        public async Task<int> GetRecevierId(int requestId)
+        public async Task<int> GetReceiverId(int requestId)
         {
             return await _handlerContext.Requests
                 .Where ((e) => e.RequestId == requestId)

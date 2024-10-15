@@ -58,13 +58,13 @@ function ViewDeliveryOffcanvas({
                 Delivery id: {delivery.deliveryId}
               </p>
             </Col>
-            <Col xs="2" className="ps-1 text-end">
+            <Col xs="2" className="ps-1 pe-0 text-end">
               <Button
                 variant="as-link"
                 onClick={() => {
                   hideFunction();
                 }}
-                className="ps-2"
+                className="ps-2 pe-0"
               >
                 <Image src={dropdown_big_down} alt="Hide" />
               </Button>
@@ -78,10 +78,10 @@ function ViewDeliveryOffcanvas({
           </Row>
         </Container>
       </Offcanvas.Header>
-      <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
+      <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
         <Container className="p-0" style={marginBottom} fluid>
-          <Row>
-            <Col>
+          <Row className="mx-1">
+            <Col xs="12" md="6" className="p-0">
               <Stack className="pt-3" gap={3}>
                 <ErrorMessage
                   message="Could not download items and notes."
@@ -95,13 +95,13 @@ function ViewDeliveryOffcanvas({
                 ) : null}
                 <Container className="px-1 ms-0">
                   <Row>
-                    <Col xs="7" className="me-auto">
+                    <Col xs="7" xl="8" className="me-auto">
                       <p className="mb-1 blue-main-text">Estimated delivery:</p>
                       <p className="mb-1">
                         {delivery.estimated.substring(0, 10)}
                       </p>
                     </Col>
-                    <Col xs="5">
+                    <Col xs="5" xl="4">
                       <p className="mb-1 blue-main-text">Delivery date:</p>
                       <p className="mb-1">
                         {delivery.delivered
@@ -176,17 +176,22 @@ function ViewDeliveryOffcanvas({
                     successFun={() => setHasChanged(!hasChanged)}
                   />
                 </Container>
-                <Container className="pt-3 text-center overflow-x-scroll px-0">
-                  {restInfo.items.length > 0 ? (
-                    <DeliveryTable items={restInfo.items} />
-                  ) : null}
-                </Container>
               </Stack>
+            </Col>
+            <Col xs="12" md="6" lg="4" className="offset-lg-2 p-0">
+              <Container
+                className="pt-5 pt-md-3 text-center overflow-x-scroll px-0"
+                fluid
+              >
+                {restInfo.items.length > 0 ? (
+                  <DeliveryTable items={restInfo.items} />
+                ) : null}
+              </Container>
             </Col>
           </Row>
         </Container>
-        <Container className="main-grey-bg p-3 fixed-bottom w-100">
-          <Row className="mx-auto minScalableWidth">
+        <Container className="main-grey-bg p-3 fixed-bottom w-100" fluid>
+          <Row className="mx-auto minScalableWidth maxFormWidth">
             {delivery.status === "In transport" ||
             delivery.status === "Preparing" ? (
               <>

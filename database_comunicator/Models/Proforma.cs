@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using database_comunicator.Models;
+using database_communicator.Models;
 
-namespace database_comunicator.Models;
+namespace database_communicator.Models;
 
 public partial class Proforma
 {
