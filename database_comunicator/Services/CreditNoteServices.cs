@@ -180,42 +180,16 @@ namespace database_communicator.Services
                 direction = sort.StartsWith("D");
             }
             var dateLCond = CreditNoteFilters.GetDateLowerFilter(dateL);
+            var dateGCond = CreditNoteFilters.GetDateGreaterFilter(dateL);
+            var qtyLCond = CreditNoteFilters.GetQtyLowerFilter(qtyL);
+            var qtyGCond = CreditNoteFilters.GetQtyGreaterFilter(qtyG);
+            var totalLCond = CreditNoteFilters.GetPriceLowerFilter(totalL);
+            var totalGCond = CreditNoteFilters.GetPriceGreaterFilter(totalG);
+            var recipientCond = CreditNoteFilters.GetRecipientFilter(recipient, yourCreditNotes);
+            var currencyCond = CreditNoteFilters.GetCurrencyFilter(currency);
+            var paymentStatusCond = CreditNoteFilters.GetPaymentStatusFilter(paymentStatus);
+            var statusCond = CreditNoteFilters.GetStatusFilter(status);
 
-            Expression<Func<CreditNote, bool>> dateGCond = dateG == null ?
-                e => true
-                : e => e.CreditNoteDate >= DateTime.Parse(dateG);
-
-            Expression<Func<CreditNote, bool>> qtyLCond = qtyL == null ?
-                e => true
-                : e => (e.CreditNoteItems.Any(d => d.Qty > 0) ? e.CreditNoteItems.Where(d => d.Qty > 0).Select(d => d.Qty).Sum() : e.CreditNoteItems.Sum(d => d.Qty)) <= qtyL;
-
-            Expression<Func<CreditNote, bool>> qtyGCond = qtyG == null ?
-                e => true
-                : e => (e.CreditNoteItems.Any(d => d.Qty > 0) ? e.CreditNoteItems.Where(d => d.Qty > 0).Select(d => d.Qty).Sum() : e.CreditNoteItems.Sum(d => d.Qty)) >= qtyG;
-
-            Expression<Func<CreditNote, bool>> totalLCond = totalL == null ?
-                e => true
-                : e => e.CreditNoteItems.Sum(d => d.NewPrice * d.Qty) <= totalL;
-
-            Expression<Func<CreditNote, bool>> totalGCond = totalG == null ?
-                e => true
-                : e => e.CreditNoteItems.Sum(d => d.NewPrice * d.Qty) >= totalG;
-
-            Expression<Func<CreditNote, bool>> recipientCond = recipient == null ?
-                e => true
-                : e => yourCreditNotes ? e.Invoice.Seller == recipient : e.Invoice.Buyer == recipient;
-
-            Expression<Func<CreditNote, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.Invoice.CurrencyName == currency;
-
-            Expression<Func<CreditNote, bool>> paymentStatusCond = paymentStatus == null ?
-                e => true
-                : e => e.IsPaid == paymentStatus;
-
-            Expression<Func<CreditNote, bool>> statusCond = status == null ?
-                e => true
-                : e => e.InSystem == status;
             return await _handlerContext.CreditNotes
                 .Where(e => yourCreditNotes ? e.Invoice.OwnedItems.Any() : e.Invoice.SellingPrices.Any())
                 .Where(dateLCond)
@@ -255,45 +229,17 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<CreditNote, bool>> dateLCond = dateL == null ?
-                e => true
-                : e => e.CreditNoteDate <= DateTime.Parse(dateL);
+            var dateLCond = CreditNoteFilters.GetDateLowerFilter(dateL);
+            var dateGCond = CreditNoteFilters.GetDateGreaterFilter(dateL);
+            var qtyLCond = CreditNoteFilters.GetQtyLowerFilter(qtyL);
+            var qtyGCond = CreditNoteFilters.GetQtyGreaterFilter(qtyG);
+            var totalLCond = CreditNoteFilters.GetPriceLowerFilter(totalL);
+            var totalGCond = CreditNoteFilters.GetPriceGreaterFilter(totalG);
+            var recipientCond = CreditNoteFilters.GetRecipientFilter(recipient, yourCreditNotes);
+            var currencyCond = CreditNoteFilters.GetCurrencyFilter(currency);
+            var paymentStatusCond = CreditNoteFilters.GetPaymentStatusFilter(paymentStatus);
+            var statusCond = CreditNoteFilters.GetStatusFilter(status);
 
-            Expression<Func<CreditNote, bool>> dateGCond = dateG == null ?
-                e => true
-                : e => e.CreditNoteDate >= DateTime.Parse(dateG);
-
-            Expression<Func<CreditNote, bool>> qtyLCond = qtyL == null ?
-                e => true
-                : e => (e.CreditNoteItems.Any(d => d.Qty > 0) ? e.CreditNoteItems.Where(d => d.Qty > 0).Select(d => d.Qty).Sum() : e.CreditNoteItems.Sum(d => d.Qty)) <= qtyL;
-
-            Expression<Func<CreditNote, bool>> qtyGCond = qtyG == null ?
-                e => true
-                : e => (e.CreditNoteItems.Any(d => d.Qty > 0) ? e.CreditNoteItems.Where(d => d.Qty > 0).Select(d => d.Qty).Sum() : e.CreditNoteItems.Sum(d => d.Qty)) >= qtyG;
-
-            Expression<Func<CreditNote, bool>> totalLCond = totalL == null ?
-                e => true
-                : e => e.CreditNoteItems.Sum(d => d.NewPrice * d.Qty) <= totalL;
-
-            Expression<Func<CreditNote, bool>> totalGCond = totalG == null ?
-                e => true
-                : e => e.CreditNoteItems.Sum(d => d.NewPrice * d.Qty) >= totalG;
-
-            Expression<Func<CreditNote, bool>> recipientCond = recipient == null ?
-                e => true
-                : e => yourCreditNotes ? e.Invoice.Seller == recipient : e.Invoice.Buyer == recipient;
-
-            Expression<Func<CreditNote, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.Invoice.CurrencyName == currency;
-
-            Expression<Func<CreditNote, bool>> paymentStatusCond = paymentStatus == null ?
-                e => true
-                : e => e.IsPaid == paymentStatus;
-
-            Expression<Func<CreditNote, bool>> statusCond = status == null ?
-                e => true
-                : e => e.InSystem == status;
             return await _handlerContext.CreditNotes
                 .Where(e => yourCreditNotes ? e.Invoice.OwnedItems.Any() : e.Invoice.SellingPrices.Any())
                 .Where(e => e.Invoice.InvoiceNumber.ToLower().Contains(search.ToLower()) 
@@ -341,45 +287,17 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<CreditNote, bool>> dateLCond = dateL == null ?
-                e => true
-                : e => e.CreditNoteDate <= DateTime.Parse(dateL);
+            var dateLCond = CreditNoteFilters.GetDateLowerFilter(dateL);
+            var dateGCond = CreditNoteFilters.GetDateGreaterFilter(dateL);
+            var qtyLCond = CreditNoteFilters.GetQtyLowerFilter(qtyL);
+            var qtyGCond = CreditNoteFilters.GetQtyGreaterFilter(qtyG);
+            var totalLCond = CreditNoteFilters.GetPriceLowerFilter(totalL);
+            var totalGCond = CreditNoteFilters.GetPriceGreaterFilter(totalG);
+            var recipientCond = CreditNoteFilters.GetRecipientFilter(recipient, yourCreditNotes);
+            var currencyCond = CreditNoteFilters.GetCurrencyFilter(currency);
+            var paymentStatusCond = CreditNoteFilters.GetPaymentStatusFilter(paymentStatus);
+            var statusCond = CreditNoteFilters.GetStatusFilter(status);
 
-            Expression<Func<CreditNote, bool>> dateGCond = dateG == null ?
-                e => true
-                : e => e.CreditNoteDate >= DateTime.Parse(dateG);
-
-            Expression<Func<CreditNote, bool>> qtyLCond = qtyL == null ?
-                e => true
-                : e => (e.CreditNoteItems.Any(d => d.Qty > 0) ? e.CreditNoteItems.Where(d => d.Qty > 0).Select(d => d.Qty).Sum() : e.CreditNoteItems.Sum(d => d.Qty)) <= qtyL;
-
-            Expression<Func<CreditNote, bool>> qtyGCond = qtyG == null ?
-                e => true
-                : e => (e.CreditNoteItems.Any(d => d.Qty > 0) ? e.CreditNoteItems.Where(d => d.Qty > 0).Select(d => d.Qty).Sum() : e.CreditNoteItems.Sum(d => d.Qty)) >= qtyG;
-
-            Expression<Func<CreditNote, bool>> totalLCond = totalL == null ?
-                e => true
-                : e => e.CreditNoteItems.Sum(d => d.NewPrice * d.Qty) <= totalL;
-
-            Expression<Func<CreditNote, bool>> totalGCond = totalG == null ?
-                e => true
-                : e => e.CreditNoteItems.Sum(d => d.NewPrice * d.Qty) >= totalG;
-
-            Expression<Func<CreditNote, bool>> recipientCond = recipient == null ?
-                e => true
-                : e => yourCreditNotes ? e.Invoice.Seller == recipient : e.Invoice.Buyer == recipient;
-
-            Expression<Func<CreditNote, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.Invoice.CurrencyName == currency;
-
-            Expression<Func<CreditNote, bool>> paymentStatusCond = paymentStatus == null ?
-                e => true
-                : e => e.IsPaid == paymentStatus;
-
-            Expression<Func<CreditNote, bool>> statusCond = status == null ?
-                e => true
-                : e => e.InSystem == status;
             return await _handlerContext.CreditNotes
                 .Where(e => e.IdUser == userId)
                 .Where(e => yourCreditNotes ? e.Invoice.OwnedItems.Any() : e.Invoice.SellingPrices.Any())
@@ -419,45 +337,17 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<CreditNote, bool>> dateLCond = dateL == null ?
-                e => true
-                : e => e.CreditNoteDate <= DateTime.Parse(dateL);
+            var dateLCond = CreditNoteFilters.GetDateLowerFilter(dateL);
+            var dateGCond = CreditNoteFilters.GetDateGreaterFilter(dateL);
+            var qtyLCond = CreditNoteFilters.GetQtyLowerFilter(qtyL);
+            var qtyGCond = CreditNoteFilters.GetQtyGreaterFilter(qtyG);
+            var totalLCond = CreditNoteFilters.GetPriceLowerFilter(totalL);
+            var totalGCond = CreditNoteFilters.GetPriceGreaterFilter(totalG);
+            var recipientCond = CreditNoteFilters.GetRecipientFilter(recipient, yourCreditNotes);
+            var currencyCond = CreditNoteFilters.GetCurrencyFilter(currency);
+            var paymentStatusCond = CreditNoteFilters.GetPaymentStatusFilter(paymentStatus);
+            var statusCond = CreditNoteFilters.GetStatusFilter(status);
 
-            Expression<Func<CreditNote, bool>> dateGCond = dateG == null ?
-                e => true
-                : e => e.CreditNoteDate >= DateTime.Parse(dateG);
-
-            Expression<Func<CreditNote, bool>> qtyLCond = qtyL == null ?
-                e => true
-                : e => (e.CreditNoteItems.Any(d => d.Qty > 0) ? e.CreditNoteItems.Where(d => d.Qty > 0).Select(d => d.Qty).Sum() : e.CreditNoteItems.Sum(d => d.Qty)) <= qtyL;
-
-            Expression<Func<CreditNote, bool>> qtyGCond = qtyG == null ?
-                e => true
-                : e => (e.CreditNoteItems.Any(d => d.Qty > 0) ? e.CreditNoteItems.Where(d => d.Qty > 0).Select(d => d.Qty).Sum() : e.CreditNoteItems.Sum(d => d.Qty)) >= qtyG;
-
-            Expression<Func<CreditNote, bool>> totalLCond = totalL == null ?
-                e => true
-                : e => e.CreditNoteItems.Sum(d => d.NewPrice * d.Qty) <= totalL;
-
-            Expression<Func<CreditNote, bool>> totalGCond = totalG == null ?
-                e => true
-                : e => e.CreditNoteItems.Sum(d => d.NewPrice * d.Qty) >= totalG;
-
-            Expression<Func<CreditNote, bool>> recipientCond = recipient == null ?
-                e => true
-                : e => yourCreditNotes ? e.Invoice.Seller == recipient : e.Invoice.Buyer == recipient;
-
-            Expression<Func<CreditNote, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.Invoice.CurrencyName == currency;
-
-            Expression<Func<CreditNote, bool>> paymentStatusCond = paymentStatus == null ?
-                e => true
-                : e => e.IsPaid == paymentStatus;
-
-            Expression<Func<CreditNote, bool>> statusCond = status == null ?
-                e => true
-                : e => e.InSystem == status;
             return await _handlerContext.CreditNotes
                 .Where(e => e.IdUser == userId)
                 .Where(e => yourCreditNotes ? e.Invoice.OwnedItems.Any() : e.Invoice.SellingPrices.Any())
