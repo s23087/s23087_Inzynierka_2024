@@ -13,7 +13,7 @@
         public required decimal TransportCost { get; set; }
         public string? InvoiceFilePath { get; set; }
         public required int Taxes { get; set; }
-        public DateTime CurrencyValueDate { get; set; }
+        public required DateTime CurrencyValueDate { get; set; }
         public required string CurrencyName { get; set; } = null!;
         public required decimal CurrencyValue { get; set; }
         public required int PaymentMethodId { get; set; }

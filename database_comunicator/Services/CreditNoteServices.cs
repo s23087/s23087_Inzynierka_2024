@@ -2,6 +2,7 @@
 using database_communicator.Models;
 using database_communicator.Models.DTOs;
 using database_communicator.Utils;
+using database_comunicator.FilterClass;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -178,9 +179,7 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<CreditNote, bool>> dateLCond = dateL == null ?
-                e => true
-                : e => e.CreditNoteDate <= DateTime.Parse(dateL);
+            var dateLCond = CreditNoteFilters.GetDateLowerFilter(dateL);
 
             Expression<Func<CreditNote, bool>> dateGCond = dateG == null ?
                 e => true
