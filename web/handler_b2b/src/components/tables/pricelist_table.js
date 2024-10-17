@@ -47,7 +47,7 @@ function PricelistTable({ items, currency }) {
   );
 }
 
-ItemTable.propTypes = {
+PricelistTable.propTypes = {
   items: PropTypes.array.isRequired,
   currency: PropTypes.string.isRequired
 };

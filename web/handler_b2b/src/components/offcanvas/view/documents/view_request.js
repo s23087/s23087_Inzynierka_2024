@@ -259,7 +259,7 @@ function ViewRequestOffcanvas({ showOffcanvas, hideFunction, request, isOrg }) {
                               }
                             }}
                           >
-                            Bring to "In progress"
+                            Bring to &quot;In progress&quot;
                           </Button>
                         </Col>
                       )}

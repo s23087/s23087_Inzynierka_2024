@@ -10,7 +10,7 @@ export default async function getRestClientInfo(orgId) {
       method: "GET",
     });
 
-    if (items.status === 404) {
+    if (info.status === 404) {
       return {
         creditLimit: null,
         availability: "This object do not exist",

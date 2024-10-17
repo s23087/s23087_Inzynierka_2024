@@ -1,5 +1,6 @@
 "use client";
 
+import PropTypes from "prop-types";
 import { useState } from "react";
 import PagationFooter from "../pagation_footer";
 import PagationWindow from "@/components/windows/pagation_window";
