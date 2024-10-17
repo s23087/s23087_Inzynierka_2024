@@ -8,7 +8,7 @@ import getNotificationCounter from "@/utils/menu/get_nofication_counter";
 import getOutsideItems from "@/utils/outside_items/get_outside_items";
 import getSearchOutsideItems from "@/utils/outside_items/get_search_outside_items";
 
-export default async function AbstractItemsPage({ searchParams }) {
+export default async function OutsideItemsPage({ searchParams }) {
   const current_role = await getRole();
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();

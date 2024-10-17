@@ -11,8 +11,8 @@ function ViewPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
   const [pricelistItems, setRestInfo] = useState([]);
   useEffect(() => {
     if (showOffcanvas) {
-      let items = getPricelistItems(pricelist.pricelistId);
-      items.then((data) => {
+      getPricelistItems(pricelist.pricelistId)
+      .then((data) => {
         if (data === null) {
           setErrorDownload(true);
         } else {
@@ -113,12 +113,10 @@ function ViewPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
   );
 }
 
-ViewPricelistOffcanvas.PropTypes = {
+ViewPricelistOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
-  proforma: PropTypes.object.isRequired,
-  isYourProforma: PropTypes.bool.isRequired,
-  isOrg: PropTypes.bool.isRequired,
+  pricelist: PropTypes.object.isRequired,
 };
 
 export default ViewPricelistOffcanvas;

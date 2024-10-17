@@ -75,78 +75,87 @@ export default async function updateRequest(
     title: title !== prevState.title ? title : null,
   };
 
-  const info = await fetch(
-    `${process.env.API_DEST}/${dbName}/Requests/${userId}/modify`,
-    {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
+  try {
+    const info = await fetch(
+      `${process.env.API_DEST}/${dbName}/Requests/modify/${userId}`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    },
-  );
+    );
 
-  if (info.status === 404) {
-    let text = await info.text();
-    if (text === "User not found.") logout();
-    return {
-      error: true,
-      completed: true,
-      message: text,
-    };
-  }
+    if (info.status === 404) {
+      let text = await info.text();
+      if (text === "User not found.") logout();
+      return {
+        error: true,
+        completed: true,
+        message: text,
+      };
+    }
 
-  if (info.status === 500) {
-    return {
-      error: true,
-      completed: true,
-      message: "Server error.",
-    };
-  }
+    if (info.status === 500) {
+      return {
+        error: true,
+        completed: true,
+        message: "Server error.",
+      };
+    }
 
-  if (info.ok) {
-    if (data.objectType && prevPath !== path) {
-      try {
-        fs.renameSync(prevPath, data.path);
-      } catch (error) {
-        const pathChange = await fetch(
-          `${process.env.API_DEST}/${dbName}/Requests/{userId}/modify?userId=${userId}`,
-          {
-            method: "POST",
-            body: JSON.stringify({
-              requestId: requestId,
-              path: prevPath,
-            }),
-            headers: {
-              "Content-Type": "application/json",
+    if (info.ok) {
+      if (data.objectType && prevPath !== path) {
+        try {
+          fs.renameSync(prevPath, data.path);
+        } catch (error) {
+          const pathChange = await fetch(
+            `${process.env.API_DEST}/${dbName}/Requests/{userId}/modify?userId=${userId}`,
+            {
+              method: "POST",
+              body: JSON.stringify({
+                requestId: requestId,
+                path: prevPath,
+              }),
+              headers: {
+                "Content-Type": "application/json",
+              },
             },
-          },
-        );
-        if (pathChange.ok) {
-          return {
-            error: true,
-            completed: true,
-            message: "Success with errors! The file has not been renamed.",
-          };
-        } else {
-          return {
-            error: true,
-            completed: true,
-            message: "Critical error. Invoice has been updated but file not.",
-          };
+          );
+          if (pathChange.ok) {
+            return {
+              error: true,
+              completed: true,
+              message: "Success with errors! The file has not been renamed.",
+            };
+          } else {
+            return {
+              error: true,
+              completed: true,
+              message: "Critical error. Invoice has been updated but file not.",
+            };
+          }
         }
       }
+      return {
+        error: false,
+        completed: true,
+        message: "Success! You have modified the request.",
+      };
+    } else {
+      return {
+        error: true,
+        completed: true,
+        message: "Critical error",
+      };
     }
-    return {
-      error: false,
-      completed: true,
-      message: "Success! You have modified the request.",
-    };
-  } else {
+  } catch {
+    console.error("updateRequest fetch failed.");
     return {
       error: true,
       completed: true,
-      message: "Critical error",
+      message: "Connection error.",
     };
   }
 }

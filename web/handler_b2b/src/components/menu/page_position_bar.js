@@ -22,7 +22,7 @@ function PagePostionBar({ site_name, with_switch, switch_bool }) {
   );
 }
 
-PagePostionBar.PropTypes = {
+PagePostionBar.propTypes = {
   site_name: PropTypes.string.isRequired,
   with_switch: PropTypes.bool.isRequired,
   switch_bool: PropTypes.bool.isRequired,

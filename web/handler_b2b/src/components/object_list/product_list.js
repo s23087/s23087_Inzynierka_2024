@@ -241,7 +241,7 @@ function ProductList({
   );
 }
 
-ProductList.PropTypes = {
+ProductList.propTypes = {
   products: PropTypes.object.isRequired,
   orgView: PropTypes.bool.isRequired,
   currency: PropTypes.string.isRequired,

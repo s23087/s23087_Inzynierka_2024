@@ -9,7 +9,7 @@ import getOrgsList from "@/utils/documents/get_orgs_list";
 import getPaymentMethods from "@/utils/documents/get_payment_methods";
 import CloseIcon from "../../../../public/icons/close_black.png";
 import ErrorMessage from "@/components/smaller_components/error_message";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
 import getRestModifyProforma from "@/utils/proformas/get_rest_modify_proforma";
 import getUsers from "@/utils/flexible/get_users";
 import updateProforma from "@/utils/proformas/modify_proforma";
@@ -29,47 +29,47 @@ function ModifyProformaOffcanvas({
     if (showOffcanvas) {
       getUsers()
         .then((data) => {
-          if (data === null) return;
-          setUsers(data);
+          if (data === null) {
+            setUserDownloadError(true)
+          } else {
+            setUserDownloadError(false)
+            setUsers(data);
+          }
         })
-        .catch(() => setUserDownloadError(true))
-        .finally(() => {
-          if (users.length > 0) setUserDownloadError(false);
-        });
 
-      getOrgsList()
-        .then((data) => {
-          if (data !== null) setOrgs(data);
-        })
-        .catch(() => setOrgDownloadError(true))
-        .finally(() => {
-          if (orgs.orgName) setOrgDownloadError(false);
-        });
+      getOrgsList().then((data) => {
+        if (data !== null) {
+          setOrgDownloadError(false);
+          setOrgs(data);
+        } else {
+          setOrgDownloadError(true);
+        }
+      });
 
-      getPaymentMethods()
-        .then((data) => {
-          if (data !== null) setPaymentMethods(data);
-        })
-        .catch(() => setMethodsDownloadError(true))
-        .finally(() => {
-          if (paymentMethods.length > 0) setMethodsDownloadError(false);
-        });
+      getPaymentMethods().then((data) => {
+        if (data !== null) {
+          setMethodsDownloadError(false);
+          setPaymentMethods(data);
+        } else {
+          setMethodsDownloadError(true);
+        }
+      });
 
       getRestModifyProforma(proforma.proformaId)
         .then((data) => {
-          if (data === null) return;
-          setRestInfo(data);
-          prevState.proformaNumber = proforma.proformaNumber;
-          prevState.transport = proforma.transport;
-          prevState.note = data.note;
-          prevState.status = data.inSystem;
-          prevState.userId = data.userId;
+          if (data === null) {
+            setRestDownloadError(true)
+          } else {
+            setRestDownloadError(false)
+            setRestInfo(data);
+            prevState.proformaNumber = proforma.proformaNumber;
+            prevState.transport = proforma.transport;
+            prevState.note = data.note;
+            prevState.status = data.inSystem;
+            prevState.userId = data.userId;
+          }
+          
         })
-        .catch(() => setRestDownloadError(true))
-        .finally(() => {
-          if (restInfo.paymentMethod !== "Is loading")
-            setRestDownloadError(false);
-        });
     }
   }, [showOffcanvas]);
   // rest info
@@ -92,7 +92,7 @@ function ModifyProformaOffcanvas({
   const [proformaNumberError, setInvoiceNumberError] = useState(false);
   const [transportError, setTransportError] = useState(false);
   const [documentError, setDocumentError] = useState(false);
-  const anyErrorActive =
+  const isFormErrorActive = () => 
     proformaNumberError ||
     transportError ||
     documentError ||
@@ -215,7 +215,7 @@ function ModifyProformaOffcanvas({
                   name="proformaNumber"
                   isInvalid={proformaNumberError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setInvoiceNumberError,
                       40,
@@ -275,7 +275,7 @@ function ModifyProformaOffcanvas({
                   defaultValue={proforma.transport}
                   isInvalid={transportError}
                   onInput={(e) => {
-                    StringValidtor.decimalValidator(
+                    InputValidtor.decimalValidator(
                       e.target.value,
                       setTransportError,
                     );
@@ -370,7 +370,7 @@ function ModifyProformaOffcanvas({
                       variant="mainBlue"
                       className="w-100"
                       type="submit"
-                      disabled={anyErrorActive}
+                      disabled={isFormErrorActive()}
                       onClick={(e) => {
                         e.preventDefault();
                         setIsLoading(true);
@@ -434,7 +434,7 @@ function ModifyProformaOffcanvas({
   }
 }
 
-ModifyProformaOffcanvas.PropTypes = {
+ModifyProformaOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   isYourProforma: PropTypes.bool.isRequired,

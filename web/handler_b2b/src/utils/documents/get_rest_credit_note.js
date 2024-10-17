@@ -5,29 +5,40 @@ import getDbName from "../auth/get_db_name";
 export default async function getRestCreditNote(creditId) {
   const dbName = await getDbName();
   let url = `${process.env.API_DEST}/${dbName}/CreditNote/rest/${creditId}`;
-  const items = await fetch(url, {
-    method: "GET",
-  });
+  try {
+    const items = await fetch(url, {
+      method: "GET",
+    });
 
-  if (items.status === 404) {
+    if (items.status === 404) {
+      return {
+        creditNoteNumber: "Error look notes",
+        currencyName: "",
+        note: "Error, this document does not exist.",
+        path: "",
+        creditItems: [],
+      };
+    }
+
+    if (items.ok) {
+      return await items.json();
+    }
+
     return {
-      creditNoteNumber: "Error look notes",
+      creditNoteNumber: "Critical error.",
       currencyName: "",
-      note: "Error, this document does not exist.",
+      note: "Critical error.",
+      path: "",
+      creditItems: [],
+    };
+  } catch {
+    console.error("Get rest credit note fetch failed.");
+    return {
+      creditNoteNumber: "Connection error.",
+      currencyName: "",
+      note: "Connection error.",
       path: "",
       creditItems: [],
     };
   }
-
-  if (items.ok) {
-    return await items.json();
-  }
-
-  return {
-    creditNoteNumber: "Critical error.",
-    currencyName: "",
-    note: "Critical error.",
-    path: "",
-    creditItems: [],
-  };
 }

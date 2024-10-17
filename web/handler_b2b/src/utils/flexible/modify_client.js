@@ -2,6 +2,7 @@
 
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
+import logout from "../auth/logout";
 import validators from "../validators/validator";
 
 export default async function modifyClient(orgId, prevState, state, formData) {
@@ -62,76 +63,113 @@ export default async function modifyClient(orgId, prevState, state, formData) {
   };
 
   const dbName = await getDbName();
-  const info = await fetch(
-    `${process.env.API_DEST}/${dbName}/Client/modifyOrg?userId=${userId}`,
-    {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
+  try {
+    const info = await fetch(
+      `${process.env.API_DEST}/${dbName}/Client/modify/${userId}`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    },
-  );
+    );
 
-  if (info.status === 404) {
-    return {
-      error: true,
-      completed: true,
-      message: "Error: User or Org id not found.",
-    };
-  }
-  if (info.ok) {
-    let availability = formData.get("availability");
+    if (info.status === 404) {
+      let text = await info.text();
+      if (text === "Your account does not exists.") logout();
+      return {
+        ok: false,
+        message: text,
+      };
+    }
+    if (info.status === 500) {
+      return {
+        ok: false,
+        message: "Server error.",
+      };
+    }
 
-    if (parseInt(availability) === prevState.statusId) {
+    if (info.ok) {
+      let availability = formData.get("availability");
+
+      if (parseInt(availability) === prevState.statusId) {
+        return {
+          error: false,
+          completed: true,
+          message: "Success! You have modified the client.",
+        };
+      }
+      if (availability) {
+        let statusData = {
+          orgId: orgId,
+          statusId: parseInt(formData.get("availability")),
+        };
+
+        const statusInfo = await fetch(
+          `${process.env.API_DEST}/${dbName}/Client/setAvailabilityStatusesToClient/${userId}`,
+          {
+            method: "POST",
+            body: JSON.stringify(statusData),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          },
+        );
+
+        if (info.status === 404) {
+          let text = await info.text();
+          if (text === "Your account does not exists.") logout();
+          return {
+            error: true,
+            completed: true,
+            message: text,
+          };
+        }
+
+        if (info.status === 500) {
+          return {
+            error: true,
+            completed: true,
+            message:
+              "Error: Changed organization, but not status. Server error.",
+          };
+        }
+
+        if (statusInfo.ok) {
+          return {
+            error: false,
+            completed: true,
+            message: "Success! You have modified the client.",
+          };
+        } else {
+          return {
+            error: true,
+            completed: true,
+            message:
+              "Error: Changed org spec, but not status. Please try again.",
+          };
+        }
+      }
+
       return {
         error: false,
         completed: true,
         message: "Success! You have modified the client.",
       };
     }
-    if (availability) {
-      let statusData = {
-        orgId: orgId,
-        statusId: parseInt(formData.get("availability")),
-      };
-
-      const statusInfo = await fetch(
-        `${process.env.API_DEST}/${dbName}/Client/setAvailabilityStatusesToClient?userId=${userId}`,
-        {
-          method: "POST",
-          body: JSON.stringify(statusData),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      if (statusInfo.ok) {
-        return {
-          error: false,
-          completed: true,
-          message: "Success! You have modified the client.",
-        };
-      } else {
-        return {
-          error: true,
-          completed: true,
-          message: "Error: Changed org spec, but not status. Please try again.",
-        };
-      }
-    }
 
     return {
-      error: false,
+      error: true,
       completed: true,
-      message: "Success! You have modified the client.",
+      message: "Critical error.",
+    };
+  } catch {
+    console.error("Modify client fetch failed.");
+    return {
+      error: true,
+      completed: true,
+      message: "Connection error.",
     };
   }
-
-  return {
-    error: true,
-    completed: true,
-    message: "Critical error: Contact the tech support.",
-  };
 }

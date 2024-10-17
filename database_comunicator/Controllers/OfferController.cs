@@ -69,7 +69,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpDelete]
-        [Route("delete/{offerId}")]
+        [Route("delete/{offerId}/user/{userId}")]
         public async Task<IActionResult> DeleteOffer(int offerId, int userId)
         {
             var userExist = await _userServices.UserExist(userId);

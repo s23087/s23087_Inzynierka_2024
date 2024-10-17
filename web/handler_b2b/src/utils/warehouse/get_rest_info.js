@@ -7,18 +7,23 @@ export default async function getRestInfo(currency, itemId, isOrg) {
   const dbName = await getDbName();
   let url = "";
   if (isOrg) {
-    url = `${process.env.API_DEST}/${dbName}/Warehouse/getRestOrgInfo?itemId=${itemId}&currency=${currency}`;
+    url = `${process.env.API_DEST}/${dbName}/Warehouse/"get/rest/org/${itemId}/${currency}`;
   } else {
     const userId = await getUserId();
-    url = `${process.env.API_DEST}/${dbName}/Warehouse/getRestInfo?itemId=${itemId}&userId=${userId}&currency=${currency}`;
+    url = `${process.env.API_DEST}/${dbName}/Warehouse/get/rest/${itemId}/${currency}/user/${userId}`;
   }
-  const info = await fetch(url, {
-    method: "GET",
-  });
-
-  if (info.ok) {
-    return await info.json();
+  try {
+    const info = await fetch(url, {
+      method: "GET",
+    });
+  
+    if (info.ok) {
+      return await info.json();
+    }
+  
+    return {};
+  } catch {
+    console.error("getRestInfo fetch failed.")
+    return null
   }
-
-  return {};
 }

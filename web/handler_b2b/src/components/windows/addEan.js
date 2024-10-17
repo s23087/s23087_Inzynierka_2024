@@ -10,7 +10,7 @@ function AddEanWindow({ modalShow, onHideFunction, addAction, eanExistFun }) {
   const [isInvalid, setIsInvalid] = useState(false);
   const [newEan, setNewEan] = useState("");
   return (
-    <Modal size="sm" show={modalShow} centered className="px-4">
+    <Modal size="md" show={modalShow} centered className="px-4 minScalableWidth">
       <Modal.Body>
         <Container>
           <Row>
@@ -82,7 +82,7 @@ function AddEanWindow({ modalShow, onHideFunction, addAction, eanExistFun }) {
   );
 }
 
-AddEanWindow.PropTypes = {
+AddEanWindow.propTypes = {
   modalShow: PropTypes.bool.isRequired,
   onHideFunction: PropTypes.func.isRequired,
   addAction: PropTypes.func.isRequired,

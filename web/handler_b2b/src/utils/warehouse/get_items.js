@@ -25,10 +25,10 @@ export default async function getItems(
   if (status) params.push(`status=${status}`);
   if (ean) params.push(`ean=${ean}`);
   if (isOrg) {
-    url = `${process.env.API_DEST}/${dbName}/Warehouse/items/${currency}${params.length > 0 ? "?" : ""}${params.join("&")}`;
+    url = `${process.env.API_DEST}/${dbName}/Warehouse/get/${currency}${params.length > 0 ? "?" : ""}${params.join("&")}`;
   } else {
     const userId = await getUserId();
-    url = `${process.env.API_DEST}/${dbName}/Warehouse/items/${currency}?userId=${userId}${params.length > 0 ? "&" : ""}${params.join("&")}`;
+    url = `${process.env.API_DEST}/${dbName}/Warehouse/get/${currency}?userId=${userId}${params.length > 0 ? "&" : ""}${params.join("&")}`;
   }
   try {
     const items = await fetch(url, {
@@ -40,8 +40,8 @@ export default async function getItems(
     }
 
     return [];
-  } catch (error) {
-    console.log(error);
+  } catch {
+    console.error("getItems fetch failed.")
     return null;
   }
 }

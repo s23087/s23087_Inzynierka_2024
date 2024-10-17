@@ -258,8 +258,9 @@ function DeliveryList({
   );
 }
 
-DeliveryList.PropTypes = {
+DeliveryList.propTypes = {
   deliveries: PropTypes.object.isRequired,
+  type: PropTypes.string.isRequired, // String that tells which delivery type is it
   orgView: PropTypes.bool.isRequired,
   deliveriesStart: PropTypes.number.isRequired,
   deliveriesEnd: PropTypes.number.isRequired,

@@ -52,6 +52,7 @@ export default async function getSearchDeliveries(
 
     return [];
   } catch {
+    console.error("getSearchDeliveries fetch failed.");
     return null;
   }
 }

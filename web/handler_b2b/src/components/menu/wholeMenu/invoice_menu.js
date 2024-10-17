@@ -63,7 +63,7 @@ function InvoiceMenu({
   );
 }
 
-InvoiceMenu.PropTypes = {
+InvoiceMenu.propTypes = {
   type: PropTypes.string.isRequired,
   current_role: PropTypes.string.isRequired,
   current_nofitication_qty: PropTypes.number.isRequired,

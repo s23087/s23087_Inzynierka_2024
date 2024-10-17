@@ -7,14 +7,15 @@ import { Form, Container, Button, Stack } from "react-bootstrap";
 import { useState } from "react";
 import changeUserInfo from "@/utils/settings/change_user_info";
 import Toastes from "@/components/smaller_components/toast";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import ErrorMessage from "@/components/smaller_components/error_message";
 
 function ModifyUserForm({ email, name, surname }) {
   const router = useRouter();
   const [emailError, setEmailError] = useState(false);
   const [nameError, setNameError] = useState(false);
   const [surnameError, setSurnameError] = useState(false);
-  const anyError = emailError || nameError || surnameError;
+  const isFormErrorActive = () =>  emailError || nameError || surnameError;
   const [isLoading, setIsLoading] = useState(false);
   const [prevState] = useState({
     email: email,
@@ -33,12 +34,6 @@ function ModifyUserForm({ email, name, surname }) {
     width: "220px",
     height: "55px",
   };
-  const hidden = {
-    display: "none",
-  };
-  const unhidden = {
-    display: "block",
-  };
   return (
     <Container className="px-4 pt-4" fluid>
       <Form
@@ -53,12 +48,10 @@ function ModifyUserForm({ email, name, surname }) {
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">Email:</Form.Label>
-          <p
-            className="text-start mb-1 red-sec-text small-text"
-            style={emailError ? unhidden : hidden}
-          >
-            Is empty or not a email.
-          </p>
+          <ErrorMessage 
+            message="Is empty or not a email."
+            messageStatus={emailError}
+          />
           <Form.Control
             className="input-style shadow-sm maxInputWidth"
             type="email"
@@ -66,19 +59,17 @@ function ModifyUserForm({ email, name, surname }) {
             defaultValue={email}
             isInvalid={emailError}
             onInput={(e) => {
-              StringValidtor.emailValidator(e.target.value, setEmailError, 350);
+              InputValidtor.emailValidator(e.target.value, setEmailError, 350);
             }}
             maxLength={350}
           />
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">Name:</Form.Label>
-          <p
-            className="text-start mb-1 red-sec-text small-text"
-            style={nameError ? unhidden : hidden}
-          >
-            Is empty or lenght is greater than 250.
-          </p>
+          <ErrorMessage 
+            message="Is empty or lenght is greater than 250."
+            messageStatus={nameError}
+          />
           <Form.Control
             className="input-style shadow-sm maxInputWidth"
             type="text"
@@ -86,7 +77,7 @@ function ModifyUserForm({ email, name, surname }) {
             defaultValue={name}
             isInvalid={nameError}
             onInput={(e) => {
-              StringValidtor.normalStringValidtor(
+              InputValidtor.normalStringValidtor(
                 e.target.value,
                 setNameError,
                 250,
@@ -97,12 +88,10 @@ function ModifyUserForm({ email, name, surname }) {
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">Surname:</Form.Label>
-          <p
-            className="text-start mb-1 red-sec-text small-text"
-            style={surnameError ? unhidden : hidden}
-          >
-            Is empty or lenght is greater than 200.
-          </p>
+          <ErrorMessage 
+            message="Is empty or lenght is greater than 200."
+            messageStatus={surnameError}
+          />
           <Form.Control
             className="input-style shadow-sm maxInputWidth"
             type="text"
@@ -110,7 +99,7 @@ function ModifyUserForm({ email, name, surname }) {
             defaultValue={surname}
             isInvalid={surnameError}
             onInput={(e) => {
-              StringValidtor.normalStringValidtor(
+              InputValidtor.normalStringValidtor(
                 e.target.value,
                 setSurnameError,
                 200,
@@ -124,10 +113,11 @@ function ModifyUserForm({ email, name, surname }) {
             className="mt-3 mx-auto ms-sm-0"
             variant="mainBlue"
             type="Submit"
+            disabled={isFormErrorActive()}
             style={buttonStyle}
             onClick={(e) => {
               e.preventDefault();
-              if (anyError) return;
+              if (isFormErrorActive()) return;
               setIsLoading(true);
               let form = document.getElementById("changeUserInfoForm");
               form.requestSubmit();
@@ -181,7 +171,7 @@ function ModifyUserForm({ email, name, surname }) {
   );
 }
 
-ModifyUserForm.PropTypes = {
+ModifyUserForm.propTypes = {
   email: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   surname: PropTypes.string.isRequired,

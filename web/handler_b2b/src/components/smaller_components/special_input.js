@@ -67,7 +67,7 @@ function SpecialInput({
   );
 }
 
-SpecialInput.PropTypes = {
+SpecialInput.propTypes = {
   value: PropTypes.string.isRequired,
   deleteValue: PropTypes.func.isRequired,
   modifyValue: PropTypes.func.isRequired,

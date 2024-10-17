@@ -17,7 +17,7 @@ namespace database_communicator.Controllers
             _userServices = userServices;
         }
         [HttpGet]
-        [Route("getNotifications/{userId}")]
+        [Route("get/{userId}")]
         public async Task<IActionResult> GetNotifications(int userId)
         {
             var exist = await _userServices.UserExist(userId);
@@ -26,7 +26,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpPost]
-        [Route("setNotification/{notifId}")]
+        [Route("modify/{notifId}/is_read_/{isRead}")]
         public async Task<IActionResult> SetNotification(int notifId, bool isRead)
         {
             var exist = await _notificationServices.NotifExists(notifId);

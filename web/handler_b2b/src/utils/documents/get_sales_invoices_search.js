@@ -53,6 +53,7 @@ export default async function getSearchSalesInvoices(
 
     return [];
   } catch {
+    console.error("getSearchSalesInvoices fetch failed.");
     return null;
   }
 }

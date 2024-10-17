@@ -48,46 +48,55 @@ export default async function updateItem(eans, prevState, state, formData) {
         : formData.get("partNumber"),
     eans: eans,
   };
-
-  const dbName = await getDbName();
-  const info = await fetch(
-    `${process.env.API_DEST}/${dbName}/Warehouse/modifyItem`,
-    {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
+  try {
+    const dbName = await getDbName();
+    const info = await fetch(
+      `${process.env.API_DEST}/${dbName}/Warehouse/modify`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    },
-  );
-
-  if (info.status == 400) {
+    );
+  
+    if (info.status == 400) {
+      return {
+        error: true,
+        completed: true,
+        message: "This part number exist.",
+      };
+    }
+  
+    if (info.status == 404) {
+      return {
+        error: true,
+        completed: true,
+        message: "This item doesn't exist.",
+      };
+    }
+  
+    if (info.ok) {
+      return {
+        error: false,
+        completed: true,
+        message: "Success! Item has been modified.",
+      };
+    } else {
+      return {
+        error: true,
+        completed: true,
+        message: "Critical error",
+      };
+    }
+  } catch {
+    console.error("updateItem fetch failed.")
     return {
       error: true,
       completed: true,
-      message: "This part number exist.",
+      message: "Connection error",
     };
   }
 
-  if (info.status == 404) {
-    return {
-      error: true,
-      completed: true,
-      message: "This item doesn't exist.",
-    };
-  }
-
-  if (info.ok) {
-    return {
-      error: false,
-      completed: true,
-      message: "Success! Item has been modified.",
-    };
-  } else {
-    return {
-      error: true,
-      completed: true,
-      message: "Critical error",
-    };
-  }
 }

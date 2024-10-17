@@ -2,6 +2,7 @@
 
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
+import logout from "../auth/logout";
 import validators from "../validators/validator";
 
 export default async function createClient(state, formData) {
@@ -74,54 +75,99 @@ export default async function createClient(state, formData) {
 
   const dbName = await getDbName();
   const userId = await getUserId();
-  const info = await fetch(
-    `${process.env.API_DEST}/${dbName}/Client/add/${userId}`,
-    {
-      method: "POST",
-      body: JSON.stringify(orgData),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    },
-  );
-
-  if (info.ok) {
-    let orgId = await info.text();
-
-    let statusData = {
-      orgId: parseInt(orgId),
-      statusId: parseInt(formData.get("availability")),
-    };
-
-    const statusInfo = await fetch(
-      `${process.env.API_DEST}/${dbName}/Client/setAvailabilityStatusesToClient?userId=${userId}`,
+  try {
+    const info = await fetch(
+      `${process.env.API_DEST}/${dbName}/Client/add/${userId}`,
       {
         method: "POST",
-        body: JSON.stringify(statusData),
+        body: JSON.stringify(orgData),
         headers: {
           "Content-Type": "application/json",
         },
       },
     );
-    if (statusInfo.ok) {
+
+    if (info.status === 500) {
       return {
-        error: false,
+        error: true,
         completed: true,
-        message: "Success! You had added the new client",
+        message: "Server error.",
       };
     }
 
+    if (info.status === 404) {
+      logout();
+      return {
+        error: true,
+        completed: true,
+        message: "Your account does not exists.",
+      };
+    }
+
+    if (info.ok) {
+      let orgId = await info.text();
+
+      let statusData = {
+        orgId: parseInt(orgId),
+        statusId: parseInt(formData.get("availability")),
+      };
+
+      const statusInfo = await fetch(
+        `${process.env.API_DEST}/${dbName}/Client/setAvailabilityStatusesToClient/${userId}`,
+        {
+          method: "POST",
+          body: JSON.stringify(statusData),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (statusInfo.status === 404) {
+        let text = await statusInfo.text();
+        if (text === "Your account does not exists.") logout();
+        return {
+          error: true,
+          completed: true,
+          message: text,
+        };
+      }
+
+      if (info.status === 500) {
+        return {
+          error: true,
+          completed: true,
+          message: "Error: Created organization, but not status. Server error.",
+        };
+      }
+
+      if (statusInfo.ok) {
+        return {
+          error: false,
+          completed: true,
+          message: "Success! You had added the new client",
+        };
+      }
+
+      return {
+        error: true,
+        completed: true,
+        message:
+          "Org has been added, but something went wrong with Availability Status. Please change it in modify form.",
+      };
+    } else {
+      return {
+        error: true,
+        completed: true,
+        message: "Critical error",
+      };
+    }
+  } catch {
+    console.error("Create client or set status fetch failed.");
     return {
       error: true,
       completed: true,
-      message:
-        "Org has been added, but something went wrong with Availability Status. Please change it in modify form.",
-    };
-  } else {
-    return {
-      error: true,
-      completed: true,
-      message: "Critical error",
+      message: "Connection error",
     };
   }
 }

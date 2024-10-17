@@ -41,7 +41,7 @@ namespace database_communicator.Controllers
             });
         }
         [HttpGet]
-        [Route("basicInfo/{userId}")]
+        [Route("get/info/{userId}")]
         public async Task<IActionResult> getBasicInfo(int userId)
         {
             var isExist = await _userServices.UserExist(userId);
@@ -51,7 +51,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("notificationCount/{userId}")]
+        [Route("get/notification_count/{userId}")]
         public async Task<IActionResult> getNotificationCount(int userId)
         {
             var isExist = await _userServices.UserExist(userId);
@@ -60,7 +60,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("getEmail/{userId}")]
+        [Route("get/email/{userId}")]
         public async Task<IActionResult> GetEmail(int userId)
         {
             var isExist = await _userServices.UserExist(userId);
@@ -69,7 +69,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("getUsers")]
+        [Route("get/users")]
         public async Task<IActionResult> GetUsers()
         {
             var result = await _userServices.GetUsers();

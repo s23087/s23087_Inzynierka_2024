@@ -22,7 +22,7 @@ import getBindings from "@/utils/warehouse/get_bindings";
 import CloseIcon from "../../../../public/icons/close_black.png";
 import switch_product_view from "../../../../public/icons/switch_product_view.png";
 import switch_binding_view from "../../../../public/icons/switch_binding_view.png";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
 import ErrorMessage from "@/components/smaller_components/error_message";
 import ChangeBidningsWindow from "@/components/windows/change_bindings_window";
 import changeBindings from "@/utils/warehouse/change_bindings";
@@ -67,19 +67,42 @@ function ModifyItemOffcanvas({
     },
   ]);
   const [description, setDescription] = useState(null);
+  const [descriptionDownloadError, setDescriptionDownloadError] = useState(false);
+  const [bindingsDownloadError, setBindingsDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas && isOrg) {
       let copyArray = [...item.eans];
       setEans(copyArray);
-      let desc = getDescription(item.itemId);
-      desc.then((data) => setDescription(data));
-      let bindings = getBindings(item.itemId, curenncy);
-      bindings.then((data) => setBindings(data));
+      getDescription(item.itemId)
+      .then((data) => {
+        if (data !== null){
+          setDescriptionDownloadError(false)
+          setDescription(data)
+        } else {
+          setDescriptionDownloadError(true)
+        }
+      });
+      getBindings(item.itemId, curenncy)
+      .then((data) => {
+        if (data !== null){
+          setBindingsDownloadError(false)
+          setBindings(data)
+        } else {
+          setBindingsDownloadError(true)
+        }
+      });
     } else if (showOffcanvas) {
       let copyArray = [...item.eans];
       setEans(copyArray);
-      let desc = getDescription(item.itemId);
-      desc.then((data) => setDescription(data ?? "download error"));
+      getDescription(item.itemId)
+      .then((data) => {
+        if (data !== null){
+          setDescriptionDownloadError(false)
+          setDescription(data)
+        } else {
+          setDescriptionDownloadError(true)
+        }
+      });
     }
   }, [showOffcanvas]);
   // Rerender Eans
@@ -92,13 +115,12 @@ function ModifyItemOffcanvas({
   // Loading bool
   const [isLoading, setIsLoading] = useState(false);
   // Error func
-  const isErrorActive = () =>
-    partnumberError || nameError || description === "download error";
+  const isFormErrorActive = () =>
+    partnumberError || nameError || descriptionDownloadError || bindingsDownloadError;
   const resetErrors = () => {
     setPartnumberError(false);
     setNameError(false);
   };
-  const errorActive = isErrorActive();
   // Form
   const [state, formAction] = useFormState(
     updateItem.bind(null, eans).bind(null, prevState),
@@ -197,6 +219,10 @@ function ModifyItemOffcanvas({
             fluid
           >
             <Form action={formAction} id="modifyItemForm">
+              <ErrorMessage 
+                message="Could not download all necessary information."
+                messageStatus={descriptionDownloadError || bindingsDownloadError}
+              />
               <Form.Group className="mb-3 maxInputWidth">
                 <Form.Label className="blue-main-text">P/N:</Form.Label>
                 <ErrorMessage
@@ -209,7 +235,7 @@ function ModifyItemOffcanvas({
                   name="partNumber"
                   isInvalid={partnumberError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setPartnumberError,
                       150,
@@ -231,7 +257,7 @@ function ModifyItemOffcanvas({
                   name="name"
                   isInvalid={nameError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setNameError,
                       250,
@@ -407,10 +433,10 @@ function ModifyItemOffcanvas({
                 <Button
                   variant="mainBlue"
                   className="w-100"
-                  disabled={errorActive}
+                  disabled={isFormErrorActive()}
                   onClick={(e) => {
                     e.preventDefault();
-                    if (errorActive) return;
+                    if (isFormErrorActive()) return;
                     setIsLoading(true);
                     prevState.itemId = item.itemId;
                     prevState.name = item.itemName;
@@ -497,7 +523,7 @@ function ModifyItemOffcanvas({
   }
 }
 
-ModifyItemOffcanvas.PropTypes = {
+ModifyItemOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   item: PropTypes.object.isRequired,

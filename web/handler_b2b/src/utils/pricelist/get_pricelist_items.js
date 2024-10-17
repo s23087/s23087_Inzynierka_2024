@@ -18,6 +18,7 @@ export default async function getPricelistItems(pricelistId) {
 
     return [];
   } catch {
+    console.error("getPricelistItems fetch failed.")
     return null;
   }
 }

@@ -36,7 +36,7 @@ namespace database_communicator.Controllers
         }
 
         [HttpPost]
-        [Route("/template/[controller]/createDb")]
+        [Route("/template/[controller]/createDb/{orgName}")]
         public async Task<IActionResult> CreateDb(string orgName)
         {
             bool result = await _registrationServices.CreateNewDatabase(orgName);

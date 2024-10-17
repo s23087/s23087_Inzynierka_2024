@@ -25,7 +25,7 @@ function SuccesFadeAway({ showSuccess, setShowSuccess }) {
   );
 }
 
-SuccesFadeAway.PropTypes = {
+SuccesFadeAway.propTypes = {
   showSuccess: PropTypes.bool.isRequired,
   setShowSuccess: PropTypes.func.isRequired,
 };

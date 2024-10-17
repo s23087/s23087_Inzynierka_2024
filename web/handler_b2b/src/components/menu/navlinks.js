@@ -94,7 +94,7 @@ function Navlinks({ role, active_link, notification_qty, is_sidebar }) {
   );
 }
 
-Navlinks.PropTypes = {
+Navlinks.propTypes = {
   role: PropTypes.string.isRequired, // Admin, Merchant, Accountatn, Warehouse manager, Solo
   active_link: PropTypes.string.isRequired, // Name of active link from role_link_dic
   notification_qty: PropTypes.number.isRequired,

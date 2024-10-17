@@ -38,6 +38,7 @@ export default async function getOutsideItems(
 
     return [];
   } catch {
+    console.error("getOutsideItems fetch failed.")
     return null;
   }
 }

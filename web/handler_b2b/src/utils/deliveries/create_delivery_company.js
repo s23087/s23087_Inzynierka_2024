@@ -20,46 +20,63 @@ export default async function createDeliveryCompany(state, formData) {
     companyName: companyName,
   };
 
-  const info = await fetch(
-    `${process.env.API_DEST}/${dbName}/Delivery/company/add?userId=${userId}`,
-    {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
+  try {
+    const info = await fetch(
+      `${process.env.API_DEST}/${dbName}/Delivery/add/company/${userId}`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    },
-  );
-  if (info.status === 404) {
-    let text = await info.text();
-    if (text === "User not found.") {
-      logout();
+    );
+    if (info.status === 404) {
+      let text = await info.text();
+      if (text === "User not found.") {
+        logout();
+      }
+      return {
+        error: true,
+        completed: true,
+        message: "Your user profile does not exists.",
+      };
     }
-    return {
-      error: true,
-      completed: true,
-      message: "Your user profile does not exists.",
-    };
-  }
-  if (info.status === 400) {
-    return {
-      error: true,
-      completed: true,
-      message: await info.text(),
-    };
-  }
+    if (info.status === 400) {
+      return {
+        error: true,
+        completed: true,
+        message: await info.text(),
+      };
+    }
 
-  if (info.ok) {
-    return {
-      error: false,
-      completed: true,
-      message: "Success! You had added new company.",
-    };
-  } else {
+    if (info.status === 500) {
+      return {
+        error: true,
+        completed: true,
+        message: "Server error.",
+      };
+    }
+
+    if (info.ok) {
+      return {
+        error: false,
+        completed: true,
+        message: "Success! You had added new company.",
+      };
+    } else {
+      return {
+        error: true,
+        completed: true,
+        message: "Critical error.",
+      };
+    }
+  } catch {
+    console.error("createDeliveryCompany fetch failed.");
     return {
       error: true,
       completed: true,
-      message: "Critical error.",
+      message: "Connection error.",
     };
   }
 }

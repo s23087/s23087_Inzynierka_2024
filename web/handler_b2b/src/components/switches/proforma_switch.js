@@ -1,6 +1,6 @@
 "use client";
 
-import propTypes from "prop-types";
+import PropTypes from "prop-types";
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Dropdown, Stack, Button } from "react-bootstrap";
@@ -74,7 +74,7 @@ function ProformaSwitch({ isYourProforma }) {
 }
 
 ProformaSwitch.propTypes = {
-  isYourProforma: propTypes.bool.isRequired, // 1 for user, 0 for client
+  isYourProforma: PropTypes.bool.isRequired, // 1 for user, 0 for client
 };
 
 export default ProformaSwitch;

@@ -101,10 +101,11 @@ export default async function createItem(eans, state, formData) {
       };
     }
   } catch {
+    console.error("createItem fetch failed.")
     return {
       error: true,
       completed: true,
-      message: "Could not connect to server.",
+      message: "Connection error.",
     };
   }
 }

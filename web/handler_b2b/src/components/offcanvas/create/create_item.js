@@ -17,7 +17,7 @@ import SpecialInput from "@/components/smaller_components/special_input";
 import AddEanWindow from "@/components/windows/addEan";
 import Toastes from "@/components/smaller_components/toast";
 import { useRouter } from "next/navigation";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
 import ErrorMessage from "@/components/smaller_components/error_message";
 import validators from "@/utils/validators/validator";
 
@@ -105,7 +105,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                   id="partnumber"
                   isInvalid={partnumberError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setPartnumberError,
                       150,
@@ -128,7 +128,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                   id="name"
                   isInvalid={nameError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setNameError,
                       250,
@@ -205,12 +205,12 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                         let partnumber =
                           document.getElementById("partnumber").value;
                         let name = document.getElementById("name").value;
-                        StringValidtor.normalStringValidtor(
+                        InputValidtor.normalStringValidtor(
                           partnumber,
                           setPartnumberError,
                           150,
                         );
-                        StringValidtor.normalStringValidtor(
+                        InputValidtor.normalStringValidtor(
                           name,
                           setNameError,
                           250,
@@ -280,7 +280,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
   }
 }
 
-AddItemOffcanvas.PropTypes = {
+AddItemOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
 };

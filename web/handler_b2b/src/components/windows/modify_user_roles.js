@@ -5,6 +5,7 @@ import { useFormState } from "react-dom";
 import { Modal, Container, Row, Col, Form, Button } from "react-bootstrap";
 import modifyUserRole from "@/utils/roles/modify_user_role";
 import { useRouter } from "next/navigation";
+import ErrorMessage from "../smaller_components/error_message";
 
 function ModifyUserRole({ modalShow, onHideFunction, roleList, user }) {
   const router = useRouter();
@@ -23,7 +24,7 @@ function ModifyUserRole({ modalShow, onHideFunction, roleList, user }) {
     display: "block",
   };
   return (
-    <Modal size="sm" show={modalShow} centered className="px-4">
+    <Modal size="md" show={modalShow} centered className="px-4 minScalableWidth">
       <Modal.Body>
         <Container>
           <Row>
@@ -38,18 +39,16 @@ function ModifyUserRole({ modalShow, onHideFunction, roleList, user }) {
           <Form action={formAction}>
             <Row>
               <p
-                className="text-start mb-1 px-3 red-sec-text small-text"
-                style={state.error && state.completed ? unhidden : hidden}
-              >
-                {state.message}
-              </p>
-              <p
                 className="text-start mb-1 px-3 green-main-text small-text"
                 style={!state.error && state.completed ? unhidden : hidden}
               >
                 {state.message}
               </p>
             </Row>
+            <ErrorMessage 
+              message={state.message}
+              messageStatus={state.error && state.completed}
+            />
             <Form.Group className="mb-4">
               <Form.Select className="input-style shadow-sm" name="role">
                 {Object.values(roleList).map((val) => (
@@ -90,7 +89,7 @@ function ModifyUserRole({ modalShow, onHideFunction, roleList, user }) {
   );
 }
 
-ModifyUserRole.PropTypes = {
+ModifyUserRole.propTypes = {
   modalShow: PropTypes.bool.isRequired,
   onHideFunction: PropTypes.func.isRequired,
   roleList: PropTypes.object.isRequired,

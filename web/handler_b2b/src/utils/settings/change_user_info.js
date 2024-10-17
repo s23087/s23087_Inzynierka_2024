@@ -20,42 +20,50 @@ export default async function changeUserInfo(prevState, state, formData) {
         ? null
         : formData.get("surname"),
   };
-
-  const info = await fetch(
-    `${process.env.API_DEST}/${dbName}/Settings/modifyUser`,
-    {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
+  try {
+    const info = await fetch(
+      `${process.env.API_DEST}/${dbName}/Settings/modify/user`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    },
-  );
-
-  if (info.status === 404) {
-    logout();
-    redirect("/");
-  }
-
-  if (info.status === 400) {
+    );
+  
+    if (info.status === 404) {
+      logout();
+      redirect("/");
+    }
+  
+    if (info.status === 400) {
+      return {
+        error: true,
+        message: "This email exist alredy.",
+        completed: true,
+      };
+    }
+  
+    if (info.ok) {
+      return {
+        error: false,
+        completed: true,
+        message: "Success! You have changed your info.",
+      };
+    }
+  
     return {
       error: true,
-      message: "This email exist alredy.",
+      message: "Critical error.",
       completed: true,
     };
-  }
-
-  if (info.ok) {
+  } catch {
+    console.error("changeUserInfo fetch failed.")
     return {
-      error: false,
+      error: true,
+      message: "Connection error.",
       completed: true,
-      message: "Success! You have changed your info.",
     };
   }
-
-  return {
-    error: true,
-    message: "Critical error.",
-    completed: true,
-  };
 }

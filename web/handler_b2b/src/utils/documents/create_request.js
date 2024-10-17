@@ -58,78 +58,96 @@ export default async function createRequest(file, state, formData) {
     }
   }
 
-  const info = await fetch(`${process.env.API_DEST}/${dbName}/Requests/add`, {
-    method: "POST",
-    body: JSON.stringify(requestData),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  console.log(info.status);
+  try {
+    const info = await fetch(`${process.env.API_DEST}/${dbName}/Requests/add`, {
+      method: "POST",
+      body: JSON.stringify(requestData),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-  if (info.status === 404) {
-    if (file) {
-      try {
-        fs.rmSync(fileName);
-      } catch (error) {
-        console.log(error);
+    if (info.status === 404) {
+      if (file) {
+        try {
+          fs.rmSync(fileName);
+        } catch (error) {
+          console.log(error);
+        }
       }
-    }
-    let text = await info.text();
-    if (text === "Creator not found.") {
-      logout();
-      return {
-        error: true,
-        completed: true,
-        message: "Unauthorized.",
-      };
-    } else {
-      return {
-        error: true,
-        completed: true,
-        message: text,
-      };
-    }
-  }
-
-  if (info.status === 500) {
-    if (file) {
-      try {
-        fs.rmSync(fileName);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    return {
-      error: true,
-      completed: true,
-      message: "Server error.",
-    };
-  }
-
-  if (info.ok) {
-    return {
-      error: false,
-      completed: true,
-      message: "Success! You had created request.",
-    };
-  } else {
-    if (file) {
-      try {
-        fs.rmSync(fileName);
-      } catch (error) {
-        console.log(error);
+      let text = await info.text();
+      if (text === "Creator not found.") {
+        logout();
         return {
           error: true,
           completed: true,
-          message: "Critical file error.",
+          message: "Unauthorized.",
+        };
+      } else {
+        return {
+          error: true,
+          completed: true,
+          message: text,
         };
       }
+    }
+
+    if (info.status === 500) {
+      if (file) {
+        try {
+          fs.rmSync(fileName);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      return {
+        error: true,
+        completed: true,
+        message: "Server error.",
+      };
+    }
+
+    if (info.ok) {
+      return {
+        error: false,
+        completed: true,
+        message: "Success! You had created request.",
+      };
+    } else {
+      if (file) {
+        try {
+          fs.rmSync(fileName);
+        } catch (error) {
+          console.log(error);
+          return {
+            error: true,
+            completed: true,
+            message: "Critical file error.",
+          };
+        }
+      }
+      return {
+        error: true,
+        completed: true,
+        message: "Critical error.",
+      };
+    }
+  } catch {
+    console.error("Create request fetch failed.");
+    try {
+      fs.rmSync(fileName);
+    } catch (error) {
+      console.log(error);
+      return {
+        error: true,
+        completed: true,
+        message: "Connection error. Critical file error.",
+      };
     }
     return {
       error: true,
       completed: true,
-      message: "Critical error.",
+      message: "Connection error.",
     };
   }
 }

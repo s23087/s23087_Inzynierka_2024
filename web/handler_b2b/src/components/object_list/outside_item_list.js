@@ -211,7 +211,7 @@ function OutsideItemList({
   );
 }
 
-OutsideItemList.PropTypes = {
+OutsideItemList.propTypes = {
   items: PropTypes.object.isRequired,
   itemsStart: PropTypes.number.isRequired,
   itemsEnd: PropTypes.number.isRequired,

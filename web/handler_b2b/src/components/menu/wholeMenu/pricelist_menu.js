@@ -52,7 +52,7 @@ function PricelistMenu({ current_role, current_nofitication_qty, user }) {
   );
 }
 
-PricelistMenu.PropTypes = {
+PricelistMenu.propTypes = {
   current_role: PropTypes.string.isRequired,
   current_nofitication_qty: PropTypes.number.isRequired,
   user: PropTypes.object.isRequired,

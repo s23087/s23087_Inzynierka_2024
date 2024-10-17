@@ -1,4 +1,5 @@
 import { Table } from "react-bootstrap";
+import PropTypes from "prop-types";
 
 function DeliveryTable({ items }) {
   if (items.length === 0) {
@@ -43,5 +44,9 @@ function DeliveryTable({ items }) {
     </Table>
   );
 }
+
+DeliveryTable.propTypes = {
+  items: PropTypes.array.isRequired,
+};
 
 export default DeliveryTable;

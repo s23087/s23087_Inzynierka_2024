@@ -30,6 +30,7 @@ import setRequestStatus from "@/utils/documents/set_request_status";
 import Toastes from "../smaller_components/toast";
 import InvoiceFilterOffcanvas from "../filter/document_filter";
 import DeleteSelectedWindow from "../windows/delete_selected";
+import ChangeSelectedStatusWindow from "../windows/change_request_status";
 
 function getIfSelected(type, document, selected) {
   if (type.includes("note")) {
@@ -196,6 +197,7 @@ function InvoiceList({
   // mass action
   const [showDeleteSelected, setShowDeleteSelected] = useState(false);
   const [deleteSelectedErrorMess, setDeleteSelectedErrorMess] = useState("");
+  const [showChangeRequestStatus, setShowChangeRequestStatus] = useState(false);
   // Nav
   const router = useRouter();
   const params = useSearchParams();
@@ -234,7 +236,9 @@ function InvoiceList({
           type === "Requests" ? "Change status" : "Delete selected"
         }
         actionOne={
-          type === "Requests" ? null : () => setShowDeleteSelected(true)
+          type === "Requests"
+            ? () => setShowChangeRequestStatus(true)
+            : () => setShowDeleteSelected(true)
         }
       />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
@@ -572,6 +576,11 @@ function InvoiceList({
         request={requestToView}
         isOrg={orgView}
       />
+      <ChangeSelectedStatusWindow
+        modalShow={showChangeRequestStatus}
+        onHideFunction={() => setShowChangeRequestStatus(false)}
+        requestsIds={selectedDocuments}
+      />
       <ChangeStatusWindow
         modalShow={showCompleteWindow}
         onHideFunction={() => setShowCompleteWindow(false)}
@@ -615,7 +624,7 @@ function InvoiceList({
   );
 }
 
-InvoiceList.PropTypes = {
+InvoiceList.propTypes = {
   invoices: PropTypes.object.isRequired,
   type: PropTypes.string.isRequired,
   orgView: PropTypes.bool.isRequired,

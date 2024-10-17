@@ -19,6 +19,7 @@ import AddDeliveryCompanyWindow from "@/components/windows/addCompany";
 import getDeliveryCompany from "@/utils/deliveries/get_delivery_company";
 import AddWaybillWindow from "@/components/windows/addWaybill";
 import updateDelivery from "@/utils/deliveries/update_delivery";
+import ErrorMessage from "@/components/smaller_components/error_message";
 
 function ModifyDeliveryOffcanvas({
   showOffcanvas,
@@ -30,13 +31,20 @@ function ModifyDeliveryOffcanvas({
   // Get rest data
   useEffect(() => {
     if (showOffcanvas) {
-      let getCompanies = getDeliveryCompany();
-      getCompanies.then((data) => setDeliveryCompanies(data));
+      getDeliveryCompany().then((data) => {
+        if (data !== null) {
+          setCompaniesDownloadError(false);
+          setDeliveryCompanies(data);
+        } else {
+          setCompaniesDownloadError(true);
+        }
+      });
       setWaybills(delivery.waybill);
       prevState.estimated = delivery.estimated.substring(0, 10);
     }
   }, [showOffcanvas]);
   const [deliveryCompanies, setDeliveryCompanies] = useState([]);
+  const [companiesDownloadError, setCompaniesDownloadError] = useState(false);
   // Waybills
   const [waybills, setWaybills] = useState([]);
   const [isAddWaybillShow, setIsAddWaybillShow] = useState(false);
@@ -52,10 +60,9 @@ function ModifyDeliveryOffcanvas({
   // Delivery company add
   const [isAddCompanyShow, setIsAddCompanyShow] = useState(false);
   // Error
-  const getIsErrorActive = () => {
-    return deliveryCompanies.length === 0;
+  const isFormErrorActive = () => {
+    return deliveryCompanies.length === 0 || companiesDownloadError;
   };
-  const anyErrorActive = getIsErrorActive();
   // Loading element
   const [isLoading, setIsLoading] = useState(false);
   // Form action
@@ -122,6 +129,10 @@ function ModifyDeliveryOffcanvas({
               id="createDelivery"
               action={formAction}
             >
+              <ErrorMessage
+                message="Could not download delivery companies."
+                messageStatus={companiesDownloadError}
+              />
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Proforma:</Form.Label>
                 <Form.Control
@@ -233,7 +244,7 @@ function ModifyDeliveryOffcanvas({
                       variant="mainBlue"
                       className="w-100"
                       type="submit"
-                      disabled={anyErrorActive}
+                      disabled={isFormErrorActive()}
                       onClick={(e) => {
                         e.preventDefault();
                         setIsLoading(true);
@@ -297,7 +308,7 @@ function ModifyDeliveryOffcanvas({
   }
 }
 
-ModifyDeliveryOffcanvas.PropTypes = {
+ModifyDeliveryOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   isDeliveryToUser: PropTypes.bool.isRequired,

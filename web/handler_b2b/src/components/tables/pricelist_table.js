@@ -1,4 +1,5 @@
 import { Stack, Table } from "react-bootstrap";
+import PropTypes from "prop-types";
 
 function PricelistTable({ items, currency }) {
   if (items.length === 0) {
@@ -45,5 +46,10 @@ function PricelistTable({ items, currency }) {
     </Table>
   );
 }
+
+ItemTable.propTypes = {
+  items: PropTypes.array.isRequired,
+  currency: PropTypes.string.isRequired
+};
 
 export default PricelistTable;

@@ -1,24 +1,27 @@
 "use server";
 
 import getDbName from "../auth/get_db_name";
-import getUserId from "../auth/get_user_id";
 
 export default async function getItemsList(userId, currency) {
   const dbName = await getDbName();
   let url = "";
   if (userId && currency) {
-    url = `${process.env.API_DEST}/${dbName}/Invoices/allSalesItems/${userId}?currency=${currency}`;
+    url = `${process.env.API_DEST}/${dbName}/Invoices/get/sales/items/${userId}/currency/${currency}`;
   } else {
-    url = `${process.env.API_DEST}/${dbName}/Invoices/allItems`;
+    url = `${process.env.API_DEST}/${dbName}/Invoices/get/items`;
   }
-  console.log(url);
-  const info = await fetch(url, {
-    method: "GET",
-  });
+  try {
+    const info = await fetch(url, {
+      method: "GET",
+    });
 
-  if (info.ok) {
-    return await info.json();
+    if (info.ok) {
+      return await info.json();
+    }
+
+    return [];
+  } catch {
+    console.error("getItemsList fetch failed.");
+    return null;
   }
-
-  return {};
 }

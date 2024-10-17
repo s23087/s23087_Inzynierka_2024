@@ -37,14 +37,14 @@ function DeliveryFilterOffcanvas({
   const [errorDownloadDeli, setDownloadErrorDeli] = useState(false);
   const [errorDownloadStatus, setDownloadErrorStatus] = useState(false);
   useEffect(() => {
-    getOrgsList()
-      .then((data) => {
-        if (data !== null) setOrgs(data.restOrgs);
-      })
-      .catch(() => setDownloadErrorOrgs(true))
-      .finally(() => {
-        if (orgs.orgName) setDownloadErrorOrgs(false);
-      });
+    getOrgsList().then((data) => {
+      if (data !== null) {
+        setDownloadErrorOrgs(false);
+        setOrgs(data.restOrgs);
+      } else {
+        setDownloadErrorOrgs(true);
+      }
+    });
     getDeliveryCompany().then((data) => {
       if (data === null) {
         setDownloadErrorDeli(true);
@@ -386,7 +386,7 @@ function DeliveryFilterOffcanvas({
   );
 }
 
-DeliveryFilterOffcanvas.PropTypes = {
+DeliveryFilterOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   currentSort: PropTypes.string.isRequired,

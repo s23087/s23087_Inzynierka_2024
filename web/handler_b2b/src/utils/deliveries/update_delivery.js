@@ -32,56 +32,64 @@ export default async function updateDelivery(
     companyId: parseInt(company) === -1 ? null : parseInt(company),
     waybills: prevState.isWaybillModified ? waybills : null,
   };
-
-  const userId = await getUserId();
-  const dbName = await getDbName();
-  const info = await fetch(
-    `${process.env.API_DEST}/${dbName}/Delivery/modify/${isDeliveryToUser}/${userId}`,
-    {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
+  try {
+    const userId = await getUserId();
+    const dbName = await getDbName();
+    const info = await fetch(
+      `${process.env.API_DEST}/${dbName}/Delivery/modify/${isDeliveryToUser}/${userId}`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    },
-  );
+    );
 
-  if (info.status == 404) {
-    let text = await info.text();
-    if (text === "User not found.") {
-      logout();
+    if (info.status == 404) {
+      let text = await info.text();
+      if (text === "User not found.") {
+        logout();
+        return {
+          error: true,
+          completed: true,
+          message: "Your account does not exist.",
+        };
+      }
       return {
         error: true,
         completed: true,
-        message: "Your account does not exist.",
+        message: text,
       };
     }
-    return {
-      error: true,
-      completed: true,
-      message: text,
-    };
-  }
 
-  if (info.status == 500) {
-    return {
-      error: true,
-      completed: true,
-      message: "Server error.",
-    };
-  }
+    if (info.status == 500) {
+      return {
+        error: true,
+        completed: true,
+        message: "Server error.",
+      };
+    }
 
-  if (info.ok) {
-    return {
-      error: false,
-      completed: true,
-      message: "Success! Delivery has been modified.",
-    };
-  } else {
+    if (info.ok) {
+      return {
+        error: false,
+        completed: true,
+        message: "Success! Delivery has been modified.",
+      };
+    } else {
+      return {
+        error: true,
+        completed: true,
+        message: "Critical error",
+      };
+    }
+  } catch {
+    console.error("updateDelivery fetch failed.");
     return {
       error: true,
       completed: true,
-      message: "Critical error",
+      message: "Connection error.",
     };
   }
 }

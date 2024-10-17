@@ -36,9 +36,8 @@ function BindingInput({ value, modifyAction }) {
   );
 }
 
-BindingInput.PropTypes = {
+BindingInput.propTypes = {
   value: PropTypes.string.isRequired,
-  deleteValue: PropTypes.func.isRequired,
   modifyAction: PropTypes.func.isRequired,
 };
 

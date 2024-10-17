@@ -1,4 +1,5 @@
 import { Stack, Table } from "react-bootstrap";
+import PropTypes from "prop-types";
 
 function ItemTable({ restInfo, isOurWarehouse }) {
   if (restInfo.outsideItemInfos.length === 0 && !isOurWarehouse) {
@@ -82,5 +83,10 @@ function ItemTable({ restInfo, isOurWarehouse }) {
     </Table>
   );
 }
+
+ItemTable.propTypes = {
+  restInfo: PropTypes.object.isRequired,
+  isOurWarehouse: PropTypes.bool.isRequired
+};
 
 export default ItemTable;

@@ -16,7 +16,7 @@ function MoreActionWindow({
   withAdd = true,
 }) {
   return (
-    <Modal size="sm" show={modalShow} centered className="px-4">
+    <Modal size="md" show={modalShow} centered className="px-4 minScalableWidth">
       <Modal.Body>
         <Container>
           <Row>
@@ -73,7 +73,7 @@ function MoreActionWindow({
   );
 }
 
-MoreActionWindow.PropTypes = {
+MoreActionWindow.propTypes = {
   modalShow: PropTypes.bool.isRequired,
   onHideFunction: PropTypes.func.isRequired,
   instanceName: PropTypes.string.isRequired,
@@ -81,7 +81,6 @@ MoreActionWindow.PropTypes = {
   selectAll: PropTypes.func.isRequired,
   selectAllOnPage: PropTypes.func.isRequired,
   deselectAll: PropTypes.func.isRequired,
-  deselectAllOnPage: PropTypes.func.isRequired,
   withAdd: PropTypes.bool,
 };
 

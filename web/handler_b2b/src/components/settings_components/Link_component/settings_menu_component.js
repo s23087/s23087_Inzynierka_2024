@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "react-bootstrap";
 import { useState } from "react";
 import getLogs from "@/utils/settings/get_logs";
+import ErrorMessage from "@/components/smaller_components/error_message";
 
 function SettingMenu({ role }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -42,9 +43,16 @@ function SettingMenu({ role }) {
     "Change org data": "settings/change_organization",
     "Switch to org": "settings/switch_model",
   };
+  const [downloadError, setDownloadError] = useState(false);
   async function getLogFile() {
     setIsLoading(true);
     const data = await getLogs();
+    if (data === null){
+      setDownloadError(true)
+      return;
+    } else {
+      setDownloadError(false)
+    }
     let logsCSV =
       "data:text/csv;charset=utf-8," +
       "Action;Description;Data;Username;Surname\n" +
@@ -70,6 +78,10 @@ function SettingMenu({ role }) {
               </Link>
             );
           })}
+          <ErrorMessage 
+            message="Could not download logs."
+            messageStatus={downloadError}
+          />
           <Button
             variant="mainBlue"
             className="mx-auto mx-xl-0 ms-xl-1 mt-3"
@@ -136,6 +148,10 @@ function SettingMenu({ role }) {
               </Link>
             );
           })}
+          <ErrorMessage 
+            message="Could not download logs."
+            messageStatus={downloadError}
+          />
           <Button
             variant="mainBlue"
             className="mx-auto mx-xl-0 ms-xl-1 mt-3"
@@ -159,7 +175,7 @@ function SettingMenu({ role }) {
   }
 }
 
-SettingMenu.PropTypes = {
+SettingMenu.propTypes = {
   role: PropTypes.string.isRequired,
 };
 

@@ -8,7 +8,7 @@ import CountryOptions from "./country_options";
 import validators from "@/utils/validators/validator";
 import PolicyOffcanvas from "./policy_offcanvas";
 import ErrorMessage from "../smaller_components/error_message";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
 
 function RegistrationForm() {
   // Variable that tell if user choose Org option or Individual one
@@ -128,7 +128,7 @@ function RegistrationForm() {
                     isInvalid={emailError}
                     maxLength={350}
                     onInput={(e) => {
-                      StringValidtor.emailValidator(
+                      InputValidtor.emailValidator(
                         e.target.value,
                         setEmailError,
                         350,
@@ -151,7 +151,7 @@ function RegistrationForm() {
                     isInvalid={nameError}
                     maxLength={250}
                     onInput={(e) => {
-                      StringValidtor.noNumberStringValidtor(
+                      InputValidtor.noNumberStringValidtor(
                         e.target.value,
                         setNameError,
                         250,
@@ -174,7 +174,7 @@ function RegistrationForm() {
                     isInvalid={surnameError}
                     maxLength={250}
                     onInput={(e) => {
-                      StringValidtor.noNumberStringValidtor(
+                      InputValidtor.noNumberStringValidtor(
                         e.target.value,
                         setSurnameError,
                         250,
@@ -203,7 +203,7 @@ function RegistrationForm() {
                     isInvalid={companyError}
                     maxLength={50}
                     onInput={(e) => {
-                      StringValidtor.normalStringValidtor(
+                      InputValidtor.normalStringValidtor(
                         e.target.value,
                         setCompanyError,
                         50,
@@ -250,7 +250,7 @@ function RegistrationForm() {
                     isInvalid={streetError}
                     maxLength={200}
                     onInput={(e) => {
-                      StringValidtor.normalStringValidtor(
+                      InputValidtor.normalStringValidtor(
                         e.target.value,
                         setStreetError,
                         200,
@@ -273,7 +273,7 @@ function RegistrationForm() {
                     isInvalid={cityError}
                     maxLength={250}
                     onInput={(e) => {
-                      StringValidtor.normalStringValidtor(
+                      InputValidtor.normalStringValidtor(
                         e.target.value,
                         setCityError,
                         250,
@@ -296,7 +296,7 @@ function RegistrationForm() {
                     isInvalid={postalError}
                     maxLength={25}
                     onInput={(e) => {
-                      StringValidtor.normalStringValidtor(
+                      InputValidtor.normalStringValidtor(
                         e.target.value,
                         setPostalError,
                         25,

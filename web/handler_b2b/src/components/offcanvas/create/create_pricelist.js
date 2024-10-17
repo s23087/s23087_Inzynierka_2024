@@ -8,17 +8,25 @@ import { useRouter } from "next/navigation";
 import CloseIcon from "../../../../public/icons/close_black.png";
 import ProductHolder from "@/components/smaller_components/product_holder";
 import ErrorMessage from "@/components/smaller_components/error_message";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
 import getOfferStatuses from "@/utils/pricelist/get_statuses";
 import AddItemToPricelistWindow from "@/components/windows/add_item_to_pricelist";
 import createPricelist from "@/utils/pricelist/create_pricelist";
 
 function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
   const router = useRouter();
+  const [statusDownloadError, setStatusDownloadError] = useState(false)
   useEffect(() => {
     if (showOffcanvas) {
-      let getStatus = getOfferStatuses();
-      getStatus.then((data) => setStatuses(data));
+      getOfferStatuses()
+      .then((data) => {
+        if (data === null){
+          setStatusDownloadError(true)
+        } else {
+          setStatusDownloadError(false)
+          setStatuses(data)
+        }
+      });
     }
   }, [showOffcanvas]);
   const [statuses, setStatuses] = useState([]);
@@ -31,8 +39,7 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
   // Errors
   const [nameError, setNameError] = useState(false);
   const [maxQtyError, setMaxQtyError] = useState(false);
-  const anyErrorActive =
-    nameError || maxQtyError || statuses.length === 0 || products.length === 0;
+  const isFormErrorActive = () => nameError || maxQtyError || statuses.length === 0 || products.length === 0 || statusDownloadError;
   // Misc
   const [isLoading, setIsLoading] = useState(false);
   // Form
@@ -95,6 +102,10 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
         <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0" style={vhStyle} fluid>
             <Form className="mx-1 mx-xl-3" id="offerForm" action={formAction}>
+            <ErrorMessage
+                  message="Could not download the statuses."
+                  messageStatus={statusDownloadError}
+                />
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Offer name:</Form.Label>
                 <ErrorMessage
@@ -108,7 +119,7 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="offer name"
                   isInvalid={nameError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setNameError,
                       100,
@@ -149,7 +160,7 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="qty"
                   isInvalid={maxQtyError}
                   onInput={(e) => {
-                    StringValidtor.decimalValidator(
+                    InputValidtor.decimalValidator(
                       e.target.value,
                       setMaxQtyError,
                     );
@@ -217,7 +228,7 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
                       variant="mainBlue"
                       className="w-100"
                       type="submit"
-                      disabled={anyErrorActive}
+                      disabled={isFormErrorActive()}
                       onClick={(e) => {
                         e.preventDefault();
                         setIsLoading(true);
@@ -293,10 +304,9 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
   }
 }
 
-AddPricelistOffcanvas.PropTypes = {
+AddPricelistOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
-  isYourInvoice: PropTypes.bool.isRequired,
 };
 
 export default AddPricelistOffcanvas;

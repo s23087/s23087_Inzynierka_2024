@@ -103,7 +103,7 @@ function ClientContainer({
   );
 }
 
-ClientContainer.PropTypes = {
+ClientContainer.propTypes = {
   client: PropTypes.object.isRequired,
   is_org: PropTypes.bool.isRequired,
   selected: PropTypes.bool.isRequired,

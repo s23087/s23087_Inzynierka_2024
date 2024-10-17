@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import CloseIcon from "../../../../public/icons/close_black.png";
 import ProductHolder from "@/components/smaller_components/product_holder";
 import ErrorMessage from "@/components/smaller_components/error_message";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
 import getOfferStatuses from "@/utils/pricelist/get_statuses";
 import AddItemToPricelistWindow from "@/components/windows/add_item_to_pricelist";
 import getRestModifyPricelist from "@/utils/pricelist/get_rest_modify_pricelist";
@@ -16,16 +16,28 @@ import modifyPricelist from "@/utils/pricelist/modify_pricelist";
 
 function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
   const router = useRouter();
+  const [statusDownloadError, setStatusDownloadError] = useState(false)
+  const [restDownloadError, setRestDownloadError] = useState(false)
   useEffect(() => {
     if (showOffcanvas) {
-      let getStatus = getOfferStatuses();
-      getStatus.then((data) => setStatuses(data));
-      let restInfo = getRestModifyPricelist(pricelist.pricelistId);
-      restInfo.then((data) => {
-        if (data) {
+      getOfferStatuses()
+      .then((data) => {
+        if (data === null){
+          setStatusDownloadError(true)
+        } else {
+          setStatusDownloadError(false)
+          setStatuses(data)
+        }
+      });
+      getRestModifyPricelist(pricelist.pricelistId)
+      .then((data) => {
+        if (data !== null) {
+          setRestDownloadError(false)
           setMaxQty(data.maxQty);
           setProducts(data.items);
           prevState.maxQty = data.maxQty;
+        } else {
+          setRestDownloadError(true)
         }
       });
       setChosenCurrency(pricelist.currency);
@@ -58,8 +70,7 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
   // Errors
   const [nameError, setNameError] = useState(false);
   const [maxQtyError, setMaxQtyError] = useState(false);
-  const anyErrorActive =
-    nameError || maxQtyError || statuses.length === 0 || products.length === 0;
+  const isFormErrorActive = () => nameError || maxQtyError || statuses.length === 0 || products.length === 0 || statusDownloadError || restDownloadError;
   // Misc
   const [isLoading, setIsLoading] = useState(false);
   // Form
@@ -126,6 +137,10 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
         <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0" style={vhStyle} fluid>
             <Form className="mx-1 mx-xl-3" id="offerForm" action={formAction}>
+              <ErrorMessage 
+                message="Could not download all necessary information."
+                messageStatus={statusDownloadError || restDownloadError}
+              />
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Offer name:</Form.Label>
                 <ErrorMessage
@@ -140,7 +155,7 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
                   placeholder="offer name"
                   isInvalid={nameError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setNameError,
                       100,
@@ -186,7 +201,7 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
                   placeholder="qty"
                   isInvalid={maxQtyError}
                   onInput={(e) => {
-                    StringValidtor.onlyNumberValidtor(
+                    InputValidtor.onlyNumberValidtor(
                       e.target.value,
                       setMaxQtyError,
                     );
@@ -256,7 +271,7 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
                       variant="mainBlue"
                       className="w-100"
                       type="submit"
-                      disabled={anyErrorActive}
+                      disabled={isFormErrorActive()}
                       onClick={(e) => {
                         e.preventDefault();
                         setIsLoading(true);
@@ -332,10 +347,10 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
   }
 }
 
-ModifyPricelistOffcanvas.PropTypes = {
+ModifyPricelistOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
-  isYourInvoice: PropTypes.bool.isRequired,
+  pricelist: PropTypes.object.isRequired,
 };
 
 export default ModifyPricelistOffcanvas;

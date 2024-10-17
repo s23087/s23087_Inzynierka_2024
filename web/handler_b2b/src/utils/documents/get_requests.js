@@ -36,6 +36,7 @@ export default async function getRequests(
 
     return [];
   } catch {
+    console.error("getRequests fetch failed.");
     return null;
   }
 }

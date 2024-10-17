@@ -47,35 +47,34 @@ function InvoiceFilterOffcanvas({
   const [errorDownloadReq, setDownloadErrorReq] = useState(false);
   useEffect(() => {
     if (!type.includes("Request")) {
-      getOrgsList()
-        .then((data) => {
-          if (data !== null) setOrgs(data.restOrgs);
-        })
-        .catch(() => setDownloadErrorOrg(true))
-        .finally(() => {
-          if (orgs.orgName) setDownloadErrorOrg(false);
-        });
+      getOrgsList().then((data) => {
+        if (data !== null) {
+          setDownloadErrorOrg(false);
+          setOrgs(data.restOrgs);
+        } else {
+          setDownloadErrorOrg(true);
+        }
+      });
 
       if (type.includes("invoice")) {
-        getPaymentStatuses()
-          .then((data) => {
-            if (data !== null) setPaymentStatuses(data);
-          })
-          .catch(() => setDownloadErrorPay(true))
-          .finally(() => {
-            if (paymentStatuses.length > 0) setDownloadErrorPay(false);
-          });
+        getPaymentStatuses().then((data) => {
+          if (data !== null) {
+            setDownloadErrorPay(false);
+            setPaymentStatuses(data);
+          } else {
+            setDownloadErrorPay(true);
+          }
+        });
       }
     } else {
-      const reqStatuses = getRequestStatuses();
-      reqStatuses
-        .then((data) => {
-          if (data !== null) setRequestStatuses(data);
-        })
-        .catch(() => setDownloadErrorReq(true))
-        .finally(() => {
-          if (reqStatuses.lenght > 0) setDownloadErrorReq(false);
-        });
+      getRequestStatuses().then((data) => {
+        if (data !== null) {
+          setDownloadErrorReq(false);
+          setRequestStatuses(data);
+        } else {
+          setDownloadErrorReq(true);
+        }
+      });
     }
   }, [type]);
   // Styles
@@ -809,11 +808,12 @@ function InvoiceFilterOffcanvas({
   );
 }
 
-InvoiceFilterOffcanvas.PropTypes = {
+InvoiceFilterOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   currentSort: PropTypes.string.isRequired,
   currentDirection: PropTypes.bool.isRequired,
+  type: PropTypes.string.isRequired
 };
 
 export default InvoiceFilterOffcanvas;

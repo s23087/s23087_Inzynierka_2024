@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import CloseIcon from "../../../../../public/icons/close_black.png";
 import ProductHolder from "@/components/smaller_components/product_holder";
 import ErrorMessage from "@/components/smaller_components/error_message";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
 import getListOfPurchaseInvoice from "@/utils/documents/get_list_purchase_invoice";
 import getListOfSalesInvoice from "@/utils/documents/get_list_sales_invoice";
 import AddCreditProductWindow from "@/components/windows/add_credit_items";
@@ -28,29 +28,27 @@ function AddCreditNoteOffcanvas({
     if (showOffcanvas) {
       getUsers()
         .then((data) => {
-          if (data === null) return;
-          setUsers(data);
+          if (data !== null) {
+            setUserDownloadError(false)
+            setUsers(data);
+          } else {
+            setUserDownloadError(true)
+          }
         })
-        .catch(() => setUserDownloadError(true))
-        .finally(() => {
-          if (users.length > 0) setUserDownloadError(false);
-        });
       const invoiceList = isYourCreditNote
         ? getListOfPurchaseInvoice()
         : getListOfSalesInvoice();
-      invoiceList
-        .then((data) => {
-          if (data === null) return;
-          setInvoiceList(data);
-          setChoosenInvoice(data[0].invoiceId ? data[0].invoiceId : null);
-          setChoosenClient(data[0].clientName ?? "Is loading");
-          setUserOrg(data[0].orgName ?? "Is loading");
-        })
-        .catch(() => setInvoiceListDownloadError(true))
-        .finally(() => {
-          if (choosenClient !== "Is loading")
-            setInvoiceListDownloadError(false);
-        });
+      invoiceList.then((data) => {
+        if (data === null) {
+          setInvoiceListDownloadError(true);
+          return;
+        }
+        setInvoiceListDownloadError(false);
+        setInvoiceList(data);
+        setChoosenInvoice(data[0].invoiceId ? data[0].invoiceId : null);
+        setChoosenClient(data[0].clientName ?? "Is loading");
+        setUserOrg(data[0].orgName ?? "Is loading");
+      });
     }
   }, [showOffcanvas, isYourCreditNote]);
   // options
@@ -69,7 +67,7 @@ function AddCreditNoteOffcanvas({
   const [creditNumberError, setCreditNumberError] = useState(false);
   const [documentError, setDocumentError] = useState(false);
   const [dateError, setDateError] = useState(false);
-  const anyErrorActive =
+  const isFormErrorActive = () => 
     creditNumberError ||
     documentError ||
     dateError ||
@@ -214,7 +212,7 @@ function AddCreditNoteOffcanvas({
                   placeholder="credit note number"
                   isInvalid={creditNumberError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setCreditNumberError,
                       40,
@@ -375,7 +373,7 @@ function AddCreditNoteOffcanvas({
                       variant="mainBlue"
                       className="w-100"
                       type="submit"
-                      disabled={anyErrorActive}
+                      disabled={isFormErrorActive()}
                       onClick={(e) => {
                         e.preventDefault();
                         setIsLoading(true);
@@ -451,7 +449,7 @@ function AddCreditNoteOffcanvas({
   }
 }
 
-AddCreditNoteOffcanvas.PropTypes = {
+AddCreditNoteOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   isYourCreditNote: PropTypes.bool.isRequired,

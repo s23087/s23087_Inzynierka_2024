@@ -53,7 +53,7 @@ function CurrencyHolder({
   );
 }
 
-CurrencyHolder.PropTypes = {
+CurrencyHolder.propTypes = {
   currency_name: PropTypes.string.isRequired,
   current_currency: PropTypes.string.isRequired,
   exchange_rate: PropTypes.number.isRequired,

@@ -8,12 +8,13 @@ export default async function getNotificationCounter() {
   const userId = await getUserId();
   try {
     const notifCount = await fetch(
-      `${process.env.API_DEST}/${dbName}/User/notificationCount/${userId}`,
+      `${process.env.API_DEST}/${dbName}/User/get/notification_count/${userId}`,
       { method: "GET" },
     ).then((res) => res.json());
 
     return notifCount;
   } catch {
+    console.error("getNotificationCounter fetch failed.")
     return 0;
   }
 }

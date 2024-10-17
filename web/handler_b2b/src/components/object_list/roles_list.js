@@ -144,11 +144,10 @@ function RolesList({
   );
 }
 
-RolesList.PropTypes = {
-  products: PropTypes.object.isRequired,
-  orgView: PropTypes.bool.isRequired,
-  productStart: PropTypes.number.isRequired,
-  productEnd: PropTypes.number.isRequired,
+RolesList.propTypes = {
+  roles: PropTypes.object.isRequired,
+  rolesStart: PropTypes.number.isRequired,
+  rolesEnd: PropTypes.number.isRequired,
   rolesToChoose: PropTypes.object.isRequired,
   filterActive: PropTypes.bool.isRequired,
   currentSort: PropTypes.string.isRequired,

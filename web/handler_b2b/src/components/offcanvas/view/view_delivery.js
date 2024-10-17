@@ -30,10 +30,14 @@ function ViewDeliveryOffcanvas({
   let statusColor = getDeliveryStatusColor(delivery.status).backgroundColor;
   useEffect(() => {
     if (showOffcanvas) {
-      let restInfo = getRestDelivery(delivery.deliveryId);
-      restInfo
-        .then((data) => setRestInfo(data))
-        .catch(() => setDownloadError(true));
+      getRestDelivery(delivery.deliveryId).then((data) => {
+        if (data !== null) {
+          setDownloadError(false);
+          setRestInfo(data);
+        } else {
+          setDownloadError(true);
+        }
+      });
     }
   }, [showOffcanvas, hasChanged]);
   // change status
@@ -283,7 +287,7 @@ function ViewDeliveryOffcanvas({
   );
 }
 
-ViewDeliveryOffcanvas.PropTypes = {
+ViewDeliveryOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   delivery: PropTypes.object.isRequired,

@@ -16,7 +16,7 @@ import AddProductWindow from "@/components/windows/addProduct";
 import getCurrencyValuesList from "@/utils/flexible/get_currency_values_list";
 import AddSaleProductWindow from "@/components/windows/add_Sales_product";
 import ErrorMessage from "@/components/smaller_components/error_message";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
 import createProforma from "@/utils/proformas/create_proforma";
 
 function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
@@ -29,40 +29,40 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
     if (showOffcanvas) {
       getUsers()
         .then((data) => {
-          if (data === null) return;
-          setUsers(data);
-          setChoosenUser(data[0].idUser);
+          if (data === null) {
+            setUserDownloadError(true)
+          } else {
+            setUserDownloadError(false)
+            setUsers(data);
+            setChoosenUser(data[0].idUser);
+          }
         })
-        .catch(() => setUserDownloadError(true))
-        .finally(() => {
-          if (choosenUser) setUserDownloadError(false);
-        });
 
-      getOrgsList()
-        .then((data) => {
-          if (data !== null) setOrgs(data);
-        })
-        .catch(() => setOrgDownloadError(true))
-        .finally(() => {
-          if (orgs.orgName) setOrgDownloadError(false);
-        });
-      getTaxes()
-        .then((data) => {
-          if (data !== null) setTaxes(data);
-        })
-        .catch(() => setTaxesDownloadError(true))
-        .finally(() => {
-          if (taxes.length > 0) setTaxesDownloadError(false);
-        });
+      getOrgsList().then((data) => {
+        if (data !== null) {
+          setOrgDownloadError(false);
+          setOrgs(data);
+        } else {
+          setOrgDownloadError(true);
+        }
+      });
+      getTaxes().then((data) => {
+        if (data !== null) {
+          setTaxes(data);
+          setTaxesDownloadError(false);
+        } else {
+          setTaxesDownloadError(true);
+        }
+      });
 
-      getPaymentMethods()
-        .then((data) => {
-          if (data !== null) setPaymentMethods(data);
-        })
-        .catch(() => setMethodsDownloadError(true))
-        .finally(() => {
-          if (paymentMethods.length > 0) setMethodsDownloadError(false);
-        });
+      getPaymentMethods().then((data) => {
+        if (data !== null) {
+          setMethodsDownloadError(false);
+          setPaymentMethods(data);
+        } else {
+          setMethodsDownloadError(true);
+        }
+      });
     }
   }, [showOffcanvas]);
   // options
@@ -128,8 +128,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
   const [transportError, setTransportError] = useState(false);
   const [documentError, setDocumentError] = useState(false);
   const [dateError, setDateError] = useState(false);
-  const anyErrorActive =
-    proformaError ||
+  const isFormErrorActive = () => proformaError ||
     transportError ||
     documentError ||
     currencyList.error ||
@@ -261,7 +260,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
                   placeholder="proforma number"
                   isInvalid={proformaError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setProformaError,
                       40,
@@ -565,7 +564,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
                       variant="mainBlue"
                       className="w-100"
                       type="submit"
-                      disabled={anyErrorActive}
+                      disabled={isFormErrorActive()}
                       onClick={(e) => {
                         e.preventDefault();
                         setIsLoading(true);
@@ -648,7 +647,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
   }
 }
 
-AddProformaOffcanvas.PropTypes = {
+AddProformaOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   isYourProforma: PropTypes.bool.isRequired,

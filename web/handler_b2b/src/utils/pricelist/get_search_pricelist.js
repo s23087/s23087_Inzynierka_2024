@@ -42,6 +42,7 @@ export default async function getSearchPricelists(
 
     return [];
   } catch {
+    console.error("getSearchPricelists fetch failed.")
     return null;
   }
 }

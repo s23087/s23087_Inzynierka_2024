@@ -43,15 +43,18 @@ export default async function modifyPricelist(
 
   const userId = await getUserId();
   const dbName = await getDbName();
-  const getDeactivatedId = await fetch(
-    `${process.env.API_DEST}/${dbName}/Offer/get/status/deactivated`,
-    { method: "GET" },
-  );
-  if (!getDeactivatedId.ok) {
+  let getDeactivatedId;
+  try {
+    getDeactivatedId = await fetch(
+      `${process.env.API_DEST}/${dbName}/Offer/get/status/deactivated`,
+      { method: "GET" },
+    );
+  } catch {
+    console.error("Get status deactivated fetch failed.")
     return {
       error: true,
       completed: true,
-      message: "Could not connect to server.",
+      message: "Connection error.",
     };
   }
   const deactivatedId = await getDeactivatedId.text();
@@ -136,55 +139,64 @@ export default async function modifyPricelist(
     items: transformProducts,
   };
 
-  const info = await fetch(`${process.env.API_DEST}/${dbName}/Offer/modify`, {
-    method: "POST",
-    body: JSON.stringify(data),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  if (info.status === 404) {
-    let text = await info.text();
-    if (text === "User not found.") {
-      logout();
+  try {
+    const info = await fetch(`${process.env.API_DEST}/${dbName}/Offer/modify`, {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (info.status === 404) {
+      let text = await info.text();
+      if (text === "User not found.") {
+        logout();
+        return {
+          error: true,
+          completed: true,
+          message: "Your user profile does not exists.",
+        };
+      }
       return {
         error: true,
         completed: true,
-        message: "Your user profile does not exists.",
+        message: text,
       };
     }
+    if (info.status === 400) {
+      return {
+        error: true,
+        completed: true,
+        message: await info.text(),
+      };
+    }
+    if (info.status === 500) {
+      return {
+        error: true,
+        completed: true,
+        message: "Server error.",
+      };
+    }
+  
+    if (info.ok) {
+      return {
+        error: false,
+        completed: true,
+        message: "Success! You had modified pricelist.",
+      };
+    } else {
+      return {
+        error: true,
+        completed: true,
+        message: "Critical error.",
+      };
+    }
+  } catch {
+    console.error("Modify offer fetch failed.")
     return {
       error: true,
       completed: true,
-      message: text,
-    };
-  }
-  if (info.status === 400) {
-    return {
-      error: true,
-      completed: true,
-      message: await info.text(),
-    };
-  }
-  if (info.status === 500) {
-    return {
-      error: true,
-      completed: true,
-      message: "Server error.",
-    };
-  }
-
-  if (info.ok) {
-    return {
-      error: false,
-      completed: true,
-      message: "Success! You had modified pricelist.",
-    };
-  } else {
-    return {
-      error: true,
-      completed: true,
-      message: "Critical error.",
+      message: "Connection error.",
     };
   }
 }

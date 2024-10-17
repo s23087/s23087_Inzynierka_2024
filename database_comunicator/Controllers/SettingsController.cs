@@ -37,7 +37,7 @@ namespace database_communicator.Controllers
             return Ok();
         }
         [HttpPost]
-        [Route("modifyUser")]
+        [Route("modify/user")]
         public async Task<IActionResult> ModifyUser(ChangeUserData data)
         {
             var exist = await _userServices.UserExist(data.UserId);
@@ -53,7 +53,7 @@ namespace database_communicator.Controllers
             return Ok();
         }
         [HttpPost]
-        [Route("addNewUser/{userId}")]
+        [Route("add/user/{userId}")]
         public async Task<IActionResult> AddNewUser(AddUser newUser, int userId)
         {
             var exist = await _userServices.UserExist(userId);
@@ -79,21 +79,20 @@ namespace database_communicator.Controllers
             return result ? Ok() : BadRequest();
         }
         [HttpGet]
-        [Route("logs")]
+        [Route("get/logs/{userId}")]
         public async Task<IActionResult> GetLogs(int userId)
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound();
             var role = await _userServices.GetUserRole(userId);
             role ??= "Solo";
-            Console.WriteLine(role);
             if (role != "Admin" && role != "Solo") return Unauthorized();
             var result = await _logServices.GetLogs();
             return Ok(result);
         }
 
         [HttpGet]
-        [Route("userOrg")]
+        [Route("get/modify/rest/{userId}")]
         public async Task<IActionResult> GetUserOrg(int userId)
         {
             var exist = await _userServices.UserExist(userId);

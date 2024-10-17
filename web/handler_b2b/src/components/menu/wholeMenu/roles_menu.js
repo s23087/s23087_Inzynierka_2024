@@ -52,7 +52,7 @@ function RolesMenu({ current_role, current_nofitication_qty, user }) {
   );
 }
 
-RolesMenu.PropTypes = {
+RolesMenu.propTypes = {
   current_role: PropTypes.string.isRequired,
   current_nofitication_qty: PropTypes.number.isRequired,
   user: PropTypes.object.isRequired,

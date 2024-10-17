@@ -15,14 +15,14 @@ function AddOutsideItemsOffcanvas({ showOffcanvas, hideFunction }) {
   const [errorDownload, setDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      getOrgsList()
-        .then((data) => {
-          if (data !== null) setOrgs(data);
-        })
-        .catch(() => setDownloadError(true))
-        .finally(() => {
-          if (orgs.orgName) setDownloadError(false);
-        });
+      getOrgsList().then((data) => {
+        if (data !== null) {
+          setDownloadError(false);
+          setOrgs(data);
+        } else {
+          setDownloadError(true);
+        }
+      });
     }
   }, [showOffcanvas]);
   // options
@@ -238,7 +238,7 @@ function AddOutsideItemsOffcanvas({ showOffcanvas, hideFunction }) {
   }
 }
 
-AddOutsideItemsOffcanvas.PropTypes = {
+AddOutsideItemsOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
 };

@@ -41,8 +41,8 @@ export default async function getSearchItems(
     }
 
     return [];
-  } catch (error) {
-    console.log(error);
+  } catch {
+    console.error("getSearchItems fetch failed.")
     return null;
   }
 }

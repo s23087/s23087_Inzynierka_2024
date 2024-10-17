@@ -37,6 +37,7 @@ export default async function getSearchRequests(
 
     return [];
   } catch {
+    console.error("getSearchRequests fetch failed.");
     return null;
   }
 }

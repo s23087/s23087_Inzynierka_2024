@@ -2,6 +2,7 @@
 
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
+import logout from "../auth/logout";
 
 export default async function getSearchClients(isOrg, search, sort, country) {
   let url = "";
@@ -11,14 +12,19 @@ export default async function getSearchClients(isOrg, search, sort, country) {
   if (sort !== ".None") params.push(`sort=${sort}`);
   if (country) params.push(`country=${country}`);
   if (isOrg) {
-    url = `${process.env.API_DEST}/${dbName}/Client/orgClients?userId=${userId}&search=${search}`;
+    url = `${process.env.API_DEST}/${dbName}/Client/get/org/${userId}?search=${search}`;
   } else {
-    url = `${process.env.API_DEST}/${dbName}/Client/clients?userId=${userId}&search=${search}`;
+    url = `${process.env.API_DEST}/${dbName}/Client/get/${userId}?search=${search}`;
   }
   try {
     const items = await fetch(url, {
       method: "GET",
     });
+
+    if (items.status === 404) {
+      logout();
+      return [];
+    }
 
     if (items.ok) {
       return await items.json();
@@ -26,6 +32,7 @@ export default async function getSearchClients(isOrg, search, sort, country) {
 
     return [];
   } catch {
+    console.error("Get search client fetch failed.");
     return null;
   }
 }

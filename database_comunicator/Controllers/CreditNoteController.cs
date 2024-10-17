@@ -67,7 +67,7 @@ namespace database_communicator.Controllers
             int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, bool? paymentStatus, bool? status)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound();
+            if (!exist) return NotFound("This user does not exists.");
             if (search != null)
             {
                 var result = await _creditNoteServices.GetCreditNotes(isYourCredit, search, userId, sort: sort, dateL, dateG, qtyL, qtyG, totalL, totalG, recipient,
@@ -108,7 +108,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("path/{creditId}")]
+        [Route("get/path/{creditId}")]
         public async Task<IActionResult> GetCreditFilePath(int creditId)
         {
             var exist = await _creditNoteServices.CreditNoteExist(creditId);
@@ -143,7 +143,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("modify/rest/{isYourCredit}/{creditId}")]
+        [Route("get/rest/modify/{isYourCredit}/{creditId}")]
         public async Task<IActionResult> GetRestModifyCredit(int creditId, bool isYourCredit)
         {
             var exist = await _creditNoteServices.CreditNoteExist(creditId);

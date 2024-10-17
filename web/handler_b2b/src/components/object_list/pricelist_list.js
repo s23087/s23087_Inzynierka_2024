@@ -254,7 +254,7 @@ function PricelistList({
   );
 }
 
-PricelistList.PropTypes = {
+PricelistList.propTypes = {
   pricelist: PropTypes.object.isRequired,
   pricelistStart: PropTypes.number.isRequired,
   pricelistEnd: PropTypes.number.isRequired,

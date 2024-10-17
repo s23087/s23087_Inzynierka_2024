@@ -8,7 +8,7 @@ import logout from "@/utils/auth/logout";
 function ForceLogutWindow({ modalShow }) {
   const router = useRouter();
   return (
-    <Modal size="sm" show={modalShow} centered className="px-4">
+    <Modal size="md" show={modalShow} centered className="px-4 minScalableWidth">
       <Modal.Body>
         <Container className="mt-3 mb-2">
           <Row>
@@ -41,13 +41,8 @@ function ForceLogutWindow({ modalShow }) {
   );
 }
 
-ForceLogutWindow.PropTypes = {
+ForceLogutWindow.propTypes = {
   modalShow: PropTypes.bool.isRequired,
-  onHideFunction: PropTypes.func.isRequired,
-  deleteItemFunc: PropTypes.func.isRequired,
-  instanceName: PropTypes.string.isRequired,
-  instanceId: PropTypes.number.isRequired,
-  isError: PropTypes.bool.isRequired,
 };
 
 export default ForceLogutWindow;

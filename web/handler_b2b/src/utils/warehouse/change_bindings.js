@@ -10,47 +10,55 @@ export default async function changeBindings(bindings) {
     userId: userId,
     bindings: bindings,
   };
-
-  const dbName = await getDbName();
-  const info = await fetch(
-    `${process.env.API_DEST}/${dbName}/Warehouse/changeBindings`,
-    {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
+  try {
+    const dbName = await getDbName();
+    const info = await fetch(
+      `${process.env.API_DEST}/${dbName}/Warehouse/modify/bindings`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    },
-  );
-
-  if (info.status == 500) {
+    );
+  
+    if (info.status == 500) {
+      return {
+        error: true,
+        completed: true,
+        message: "Server error.",
+      };
+    }
+  
+    if (info.status == 404) {
+      logout();
+      return {
+        error: true,
+        completed: true,
+        message: "This user doesn't exists.",
+      };
+    }
+  
+    if (info.ok) {
+      return {
+        error: false,
+        completed: true,
+        message: "Success!",
+      };
+    } else {
+      return {
+        error: true,
+        completed: true,
+        message: "Critical error",
+      };
+    }
+  } catch {
+    console.error("changeBindings fetch failed.")
     return {
       error: true,
       completed: true,
-      message: "Server error.",
-    };
-  }
-
-  if (info.status == 404) {
-    logout();
-    return {
-      error: true,
-      completed: true,
-      message: "This user doesn't exists.",
-    };
-  }
-
-  if (info.ok) {
-    return {
-      error: false,
-      completed: true,
-      message: "Success!",
-    };
-  } else {
-    return {
-      error: true,
-      completed: true,
-      message: "Critical error",
+      message: "Connection error",
     };
   }
 }

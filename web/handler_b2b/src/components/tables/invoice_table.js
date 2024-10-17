@@ -1,4 +1,5 @@
 import { Stack, Table } from "react-bootstrap";
+import PropTypes from "prop-types";
 
 function InvoiceTable({ items, currency }) {
   if (items.length === 0) {
@@ -59,5 +60,10 @@ function InvoiceTable({ items, currency }) {
     </Table>
   );
 }
+
+InvoiceTable.propTypes = {
+  items: PropTypes.array.isRequired,
+  currency: PropTypes.string.isRequired
+};
 
 export default InvoiceTable;

@@ -53,7 +53,7 @@ function SettingNavMenu({ current_role, current_nofitication_qty, user }) {
   );
 }
 
-SettingNavMenu.PropTypes = {
+SettingNavMenu.propTypes = {
   current_role: PropTypes.string.isRequired,
   current_nofitication_qty: PropTypes.number.isRequired,
   user: PropTypes.object.isRequired,

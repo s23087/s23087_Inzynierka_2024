@@ -12,7 +12,7 @@ function ChangeStatusWindow({
 }) {
   const [isLoading, setIsLoading] = useState(false);
   return (
-    <Modal size="sm" show={modalShow} centered className="px-4">
+    <Modal size="md" show={modalShow} centered className="px-4 minScalableWidth">
       <Modal.Body>
         <Container>
           <Row>
@@ -74,10 +74,11 @@ function ChangeStatusWindow({
   );
 }
 
-ChangeStatusWindow.PropTypes = {
+ChangeStatusWindow.propTypes = {
   modalShow: PropTypes.bool.isRequired,
   onHideFunction: PropTypes.func.isRequired,
-  statuses: PropTypes.object.isRequired,
+  actionName: PropTypes.string,
+  actionFunc: PropTypes.func,
 };
 
 export default ChangeStatusWindow;

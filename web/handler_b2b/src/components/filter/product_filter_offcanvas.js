@@ -314,7 +314,7 @@ function ProductFilterOffcanvas({
   );
 }
 
-ProductFilterOffcanvas.PropTypes = {
+ProductFilterOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   currentSort: PropTypes.string.isRequired,

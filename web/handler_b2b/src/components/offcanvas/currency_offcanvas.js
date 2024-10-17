@@ -35,10 +35,36 @@ function CurrencyOffcanvas({ showOffcanvas, hideFunction, current_currency }) {
   });
   useEffect(() => {
     if (showOffcanvas) {
-      let eur = getCurrencyValues("EUR");
-      eur.then((data) => setEurData(data));
-      let usd = getCurrencyValues("USD");
-      usd.then((data) => setUsdData(data));
+      getCurrencyValues("EUR")
+      .then((data) => {
+        if (data !== null){
+          setEurData(data)
+        } else {
+          setEurData({
+            rates: [
+              {
+                effectiveDate: "Connection error",
+                mid: 0,
+              },
+            ],
+          })
+        }
+      });
+      getCurrencyValues("USD")
+      .then((data) => {
+        if (data !== null){
+          setUsdData(data)
+        } else {
+          setUsdData({
+            rates: [
+              {
+                effectiveDate: "Connection error",
+                mid: 0,
+              },
+            ],
+          })
+        }
+      });
     }
   }, [showOffcanvas]);
   const spanStyle = {
@@ -174,9 +200,10 @@ function CurrencyOffcanvas({ showOffcanvas, hideFunction, current_currency }) {
   );
 }
 
-CurrencyOffcanvas.PropTypes = {
+CurrencyOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
+  current_currency: PropTypes.string.isRequired
 };
 
 export default CurrencyOffcanvas;

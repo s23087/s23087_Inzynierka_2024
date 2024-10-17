@@ -30,7 +30,7 @@ function AbstractItemPostionBar({ site_name }) {
   );
 }
 
-AbstractItemPostionBar.PropTypes = {
+AbstractItemPostionBar.propTypes = {
   site_name: PropTypes.string.isRequired,
 };
 

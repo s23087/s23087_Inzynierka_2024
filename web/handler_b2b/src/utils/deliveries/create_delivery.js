@@ -41,47 +41,56 @@ export default async function createDelivery(
     note: note === "" ? null : note,
   };
 
-  const info = await fetch(`${process.env.API_DEST}/${dbName}/Delivery/add`, {
-    method: "POST",
-    body: JSON.stringify(deliveryData),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  if (info.status === 404) {
-    logout();
-    return {
-      error: true,
-      completed: true,
-      message: "Your user profile does not exists.",
-    };
-  }
-  if (info.status === 400) {
-    return {
-      error: true,
-      completed: true,
-      message: await info.text(),
-    };
-  }
-  if (info.status === 500) {
-    return {
-      error: true,
-      completed: true,
-      message: "Server error.",
-    };
-  }
+  try {
+    const info = await fetch(`${process.env.API_DEST}/${dbName}/Delivery/add`, {
+      method: "POST",
+      body: JSON.stringify(deliveryData),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (info.status === 404) {
+      logout();
+      return {
+        error: true,
+        completed: true,
+        message: "Your user profile does not exists.",
+      };
+    }
+    if (info.status === 400) {
+      return {
+        error: true,
+        completed: true,
+        message: await info.text(),
+      };
+    }
+    if (info.status === 500) {
+      return {
+        error: true,
+        completed: true,
+        message: "Server error.",
+      };
+    }
 
-  if (info.ok) {
-    return {
-      error: false,
-      completed: true,
-      message: "Success! You had created delivery.",
-    };
-  } else {
+    if (info.ok) {
+      return {
+        error: false,
+        completed: true,
+        message: "Success! You had created delivery.",
+      };
+    } else {
+      return {
+        error: true,
+        completed: true,
+        message: "Critical error.",
+      };
+    }
+  } catch {
+    console.error("createDelivery fetch failed.");
     return {
       error: true,
       completed: true,
-      message: "Critical error.",
+      message: "Connection error.",
     };
   }
 }

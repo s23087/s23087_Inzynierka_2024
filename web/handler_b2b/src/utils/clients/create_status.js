@@ -2,6 +2,7 @@
 
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
+import logout from "../auth/logout";
 import validators from "../validators/validator";
 
 export default async function createStatus(state, formData) {
@@ -29,26 +30,44 @@ export default async function createStatus(state, formData) {
 
   const dbName = await getDbName();
   const userId = await getUserId();
-  const info = await fetch(
-    `${process.env.API_DEST}/${dbName}/Client/addAvailabilityStatuses?userId=${userId}`,
-    {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
+  try {
+    const info = await fetch(
+      `${process.env.API_DEST}/${dbName}/Client/add/availability_status/${userId}`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    },
-  );
+    );
 
-  if (info.ok) {
+    if (info.status === 404) {
+      logout();
+      return {
+        error: true,
+        completed: true,
+        message: "Your account does not exists.",
+      };
+    }
+
+    if (info.ok) {
+      return {
+        error: false,
+        completed: true,
+      };
+    }
     return {
-      error: false,
+      error: true,
       completed: true,
+      message: "Critical error",
+    };
+  } catch {
+    console.error("Create status fetch failed.");
+    return {
+      error: true,
+      completed: true,
+      message: "Connection error",
     };
   }
-  return {
-    error: true,
-    completed: true,
-    message: "Critical error",
-  };
 }

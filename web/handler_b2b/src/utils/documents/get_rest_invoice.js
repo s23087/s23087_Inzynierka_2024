@@ -10,13 +10,18 @@ export default async function getRestInvoice(invoiceId, isYourInvoice) {
   } else {
     url = `${process.env.API_DEST}/${dbName}/Invoices/rest/sales/${invoiceId}`;
   }
-  const items = await fetch(url, {
-    method: "GET",
-  });
+  try {
+    const items = await fetch(url, {
+      method: "GET",
+    });
 
-  if (items.ok) {
-    return await items.json();
+    if (items.ok) {
+      return await items.json();
+    }
+
+    return {};
+  } catch {
+    console.error("getRestInvoice fetch failed.");
+    return null;
   }
-
-  return {};
 }

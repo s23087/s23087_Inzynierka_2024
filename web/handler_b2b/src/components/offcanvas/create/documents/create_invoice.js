@@ -18,7 +18,7 @@ import getCurrencyValuesList from "@/utils/flexible/get_currency_values_list";
 import AddSaleProductWindow from "@/components/windows/add_Sales_product";
 import CreateSalesInvoice from "@/utils/documents/create_sales_invoice";
 import ErrorMessage from "@/components/smaller_components/error_message";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
 
 function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
   const router = useRouter();
@@ -29,52 +29,52 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
   const [statusesDownloadError, setStatusesDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      getUsers()
+        getUsers()
         .then((data) => {
-          if (data === null) return;
-          setUsers(data);
-          setChoosenUser(data[0].idUser);
+          if (data === null) {
+            setUserDownloadError(true)
+          } else {
+            setUserDownloadError(false)
+            setUsers(data);
+            setChoosenUser(data[0].idUser);
+          }
         })
-        .catch(() => setUserDownloadError(true))
-        .finally(() => {
-          if (choosenUser) setUserDownloadError(false);
-        });
 
-      getOrgsList()
-        .then((data) => {
-          if (data !== null) setOrgs(data);
-        })
-        .catch(() => setOrgDownloadError(true))
-        .finally(() => {
-          if (orgs.orgName) setOrgDownloadError(false);
-        });
+      getOrgsList().then((data) => {
+        if (data !== null) {
+          setOrgDownloadError(false);
+          setOrgs(data);
+        } else {
+          setOrgDownloadError(true);
+        }
+      });
 
-      getTaxes()
-        .then((data) => {
-          if (data !== null) setTaxes(data);
-        })
-        .catch(() => setTaxesDownloadError(true))
-        .finally(() => {
-          if (taxes.length > 0) setTaxesDownloadError(false);
-        });
+      getTaxes().then((data) => {
+        if (data !== null) {
+          setTaxes(data);
+          setTaxesDownloadError(false);
+        } else {
+          setTaxesDownloadError(true);
+        }
+      });
 
-      getPaymentMethods()
-        .then((data) => {
-          if (data !== null) setPaymentMethods(data);
-        })
-        .catch(() => setMethodsDownloadError(true))
-        .finally(() => {
-          if (paymentMethods.length > 0) setMethodsDownloadError(false);
-        });
+      getPaymentMethods().then((data) => {
+        if (data !== null) {
+          setMethodsDownloadError(false);
+          setPaymentMethods(data);
+        } else {
+          setMethodsDownloadError(true);
+        }
+      });
 
-      getPaymentStatuses()
-        .then((data) => {
-          if (data !== null) setPaymentStatuses(data);
-        })
-        .catch(() => setStatusesDownloadError(true))
-        .finally(() => {
-          if (paymentStatuses.length > 0) setStatusesDownloadError(false);
-        });
+      getPaymentStatuses().then((data) => {
+        if (data !== null) {
+          setStatusesDownloadError(false);
+          setPaymentStatuses(data);
+        } else {
+          setStatusesDownloadError(true);
+        }
+      });
     }
   }, [showOffcanvas]);
   // options
@@ -115,25 +115,17 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
         });
         return;
       }
-      let list = getCurrencyValuesList(
+      getCurrencyValuesList(
         choosenCurrency,
         invoiceDate,
         new Date().toLocaleDateString("en-CA"),
-      );
-      list
-        .then((data) =>
+      ).then((data) => {
           setCurrencyList({
             error: data.error,
             rates: data.rates,
-          }),
+          })
+        }
         )
-        .catch(() => {
-          setCurrencyList({
-            error: true,
-            message: "Critical error",
-            rates: [],
-          });
-        });
     }
   }, [showCurrencyExchange, invoiceDate, choosenCurrency]);
   // Errors
@@ -141,7 +133,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
   const [transportError, setTransportError] = useState(false);
   const [documentError, setDocumentError] = useState(false);
   const [dateError, setDateError] = useState(false);
-  const anyErrorActive =
+  const isFormErrorActive = () =>
     invoiceError ||
     transportError ||
     documentError ||
@@ -278,7 +270,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                   placeholder="invoice"
                   isInvalid={invoiceError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setInvoiceError,
                       40,
@@ -460,7 +452,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                   placeholder="transport cost"
                   isInvalid={transportError}
                   onInput={(e) => {
-                    StringValidtor.decimalValidator(
+                    InputValidtor.decimalValidator(
                       e.target.value,
                       setTransportError,
                     );
@@ -614,7 +606,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                       variant="mainBlue"
                       className="w-100"
                       type="submit"
-                      disabled={anyErrorActive}
+                      disabled={isFormErrorActive()}
                       onClick={(e) => {
                         e.preventDefault();
                         setIsLoading(true);
@@ -697,7 +689,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
   }
 }
 
-AddInvoiceOffcanvas.PropTypes = {
+AddInvoiceOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   isYourInvoice: PropTypes.bool.isRequired,

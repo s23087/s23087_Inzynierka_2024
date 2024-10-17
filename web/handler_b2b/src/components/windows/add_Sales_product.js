@@ -30,13 +30,14 @@ function AddSaleProductWindow({
   const [downloadError, setDownloadError] = useState(false);
   useEffect(() => {
     if (modalShow && addedProductsQty === 0) {
-      getItemsList(userId, currency)
-        .then((data) => {
-          if (data !== null) setProducts(data);
-        })
-        .catch(() => setDownloadError(true));
-    } else {
-      setDownloadError(false);
+      getItemsList(userId, currency).then((data) => {
+        if (data !== null) {
+          setDownloadError(false);
+          setProducts(data);
+        } else {
+          setDownloadError(true);
+        }
+      });
     }
   }, [modalShow, addedProductsQty, userId, currency]);
   // Errors
@@ -234,10 +235,9 @@ function AddSaleProductWindow({
   );
 }
 
-AddSaleProductWindow.PropTypes = {
+AddSaleProductWindow.propTypes = {
   modalShow: PropTypes.bool.isRequired,
   onHideFunction: PropTypes.func.isRequired,
-  statuses: PropTypes.object.isRequired,
   addFunction: PropTypes.func.isRequired,
   userId: PropTypes.number.isRequired,
   currency: PropTypes.string.isRequired,

@@ -24,7 +24,7 @@ function FilterIcon({ is_active, filterAction }) {
   );
 }
 
-FilterIcon.PropTypes = {
+FilterIcon.propTypes = {
   is_active: PropTypes.bool.isRequired,
   filterAction: PropTypes.func.isRequired,
 };

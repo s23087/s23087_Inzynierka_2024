@@ -21,6 +21,7 @@ export default async function getRestModifyPricelist(pricelistId) {
       items: [],
     };
   } catch {
+    console.error("getRestModifyPricelist fetch failed.")
     return null;
   }
 }

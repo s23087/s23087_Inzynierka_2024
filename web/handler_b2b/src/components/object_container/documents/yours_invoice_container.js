@@ -168,7 +168,7 @@ function InvoiceContainer({
   );
 }
 
-InvoiceContainer.PropTypes = {
+InvoiceContainer.propTypes = {
   item: PropTypes.object.isRequired,
   is_org: PropTypes.bool.isRequired,
   selected: PropTypes.bool.isRequired,

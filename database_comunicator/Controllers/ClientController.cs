@@ -1,6 +1,7 @@
 ﻿using database_communicator.Models.DTOs;
 using database_communicator.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -25,6 +26,8 @@ namespace database_communicator.Controllers
         [Route("get/{userId}")]
         public async Task<IActionResult> GetClients(int userId, string? search, string? sort, int? country)
         {
+            var exist = await _userServices.UserExist(userId);
+            if (!exist) return NotFound();
             var isOrg = await _userServices.IsOrgUser(userId);
             var orgId = await _userServices.GetOrgId(userId, isOrg);
             IEnumerable<GetClient> result;
@@ -40,6 +43,8 @@ namespace database_communicator.Controllers
         [Route("get/org/{userId}")]
         public async Task<IActionResult> GetOrgClients(int userId, string? search, string? sort, int? country)
         {
+            var exist = await _userServices.UserExist(userId);
+            if (!exist) return NotFound();
             var orgId = await _userServices.GetOrgId(userId, true);
             IEnumerable<GetOrgClient> result;
             if (search == null)
@@ -51,21 +56,23 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("restInfoOrg")]
+        [Route("get/rest/{orgId}")]
         public async Task<IActionResult> GetRestInfoOrg(int orgId)
         {
+            var orgExist = await _organizationServices.OrgExist(orgId);
+            if (!orgExist) return NotFound("Org do not exist.");
             var result = await _organizationServices.GetClientsRestInfo(orgId);
             return Ok(result);
         }
         [HttpGet]
-        [Route("availabilityStatuses")]
+        [Route("get/availability_statuses")]
         public async Task<IActionResult> GetAvailabilityStatuses()
         {
             var result = await _organizationServices.GetAvailabilityStatuses();
             return Ok(result);
         }
         [HttpPost]
-        [Route("addAvailabilityStatuses")]
+        [Route("add/availability_status/{userId}")]
         public async Task<IActionResult> AddAvailabilityStatuses(AddAvailabilityStatus data, int userId)
         {
             var exist = await _userServices.UserExist(userId);
@@ -76,44 +83,47 @@ namespace database_communicator.Controllers
             return Ok();
         }
         [HttpPost]
-        [Route("setUserClientBindings")]
+        [Route("modify/user_client_bindings/{userId}")]
         public async Task<IActionResult> SetUserClientBindings(SetUserClientBindings data, int userId)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User do not exist.");
+            if (!exist) return NotFound("Your account does not exists.");
             var orgExist = await _organizationServices.OrgExist(data.OrgId);
             if (!orgExist) return NotFound("Org do not exist.");
             var usersExist = await _organizationServices.ManyUserExist(data.UsersId);
             if (!usersExist) return NotFound("One of user id do not exist.");
+            var result = await _organizationServices.SetClientUserBindings(data);
+            if (!result) return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             var logTypeId = await _logServices.getLogTypeId("Modify");
             await _logServices.CreateActionLog($"User bindings for client with id {data.OrgId} has been changed by user id {userId}.", userId, logTypeId);
-            var result = await _organizationServices.SetClientUserBindings(data);
-            return result ? Ok() : new StatusCodeResult(StatusCodes.Status500InternalServerError);
-        }
-        [HttpPost]
-        [Route("setAvailabilityStatusesToClient")]
-        public async Task<IActionResult> SetAvailabilityStatusesToClient(SetAvailabilityStatusesToClient data, int userId)
-        {
-            var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound();
-            var orgExist = await _organizationServices.OrgExist(data.OrgId);
-            if (!orgExist) return NotFound();
-            var statusExists = await _organizationServices.StatusExist(data.StatusId);
-            if (!statusExists) return NotFound();
-            var logTypeId = await _logServices.getLogTypeId("Modify");
-            await _logServices.CreateActionLog($"Availability Status for client with id {data.OrgId} has been changed by user id {userId}.", userId, logTypeId);
-            await _organizationServices.SetClientAvailabilityStatus(data.OrgId, data.StatusId);
             return Ok();
         }
         [HttpPost]
-        [Route("modifyOrg")]
+        [Route("setAvailabilityStatusesToClient/{userId}")]
+        public async Task<IActionResult> SetAvailabilityStatusesToClient(SetAvailabilityStatusesToClient data, int userId)
+        {
+            var exist = await _userServices.UserExist(userId);
+            if (!exist) return NotFound("Your account does not exists.");
+            var orgExist = await _organizationServices.OrgExist(data.OrgId);
+            if (!orgExist) return NotFound("Organization does not exists.");
+            var statusExists = await _organizationServices.StatusExist(data.StatusId);
+            if (!statusExists) return NotFound("Status does not exists.");
+            var result = await _organizationServices.SetClientAvailabilityStatus(data.OrgId, data.StatusId);
+            if (!result) return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            var logTypeId = await _logServices.getLogTypeId("Modify");
+            await _logServices.CreateActionLog($"Availability Status for client with id {data.OrgId} has been changed by user id {userId}.", userId, logTypeId);
+            return Ok();
+        }
+        [HttpPost]
+        [Route("modify/{userId}")]
         public async Task<IActionResult> ModifyOrg(ModifyOrg data, int userId)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound();
+            if (!exist) return NotFound("Your account does not exists.");
             var orgExist = await _organizationServices.OrgExist(data.OrgId);
-            if (!orgExist) return NotFound();
-            await _organizationServices.ModifyOrg(data);
+            if (!orgExist) return NotFound("Organization does not exists.");
+            var result = await _organizationServices.ModifyOrg(data);
+            if (!result) return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             var logTypeId = await _logServices.getLogTypeId("Modify");
             await _logServices.CreateActionLog($"Organization with id {data.OrgId} had been modified by user with id {userId}.", userId, logTypeId);
             return Ok();
@@ -131,7 +141,7 @@ namespace database_communicator.Controllers
             return Ok(orgId);
         }
         [HttpGet]
-        [Route("getUserClientBindings")]
+        [Route("get/user_client_bindings/{orgId}")]
         public async Task<IActionResult> GetUserClientBindings(int orgId)
         {
             var orgExist = await _organizationServices.OrgExist(orgId);

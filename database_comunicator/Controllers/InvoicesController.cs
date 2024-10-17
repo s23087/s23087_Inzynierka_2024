@@ -34,41 +34,41 @@ namespace database_communicator.Controllers
             _notificationServices = notificationServices;
         }
         [HttpGet]
-        [Route("getTaxes")]
+        [Route("get/taxes")]
         public async Task<IActionResult> GetTaxes() { 
             var result = await _invoicesService.GetTaxes();
             return Ok(result);
         }
         [HttpGet]
-        [Route("getPaymentStatuses")]
+        [Route("get/payment/statuses")]
         public async Task<IActionResult> GetPaymentStatuses()
         {
             var result = await _invoicesService.GetPaymentStatuses();
             return Ok(result);
         }
         [HttpGet]
-        [Route("getPurchaseList")]
+        [Route("get/purchase/list")]
         public async Task<IActionResult> GetPurchaseList()
         {
             var result = await _invoicesService.GetPurchaseInvoicesList();
             return Ok(result);
         }
         [HttpGet]
-        [Route("getSalesList")]
+        [Route("get/sales/list")]
         public async Task<IActionResult> GetSalesList()
         {
             var result = await _invoicesService.GetSalesInvoicesList();
             return Ok(result);
         }
         [HttpGet]
-        [Route("getPaymentMethods")]
+        [Route("get/payment/methods")]
         public async Task<IActionResult> GetPaymentMethods()
         {
             var result = await _invoicesService.GetPaymentMethods();
             return Ok(result);
         }
         [HttpGet]
-        [Route("getPurchaseInvoiceItems/{invoiceId}")]
+        [Route("get/purchase/items/{invoiceId}")]
         public async Task<IActionResult> GetPurchaseInvoiceItems(int invoiceId)
         {
             var invoiceExist = await _invoicesService.InvoiceExist(invoiceId);
@@ -77,7 +77,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("getSalesInvoiceItems/{invoiceId}")]
+        [Route("get/sales/items/{invoiceId}")]
         public async Task<IActionResult> GetSalesInvoiceItems(int invoiceId)
         {
             var invoiceExist = await _invoicesService.InvoiceExist(invoiceId);
@@ -86,7 +86,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("getOrgs/{userId}")]
+        [Route("get/orgs/{userId}")]
         public async Task<IActionResult> GetOrgs(int userId)
         {
             var exist = await _userServices.UserExist(userId);
@@ -163,7 +163,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpPost]
-        [Route("addPurchaseInvoice")]
+        [Route("add/purchase/{userId}")]
         public async Task<IActionResult> AddPurchaseInvoice(AddPurchaseInvoice data, int userId)
         {
             var exist = await _userServices.UserExist(data.UserId);
@@ -197,7 +197,7 @@ namespace database_communicator.Controllers
             return Ok();
         }
         [HttpPost]
-        [Route("addSalesInvoice")]
+        [Route("add/sales/{userId}")]
         public async Task<IActionResult> AddSalesInvoice(AddSalesInvoice data, int userId)
         {
             var exist = await _userServices.UserExist(data.UserId);
@@ -231,14 +231,14 @@ namespace database_communicator.Controllers
             return Ok();
         }
         [HttpGet]
-        [Route("allItems")]
+        [Route("get/items")]
         public async Task<IActionResult> GetAllItems()
         {
             var result = await _itemServices.GetItemList();
             return Ok(result);
         }
         [HttpGet]
-        [Route("allSalesItems/{userId}")]
+        [Route("get/sales/items/{userId}/currency/{currency}")]
         public async Task<IActionResult> GetAllSalesItems(int userId, string currency)
         {
             var exist = await _userServices.UserExist(userId);
@@ -283,7 +283,7 @@ namespace database_communicator.Controllers
             return result ? Ok() : new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
         [HttpGet]
-        [Route("invoicePath/{invoiceId}")]
+        [Route("get/path/{invoiceId}")]
         public async Task<IActionResult> GetInvoicePath(int invoiceId)
         {
             var invoiceExist = await _invoicesService.InvoiceExist(invoiceId);
@@ -310,7 +310,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("rest/modify/{invoiceId}")]
+        [Route("get/rest/modify/{invoiceId}")]
         public async Task<IActionResult> GetRestModifyInvoice(int invoiceId)
         {
             var invoiceExist = await _invoicesService.InvoiceExist(invoiceId);

@@ -1,6 +1,6 @@
 "use client";
 
-import propTypes from "prop-types";
+import PropTypes from "prop-types";
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Dropdown, Stack, Button } from "react-bootstrap";
@@ -77,8 +77,7 @@ function DeliverySwitch({ isDeliveryToUser }) {
 }
 
 DeliverySwitch.propTypes = {
-  boolean_value: propTypes.bool.isRequired, // 1 for client, 0 for user
-  switch_action: propTypes.func.isRequired,
+  isDeliveryToUser: PropTypes.bool.isRequired, // true for user, false for client
 };
 
 export default DeliverySwitch;

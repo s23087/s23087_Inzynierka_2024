@@ -14,7 +14,7 @@ function AddWaybillWindow({
   const [waybillIsInvalid, setWaybillIsInvalid] = useState(false);
   const [newEan, setNewEan] = useState("");
   return (
-    <Modal size="sm" show={modalShow} centered className="px-4">
+    <Modal size="md" show={modalShow} centered className="px-4 minScalableWidth">
       <Modal.Body>
         <Container>
           <Row>
@@ -90,7 +90,7 @@ function AddWaybillWindow({
   );
 }
 
-AddWaybillWindow.PropTypes = {
+AddWaybillWindow.propTypes = {
   modalShow: PropTypes.bool.isRequired,
   onHideFunction: PropTypes.func.isRequired,
   addAction: PropTypes.func.isRequired,

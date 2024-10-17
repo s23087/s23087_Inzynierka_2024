@@ -17,13 +17,13 @@ namespace database_communicator.Services
         public Task<int> GetCountryId(string countryName);
         public Task<bool> CountryExist(string countryName);
         public Task<GetOrg> GetOrg(int orgId);
-        public Task ModifyOrg(ModifyOrg data);
+        public Task<bool> ModifyOrg(ModifyOrg data);
         public Task<IEnumerable<GetClient>> GetClients(int userId, int userOrgId, string? sort, int? country);
         public Task<IEnumerable<GetClient>> GetClients(int userId, int userOrgId, string search, string? sort, int? country);
         public Task<IEnumerable<GetOrgClient>> GetOrgClients(int userOrgId, string? sort, int? country);
         public Task<IEnumerable<GetOrgClient>> GetOrgClients(int userOrgId, string search, string? sort, int? country);
         public Task<GetClientRestInfo> GetClientsRestInfo(int orgId);
-        public Task SetClientAvailabilityStatus(int orgId, int statusId);
+        public Task<bool> SetClientAvailabilityStatus(int orgId, int statusId);
         public Task<bool> SetClientUserBindings(SetUserClientBindings data);
         public Task AddAvailabilityStatus(AddAvailabilityStatus data);
         public Task<IEnumerable<GetAvailabilityStatuses>> GetAvailabilityStatuses();
@@ -99,47 +99,54 @@ namespace database_communicator.Services
                 Country=e.Country.CountryName
             }).FirstAsync();
         }
-        public async Task ModifyOrg(ModifyOrg data)
+        public async Task<bool> ModifyOrg(ModifyOrg data)
         {
-            var changedOrg = new Organization
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
             {
-                OrganizationId = data.OrgId,
-                OrgName = data.OrgName,
-                Nip = data.Nip,
-                Street = data.Street,
-                City = data.City,
-                PostalCode = data.PostalCode,
-                CreditLimit = data.CreditLimit,
-                CountryId = data.CountryId,
-                AvailabilityStatus = null
-            };
-
-            _handlerContext.Update<Organization>(changedOrg);
-            _handlerContext.Entry(changedOrg).Property("AvailabilityStatusId").IsModified = false;
-
-            if (changedOrg.OrgName == null)
+                await _handlerContext.Organizations.Where(e => e.OrganizationId == data.OrgId)
+                    .ExecuteUpdateAsync(setter =>
+                        setter.SetProperty(s => s.Nip, data.Nip)
+                        .SetProperty(s => s.CreditLimit, data.CreditLimit)
+                        .SetProperty(s => s.CountryId, data.CountryId)
+                    );
+                if (data.OrgName != null)
+                {
+                    await _handlerContext.Organizations.Where(e => e.OrganizationId == data.OrgId)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => s.OrgName, data.OrgName)
+                        );
+                }
+                if (data.Street != null)
+                {
+                    await _handlerContext.Organizations.Where(e => e.OrganizationId == data.OrgId)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => s.Street, data.Street)
+                        );
+                }
+                if (data.City != null)
+                {
+                    await _handlerContext.Organizations.Where(e => e.OrganizationId == data.OrgId)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => s.City, data.City)
+                        );
+                }
+                if (data.PostalCode != null)
+                {
+                    await _handlerContext.Organizations.Where(e => e.OrganizationId == data.OrgId)
+                        .ExecuteUpdateAsync(setter =>
+                            setter.SetProperty(s => s.PostalCode, data.PostalCode)
+                        );
+                }
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+                return true;
+            } catch (Exception ex)
             {
-                _handlerContext.Entry(changedOrg).Property("OrgName").IsModified = false;
+                Console.WriteLine(ex.ToString());
+                await trans.RollbackAsync();
+                return false;
             }
-
-            if (changedOrg.Street == null)
-            {
-                _handlerContext.Entry(changedOrg).Property("Street").IsModified = false;
-            }
-            if (changedOrg.City == null)
-            {
-                _handlerContext.Entry(changedOrg).Property("City").IsModified = false;
-            }
-            if (changedOrg.PostalCode == null)
-            {
-                _handlerContext.Entry(changedOrg).Property("PostalCode").IsModified = false;
-            }
-            if (changedOrg.CreditLimit == null)
-            {
-                _handlerContext.Entry(changedOrg).Property("CreditLimit").IsModified = false;
-            }
-
-            await _handlerContext.SaveChangesAsync();
         }
         public async Task<IEnumerable<GetClient>> GetClients(int userId, int userOrgId, string? sort, int? country)
         {
@@ -279,11 +286,19 @@ namespace database_communicator.Services
                 }).FirstAsync();
         }
 
-        public async Task SetClientAvailabilityStatus(int orgId, int statusId)
+        public async Task<bool> SetClientAvailabilityStatus(int orgId, int statusId)
         {
-            await _handlerContext.Organizations.ExecuteUpdateAsync(setters => 
-            setters.SetProperty(s => s.AvailabilityStatusId, statusId));
-            await _handlerContext.SaveChangesAsync();
+            try
+            {
+                await _handlerContext.Organizations.ExecuteUpdateAsync(setters =>
+                    setters.SetProperty(s => s.AvailabilityStatusId, statusId));
+                await _handlerContext.SaveChangesAsync();
+                return true;
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return false;
+            }
         }
 
         public async Task AddAvailabilityStatus(AddAvailabilityStatus data)

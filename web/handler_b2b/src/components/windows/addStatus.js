@@ -7,6 +7,7 @@ import { Modal, Container, Row, Col, Form, Button } from "react-bootstrap";
 import validators from "@/utils/validators/validator";
 import createStatus from "@/utils/clients/create_status";
 import { useRouter } from "next/navigation";
+import ErrorMessage from "../smaller_components/error_message";
 
 function AddAvailabilityStatusWindow({ modalShow, onHideFunction, statuses }) {
   const router = useRouter();
@@ -17,14 +18,8 @@ function AddAvailabilityStatusWindow({ modalShow, onHideFunction, statuses }) {
     completed: false,
     message: "",
   });
-  const hidden = {
-    display: "none",
-  };
-  const unhidden = {
-    display: "block",
-  };
   return (
-    <Modal size="sm" show={modalShow} centered className="px-4">
+    <Modal size="md" show={modalShow} centered className="px-4 minScalableWidth">
       <Modal.Body>
         <Container>
           <Row>
@@ -35,14 +30,10 @@ function AddAvailabilityStatusWindow({ modalShow, onHideFunction, statuses }) {
         </Container>
         <Container className="mt-4 mb-2">
           <Form id="statusAddForm" action={formAction}>
-            <Row>
-              <p
-                className="text-start mb-0 px-3 red-sec-text small-text"
-                style={state.error ? unhidden : hidden}
-              >
-                {state.message}
-              </p>
-            </Row>
+            <ErrorMessage 
+              message={state.message}
+              messageStatus={state.error}
+            />
             <Form.Group className="mb-4">
               <Form.Label className="blue-main-text">Name:</Form.Label>
               <Form.Control
@@ -65,14 +56,10 @@ function AddAvailabilityStatusWindow({ modalShow, onHideFunction, statuses }) {
                   }
                 }}
               />
-              <Row>
-                <p
-                  className="text-start mb-0 px-3 red-sec-text small-text"
-                  style={nameError ? unhidden : hidden}
-                >
-                  Status already exist or it&apos;s length exceed 150 chars.
-                </p>
-              </Row>
+              <ErrorMessage 
+                message="Status already exist or it&apos;s length exceed 150 chars."
+                messageStatus={nameError}
+              />
             </Form.Group>
             <Form.Group className="mb-2">
               <Form.Label className="blue-main-text">Days:</Form.Label>
@@ -92,14 +79,10 @@ function AddAvailabilityStatusWindow({ modalShow, onHideFunction, statuses }) {
                 }}
               />
             </Form.Group>
-            <Row>
-              <p
-                className="text-start mb-0 px-3 red-sec-text small-text"
-                style={daysError ? unhidden : hidden}
-              >
-                Can only be numbers
-              </p>
-            </Row>
+            <ErrorMessage 
+                message="Can only be numbers."
+                messageStatus={daysError}
+              />
           </Form>
           {state.completed && !state.error ? (
             <Container className="px-5 mt-4">
@@ -149,7 +132,7 @@ function AddAvailabilityStatusWindow({ modalShow, onHideFunction, statuses }) {
   );
 }
 
-AddAvailabilityStatusWindow.PropTypes = {
+AddAvailabilityStatusWindow.propTypes = {
   modalShow: PropTypes.bool.isRequired,
   onHideFunction: PropTypes.func.isRequired,
   statuses: PropTypes.object.isRequired,

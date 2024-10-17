@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useFormState } from "react-dom";
 import { Modal, Container, Row, Col, Form, Button } from "react-bootstrap";
 import ErrorMessage from "../smaller_components/error_message";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
 import createNote from "@/utils/deliveries/create_note";
 
 function AddNoteWindow({ modalShow, onHideFunction, deliveryId, successFun }) {
@@ -16,7 +16,7 @@ function AddNoteWindow({ modalShow, onHideFunction, deliveryId, successFun }) {
     message: "",
   });
   return (
-    <Modal size="sm" show={modalShow} centered className="px-4">
+    <Modal size="md" show={modalShow} centered className="px-4 minScalableWidth">
       <Modal.Body>
         <Container>
           <Row>
@@ -42,7 +42,7 @@ function AddNoteWindow({ modalShow, onHideFunction, deliveryId, successFun }) {
                 maxLength={500}
                 isInvalid={noteError}
                 onInput={(e) => {
-                  StringValidtor.normalStringValidtor(
+                  InputValidtor.normalStringValidtor(
                     e.target.value,
                     setNoteError,
                     500,
@@ -107,7 +107,7 @@ function AddNoteWindow({ modalShow, onHideFunction, deliveryId, successFun }) {
   );
 }
 
-AddNoteWindow.PropTypes = {
+AddNoteWindow.propTypes = {
   modalShow: PropTypes.bool.isRequired,
   onHideFunction: PropTypes.func.isRequired,
   deliveryId: PropTypes.number.isRequired,

@@ -191,7 +191,7 @@ function ItemContainer({
   );
 }
 
-ItemContainer.PropTypes = {
+ItemContainer.propTypes = {
   item: PropTypes.object.isRequired,
   currency: PropTypes.string.isRequired,
   is_org: PropTypes.bool.isRequired,

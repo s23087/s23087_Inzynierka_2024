@@ -32,12 +32,13 @@ function ClientFilterOffcanvas({
   useEffect(() => {
     getCountries()
       .then((data) => {
-        if (data !== null) setCountries(data);
+        if (data !== null) {
+          setDownloadError(false)
+          setCountries(data)
+        } else {
+          setDownloadError(true)
+        }
       })
-      .catch(() => setDownloadError(true))
-      .finally(() => {
-        if (countries.length > 0) setDownloadError(false);
-      });
   }, []);
   // Styles
   const vhStyle = {
@@ -193,12 +194,11 @@ function ClientFilterOffcanvas({
   );
 }
 
-ClientFilterOffcanvas.PropTypes = {
+ClientFilterOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   currentSort: PropTypes.string.isRequired,
   currentDirection: PropTypes.bool.isRequired,
-  isOrg: PropTypes.bool.isRequired,
 };
 
 export default ClientFilterOffcanvas;

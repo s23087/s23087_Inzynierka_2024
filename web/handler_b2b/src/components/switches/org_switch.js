@@ -32,7 +32,7 @@ function OrgSwitcher({ is_org }) {
   );
 }
 
-OrgSwitcher.PropTypes = {
+OrgSwitcher.propTypes = {
   is_org: PropTypes.bool.isRequired,
 };
 

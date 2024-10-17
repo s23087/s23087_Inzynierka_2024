@@ -18,15 +18,15 @@ function ViewRequestOffcanvas({ showOffcanvas, hideFunction, request, isOrg }) {
   const [requestPath, setRequestPath] = useState("");
   useEffect(() => {
     if (showOffcanvas) {
-      let restInfo = getRestRequest(request.id);
-      restInfo
-        .then((data) => {
+      getRestRequest(request.id)
+      .then((data) => {
+        if (data !== null) {
           setNote(data.note);
           setRequestPath(data.path);
-        })
-        .catch(() => {
+        } else {
           setNote("Error: could not download");
-        });
+        }
+      });
     }
   }, [showOffcanvas]);
   // Download bool
@@ -174,62 +174,95 @@ function ViewRequestOffcanvas({ showOffcanvas, hideFunction, request, isOrg }) {
                     {note ? note : "-"}
                   </p>
                 </Container>
-                {isOrg && request.status === "In progress" ? (
+                {isOrg ? (
                   <Container
                     className="main-grey-bg p-3 fixed-bottom w-100"
                     fluid
                   >
                     <Row className="mx-auto minScalableWidth maxFormWidth">
-                      <Col>
-                        <Button
-                          variant="green"
-                          className="w-100"
-                          disabled={isLoadingCompleted}
-                          onClick={async () => {
-                            setIsLoadingCompleted(true);
-                            let result = await setRequestStatus(
-                              request.id,
-                              "Fulfilled",
-                              "",
-                            );
-                            if (result) {
-                              setStatusError(false);
-                              setIsLoadingCompleted(false);
-                              router.refresh();
-                            } else {
-                              setStatusError(true);
-                              setIsLoadingCompleted(false);
-                            }
-                          }}
-                        >
-                          Complete
-                        </Button>
-                      </Col>
-                      <Col>
-                        <Button
-                          variant="red"
-                          className="w-100"
-                          disabled={isLoadingRejected}
-                          onClick={async () => {
-                            setIsLoadingRejected(true);
-                            let result = await setRequestStatus(
-                              request.id,
-                              "Request cancelled",
-                              "",
-                            );
-                            if (result) {
-                              setStatusError(false);
-                              setIsLoadingRejected(false);
-                              router.refresh();
-                            } else {
-                              setStatusError(true);
-                              setIsLoadingRejected(false);
-                            }
-                          }}
-                        >
-                          Reject
-                        </Button>
-                      </Col>
+                      {request.status === "In progress" ? (
+                        <>
+                          <Col>
+                            <Button
+                              variant="green"
+                              className="w-100"
+                              disabled={isLoadingCompleted}
+                              onClick={async () => {
+                                setIsLoadingCompleted(true);
+                                let result = await setRequestStatus(
+                                  request.id,
+                                  "Fulfilled",
+                                  "",
+                                );
+                                if (result) {
+                                  setStatusError(false);
+                                  setIsLoadingCompleted(false);
+                                  router.refresh();
+                                  hideFunction();
+                                } else {
+                                  setStatusError(true);
+                                  setIsLoadingCompleted(false);
+                                }
+                              }}
+                            >
+                              Complete
+                            </Button>
+                          </Col>
+                          <Col>
+                            <Button
+                              variant="red"
+                              className="w-100"
+                              disabled={isLoadingRejected}
+                              onClick={async () => {
+                                setIsLoadingRejected(true);
+                                let result = await setRequestStatus(
+                                  request.id,
+                                  "Request cancelled",
+                                  "",
+                                );
+                                if (result) {
+                                  setStatusError(false);
+                                  setIsLoadingRejected(false);
+                                  router.refresh();
+                                  hideFunction();
+                                } else {
+                                  setStatusError(true);
+                                  setIsLoadingRejected(false);
+                                }
+                              }}
+                            >
+                              Reject
+                            </Button>
+                          </Col>
+                        </>
+                      ) : (
+                        <Col>
+                          <Button
+                            variant="secBlue"
+                            className="w-100"
+                            disabled={isLoadingCompleted}
+                            onClick={async () => {
+                              setIsLoadingCompleted(true);
+                              let result = await setRequestStatus(
+                                request.id,
+                                "In progress",
+                                "",
+                              );
+                              if (result) {
+                                setStatusError(false);
+                                setIsLoadingCompleted(false);
+                                router.refresh();
+                                hideFunction();
+                              } else {
+                                setStatusError(true);
+                                setIsLoadingCompleted(false);
+                              }
+                            }}
+                          >
+                            Bring to "In progress"
+                          </Button>
+                        </Col>
+                      )}
                     </Row>
                   </Container>
                 ) : null}
@@ -242,7 +275,7 @@ function ViewRequestOffcanvas({ showOffcanvas, hideFunction, request, isOrg }) {
   );
 }
 
-ViewRequestOffcanvas.PropTypes = {
+ViewRequestOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   request: PropTypes.object.isRequired,

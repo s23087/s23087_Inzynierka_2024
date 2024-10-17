@@ -16,6 +16,7 @@ export default async function getDeliveryStatuses() {
 
     return [];
   } catch {
+    console.error("getDeliveryStatuses fetch failed.");
     return null;
   }
 }

@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import CloseIcon from "../../../../../public/icons/close_black.png";
 import ErrorMessage from "@/components/smaller_components/error_message";
 import getReceviers from "@/utils/documents/get_request_users";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
 import getRestModifyRequest from "@/utils/documents/get_rest_modify_request";
 import updateRequest from "@/utils/documents/modify_request";
 
@@ -18,23 +18,25 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
   const [restDownloadError, setRestDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      getReceviers()
-        .then((data) => setUsers(data))
-        .catch(() => setUserDownloadError(true))
-        .finally(() => {
-          if (users.length > 0) setUserDownloadError(false);
-        });
-      getRestModifyRequest(request.id)
-        .then((data) => {
-          if (data === null) return;
-          setRestInfo(data);
-          prevState.recevierId = data.recevierId;
-          prevState.note = data.note;
-        })
-        .catch(() => setRestDownloadError(true))
-        .finally(() => {
-          if (restInfo.note !== "is loading") setRestDownloadError(false);
-        });
+      getReceviers().then((data) => {
+        if (data !== null) {
+          setUserDownloadError(false);
+          setUsers(data);
+        } else {
+          setUserDownloadError(true);
+        }
+      });
+
+      getRestModifyRequest(request.id).then((data) => {
+        if (data === null) {
+          setRestDownloadError(true);
+          return;
+        }
+        setRestDownloadError(false);
+        setRestInfo(data);
+        prevState.recevierId = data.recevierId;
+        prevState.note = data.note;
+      });
       prevState.objectType = request.objectType;
       prevState.title = request.title;
     }
@@ -58,7 +60,7 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
   const [documentError, setDocumentError] = useState(false);
   const [noteError, setNoteError] = useState(false);
   const [titleError, setTitleError] = useState(false);
-  let anyErrorActive =
+  const isFormErrorActive = () => 
     documentError ||
     noteError ||
     titleError ||
@@ -147,7 +149,7 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
                   id="title"
                   isInvalid={titleError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setTitleError,
                       100,
@@ -231,7 +233,7 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
                   defaultValue={restInfo.note}
                   isInvalid={noteError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setNoteError,
                       500,
@@ -247,7 +249,7 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
                       variant="mainBlue"
                       className="w-100"
                       type="submit"
-                      disabled={anyErrorActive}
+                      disabled={isFormErrorActive()}
                       onClick={(e) => {
                         e.preventDefault();
                         let note = document.getElementById("noteId").value;
@@ -322,10 +324,10 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
   }
 }
 
-ModifyRequestOffcanvas.PropTypes = {
+ModifyRequestOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
-  isYourInvoice: PropTypes.bool.isRequired,
+  request: PropTypes.object.isRequired,
 };
 
 export default ModifyRequestOffcanvas;

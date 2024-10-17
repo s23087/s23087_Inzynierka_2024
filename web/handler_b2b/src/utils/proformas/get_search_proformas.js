@@ -45,8 +45,8 @@ export default async function getSearchProformas(
     }
 
     return [];
-  } catch (error) {
-    console.log(error);
+  } catch {
+    console.error("getSearchProformas fetch failed.")
     return null;
   }
 }

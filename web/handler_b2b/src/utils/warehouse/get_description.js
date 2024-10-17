@@ -4,7 +4,7 @@ import getDbName from "../auth/get_db_name";
 
 export default async function getDescription(itemId) {
   const dbName = await getDbName();
-  let url = `${process.env.API_DEST}/${dbName}/Warehouse/description?itemId=${itemId}`;
+  let url = `${process.env.API_DEST}/${dbName}/Warehouse/get/description/${itemId}`;
   try {
     const desc = await fetch(url, {
       method: "GET",
@@ -15,8 +15,8 @@ export default async function getDescription(itemId) {
     }
 
     return "";
-  } catch (error) {
-    console.log(error);
+  } catch {
+    console.error("getDescription fetch failed.")
     return null;
   }
 }

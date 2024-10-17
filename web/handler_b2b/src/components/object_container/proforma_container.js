@@ -118,7 +118,7 @@ function ProformaContainer({
   );
 }
 
-ProformaContainer.PropTypes = {
+ProformaContainer.propTypes = {
   proforma: PropTypes.object.isRequired,
   is_org: PropTypes.bool.isRequired,
   selected: PropTypes.bool.isRequired,

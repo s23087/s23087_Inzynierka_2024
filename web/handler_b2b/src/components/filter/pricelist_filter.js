@@ -354,7 +354,7 @@ function PricelistFilterOffcanvas({
   );
 }
 
-PricelistFilterOffcanvas.PropTypes = {
+PricelistFilterOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   currentSort: PropTypes.string.isRequired,

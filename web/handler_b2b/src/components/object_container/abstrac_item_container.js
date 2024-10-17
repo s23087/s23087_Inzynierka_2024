@@ -118,7 +118,7 @@ function AbstractItemContainer({
   );
 }
 
-AbstractItemContainer.PropTypes = {
+AbstractItemContainer.propTypes = {
   abstract_item: PropTypes.object.isRequired,
   selected: PropTypes.bool.isRequired,
   selectAction: PropTypes.func.isRequired,

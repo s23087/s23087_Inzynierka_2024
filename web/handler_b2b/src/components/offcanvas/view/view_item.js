@@ -20,6 +20,7 @@ import dropdown_big_down from "../../../../public/icons/dropdown_big_down.png";
 import view_outside_icon from "../../../../public/icons/view_outside_icon.png";
 import view_warehouse_icon from "../../../../public/icons/view_warehouse_icon.png";
 import getItemOwners from "@/utils/warehouse/get_item_owners";
+import ErrorMessage from "@/components/smaller_components/error_message";
 function ViewItemOffcanvas({
   showOffcanvas,
   hideFunction,
@@ -35,19 +36,39 @@ function ViewItemOffcanvas({
     ownedItemInfos: [],
   });
   const [description, setDescription] = useState("Is loading");
+  const [ownerDownloadError, setOwnerDownloadError] = useState(false);
+  const [restDownloadError, setRestDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      let restData = getRestInfo(currency, item.itemId, isOrg);
-      restData.then((data) => setRestInfo(data));
-      let desc = getDescription(item.itemId);
-      desc.then((data) => setDescription(data));
+      getRestInfo(currency, item.itemId, isOrg)
+      .then((data) => {
+        if (data !== null){
+          setRestDownloadError(false)
+          setRestInfo(data)
+        } else {
+          setRestDownloadError(true)
+        }
+      });
+      getDescription(item.itemId)
+      .then((data) => {
+        if (data !== null){
+          setDescription(data)
+        } else {
+          setDescription("Connection error")
+        }
+      });
     }
     if (isOrg) {
-      let users = getItemOwners(item.itemId);
-      users.then((data) => {
-        setUsers(data);
-        if (data[0]) {
-          setChoosenUser(data[0].idUser);
+      getItemOwners(item.itemId)
+      .then((data) => {
+        if (data !== null){
+          setOwnerDownloadError(false)
+          setUsers(data);
+          if (data[0]) {
+            setChoosenUser(data[0].idUser);
+          }
+        } else {
+          setOwnerDownloadError(true)
         }
       });
     }
@@ -114,6 +135,10 @@ function ViewItemOffcanvas({
               <Stack className="pt-3" gap={3}>
                 {isOrg && item.users.length > 0 ? (
                   <Form.Group>
+                    <ErrorMessage 
+                      message="Could not download users."
+                      messageStatus={ownerDownloadError}
+                    />
                     <Form.Label className="blue-main-text">User:</Form.Label>
                     <Form.Select
                       className="input-style shadow-sm"
@@ -167,6 +192,10 @@ function ViewItemOffcanvas({
                 key={choosenUser}
                 fluid
               >
+                <ErrorMessage 
+                  message="Could not download items data."
+                  messageStatus={restDownloadError}
+                />
                 {restInfo ? (
                   <ItemTable
                     restInfo={{
@@ -199,7 +228,7 @@ function ViewItemOffcanvas({
   );
 }
 
-ViewItemOffcanvas.PropTypes = {
+ViewItemOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   item: PropTypes.object.isRequired,

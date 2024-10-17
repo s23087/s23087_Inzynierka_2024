@@ -93,7 +93,7 @@ function UserSettingWindow({
   );
 }
 
-UserSettingWindow.PropTypes = {
+UserSettingWindow.propTypes = {
   user_name: PropTypes.string.isRequired,
   notification_qty: PropTypes.number.isRequired,
   active_link: PropTypes.string,

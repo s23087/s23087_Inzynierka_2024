@@ -73,7 +73,7 @@ export default async function addOutsideItems(file, state, formData) {
     })
     .on("error", async () => {
       await fetch(
-        `${process.env.API_DEST}/${dbName}/OutsideItem/add/error/notification?userId=${userId}`,
+        `${process.env.API_DEST}/${dbName}/OutsideItem/add/error/notification/${userId}`,
         {
           method: "POST",
           body: JSON.stringify({
@@ -87,7 +87,7 @@ export default async function addOutsideItems(file, state, formData) {
     })
     .on("end", async () => {
       const info = await fetch(
-        `${process.env.API_DEST}/${dbName}/OutsideItem/add?userId=${userId}`,
+        `${process.env.API_DEST}/${dbName}/OutsideItem/add/${userId}`,
         {
           method: "POST",
           body: JSON.stringify(data),
@@ -103,7 +103,7 @@ export default async function addOutsideItems(file, state, formData) {
         let message = `Import info. ${errorRows.length} rows has been omitted. Indexes: ${errorRows.join(",")}`;
         if (message.length > 250) message = message.substring(0, 247) + "...";
         await fetch(
-          `${process.env.API_DEST}/${dbName}/OutsideItem/add/error/notification?userId=${userId}`,
+          `${process.env.API_DEST}/${dbName}/OutsideItem/add/error/notification/${userId}`,
           {
             method: "POST",
             body: JSON.stringify({

@@ -13,7 +13,7 @@ namespace database_communicator.Services
     public interface IDeliveryServices
     {
         public Task<bool> DoesDeliveryCompanyExist(string companyName);
-        public Task AddDeliveryCompany(string companyName);
+        public Task<bool> AddDeliveryCompany(string companyName);
         public Task<int> AddDelivery(AddDelivery data);
         public Task<bool> DeliveryProformaExist(int proformaId);
         public Task<bool> DeliveryExist(int deliveryId);
@@ -32,7 +32,7 @@ namespace database_communicator.Services
         public Task<int> GetDeliveryOwnerId(int deliveryId);
         public Task<GetRestDelivery> GetRestDelivery(int deliveryId);
         public Task<bool> AddNote(AddNote data);
-        public Task SetDeliveryStatus(SetDeliveryStatus data);
+        public Task<bool> SetDeliveryStatus(SetDeliveryStatus data);
         public Task<bool> ModifyDelivery(ModifyDelivery data);
         public Task<IEnumerable<int>> GetWarehouseManagerIds();
     }
@@ -47,12 +47,21 @@ namespace database_communicator.Services
         {
             return await _handlerContext.DeliveryCompanies.AnyAsync(x => x.DeliveryCompanyName.ToLower() == companyName.ToLower());
         }
-        public async Task AddDeliveryCompany(string companyName)
+        public async Task<bool> AddDeliveryCompany(string companyName)
         {
-            await _handlerContext.DeliveryCompanies.AddAsync(new DeliveryCompany
+            try
             {
-                DeliveryCompanyName = companyName,
-            });
+                await _handlerContext.DeliveryCompanies.AddAsync(new DeliveryCompany
+                {
+                    DeliveryCompanyName = companyName,
+                });
+                await _handlerContext.SaveChangesAsync();
+                return true;
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return false;
+            }
         }
         public async Task<int> AddDelivery(AddDelivery data)
         {
@@ -529,33 +538,45 @@ namespace database_communicator.Services
                 return false;
             }
         }
-        public async Task SetDeliveryStatus(SetDeliveryStatus data)
+        public async Task<bool> SetDeliveryStatus(SetDeliveryStatus data)
         {
-            var statusId = await _handlerContext.DeliveryStatuses
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
+            {
+                var statusId = await _handlerContext.DeliveryStatuses
                 .Where(e => e.StatusName == data.StatusName)
                 .Select(e => e.DeliveryStatusId).FirstAsync();
-            await _handlerContext.Deliveries
-                .Where(e => e.DeliveryId == data.DeliveryId)
-                .ExecuteUpdateAsync(setter =>
-                    setter.SetProperty(s => s.DeliveryStatusId, statusId)
-                );
-            string[] statusDateChange = { "Fulfilled", "Rejected", "Delivered with issues" };
-            if (statusDateChange.Contains(data.StatusName))
-            {
                 await _handlerContext.Deliveries
-                .Where(e => e.DeliveryId == data.DeliveryId)
-                .ExecuteUpdateAsync(setter =>
-                    setter.SetProperty(s => s.DeliveryDate, DateTime.Now)
-                );
-            } else
+                    .Where(e => e.DeliveryId == data.DeliveryId)
+                    .ExecuteUpdateAsync(setter =>
+                        setter.SetProperty(s => s.DeliveryStatusId, statusId)
+                    );
+                string[] statusDateChange = { "Fulfilled", "Rejected", "Delivered with issues" };
+                if (statusDateChange.Contains(data.StatusName))
+                {
+                    await _handlerContext.Deliveries
+                    .Where(e => e.DeliveryId == data.DeliveryId)
+                    .ExecuteUpdateAsync(setter =>
+                        setter.SetProperty(s => s.DeliveryDate, DateTime.Now)
+                    );
+                }
+                else
+                {
+                    await _handlerContext.Deliveries
+                    .Where(e => e.DeliveryId == data.DeliveryId)
+                    .ExecuteUpdateAsync(setter =>
+                        setter.SetProperty(s => s.DeliveryDate, (DateTime?)null)
+                    );
+                }
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+                return true;
+            } catch (Exception ex)
             {
-                await _handlerContext.Deliveries
-                .Where(e => e.DeliveryId == data.DeliveryId)
-                .ExecuteUpdateAsync(setter =>
-                    setter.SetProperty(s => s.DeliveryDate, (DateTime?)null)
-                );
+                Console.WriteLine(ex.Message);
+                await trans.RollbackAsync();
+                return false;
             }
-            await _handlerContext.SaveChangesAsync();
         }
         public async Task<bool> ModifyDelivery(ModifyDelivery data)
         {

@@ -11,7 +11,7 @@ import getPaymentStatuses from "@/utils/documents/get_payment_statuses";
 import CloseIcon from "../../../../../public/icons/close_black.png";
 import ErrorMessage from "@/components/smaller_components/error_message";
 import updateInvoice from "@/utils/documents/modify_invoice";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
 import getRestModifyInvoice from "@/utils/documents/get_rest_modify_info";
 
 function ModifyInvoiceOffcanvas({
@@ -27,48 +27,46 @@ function ModifyInvoiceOffcanvas({
   const [restDownloadError, setRestDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      getOrgsList()
-        .then((data) => {
-          if (data !== null) setOrgs(data);
-        })
-        .catch(() => setOrgDownloadError(true))
-        .finally(() => {
-          if (orgs.orgName) setOrgDownloadError(false);
-        });
+      getOrgsList().then((data) => {
+        if (data !== null) {
+          setOrgDownloadError(false);
+          setOrgs(data);
+        } else {
+          setOrgDownloadError(true);
+        }
+      });
 
-      getPaymentMethods()
-        .then((data) => {
-          if (data !== null) setPaymentMethods(data);
-        })
-        .catch(() => setMethodsDownloadError(true))
-        .finally(() => {
-          if (paymentMethods.length > 0) setMethodsDownloadError(false);
-        });
+      getPaymentMethods().then((data) => {
+        if (data !== null) {
+          setMethodsDownloadError(false);
+          setPaymentMethods(data);
+        } else {
+          setMethodsDownloadError(true);
+        }
+      });
 
-      getPaymentStatuses()
-        .then((data) => {
-          if (data !== null) setPaymentStatuses(data);
-        })
-        .catch(() => setStatusesDownloadError(true))
-        .finally(() => {
-          if (paymentStatuses.length > 0) setStatusesDownloadError(false);
-        });
+      getPaymentStatuses().then((data) => {
+        if (data !== null) {
+          setStatusesDownloadError(false);
+          setPaymentStatuses(data);
+        } else {
+          setStatusesDownloadError(true);
+        }
+      });
 
-      getRestModifyInvoice(invoice.invoiceId)
-        .then((data) => {
-          if (data !== null) {
-            setRestInfo(data);
-            prevState.invoiceNumber = invoice.invoiceNumber;
-            prevState.transport = data.transport;
-            prevState.paymentMethod = data.paymentMethod;
-            prevState.note = data.note;
-            prevState.status = invoice.inSystem;
-          }
-        })
-        .catch(() => setRestDownloadError(true))
-        .finally(() => {
-          if (restInfo.transport !== "is loading") setRestDownloadError(false);
-        });
+      getRestModifyInvoice(invoice.invoiceId).then((data) => {
+        if (data !== null) {
+          setRestDownloadError(false);
+          setRestInfo(data);
+          prevState.invoiceNumber = invoice.invoiceNumber;
+          prevState.transport = data.transport;
+          prevState.paymentMethod = data.paymentMethod;
+          prevState.note = data.note;
+          prevState.status = invoice.inSystem;
+        } else {
+          setRestDownloadError(true);
+        }
+      });
     }
   }, [showOffcanvas]);
   // rest info
@@ -89,7 +87,7 @@ function ModifyInvoiceOffcanvas({
   const [invoiceNumberError, setInvoiceNumberError] = useState(false);
   const [transportError, setTransportError] = useState(false);
   const [documentError, setDocumentError] = useState(false);
-  const anyErrorActive =
+  const isFormErrorActive = () => 
     invoiceNumberError ||
     transportError ||
     documentError ||
@@ -191,7 +189,7 @@ function ModifyInvoiceOffcanvas({
                   name="invoice"
                   isInvalid={invoiceNumberError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setInvoiceNumberError,
                       40,
@@ -250,7 +248,7 @@ function ModifyInvoiceOffcanvas({
                   defaultValue={restInfo.transport}
                   isInvalid={transportError}
                   onInput={(e) => {
-                    StringValidtor.decimalValidator(
+                    InputValidtor.decimalValidator(
                       e.target.value,
                       setTransportError,
                     );
@@ -378,7 +376,7 @@ function ModifyInvoiceOffcanvas({
                       variant="mainBlue"
                       className="w-100"
                       type="submit"
-                      disabled={anyErrorActive}
+                      disabled={isFormErrorActive()}
                       onClick={(e) => {
                         e.preventDefault();
                         setIsLoading(true);
@@ -442,7 +440,7 @@ function ModifyInvoiceOffcanvas({
   }
 }
 
-ModifyInvoiceOffcanvas.PropTypes = {
+ModifyInvoiceOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   isYourInvoice: PropTypes.bool.isRequired,

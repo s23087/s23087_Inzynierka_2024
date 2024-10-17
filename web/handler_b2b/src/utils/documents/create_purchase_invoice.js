@@ -72,6 +72,14 @@ export default async function CreatePurchaseInvoice(
     usdVal = await getCurrencyValueByDate("USD", currencyExchangeDate);
   }
 
+  if (euroVal === null || usdVal === null) {
+    return {
+      error: true,
+      completed: true,
+      message: "Connection error.",
+    };
+  }
+
   if (euroVal === 0 || usdVal === 0) {
     return {
       error: true,
@@ -124,40 +132,58 @@ export default async function CreatePurchaseInvoice(
       message: "Could not upload file.",
     };
   }
-
-  const userId = await getUserId();
-  const info = await fetch(
-    `${process.env.API_DEST}/${dbName}/Invoices/addPurchaseInvoice?userId=${userId}`,
-    {
-      method: "POST",
-      body: JSON.stringify(purchaseInvoiceData),
-      headers: {
-        "Content-Type": "application/json",
+  try {
+    const userId = await getUserId();
+    const info = await fetch(
+      `${process.env.API_DEST}/${dbName}/Invoices/add/purchase/${userId}`,
+      {
+        method: "POST",
+        body: JSON.stringify(purchaseInvoiceData),
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    },
-  );
+    );
 
-  if (info.ok) {
-    return {
-      error: false,
-      completed: true,
-      message: "Success! You had created purchase invoice.",
-    };
-  } else {
-    try {
-      fs.rmSync(fileName);
-    } catch (error) {
-      console.log(error);
+    if (info.ok) {
+      return {
+        error: false,
+        completed: true,
+        message: "Success! You had created purchase invoice.",
+      };
+    } else {
+      try {
+        fs.rmSync(fileName);
+      } catch (error) {
+        console.log(error);
+        return {
+          error: true,
+          completed: true,
+          message: "Critical file error.",
+        };
+      }
       return {
         error: true,
         completed: true,
-        message: "Critical file error.",
+        message: "Critical error.",
+      };
+    }
+  } catch {
+    console.error("Create purchase invoice fetch failed.");
+    try {
+      fs.rmSync(fileName);
+    } catch (error) {
+      console.error(error);
+      return {
+        error: true,
+        completed: true,
+        message: "Connection error. Critical file error.",
       };
     }
     return {
       error: true,
       completed: true,
-      message: "Critical error.",
+      message: "Connection error.",
     };
   }
 }

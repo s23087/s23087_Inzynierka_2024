@@ -24,49 +24,58 @@ export default async function createNote(deliveryId, state, formData) {
     deliveryId: deliveryId,
   };
 
-  const info = await fetch(
-    `${process.env.API_DEST}/${dbName}/Delivery/note/add`,
-    {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
+  try {
+    const info = await fetch(
+      `${process.env.API_DEST}/${dbName}/Delivery/add/note`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    },
-  );
-  if (info.status === 404) {
-    logout();
-    return {
-      error: true,
-      completed: true,
-      message: "Your account does not exist.",
-    };
-  }
-  if (info.status === 400) {
-    logout();
-    return {
-      error: true,
-      completed: true,
-      message: await info.text(),
-    };
-  }
-  if (info.status === 500) {
-    return {
-      error: true,
-      completed: true,
-      message: "Server error",
-    };
-  }
+    );
+    if (info.status === 404) {
+      logout();
+      return {
+        error: true,
+        completed: true,
+        message: "Your account does not exist.",
+      };
+    }
+    if (info.status === 400) {
+      logout();
+      return {
+        error: true,
+        completed: true,
+        message: await info.text(),
+      };
+    }
+    if (info.status === 500) {
+      return {
+        error: true,
+        completed: true,
+        message: "Server error",
+      };
+    }
 
-  if (info.ok) {
+    if (info.ok) {
+      return {
+        error: false,
+        completed: true,
+      };
+    }
     return {
-      error: false,
+      error: true,
       completed: true,
+      message: "Critical error",
+    };
+  } catch {
+    console.error("createNote fetch failed.");
+    return {
+      error: true,
+      completed: true,
+      message: "Connection error.",
     };
   }
-  return {
-    error: true,
-    completed: true,
-    message: "Critical error",
-  };
 }

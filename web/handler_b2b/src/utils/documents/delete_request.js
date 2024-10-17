@@ -10,40 +10,48 @@ export default async function deleteRequest(requestId) {
   if (path === null) {
     return {
       error: true,
-      message: "Request do not exists.",
+      message: "Server error.",
     };
   }
   const userId = await getUserId();
 
-  let url = `${process.env.API_DEST}/${dbName}/Requests/delete/${requestId}?userId=${userId}`;
-  const info = await fetch(url, {
-    method: "Delete",
-  });
+  let url = `${process.env.API_DEST}/${dbName}/Requests/delete/${requestId}/user/${userId}`;
+  try {
+    const info = await fetch(url, {
+      method: "Delete",
+    });
 
-  if (info.ok) {
-    if (path === "") {
-      return {
-        error: false,
-        message: "Success!",
-      };
+    if (info.ok) {
+      if (path === "") {
+        return {
+          error: false,
+          message: "Success!",
+        };
+      }
+      const fs = require("node:fs");
+      try {
+        fs.rmSync(path);
+        return {
+          error: false,
+          message: "Success!",
+        };
+      } catch (error) {
+        console.log(error);
+        return {
+          error: true,
+          message: "Success with error. Could not delete file on server.",
+        };
+      }
     }
-    const fs = require("node:fs");
-    try {
-      fs.rmSync(path);
-      return {
-        error: false,
-        message: "Success!",
-      };
-    } catch (error) {
-      console.log(error);
-      return {
-        error: true,
-        message: "Success with error. Could not delete file on server.",
-      };
-    }
+    return {
+      error: true,
+      message: await info.text(),
+    };
+  } catch {
+    console.error("Delete request fetch failed.");
+    return {
+      error: true,
+      message: "Connection error.",
+    };
   }
-  return {
-    error: true,
-    message: await info.text(),
-  };
 }

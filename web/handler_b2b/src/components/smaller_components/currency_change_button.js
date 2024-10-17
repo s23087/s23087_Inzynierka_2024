@@ -24,7 +24,7 @@ function CurrencyChangeButton({ currency, openCurrencyOffcanvas }) {
   );
 }
 
-CurrencyChangeButton.PropTypes = {
+CurrencyChangeButton.propTypes = {
   currency: PropTypes.string.isRequired,
   openCurrencyOffcanvas: PropTypes.func.isRequired,
 };

@@ -13,38 +13,47 @@ export default async function modifyUserRole(choosenUser, state, formData) {
     roleName: formData.get("role"),
   };
 
-  const dbName = await getDbName();
-  const info = await fetch(`${process.env.API_DEST}/${dbName}/Roles/modify`, {
-    method: "POST",
-    body: JSON.stringify(data),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (info.status == 404) {
-    let text = await info.text();
-    if (text === "User not found") {
-      logout();
-      redirect("/");
+  try {
+    const dbName = await getDbName();
+    const info = await fetch(`${process.env.API_DEST}/${dbName}/Roles/modify`, {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  
+    if (info.status == 404) {
+      let text = await info.text();
+      if (text === "User not found") {
+        logout();
+        redirect("/");
+      }
+      return {
+        error: true,
+        message: text,
+        completed: true,
+      };
     }
+  
+    if (info.ok) {
+      return {
+        error: false,
+        message: "Success! User role has been changed",
+        completed: true,
+      };
+    } else {
+      return {
+        error: true,
+        message: "Critical error",
+        completed: true,
+      };
+    }
+  } catch {
+    console.error("modifyUserRole fetch failed.")
     return {
       error: true,
-      message: text,
-      completed: true,
-    };
-  }
-
-  if (info.ok) {
-    return {
-      error: false,
-      message: "Success! User role has been changed",
-      completed: true,
-    };
-  } else {
-    return {
-      error: true,
-      message: "Critical error",
+      message: "Connection error.",
       completed: true,
     };
   }

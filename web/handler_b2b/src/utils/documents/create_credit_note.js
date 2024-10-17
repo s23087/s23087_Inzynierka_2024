@@ -100,63 +100,72 @@ export default async function CreateCreditNote(
     };
   }
 
-  const info = await fetch(
-    `${process.env.API_DEST}/${dbName}/CreditNote/add/${userId}`,
-    {
-      method: "POST",
-      body: JSON.stringify(creditNoteData),
-      headers: {
-        "Content-Type": "application/json",
+  try {
+    const info = await fetch(
+      `${process.env.API_DEST}/${dbName}/CreditNote/add/${userId}`,
+      {
+        method: "POST",
+        body: JSON.stringify(creditNoteData),
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    },
-  );
+    );
 
-  if (info.status === 404) {
-    logout();
-    return {
-      error: true,
-      completed: true,
-      message: "Unauthorized.",
-    };
-  }
-
-  if (info.status === 400) {
-    return {
-      error: true,
-      completed: true,
-      message: await info.text(),
-    };
-  }
-
-  if (info.status === 500) {
-    return {
-      error: true,
-      completed: true,
-      message: "Server error.",
-    };
-  }
-
-  if (info.ok) {
-    return {
-      error: false,
-      completed: true,
-      message: "Success! You had created credit note.",
-    };
-  } else {
-    try {
-      fs.rmSync(fileName);
-    } catch (error) {
-      console.log(error);
+    if (info.status === 404) {
+      logout();
       return {
         error: true,
         completed: true,
-        message: "Critical file error.",
+        message: "Unauthorized.",
       };
     }
+
+    if (info.status === 400) {
+      return {
+        error: true,
+        completed: true,
+        message: await info.text(),
+      };
+    }
+
+    if (info.status === 500) {
+      return {
+        error: true,
+        completed: true,
+        message: "Server error.",
+      };
+    }
+
+    if (info.ok) {
+      return {
+        error: false,
+        completed: true,
+        message: "Success! You had created credit note.",
+      };
+    } else {
+      try {
+        fs.rmSync(fileName);
+      } catch (error) {
+        console.log(error);
+        return {
+          error: true,
+          completed: true,
+          message: "Critical file error.",
+        };
+      }
+      return {
+        error: true,
+        completed: true,
+        message: "Critical error.",
+      };
+    }
+  } catch {
+    console.error("Create credit note fetch failed.");
     return {
       error: true,
       completed: true,
-      message: "Critical error.",
+      message: "Connection error.",
     };
   }
 }

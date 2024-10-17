@@ -30,7 +30,7 @@ function SearchFilterBar({ filter_icon_bool, moreButtonAction, filterAction }) {
   );
 }
 
-SearchFilterBar.PropTypes = {
+SearchFilterBar.propTypes = {
   filter_icon_bool: PropTypes.bool.isRequired,
   moreButtonAction: PropTypes.func.isRequired,
   filterAction: PropTypes.func.isRequired,

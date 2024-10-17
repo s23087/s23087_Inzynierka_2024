@@ -44,8 +44,8 @@ export default async function getProformas(
     }
 
     return [];
-  } catch (error) {
-    console.log(error);
+  } catch {
+    console.error("getProformas fetch failed.")
     return null;
   }
 }

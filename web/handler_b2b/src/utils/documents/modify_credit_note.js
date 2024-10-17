@@ -4,7 +4,7 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 import validators from "../validators/validator";
-import getCreditPath from "./get_credit_path";
+import { getCreditPath } from "./get_document_path";
 
 export default async function updateCreditNote(
   file,
@@ -83,80 +83,89 @@ export default async function updateCreditNote(
     note: note !== prevState.note ? note : null,
   };
 
-  const userId = await getUserId();
-  const info = await fetch(
-    `${process.env.API_DEST}/${dbName}/CreditNote/modify/${userId}`,
-    {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
+  try {
+    const userId = await getUserId();
+    const info = await fetch(
+      `${process.env.API_DEST}/${dbName}/CreditNote/modify/${userId}`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    },
-  );
+    );
 
-  if (info.status === 404) {
-    let infoText = await info.text();
-    if (infoText.includes("User")) logout();
-    return {
-      error: true,
-      completed: true,
-      message: infoText,
-    };
-  }
+    if (info.status === 404) {
+      let infoText = await info.text();
+      if (infoText.includes("User")) logout();
+      return {
+        error: true,
+        completed: true,
+        message: infoText,
+      };
+    }
 
-  if (info.status === 500) {
-    return {
-      error: true,
-      completed: true,
-      message: "Server error.",
-    };
-  }
+    if (info.status === 500) {
+      return {
+        error: true,
+        completed: true,
+        message: "Server error.",
+      };
+    }
 
-  if (info.ok) {
-    if (data.creditNumber) {
-      try {
-        fs.renameSync(prevPath, data.path);
-      } catch (error) {
-        const pathChange = await fetch(
-          `${process.env.API_DEST}/${dbName}/CreditNote/modify?userId=${userId}`,
-          {
-            method: "POST",
-            body: JSON.stringify({
-              isYourCredit: isYourCredit,
-              id: creditNoteId,
-              path: prevPath,
-            }),
-            headers: {
-              "Content-Type": "application/json",
+    if (info.ok) {
+      if (data.creditNumber) {
+        try {
+          fs.renameSync(prevPath, data.path);
+        } catch (error) {
+          const pathChange = await fetch(
+            `${process.env.API_DEST}/${dbName}/CreditNote/modify?userId=${userId}`,
+            {
+              method: "POST",
+              body: JSON.stringify({
+                isYourCredit: isYourCredit,
+                id: creditNoteId,
+                path: prevPath,
+              }),
+              headers: {
+                "Content-Type": "application/json",
+              },
             },
-          },
-        );
-        if (pathChange.ok) {
-          return {
-            error: true,
-            completed: true,
-            message: "Success with errors! The file has not been renamed.",
-          };
-        } else {
-          return {
-            error: true,
-            completed: true,
-            message: "Critical error. Invoice has been updated but file not.",
-          };
+          );
+          if (pathChange.ok) {
+            return {
+              error: true,
+              completed: true,
+              message: "Success with errors! The file has not been renamed.",
+            };
+          } else {
+            return {
+              error: true,
+              completed: true,
+              message: "Critical error. Invoice has been updated but file not.",
+            };
+          }
         }
       }
+      return {
+        error: false,
+        completed: true,
+        message: "Success! You have modified the credit note.",
+      };
+    } else {
+      return {
+        error: true,
+        completed: true,
+        message: "Critical error",
+      };
     }
-    return {
-      error: false,
-      completed: true,
-      message: "Success! You have modified the credit note.",
-    };
-  } else {
+  } catch {
+    console.error("updateCreditNote fetch failed.");
     return {
       error: true,
       completed: true,
-      message: "Critical error",
+      message: "Connection error.",
     };
   }
 }

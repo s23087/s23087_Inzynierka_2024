@@ -105,14 +105,15 @@ namespace database_communicator.Controllers
             return Ok();
         }
         [HttpPost]
-        [Route("company/add")]
+        [Route("add/company/{userId}")]
         public async Task<IActionResult> AddDeliveryCompany(AddDeliveryComapny data, int userId)
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("User not found.");
             var companyExist = await _deliveryService.DoesDeliveryCompanyExist(data.CompanyName);
             if (companyExist) return BadRequest("This company already exists.");
-            await _deliveryService.AddDeliveryCompany(data.CompanyName);
+            var result = await _deliveryService.AddDeliveryCompany(data.CompanyName);
+            if (!result) return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             var logId = await _logServices.getLogTypeId("Create");
             var desc = $"User with id {userId} has created the delivery company with name {data.CompanyName}.";
             await _logServices.CreateActionLog(desc, userId, logId);
@@ -151,7 +152,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpDelete]
-        [Route("delete/{deliveryId}")]
+        [Route("delete/{isDeliveryToUser}/{deliveryId}/user/{userId}")]
         public async Task<IActionResult> DeleteDelivery(int deliveryId, int userId, bool isDeliveryToUser)
         {
             var userExist = await _userServices.UserExist(userId);
@@ -187,7 +188,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpPost]
-        [Route("note/add")]
+        [Route("add/note")]
         public async Task<IActionResult> AddNote(AddNote data)
         {
             var exist = await _userServices.UserExist(data.UserId);
@@ -199,12 +200,13 @@ namespace database_communicator.Controllers
             return Ok();
         }
         [HttpPost]
-        [Route("status/change")]
+        [Route("modify/status")]
         public async Task<IActionResult> SetDeliveryStatus(SetDeliveryStatus data)
         {
             var deliveryExist = await _deliveryService.DeliveryExist(data.DeliveryId);
             if (!deliveryExist) return BadRequest("This delivery do not exists.");
-            await _deliveryService.SetDeliveryStatus(data);
+            var result = await _deliveryService.SetDeliveryStatus(data);
+            if (!result) return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             return Ok();
         }
         [HttpPost]

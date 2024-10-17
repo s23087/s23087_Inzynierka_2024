@@ -22,8 +22,8 @@ namespace database_communicator.Controllers
             _notificationServices = notificationServices;
         }
         [HttpGet]
-        [Route("users")]
-        public async Task<IActionResult> GetRequestUsers()
+        [Route("get/receviers")]
+        public async Task<IActionResult> GetReceviers()
         {
             var result = await _userServices.GetAccountantUser();
             return Ok(result);
@@ -94,7 +94,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpDelete]
-        [Route("delete/{requestId}")]
+        [Route("delete/{requestId}/user/{userId}")]
         public async Task<IActionResult> DeleteRequest(int requestId, int userId)
         {
             var userExist = await _userServices.UserExist(userId);
@@ -120,7 +120,7 @@ namespace database_communicator.Controllers
             return Ok();
         }
         [HttpPost]
-        [Route("{userId}/modify")]
+        [Route("modify/{userId}")]
         public async Task<IActionResult> ModifyRequest(ModifyRequest data, int userId)
         {
             var exist = await _userServices.UserExist(userId);

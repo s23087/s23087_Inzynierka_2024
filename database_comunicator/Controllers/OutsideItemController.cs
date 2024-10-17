@@ -36,7 +36,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpDelete]
-        [Route("delete/org/{orgId}/item/{itemId}")]
+        [Route("delete/org/{orgId}/item/{itemId}/user/{userId}")]
         public async Task<IActionResult> DeleteOutsideItem(int itemId, int orgId, int userId)
         {
             var userExist = await _userServices.UserExist(userId);
@@ -64,7 +64,7 @@ namespace database_communicator.Controllers
             return Ok();
         }
         [HttpPost]
-        [Route("add")]
+        [Route("add/{userId}")]
         public async Task<IActionResult> AddOutsideItems(CreateOutsideItems data, int userId)
         {
             var date = DateTime.Now;
@@ -119,7 +119,7 @@ namespace database_communicator.Controllers
             return Ok();
         }
         [HttpPost]
-        [Route("add/error/notification")]
+        [Route("add/error/notification/{userId}")]
         public async Task<IActionResult> AddNotification(AddImportErrorNotification data, int userId)
         {
             var exist = await _userServices.UserExist(userId);

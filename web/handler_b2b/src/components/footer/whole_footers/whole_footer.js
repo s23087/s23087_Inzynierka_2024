@@ -22,4 +22,11 @@ function WholeFooter({ max_instance_on_page, page_qty, current_page }) {
   );
 }
 
+WholeFooter.propTypes = {
+  page_qty: PropTypes.number.isRequired,
+  max_instance_on_page: PropTypes.number.isRequired,
+  current_page: PropTypes.number.isRequired
+};
+
+
 export default WholeFooter;

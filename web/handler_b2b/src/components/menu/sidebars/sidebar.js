@@ -72,7 +72,7 @@ function CustomSidebar({
   );
 }
 
-CustomSidebar.PropTypes = {
+CustomSidebar.propTypes = {
   user_name: PropTypes.string.isRequired,
   org_name: PropTypes.string,
   children: PropTypes.object.isRequired, // All links of Navbar as horizontal stack

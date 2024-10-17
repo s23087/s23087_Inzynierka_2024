@@ -25,28 +25,57 @@ import switch_binding_view from "../../../../public/icons/switch_binding_view.pn
 import getUserClientBindings from "@/utils/clients/get_client_bindings";
 import getUsers from "@/utils/flexible/get_users";
 import setUserClientBindings from "@/utils/clients/set_user_clients_bindings";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
 
 function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
   const router = useRouter();
   // View change
   const [isBindingView, setIsBindingView] = useState(false);
   // Object data
-  const [restInfo, setRestInfo] = useState({});
+  const [restInfo, setRestInfo] = useState({
+    creditLimit: null,
+    availability: "",
+    daysForRealization: null,
+  });
   const [countries, setCountries] = useState([]);
   const [statues, setStatuses] = useState([]);
   const [clientBindings, setClientBindings] = useState([]);
   const [users, setUsers] = useState([]);
   // Get data & set prev state
   const [prevState, setPrevState] = useState({});
+  // download error
+  const [statusesDownloadError, setStatusesDownloadError] = useState(false);
+  const [bindingsDownloadError, setBindingsDownloadError] = useState(false);
+  const [restDownloadError, setRestDownloadError] = useState(false);
+  const [countriesDownloadError, setCountriesDownloadError] = useState(false);
+  const [userDownloadError, setUserDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      const restData = getRestClientInfo(client.clientId);
-      restData.then((data) => setRestInfo(data));
-      const countries = getCountries();
-      countries.then((data) => setCountries(data));
-      const statuses = getAvailabilityStatuses();
-      statuses.then((data) => setStatuses(data));
+      getRestClientInfo(client.clientId).then((data) => {
+        if (data !== null) {
+          setRestInfo(data);
+          setRestDownloadError(false);
+        } else {
+          setRestDownloadError(true);
+        }
+      });
+      getCountries()
+      .then((data) => {
+        if (data !== null) {
+          setCountriesDownloadError(false)
+          setCountries(data)
+        } else {
+          setCountriesDownloadError(true)
+        }
+      })
+      getAvailabilityStatuses().then((data) => {
+        if (data !== null) {
+          setStatuses(data);
+          setStatusesDownloadError(false);
+        } else {
+          setStatusesDownloadError(true);
+        }
+      });
       setPrevState({
         orgName: client.clientName,
         street: client.street,
@@ -61,10 +90,23 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
   }, [showOffcanvas]);
   useEffect(() => {
     if (isBindingView) {
-      const bindings = getUserClientBindings(client.clientId);
-      bindings.then((data) => setClientBindings(data));
-      const users = getUsers();
-      users.then((data) => setUsers(data));
+      getUserClientBindings(client.clientId).then((data) => {
+        if (data !== null) {
+          setClientBindings(data);
+          setBindingsDownloadError(false);
+        } else {
+          setBindingsDownloadError(true);
+        }
+      });
+      getUsers()
+        .then((data) => {
+          if (data === null) {
+            setUserDownloadError(true)
+          } else {
+            setUserDownloadError(false)
+            setUsers(data);
+          }
+        })
     }
   }, [isBindingView]);
   // Errors
@@ -89,7 +131,10 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
       streetError ||
       cityError ||
       postalError ||
-      creditError
+      creditError ||
+      statusesDownloadError ||
+      bindingsDownloadError ||
+      restDownloadError || countriesDownloadError || userDownloadError
     );
   };
   const anyErrorActive = getIsErrorActive();
@@ -195,6 +240,14 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
             style={isBindingView ? vhStyleHidden : vhStyleUnhidden}
             fluid
           >
+            <ErrorMessage
+              message="Error: could not download all necessary info."
+              messageStatus={
+                statusesDownloadError ||
+                bindingsDownloadError ||
+                restDownloadError || countriesDownloadError || userDownloadError
+              }
+            />
             <Form
               className="mx-1 mx-xl-3"
               id="clientModify"
@@ -213,7 +266,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   defaultValue={client.clientName}
                   isInvalid={nameError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setNameError,
                       50,
@@ -235,7 +288,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   defaultValue={client.nip}
                   isInvalid={nipError}
                   onInput={(e) => {
-                    StringValidtor.emptyNumberStringValidtor(
+                    InputValidtor.emptyNumberStringValidtor(
                       e.target.value,
                       setNipError,
                       15,
@@ -257,7 +310,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   defaultValue={client.street}
                   isInvalid={streetError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setStreetError,
                       200,
@@ -279,7 +332,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   defaultValue={client.city}
                   isInvalid={cityError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setCityError,
                       200,
@@ -301,7 +354,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   defaultValue={client.postal}
                   isInvalid={postalError}
                   onInput={(e) => {
-                    StringValidtor.onlyNumberStringValidtor(
+                    InputValidtor.onlyNumberStringValidtor(
                       e.target.value,
                       setPostalError,
                       25,
@@ -325,7 +378,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   defaultValue={restInfo.creditLimit}
                   isInvalid={creditError}
                   onInput={(e) => {
-                    StringValidtor.emptyNumberStringValidtor(
+                    InputValidtor.emptyNumberStringValidtor(
                       e.target.value,
                       setCreditError,
                       25,
@@ -594,7 +647,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
   }
 }
 
-ModifyClientOffcanvas.PropTypes = {
+ModifyClientOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   client: PropTypes.object.isRequired,

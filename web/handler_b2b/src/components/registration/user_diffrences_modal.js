@@ -71,7 +71,7 @@ function UserDiffModal({ modalShow, onHideFunction }) {
   );
 }
 
-UserDiffModal.PropTypes = {
+UserDiffModal.propTypes = {
   modalShow: PropTypes.bool.isRequired,
   onHideFunction: PropTypes.func.isRequired,
 };

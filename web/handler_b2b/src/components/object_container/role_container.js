@@ -82,7 +82,7 @@ function RoleContainer({
   );
 }
 
-RoleContainer.PropTypes = {
+RoleContainer.propTypes = {
   role: PropTypes.object.isRequired,
   selected: PropTypes.bool.isRequired,
   selectAction: PropTypes.func,

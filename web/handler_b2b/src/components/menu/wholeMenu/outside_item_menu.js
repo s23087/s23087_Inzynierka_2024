@@ -48,11 +48,9 @@ function OutsideItemsMenu({ current_role, current_nofitication_qty, user }) {
   );
 }
 
-OutsideItemsMenu.PropTypes = {
+OutsideItemsMenu.propTypes = {
   current_role: PropTypes.string.isRequired,
   current_nofitication_qty: PropTypes.number.isRequired,
-  is_org_switch_needed: PropTypes.bool.isRequired,
-  org_view: PropTypes.bool.isRequired,
   user: PropTypes.object.isRequired,
 };
 

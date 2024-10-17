@@ -1,4 +1,5 @@
 import { Stack, Table } from "react-bootstrap";
+import PropTypes from "prop-types";
 
 function CreditNoteTable({ creditItems, currency }) {
   if (creditItems.length === 0) {
@@ -59,5 +60,10 @@ function CreditNoteTable({ creditItems, currency }) {
     </Table>
   );
 }
+
+CreditNoteTable.propTypes = {
+  creditItems: PropTypes.array.isRequired,
+  currency: PropTypes.string.isRequired
+};
 
 export default CreditNoteTable;

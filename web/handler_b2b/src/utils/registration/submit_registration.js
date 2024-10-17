@@ -15,8 +15,8 @@ function createFolders(dbfile, logFile, docFile, pricelistFile) {
       return true;
     }
     return false;
-  } catch (error) {
-    console.log("Error:" + error);
+  } catch {
+    console.error("createFolders fetch failed.")
     return false;
   }
 }
@@ -28,8 +28,8 @@ function deleteFolders(dbfile, logFile, docFile, pricelistFile) {
     fs.rmdirSync(dbfile);
     fs.rmdirSync(docFile);
     fs.rmdirSync(pricelistFile);
-  } catch (error) {
-    console.log("Error:" + error);
+  } catch {
+    console.error("deleteFolders fetch failed.")
   }
 }
 

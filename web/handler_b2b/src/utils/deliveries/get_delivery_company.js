@@ -16,6 +16,7 @@ export default async function getDeliveryCompany() {
 
     return [];
   } catch {
+    console.error("getDeliveryCompany fetch failed.");
     return null;
   }
 }

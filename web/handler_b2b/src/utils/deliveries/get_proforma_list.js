@@ -8,18 +8,23 @@ export default async function getProformaListWithoutDelivery(isDeliveryToUser) {
   const dbName = await getDbName();
   const userId = await getUserId();
   let url = `${process.env.API_DEST}/${dbName}/Delivery/get/${isDeliveryToUser ? "user" : "client"}/proformas/${userId}`;
-  const info = await fetch(url, {
-    method: "GET",
-  });
+  try {
+    const info = await fetch(url, {
+      method: "GET",
+    });
 
-  if (info.status === 404) {
-    logout();
+    if (info.status === 404) {
+      logout();
+      return [];
+    }
+
+    if (info.ok) {
+      return await info.json();
+    }
+
     return [];
+  } catch {
+    console.error("getProformaListWithoutDelivery fetch failed.");
+    return null;
   }
-
-  if (info.ok) {
-    return await info.json();
-  }
-
-  return [];
 }

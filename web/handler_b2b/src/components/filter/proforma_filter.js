@@ -32,14 +32,14 @@ function ProformaFilterOffcanvas({
   const [orgs, setOrgs] = useState([]);
   const [errorDownload, setDownloadError] = useState(false);
   useEffect(() => {
-    getOrgsList()
-      .then((data) => {
-        if (data !== null) setOrgs(data.restOrgs);
-      })
-      .catch(() => setDownloadError(true))
-      .finally(() => {
-        if (orgs.orgName) setDownloadError(false);
-      });
+    getOrgsList().then((data) => {
+      if (data !== null) {
+        setDownloadError(false);
+        setOrgs(data.restOrgs);
+      } else {
+        setDownloadError(true);
+      }
+    });
   }, []);
   // Styles
   const vhStyle = {
@@ -367,7 +367,7 @@ function ProformaFilterOffcanvas({
   );
 }
 
-ProformaFilterOffcanvas.PropTypes = {
+ProformaFilterOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   currentSort: PropTypes.string.isRequired,

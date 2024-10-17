@@ -5,8 +5,9 @@ import { useState } from "react";
 import { useFormState } from "react-dom";
 import { Form, Container, Button, Stack } from "react-bootstrap";
 import ChangePassword from "@/utils/settings/change_password";
-import validators from "@/utils/validators/validator";
 import ForceLogutWindow from "@/components/windows/force_logout";
+import ErrorMessage from "@/components/smaller_components/error_message";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
 
 export default function ChangePasswordPage() {
   const router = useRouter();
@@ -17,12 +18,6 @@ export default function ChangePasswordPage() {
     completed: false,
     message: "",
   });
-  const hidden = {
-    display: "none",
-  };
-  const unhidden = {
-    display: "block",
-  };
   const buttonStyle = {
     width: "220px",
     height: "55px",
@@ -35,28 +30,20 @@ export default function ChangePasswordPage() {
       <Form className="mx-1 mx-xl-3" id="changePassForm" action={formAction}>
         <Form.Group className="mb-3" style={maxInputWidth}>
           <Form.Label className="blue-main-text">Old Password:</Form.Label>
-          <p
-            className="text-start mb-1 red-sec-text small-text"
-            style={state.error ? unhidden : hidden}
-          >
-            {state.message}
-          </p>
-          <p
-            className="text-start mb-1 red-sec-text small-text"
-            style={isInvalid ? unhidden : hidden}
-          >
-            One of password are empty or password are the same.
-          </p>
+          <ErrorMessage 
+            message={state.message}
+            messageStatus={state.error}
+          />
+          <ErrorMessage 
+            message="One of password are empty or password are the same."
+            messageStatus={isInvalid}
+          />
           <Form.Control
             className="input-style shadow-sm"
             type="password"
             name="oldPassword"
             onInput={(e) => {
-              if (validators.stringIsNotEmpty(e.target.value)) {
-                setIsInvalid(false);
-              } else {
-                setIsInvalid(true);
-              }
+              InputValidtor.isEmptyValidator(e.target.value, setIsInvalid)
             }}
             isInvalid={isInvalid}
             placeholder="old password"
@@ -72,11 +59,7 @@ export default function ChangePasswordPage() {
             id="newPassword"
             isInvalid={isInvalid}
             onInput={(e) => {
-              if (validators.stringIsNotEmpty(e.target.value)) {
-                setIsInvalid(false);
-              } else {
-                setIsInvalid(true);
-              }
+              InputValidtor.isEmptyValidator(e.target.value, setIsInvalid)
             }}
             placeholder="new password"
           />
@@ -96,8 +79,8 @@ export default function ChangePasswordPage() {
                 return;
               }
               if (
-                !validators.stringIsNotEmpty(newPass.value) ||
-                !validators.stringIsNotEmpty(oldPass.value)
+                newPass.value === "" ||
+                oldPass.value === ""
               ) {
                 setIsInvalid(true);
                 return;

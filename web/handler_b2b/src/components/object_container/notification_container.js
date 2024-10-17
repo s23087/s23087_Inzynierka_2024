@@ -77,7 +77,7 @@ function NotificationContainer({ notification, switch_read_action }) {
   );
 }
 
-NotificationContainer.PropTypes = {
+NotificationContainer.propTypes = {
   notification: PropTypes.object.isRequired,
   switch_read_action: PropTypes.func.isRequired,
 };

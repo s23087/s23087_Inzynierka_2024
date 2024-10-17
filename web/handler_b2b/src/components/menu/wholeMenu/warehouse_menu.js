@@ -73,7 +73,7 @@ function WarehouseMenu({
   );
 }
 
-WarehouseMenu.PropTypes = {
+WarehouseMenu.propTypes = {
   current_role: PropTypes.string.isRequired,
   current_nofitication_qty: PropTypes.number.isRequired,
   is_org_switch_needed: PropTypes.bool.isRequired,

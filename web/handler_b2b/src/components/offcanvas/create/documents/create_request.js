@@ -9,19 +9,21 @@ import CloseIcon from "../../../../../public/icons/close_black.png";
 import ErrorMessage from "@/components/smaller_components/error_message";
 import getReceviers from "@/utils/documents/get_request_users";
 import createRequest from "@/utils/documents/create_request";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
 
 function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
   const router = useRouter();
   const [userDownloadError, setUserDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      getReceviers()
-        .then((data) => setUsers(data))
-        .catch(() => setUserDownloadError(true))
-        .finally(() => {
-          if (users.length > 0) setUserDownloadError(false);
-        });
+      getReceviers().then((data) => {
+        if (data !== null) {
+          setUserDownloadError(false);
+          setUsers(data);
+        } else {
+          setUserDownloadError(true);
+        }
+      });
     }
   }, [showOffcanvas]);
   // options
@@ -32,7 +34,7 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
   const [documentError, setDocumentError] = useState(false);
   const [noteError, setNoteError] = useState(false);
   const [titleError, setTitleError] = useState(false);
-  let anyErrorActive =
+  const isFromErrorActive = () => 
     documentError ||
     noteError ||
     users.length === 0 ||
@@ -107,7 +109,7 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
                   id="title"
                   isInvalid={titleError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setTitleError,
                       100,
@@ -186,7 +188,7 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
                   id="noteId"
                   isInvalid={noteError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setNoteError,
                       500,
@@ -202,7 +204,7 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
                       variant="mainBlue"
                       className="w-100"
                       type="submit"
-                      disabled={anyErrorActive}
+                      disabled={isFromErrorActive()}
                       onClick={(e) => {
                         e.preventDefault();
                         let note = document.getElementById("noteId").value;
@@ -280,10 +282,9 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
   }
 }
 
-AddRequestOffcanvas.PropTypes = {
+AddRequestOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
-  isYourInvoice: PropTypes.bool.isRequired,
 };
 
 export default AddRequestOffcanvas;

@@ -8,7 +8,7 @@ export default async function getBasicInfo() {
   const userId = await getUserId();
   try {
     const info = await fetch(
-      `${process.env.API_DEST}/${dbName}/User/basicInfo/${userId}`,
+      `${process.env.API_DEST}/${dbName}/User/info/${userId}`,
       { method: "GET" },
     );
     if (info.ok) {
@@ -21,10 +21,11 @@ export default async function getBasicInfo() {
       };
     }
   } catch {
+    console.error("getBasicInfo fetch failed.")
     return {
-      username: "error",
-      surname: "error",
-      orgName: "error",
+      username: "connection error",
+      surname: "connection error",
+      orgName: "connection error",
     };
   }
 }

@@ -142,7 +142,7 @@ function PricelistContainer({
   );
 }
 
-PricelistContainer.PropTypes = {
+PricelistContainer.propTypes = {
   pricelist: PropTypes.object.isRequired,
   selected: PropTypes.bool.isRequired,
   selectAction: PropTypes.func,

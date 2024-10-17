@@ -96,48 +96,56 @@ export default async function createPricelist(
     currency: currency,
     items: transformProducts,
   };
-
-  const info = await fetch(`${process.env.API_DEST}/${dbName}/Offer/add`, {
-    method: "POST",
-    body: JSON.stringify(data),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  if (info.status === 404) {
-    logout();
+  try {
+    const info = await fetch(`${process.env.API_DEST}/${dbName}/Offer/add`, {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (info.status === 404) {
+      logout();
+      return {
+        error: true,
+        completed: true,
+        message: "Your user profile does not exists.",
+      };
+    }
+    if (info.status === 400) {
+      return {
+        error: true,
+        completed: true,
+        message: await info.text(),
+      };
+    }
+    if (info.status === 500) {
+      return {
+        error: true,
+        completed: true,
+        message: "Server error.",
+      };
+    }
+  
+    if (info.ok) {
+      return {
+        error: false,
+        completed: true,
+        message: "Success! You had created pricelist.",
+      };
+    } else {
+      return {
+        error: true,
+        completed: true,
+        message: "Critical error.",
+      };
+    }
+  } catch {
+    console.error("createPricelist fetch failed.")
     return {
       error: true,
       completed: true,
-      message: "Your user profile does not exists.",
-    };
-  }
-  if (info.status === 400) {
-    return {
-      error: true,
-      completed: true,
-      message: await info.text(),
-    };
-  }
-  if (info.status === 500) {
-    return {
-      error: true,
-      completed: true,
-      message: "Server error.",
-    };
-  }
-
-  if (info.ok) {
-    return {
-      error: false,
-      completed: true,
-      message: "Success! You had created pricelist.",
-    };
-  } else {
-    return {
-      error: true,
-      completed: true,
-      message: "Critical error.",
+      message: "Connection error.",
     };
   }
 }

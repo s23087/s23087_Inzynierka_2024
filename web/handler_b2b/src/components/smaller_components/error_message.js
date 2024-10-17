@@ -19,7 +19,7 @@ function ErrorMessage({ message, messageStatus }) {
   );
 }
 
-ErrorMessage.PropTypes = {
+ErrorMessage.propTypes = {
   message: PropTypes.string.isRequired,
   messageStatus: PropTypes.bool.isRequired,
 };

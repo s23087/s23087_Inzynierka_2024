@@ -14,7 +14,7 @@ import validators from "@/utils/validators/validator";
 import { useEffect, useState } from "react";
 import SuccesFadeAway from "../smaller_components/succes_fade_away";
 import ErrorMessage from "../smaller_components/error_message";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
 import getInvoiceItemForCredit from "@/utils/documents/get_invoice_item_for_credit";
 
 function AddCreditProductWindow({
@@ -28,14 +28,25 @@ function AddCreditProductWindow({
   // Products
   const [products, setProducts] = useState([]);
   const [currentProduct, setCurrentProduct] = useState(0);
+  const [downloadError, setDownloadError] = useState([]);
   useEffect(() => {
     if (modalShow && addedProducts.length === 0) {
-      const servProducts = getInvoiceItemForCredit(invoiceId, isYourCredit);
-      servProducts.then((data) => setProducts(data));
+      getInvoiceItemForCredit(invoiceId, isYourCredit).then((data) => {
+        if (data !== null) {
+          setProducts(data);
+          setDownloadError(false);
+        } else {
+          setDownloadError(true);
+        }
+      });
     }
     if (modalShow && addedProducts.length > 0) {
-      const servProducts = getInvoiceItemForCredit(invoiceId, isYourCredit);
-      servProducts.then((data) => {
+      getInvoiceItemForCredit(invoiceId, isYourCredit).then((data) => {
+        if (data === null) {
+          setDownloadError(true);
+          return;
+        }
+        setDownloadError(false);
         data.forEach((element) => {
           let qtyToSunstract = addedProducts
             .filter((e) => e.id === element.itemId)
@@ -73,6 +84,10 @@ function AddCreditProductWindow({
           </Row>
         </Container>
         <Container className="mt-3 mb-2">
+          <ErrorMessage
+            message="Could not download products."
+            messageStatus={downloadError}
+          />
           <Form.Group className="mb-3">
             <Form.Label className="blue-main-text">Product:</Form.Label>
             <Form.Select
@@ -142,7 +157,7 @@ function AddCreditProductWindow({
               }
               isInvalid={priceError}
               onInput={(e) => {
-                StringValidtor.decimalValidator(e.target.value, setPriceError);
+                InputValidtor.decimalValidator(e.target.value, setPriceError);
               }}
             />
           </Form.Group>
@@ -150,10 +165,11 @@ function AddCreditProductWindow({
             <Button
               variant="mainBlue"
               className="me-2 w-100"
+              disabled={priceError || qtyError || downloadError}
               onClick={() => {
                 setShowSuccess(false);
                 if (products.filter((e) => e.qty > 0).length <= 0) return;
-                if (priceError || qtyError) {
+                if (priceError || qtyError || downloadError) {
                   return;
                 }
                 let productKey = document.getElementById("product").value;
@@ -223,12 +239,13 @@ function AddCreditProductWindow({
   );
 }
 
-AddCreditProductWindow.PropTypes = {
+AddCreditProductWindow.propTypes = {
   modalShow: PropTypes.bool.isRequired,
   onHideFunction: PropTypes.func.isRequired,
   addFunction: PropTypes.func.isRequired,
   addedProducts: PropTypes.array.isRequired,
   invoiceId: PropTypes.number.isRequired,
+  isYourCredit: PropTypes.bool.isRequired,
 };
 
 export default AddCreditProductWindow;

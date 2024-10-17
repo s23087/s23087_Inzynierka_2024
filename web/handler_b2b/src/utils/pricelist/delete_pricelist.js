@@ -8,7 +8,7 @@ export default async function deletePricelist(pricelistId, path) {
   const dbName = await getDbName();
   const userId = await getUserId();
 
-  let url = `${process.env.API_DEST}/${dbName}/Offer/delete/${pricelistId}?userId=${userId}`;
+  let url = `${process.env.API_DEST}/${dbName}/Offer/delete/${pricelistId}/user/${userId}`;
   try {
     const info = await fetch(url, {
       method: "Delete",
@@ -50,9 +50,10 @@ export default async function deletePricelist(pricelistId, path) {
       message: "Critical error.",
     };
   } catch {
+    console.error("deletePricelist fetch failed.")
     return {
       error: true,
-      message: "Could not connect to server.",
+      message: "Connection error.",
     };
   }
 }

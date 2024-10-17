@@ -6,7 +6,7 @@ export default async function getFileFormServer(path) {
     let file = fs.readFileSync(path);
     return JSON.stringify(file);
   } catch (ex) {
-    console.log(ex);
+    console.error(ex);
     return null;
   }
 }

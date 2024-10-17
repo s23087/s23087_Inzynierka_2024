@@ -6,7 +6,7 @@ import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import Link from "next/link";
 import signIn from "@/utils/login/sign_in";
 import ErrorMessage from "../smaller_components/error_message";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
 
 export default function LoginForm() {
   const [state, formAction] = useFormState(signIn, {
@@ -31,7 +31,7 @@ export default function LoginForm() {
           placeholder="company id"
           isInvalid={state.error || companyIdError}
           onInput={(e) =>
-            StringValidtor.noPathCharactersValidator(
+            InputValidtor.noPathCharactersValidator(
               e.target.value,
               setComapnyIdError,
             )
@@ -47,7 +47,7 @@ export default function LoginForm() {
           name="email"
           placeholder="email"
           onInput={(e) =>
-            StringValidtor.emailValidator(e.target.value, setEmailError, 350)
+            InputValidtor.emailValidator(e.target.value, setEmailError, 350)
           }
           maxLength={350}
           isInvalid={state.error || emailError}

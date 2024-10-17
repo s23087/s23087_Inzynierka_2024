@@ -60,9 +60,10 @@ export default async function signIn(state, formData) {
       };
     }
   } catch {
+    console.error("signIn fetch failed")
     return {
       error: true,
-      message: "Server error.",
+      message: "Connection error.",
     };
   }
   const body = await response.json();

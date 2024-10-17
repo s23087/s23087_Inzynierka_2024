@@ -27,21 +27,31 @@ function ViewCreditNoteOffcanvas({
   const [creditPath, setCreditPath] = useState("");
   useEffect(() => {
     if (showOffcanvas) {
-      let restInfo = getRestCreditNote(creditNote.creditNoteId);
-      restInfo
-        .then((data) => {
+      getRestCreditNote(creditNote.creditNoteId)
+      .then((data) => {
+        if (data !== null){
+          if (data.length === 0){
+            setRestInfo({
+              creditNoteNumber: "not found",
+              currencyName: "not found",
+              note: "not found",
+              path: "not found",
+              creditItems: [],
+            })
+            return;
+          }
           setRestInfo(data);
           setCreditPath(data.path);
-        })
-        .catch(() =>
+        } else {
           setRestInfo({
-            creditNoteNumber: "error",
-            currencyName: "error",
-            note: "error",
-            path: "error",
+            creditNoteNumber: "connection error",
+            currencyName: "connection error",
+            note: "connection error",
+            path: "connection error",
             creditItems: [],
-          }),
-        );
+          })
+        }
+        })
     }
   }, [showOffcanvas]);
   // Download bool
@@ -206,7 +216,7 @@ function ViewCreditNoteOffcanvas({
   );
 }
 
-ViewCreditNoteOffcanvas.PropTypes = {
+ViewCreditNoteOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   creditNote: PropTypes.object.isRequired,

@@ -1,6 +1,6 @@
 "use client";
 
-import propTypes from "prop-types";
+import PropTypes from "prop-types";
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Dropdown, Stack, Button } from "react-bootstrap";
@@ -113,12 +113,12 @@ function InvoiceSwitch({ type, is_role_solo }) {
 }
 
 getIcon.propTypes = {
-  type: propTypes.bool.isRequired,
+  type: PropTypes.bool.isRequired,
 };
 
 InvoiceSwitch.propTypes = {
-  type: propTypes.bool.isRequired, // from switch statment in function 'getIcon'
-  is_role_solo: propTypes.bool.isRequired,
+  type: PropTypes.bool.isRequired, // from switch statment in function 'getIcon'
+  is_role_solo: PropTypes.bool.isRequired,
 };
 
 export default InvoiceSwitch;

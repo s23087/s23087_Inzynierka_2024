@@ -16,6 +16,7 @@ export default async function getOfferStatuses() {
 
     return [];
   } catch {
-    return [];
+    console.error("getOfferStatuses fetch failed.")
+    return null;
   }
 }

@@ -38,6 +38,7 @@ export default async function getUserRoles(search, sort, role) {
 
     return [];
   } catch {
+    console.error("getUserRoles fetch failed.")
     return null;
   }
 }

@@ -257,8 +257,9 @@ function ProformaList({
   );
 }
 
-ProformaList.PropTypes = {
+ProformaList.propTypes = {
   proformas: PropTypes.object.isRequired,
+  type: PropTypes.string.isRequired, // String that tells which type of proforma is it
   orgView: PropTypes.bool.isRequired,
   proformasStart: PropTypes.number.isRequired,
   proformasEnd: PropTypes.number.isRequired,

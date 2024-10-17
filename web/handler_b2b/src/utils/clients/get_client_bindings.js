@@ -4,14 +4,23 @@ import getDbName from "../auth/get_db_name";
 
 export default async function getUserClientBindings(orgId) {
   const dbName = await getDbName();
-  let url = `${process.env.API_DEST}/${dbName}/Client/getUserClientBindings?orgId=${orgId}`;
-  const info = await fetch(url, {
-    method: "GET",
-  });
+  try {
+    let url = `${process.env.API_DEST}/${dbName}/Client/get/user_client_bindings/${orgId}`;
+    const info = await fetch(url, {
+      method: "GET",
+    });
 
-  if (info.ok) {
-    return await info.json();
+    if (info.status === 404) {
+      return null;
+    }
+
+    if (info.ok) {
+      return await info.json();
+    }
+
+    return [];
+  } catch {
+    console.error("Get user client bindings fetch failed.");
+    return null;
   }
-
-  return [];
 }

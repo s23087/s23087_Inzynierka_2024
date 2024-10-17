@@ -61,7 +61,7 @@ function PolicyOffcanvas({ show, hideFunction }) {
   );
 }
 
-PolicyOffcanvas.PropTypes = {
+PolicyOffcanvas.propTypes = {
   show: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
 };

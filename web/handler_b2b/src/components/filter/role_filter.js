@@ -176,11 +176,12 @@ function RoleFilterOffcanvas({
   );
 }
 
-RoleFilterOffcanvas.PropTypes = {
+RoleFilterOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   currentSort: PropTypes.string.isRequired,
   currentDirection: PropTypes.bool.isRequired,
+  rolesToChoose: PropTypes.array.isRequired
 };
 
 export default RoleFilterOffcanvas;

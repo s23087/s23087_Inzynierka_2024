@@ -125,11 +125,11 @@ function DeliveryContainer({
   );
 }
 
-DeliveryContainer.PropTypes = {
+DeliveryContainer.propTypes = {
   delivery: PropTypes.object.isRequired,
   is_org: PropTypes.bool.isRequired,
   selected: PropTypes.bool.isRequired,
-  isDeliveryToUser: PropTypes.bool.isRequired, // 1 for user, 0 for client
+  isDeliveryToUser: PropTypes.bool.isRequired, // true for user, false for client
   selectAction: PropTypes.func,
   unselectAction: PropTypes.func,
   deleteAction: PropTypes.func,

@@ -98,39 +98,58 @@ export default async function CreateSalesInvoice(
     };
   }
 
-  const userId = await getUserId();
-  const info = await fetch(
-    `${process.env.API_DEST}/${dbName}/Invoices/addSalesInvoice?userId=${userId}`,
-    {
-      method: "POST",
-      body: JSON.stringify(invoiceData),
-      headers: {
-        "Content-Type": "application/json",
+  try {
+    const userId = await getUserId();
+    const info = await fetch(
+      `${process.env.API_DEST}/${dbName}/Invoices/add/sales/${userId}`,
+      {
+        method: "POST",
+        body: JSON.stringify(invoiceData),
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    },
-  );
+    );
 
-  if (info.ok) {
-    return {
-      error: false,
-      completed: true,
-      message: "Success! You had created sales invoice.",
-    };
-  } else {
-    try {
-      fs.rmSync(fileName);
-    } catch (error) {
-      console.log(error);
+    if (info.ok) {
+      return {
+        error: false,
+        completed: true,
+        message: "Success! You had created sales invoice.",
+      };
+    } else {
+      try {
+        fs.rmSync(fileName);
+      } catch (error) {
+        console.log(error);
+        return {
+          error: true,
+          completed: true,
+          message: "Critical file error.",
+        };
+      }
       return {
         error: true,
         completed: true,
-        message: "Critical file error.",
+        message: "Critical error.",
+      };
+    }
+  } catch {
+    console.error(" fetch failed.");
+    try {
+      fs.rmSync(fileName);
+    } catch (error) {
+      console.error(error);
+      return {
+        error: true,
+        completed: true,
+        message: "Connection error. Critical file error.",
       };
     }
     return {
       error: true,
       completed: true,
-      message: "Critical error.",
+      message: "Connection error.",
     };
   }
 }

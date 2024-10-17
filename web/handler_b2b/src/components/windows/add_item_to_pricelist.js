@@ -13,7 +13,7 @@ import {
 import { useEffect, useState } from "react";
 import SuccesFadeAway from "../smaller_components/succes_fade_away";
 import ErrorMessage from "../smaller_components/error_message";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
 import getItemsForPricelist from "@/utils/pricelist/get_items_for_pricelist";
 import validators from "@/utils/validators/validator";
 
@@ -75,7 +75,7 @@ function AddItemToPricelistWindow({
   // Misc
   const [showSuccess, setShowSuccess] = useState(false);
   return (
-    <Modal size="sm" show={modalShow} centered className="px-4">
+    <Modal size="md" show={modalShow} centered className="px-4 minScalableWidth">
       <Modal.Body>
         <Container>
           <Row>
@@ -137,7 +137,7 @@ function AddItemToPricelistWindow({
               defaultValue={chosenPrice}
               isInvalid={salesPriceError}
               onInput={(e) => {
-                StringValidtor.decimalValidator(
+                InputValidtor.decimalValidator(
                   e.target.value,
                   setSalesPriceError,
                 );
@@ -167,7 +167,7 @@ function AddItemToPricelistWindow({
               defaultValue={chosenMargin}
               isInvalid={marginError}
               onInput={(e) => {
-                StringValidtor.decimalValidator(e.target.value, setMarginError);
+                InputValidtor.decimalValidator(e.target.value, setMarginError);
                 if (!e.target.value) return;
                 if (!isNaN(parseFloat(e.target.value))) {
                   setChosenPrice(
@@ -240,7 +240,7 @@ function AddItemToPricelistWindow({
   );
 }
 
-AddItemToPricelistWindow.PropTypes = {
+AddItemToPricelistWindow.propTypes = {
   modalShow: PropTypes.bool.isRequired,
   onHideFunction: PropTypes.func.isRequired,
   addFunction: PropTypes.func.isRequired,

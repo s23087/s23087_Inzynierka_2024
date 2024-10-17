@@ -7,7 +7,8 @@ import { Form, Container, Button, Stack } from "react-bootstrap";
 import { useState } from "react";
 import modifyClient from "@/utils/flexible/modify_client";
 import Toastes from "@/components/smaller_components/toast";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import ErrorMessage from "@/components/smaller_components/error_message";
 
 function ModifyUserOrgForm({ orgInfo, countries }) {
   const router = useRouter();
@@ -16,8 +17,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
   const [streetError, setStreetError] = useState(false);
   const [cityError, setCityError] = useState(false);
   const [postalError, setPostalError] = useState(false);
-  const anyErrorActive =
-    orgNameError || nipMyError || streetError || cityError || postalError;
+  const isFormErrorActive = () =>  orgNameError || nipMyError || streetError || cityError || postalError || !countries || orgInfo.street === "connection error";
   const [prevState] = useState({
     orgName: orgInfo.orgName,
     street: orgInfo.street,
@@ -35,12 +35,6 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
     width: "220px",
     height: "55px",
   };
-  const hidden = {
-    display: "none",
-  };
-  const unhidden = {
-    display: "block",
-  };
   return (
     <Container className="px-4 pt-4" fluid>
       <Form className="mx-1 mx-xl-4" id="UserOrgModify" action={formAction}>
@@ -51,12 +45,10 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">Name:</Form.Label>
-          <p
-            className="text-start mb-1 red-sec-text small-text"
-            style={orgNameError ? unhidden : hidden}
-          >
-            Is empty or lenght is greater than 50.
-          </p>
+          <ErrorMessage 
+            message="Is empty or lenght is greater than 50."
+            messageStatus={orgNameError}
+          />
           <Form.Control
             className="input-style shadow-sm maxInputWidth"
             type="text"
@@ -64,7 +56,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             defaultValue={orgInfo.orgName}
             isInvalid={orgNameError}
             onInput={(e) => {
-              StringValidtor.normalStringValidtor(
+              InputValidtor.normalStringValidtor(
                 e.target.value,
                 setOrgNameError,
                 50,
@@ -75,12 +67,10 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">Nip:</Form.Label>
-          <p
-            className="text-start mb-1 red-sec-text small-text"
-            style={nipMyError ? unhidden : hidden}
-          >
-            Is empty, not a number or lenght is greater than 15.
-          </p>
+          <ErrorMessage 
+            message="Is empty, not a number or lenght is greater than 15."
+            messageStatus={nipMyError}
+          />
           <Form.Control
             className="input-style shadow-sm maxInputWidth"
             type="text"
@@ -88,7 +78,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             defaultValue={orgInfo.nip}
             isInvalid={nipMyError}
             onInput={(e) => {
-              StringValidtor.emptyNumberStringValidtor(
+              InputValidtor.emptyNumberStringValidtor(
                 e.target.value,
                 setMyNipError,
                 15,
@@ -99,12 +89,10 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">Street:</Form.Label>
-          <p
-            className="text-start mb-1 red-sec-text small-text"
-            style={streetError ? unhidden : hidden}
-          >
-            Is empty or lenght is greater than 200.
-          </p>
+          <ErrorMessage 
+            message="Is empty or lenght is greater than 200."
+            messageStatus={streetError}
+          />
           <Form.Control
             className="input-style shadow-sm maxInputWidth"
             type="text"
@@ -112,7 +100,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             defaultValue={orgInfo.street}
             isInvalid={streetError}
             onInput={(e) => {
-              StringValidtor.normalStringValidtor(
+              InputValidtor.normalStringValidtor(
                 e.target.value,
                 setStreetError,
                 200,
@@ -123,12 +111,10 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">City:</Form.Label>
-          <p
-            className="text-start mb-1 red-sec-text small-text"
-            style={cityError ? unhidden : hidden}
-          >
-            Is empty or lenght is greater than 200.
-          </p>
+          <ErrorMessage 
+            message="Is empty or lenght is greater than 200."
+            messageStatus={cityError}
+          />
           <Form.Control
             className="input-style shadow-sm maxInputWidth"
             type="text"
@@ -136,7 +122,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             defaultValue={orgInfo.city}
             isInvalid={cityError}
             onInput={(e) => {
-              StringValidtor.normalStringValidtor(
+              InputValidtor.normalStringValidtor(
                 e.target.value,
                 setCityError,
                 200,
@@ -147,12 +133,10 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">Postal code:</Form.Label>
-          <p
-            className="text-start mb-1 red-sec-text small-text"
-            style={postalError ? unhidden : hidden}
-          >
-            Is empty or lenght is greater than 25.
-          </p>
+          <ErrorMessage 
+            message="Is empty or lenght is greater than 25."
+            messageStatus={postalError}
+          />
           <Form.Control
             className="input-style shadow-sm maxInputWidth"
             type="text"
@@ -160,7 +144,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             defaultValue={orgInfo.postalCode}
             isInvalid={postalError}
             onInput={(e) => {
-              StringValidtor.normalStringValidtor(
+              InputValidtor.normalStringValidtor(
                 e.target.value,
                 setPostalError,
                 25,
@@ -179,7 +163,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             <option key={orgInfo.countryId} value={orgInfo.countryId}>
               {orgInfo.country}
             </option>
-            {Object.values(countries)
+            {Object.values(countries ?? [])
               .filter((e) => e.id !== orgInfo.countryId)
               .map((value) => {
                 return (
@@ -196,10 +180,10 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             variant="mainBlue"
             type="Submit"
             style={buttonStyle}
-            disabled={anyErrorActive}
+            disabled={isFormErrorActive()}
             onClick={(e) => {
               e.preventDefault();
-              if (anyErrorActive) return;
+              if (isFormErrorActive()) return;
               setIsLoading(true);
               let form = document.getElementById("UserOrgModify");
               form.requestSubmit();
@@ -253,7 +237,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
   );
 }
 
-ModifyUserOrgForm.PropTypes = {
+ModifyUserOrgForm.propTypes = {
   orgInfo: PropTypes.object.isRequired,
   countries: PropTypes.object.isRequired,
 };

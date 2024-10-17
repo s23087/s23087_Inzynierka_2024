@@ -2,6 +2,7 @@
 
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
+import logout from "../auth/logout";
 
 export default async function getSearchCreditNotes(
   isOrg,
@@ -44,12 +45,18 @@ export default async function getSearchCreditNotes(
       method: "GET",
     });
 
+    if (items.status === 404) {
+      logout();
+      return [];
+    }
+
     if (items.ok) {
       return await items.json();
     }
 
     return [];
   } catch {
+    console.error("getSearchCreditNotes fetch failed.");
     return null;
   }
 }

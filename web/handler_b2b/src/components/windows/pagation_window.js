@@ -9,7 +9,7 @@ function PagationWindow({ windowShow, onHideFunction }) {
   const pathName = usePathname();
   const params = useSearchParams();
   return (
-    <Modal size="sm" show={windowShow} centered className="px-4">
+    <Modal size="md" show={windowShow} centered className="px-4 minScalableWidth">
       <Modal.Body>
         <Container>
           <Row>
@@ -66,11 +66,9 @@ function PagationWindow({ windowShow, onHideFunction }) {
   );
 }
 
-PagationWindow.PropTypes = {
-  modalShow: PropTypes.bool.isRequired,
+PagationWindow.propTypes = {
+  windowShow: PropTypes.bool.isRequired,
   onHideFunction: PropTypes.func.isRequired,
-  addAction: PropTypes.func.isRequired,
-  eanExistFun: PropTypes.func.isRequired,
 };
 
 export default PagationWindow;

@@ -10,30 +10,34 @@ import { useRouter } from "next/navigation";
 import getCountries from "@/utils/flexible/get_countries";
 import getAvailabilityStatuses from "@/utils/clients/get_availability_statuses";
 import AddAvailabilityStatusWindow from "@/components/windows/addStatus";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
 import ErrorMessage from "@/components/smaller_components/error_message";
 
 function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
   const router = useRouter();
-  // Get country and statuses
+  // download error
   const [countriesDownloadError, setCountriesDownloadError] = useState(false);
   const [statusesDownloadError, setStatusesDownloadError] = useState(false);
+  // Get country and statuses
   useEffect(() => {
     if (showOffcanvas) {
       getCountries()
-        .then((data) => {
-          if (data !== null) setCountries(data);
-        })
-        .catch(() => setCountriesDownloadError(true))
-        .finally(() => {
-          if (countries.length > 0) setCountriesDownloadError(false);
-        });
-      getAvailabilityStatuses()
-        .then((data) => setStatuses(data))
-        .catch(() => setStatusesDownloadError(true))
-        .finally(() => {
-          if (statues.length > 0) setStatusesDownloadError(false);
-        });
+      .then((data) => {
+        if (data !== null) {
+          setCountriesDownloadError(false)
+          setCountries(data)
+        } else {
+          setCountriesDownloadError(true)
+        }
+      })
+      getAvailabilityStatuses().then((data) => {
+        if (data !== null) {
+          setStatuses(data);
+          setStatusesDownloadError(false);
+        } else {
+          setStatusesDownloadError(true);
+        }
+      });
     }
   }, [showOffcanvas]);
   const [countries, setCountries] = useState([]);
@@ -53,7 +57,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
     setClientPostalError(false);
     setCreditError(false);
   };
-  const getIsErrorActive = () => {
+  const isFormErrorActive = () => {
     return (
       clientNameError ||
       nipClientError ||
@@ -65,7 +69,6 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
       statusesDownloadError
     );
   };
-  const anyErrorActive = getIsErrorActive();
   // Add status
   const [showAddStatus, setShowAddStatus] = useState(false);
   // Loading element
@@ -139,7 +142,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="name"
                   isInvalid={clientNameError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setClientNameError,
                       50,
@@ -161,7 +164,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="nip"
                   isInvalid={nipClientError}
                   onInput={(e) => {
-                    StringValidtor.emptyNumberStringValidtor(
+                    InputValidtor.emptyNumberStringValidtor(
                       e.target.value,
                       setClientNipError,
                       15,
@@ -183,7 +186,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="street"
                   isInvalid={clientStreetError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setClientStreetError,
                       200,
@@ -205,7 +208,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="city"
                   isInvalid={cityClientError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setClientCityError,
                       200,
@@ -227,7 +230,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="postal code"
                   isInvalid={clientPostalError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setClientPostalError,
                       25,
@@ -251,7 +254,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="credit limit"
                   isInvalid={creditError}
                   onInput={(e) => {
-                    StringValidtor.emptyNumberStringValidtor(
+                    InputValidtor.emptyNumberStringValidtor(
                       e.target.value,
                       setCreditError,
                       25,
@@ -300,7 +303,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                       variant="mainBlue"
                       className="w-100"
                       type="submit"
-                      disabled={anyErrorActive}
+                      disabled={isFormErrorActive()}
                       onClick={(e) => {
                         e.preventDefault();
                         setIsLoading(true);
@@ -377,7 +380,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
   }
 }
 
-AddClientOffcanvas.PropTypes = {
+AddClientOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
 };

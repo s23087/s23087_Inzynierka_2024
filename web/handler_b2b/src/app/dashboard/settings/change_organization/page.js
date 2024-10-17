@@ -5,7 +5,12 @@ import getOrgModifyInfo from "@/utils/flexible/get_Org_modify_info";
 import getCountries from "@/utils/flexible/get_countries";
 
 export default async function ChangeOrgPage() {
-  const orgInfo = await getOrgModifyInfo();
-  const countries = await getCountries();
+  const orgInfo = await getOrgModifyInfo() ?? {
+    orgName: "connection error",
+    street: "connection error",
+    city: "connection error",
+    postalCode: "connection error",
+  };
+  const countries = await getCountries() ?? [];
   return <ModifyUserOrgForm orgInfo={orgInfo} countries={countries} />;
 }

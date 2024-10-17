@@ -21,49 +21,57 @@ export default async function ChangePassword(state, formData) {
     oldPassword: formData.get("oldPassword"),
     newPassword: formData.get("newPassword"),
   };
-
-  const info = await fetch(
-    `${process.env.API_DEST}/${dbName}/Settings/changePassword`,
-    {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
+  try {
+    const info = await fetch(
+      `${process.env.API_DEST}/${dbName}/Settings/changePassword`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    },
-  );
-
-  if (info.status === 404) {
-    logout();
-    redirect("/");
-  }
-
-  if (info.status === 401) {
+    );
+  
+    if (info.status === 404) {
+      logout();
+      redirect("/");
+    }
+  
+    if (info.status === 401) {
+      return {
+        error: true,
+        message: "Password is incorrect.",
+        completed: true,
+      };
+    }
+  
+    if (info.status === 400) {
+      return {
+        error: true,
+        message: "New password is the same as old one.",
+        completed: true,
+      };
+    }
+  
+    if (info.ok) {
+      return {
+        error: false,
+        completed: true,
+      };
+    }
+  
     return {
       error: true,
-      message: "Password is incorrect.",
+      message: "Ups, something went wrong.",
       completed: true,
     };
-  }
-
-  if (info.status === 400) {
+  } catch {
+    console.error("ChangePassword fetch failed.")
     return {
       error: true,
-      message: "New password is the same as old one.",
+      message: "Connection error.",
       completed: true,
     };
   }
-
-  if (info.ok) {
-    return {
-      error: false,
-      completed: true,
-    };
-  }
-
-  return {
-    error: true,
-    message: "Ups, something went wrong.",
-    completed: true,
-  };
 }

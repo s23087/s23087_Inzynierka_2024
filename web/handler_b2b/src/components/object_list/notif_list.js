@@ -41,7 +41,7 @@ function NotificationList({ notifs, notifStart, notifEnd }) {
   );
 }
 
-NotificationList.PropTypes = {
+NotificationList.propTypes = {
   notifs: PropTypes.object.isRequired,
   notifStart: PropTypes.number.isRequired,
   notifEnd: PropTypes.number.isRequired,

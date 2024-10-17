@@ -20,6 +20,7 @@ import getDeliveryCompany from "@/utils/deliveries/get_delivery_company";
 import getProformaListWithoutDelivery from "@/utils/deliveries/get_proforma_list";
 import AddWaybillWindow from "@/components/windows/addWaybill";
 import createDelivery from "@/utils/deliveries/create_delivery";
+import ErrorMessage from "@/components/smaller_components/error_message";
 
 function AddDeliveryOffcanvas({
   showOffcanvas,
@@ -30,14 +31,28 @@ function AddDeliveryOffcanvas({
   // Get country and statuses
   useEffect(() => {
     if (showOffcanvas) {
-      let getCompanies = getDeliveryCompany();
-      getCompanies.then((data) => setDeliveryCompanies(data));
-      let getProformas = getProformaListWithoutDelivery(isDeliveryToUser);
-      getProformas.then((data) => setProformas(data));
+      getDeliveryCompany().then((data) => {
+        if (data !== null) {
+          setCompaniesDownloadError(false);
+          setDeliveryCompanies(data);
+        } else {
+          setCompaniesDownloadError(true);
+        }
+      });
+      getProformaListWithoutDelivery(isDeliveryToUser).then((data) => {
+        if (data !== null) {
+          setProformasDownloadError(false);
+          setProformas(data);
+        } else {
+          setProformasDownloadError(true);
+        }
+      });
     }
   }, [showOffcanvas]);
   const [proformas, setProformas] = useState([]);
   const [deliveryCompanies, setDeliveryCompanies] = useState([]);
+  const [companiesDownloadError, setCompaniesDownloadError] = useState(false);
+  const [proformasDownloadError, setProformasDownloadError] = useState(false);
   // Waybills
   const [waybills] = useState([]);
   const [isAddWaybillShow, setIsAddWaybillShow] = useState(false);
@@ -48,10 +63,14 @@ function AddDeliveryOffcanvas({
   // Delivery company add
   const [isAddCompanyShow, setIsAddCompanyShow] = useState(false);
   // Error
-  const getIsErrorActive = () => {
-    return proformas.length === 0 || deliveryCompanies.length === 0;
+  const isFormErrorActive = () => {
+    return (
+      proformas.length === 0 ||
+      deliveryCompanies.length === 0 ||
+      companiesDownloadError ||
+      proformasDownloadError
+    );
   };
-  const anyErrorActive = getIsErrorActive();
   // Loading element
   const [isLoading, setIsLoading] = useState(false);
   // Form action
@@ -114,6 +133,10 @@ function AddDeliveryOffcanvas({
               id="createDelivery"
               action={formAction}
             >
+              <ErrorMessage
+                message="Could not download all necessary information."
+                messageStatus={companiesDownloadError || proformasDownloadError}
+              />
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Proforma:</Form.Label>
                 <Form.Select
@@ -232,7 +255,7 @@ function AddDeliveryOffcanvas({
                       variant="mainBlue"
                       className="w-100"
                       type="submit"
-                      disabled={anyErrorActive}
+                      disabled={isFormErrorActive()}
                       onClick={(e) => {
                         e.preventDefault();
                         setIsLoading(true);
@@ -296,7 +319,7 @@ function AddDeliveryOffcanvas({
   }
 }
 
-AddDeliveryOffcanvas.PropTypes = {
+AddDeliveryOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   isDeliveryToUser: PropTypes.bool.isRequired,

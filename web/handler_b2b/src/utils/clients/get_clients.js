@@ -20,12 +20,18 @@ export default async function getClients(isOrg, sort, country) {
       method: "GET",
     });
 
+    if (items.status === 404) {
+      logout();
+      return [];
+    }
+
     if (items.ok) {
       return await items.json();
     }
 
     return [];
   } catch {
+    console.error("Get client fetch failed.");
     return null;
   }
 }

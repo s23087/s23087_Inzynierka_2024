@@ -35,7 +35,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("roles")]
+        [Route("get")]
         public async Task<IActionResult> GetRoles()
         {
             var result = await _rolesServices.GetRoleNames();

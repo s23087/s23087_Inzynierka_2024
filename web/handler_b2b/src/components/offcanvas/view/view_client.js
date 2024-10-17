@@ -7,11 +7,20 @@ import { Offcanvas, Container, Row, Col, Button, Stack } from "react-bootstrap";
 import getRestClientInfo from "@/utils/clients/get_rest_info";
 import dropdown_big_down from "../../../../public/icons/dropdown_big_down.png";
 function ViewClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
-  const [restInfo, setRestInfo] = useState({});
+  const [restInfo, setRestInfo] = useState({
+    creditLimit: null,
+    availability: "",
+    daysForRealization: null,
+  });
   useEffect(() => {
     if (showOffcanvas) {
-      let restData = getRestClientInfo(client.clientId);
-      restData.then((data) => setRestInfo(data));
+      getRestClientInfo(client.clientId).then((data) => {
+        if (data !== null) {
+          setRestInfo(data);
+        } else {
+          restInfo.availability = "Error: could not download";
+        }
+      });
     }
   }, [showOffcanvas, client.clientId]);
   return (
@@ -92,7 +101,7 @@ function ViewClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
   );
 }
 
-ViewClientOffcanvas.PropTypes = {
+ViewClientOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   client: PropTypes.object.isRequired,

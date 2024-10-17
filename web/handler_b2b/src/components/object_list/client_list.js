@@ -233,7 +233,7 @@ function ClientsList({
   );
 }
 
-ClientsList.PropTypes = {
+ClientsList.propTypes = {
   clients: PropTypes.object.isRequired,
   orgView: PropTypes.bool.isRequired,
   clientsStart: PropTypes.number.isRequired,

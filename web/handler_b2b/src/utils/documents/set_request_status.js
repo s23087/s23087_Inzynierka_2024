@@ -8,15 +8,20 @@ export default async function setRequestStatus(requestId, statusName, note) {
     statusName: statusName,
     note: note,
   };
-  const info = await fetch(
-    `${process.env.API_DEST}/${dbName}/Requests/modify/${requestId}/status`,
-    {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
+  try {
+    const info = await fetch(
+      `${process.env.API_DEST}/${dbName}/Requests/modify/${requestId}/status`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    },
-  );
-  return info.ok;
+    );
+    return info.ok;
+  } catch {
+    console.error("setRequestStatus fetch failed.");
+    return false;
+  }
 }

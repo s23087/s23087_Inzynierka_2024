@@ -3,24 +3,18 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
+import { getInvoicePath } from "./get_document_path";
 
 export default async function deleteInvoice(invoiceId, isYourInvoice) {
   const dbName = await getDbName();
-  const path = await fetch(
-    `${process.env.API_DEST}/${dbName}/Invoices/invoicePath/${invoiceId}`,
-    {
-      method: "GET",
-    },
-  );
-  if (!path) {
+  let invoicePath = await getInvoicePath(invoiceId);
+  if (invoicePath === null) {
     return {
       error: true,
-      message: "File do not exists.",
+      message: "Server error.",
     };
   }
-  let invoicePath = await path.text();
   const userId = await getUserId();
-
   let url = `${process.env.API_DEST}/${dbName}/Invoices/delete/${invoiceId}/${isYourInvoice}/${userId}`;
   try {
     const info = await fetch(url, {
@@ -63,9 +57,10 @@ export default async function deleteInvoice(invoiceId, isYourInvoice) {
       message: await info.text(),
     };
   } catch {
+    console.error("Delete invoice fetch failed.");
     return {
       error: true,
-      message: "Could not connect to server.",
+      message: "Connection error.",
     };
   }
 }

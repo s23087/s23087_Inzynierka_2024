@@ -53,37 +53,46 @@ export default async function AddUser(state, formData) {
       message: "Error: Postal code is empty or length exceed 25 chars.",
     };
 
-  const dbName = await getDbName();
-  const userId = await getUserId();
-  const info = await fetch(
-    `${process.env.API_DEST}/${dbName}/Settings/addNewUser/${userId}`,
-    {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
+  try {
+    const dbName = await getDbName();
+    const userId = await getUserId();
+    const info = await fetch(
+      `${process.env.API_DEST}/${dbName}/Settings/add/user/${userId}`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    },
-  );
-
-  if (info.status === 404) {
-    logout();
-    redirect("/");
-  }
-
-  if (info.status === 400) {
-    let message = await info.text();
-    return {
-      error: true,
-      message: message ? message : "Couldn't create the new user",
-      completed: true,
-    };
-  }
-
-  if (info.ok) {
+    );
+  
+    if (info.status === 404) {
+      logout();
+      redirect("/");
+    }
+  
+    if (info.status === 400) {
+      let message = await info.text();
+      return {
+        error: true,
+        message: message ? message : "Couldn't create the new user",
+        completed: true,
+      };
+    }
+  
+    if (info.ok) {
+      return {
+        error: false,
+        message: "Success! You have created a user.",
+        completed: true,
+      };
+    }
+  } catch {
+    console.error("AddUser fetch failed.")
     return {
       error: false,
-      message: "Success! You have created a user.",
+      message: "Connection error.",
       completed: true,
     };
   }

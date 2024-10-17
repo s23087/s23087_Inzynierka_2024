@@ -7,7 +7,7 @@ import Toastes from "@/components/smaller_components/toast";
 import { useRouter } from "next/navigation";
 import CloseIcon from "../../../../../public/icons/close_black.png";
 import ErrorMessage from "@/components/smaller_components/error_message";
-import StringValidtor from "@/utils/validators/form_validator/stringValidator";
+import InputValidtor from "@/utils/validators/form_validator/inputValidator";
 import getRestModifyCredit from "@/utils/documents/get_rest_modify_credit";
 import updateCreditNote from "@/utils/documents/modify_credit_note";
 
@@ -23,16 +23,15 @@ function ModifyCreditNoteOffcanvas({
     if (showOffcanvas) {
       getRestModifyCredit(creditNote.creditNoteId, isYourCredit)
         .then((data) => {
-          if (data === null) return;
-          setRestInfo(data);
-          prevState.creditNoteNumber = data.creditNumber;
-          prevState.note = data.note;
+          if (data === null) {
+            setRestDownloadError(true)
+          } else {
+            setRestDownloadError(false)
+            setRestInfo(data);
+            prevState.creditNoteNumber = data.creditNumber;
+            prevState.note = data.note;
+          }
         })
-        .catch(() => setRestDownloadError(true))
-        .finally(() => {
-          if (restInfo.creditNumber !== "is loading")
-            setRestDownloadError(false);
-        });
     }
   }, [showOffcanvas]);
   // Rest info
@@ -47,7 +46,7 @@ function ModifyCreditNoteOffcanvas({
   const [creditNumberError, setCreditNumberError] = useState(false);
   const [documentError, setDocumentError] = useState(false);
   const [dateError, setDateError] = useState(false);
-  const anyErrorActive =
+  const isFormErrorActive = () =>
     creditNumberError ||
     documentError ||
     dateError ||
@@ -140,7 +139,7 @@ function ModifyCreditNoteOffcanvas({
                   name="creditNumber"
                   isInvalid={creditNumberError}
                   onInput={(e) => {
-                    StringValidtor.normalStringValidtor(
+                    InputValidtor.normalStringValidtor(
                       e.target.value,
                       setCreditNumberError,
                       40,
@@ -281,7 +280,7 @@ function ModifyCreditNoteOffcanvas({
                       variant="mainBlue"
                       className="w-100"
                       type="submit"
-                      disabled={anyErrorActive}
+                      disabled={isFormErrorActive()}
                       onClick={(e) => {
                         e.preventDefault();
                         setIsLoading(true);
@@ -349,11 +348,11 @@ function ModifyCreditNoteOffcanvas({
   }
 }
 
-ModifyCreditNoteOffcanvas.PropTypes = {
+ModifyCreditNoteOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   isYourCredit: PropTypes.bool.isRequired,
-  invoice: PropTypes.object.isRequired,
+  creditNote: PropTypes.object.isRequired,
 };
 
 export default ModifyCreditNoteOffcanvas;

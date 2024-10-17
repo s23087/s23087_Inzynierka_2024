@@ -30,19 +30,31 @@ function ViewProformaOffcanvas({
   const [proformaPath, setProformaPath] = useState("");
   useEffect(() => {
     if (showOffcanvas) {
-      let restProforma = getRestProforma(isYourProforma, proforma.proformaId);
-      restProforma.then((data) => {
-        if (data.length !== 0) {
-          setRestInfo(data);
-          setProformaPath(data.path);
+      getRestProforma(isYourProforma, proforma.proformaId)
+      .then((data) => {
+        if (data !== null) {
+          if (data.length === 0){
+            setRestInfo({
+              taxes: 0,
+              currencyValue: 0.0,
+              currencyDate: "Not found",
+              paymentMethod: "Not found",
+              inSystem: false,
+              note: "Not found",
+              items: [],
+            });
+          } else {
+            setRestInfo(data);
+            setProformaPath(data.path);
+          }
         } else {
           setRestInfo({
             taxes: 0,
             currencyValue: 0.0,
-            currencyDate: "Not found",
-            paymentMethod: "Not found",
+            currencyDate: "Connection error.",
+            paymentMethod: "Connection error.",
             inSystem: false,
-            note: "Not found",
+            note: "Connection error.",
             items: [],
           });
         }
@@ -201,7 +213,7 @@ function ViewProformaOffcanvas({
   );
 }
 
-ViewProformaOffcanvas.PropTypes = {
+ViewProformaOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   proforma: PropTypes.object.isRequired,

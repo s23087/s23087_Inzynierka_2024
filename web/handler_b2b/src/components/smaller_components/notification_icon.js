@@ -23,7 +23,7 @@ function NotificationBadge({ qty, top_value = "-3px", right_value = "-7px" }) {
   );
 }
 
-NotificationBadge.PropTypes = {
+NotificationBadge.propTypes = {
   qty: PropTypes.number.isRequired,
   top_value: PropTypes.string,
   right_value: PropTypes.string,

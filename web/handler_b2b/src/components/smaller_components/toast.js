@@ -23,7 +23,7 @@ function ErrorToast({ showToast, message, onHideFun }) {
   );
 }
 
-ErrorToast.PropTypes = {
+ErrorToast.propTypes = {
   showToast: PropTypes.bool.isRequired,
   message: PropTypes.string.isRequired,
   onHideFun: PropTypes.func.isRequired,
@@ -45,7 +45,7 @@ function SuccessToast({ showToast, message, onHideFun }) {
   );
 }
 
-SuccessToast.PropTypes = {
+SuccessToast.propTypes = {
   showToast: PropTypes.bool.isRequired,
   message: PropTypes.string.isRequired,
   onHideFun: PropTypes.func.isRequired,

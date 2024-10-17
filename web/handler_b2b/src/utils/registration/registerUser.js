@@ -16,17 +16,21 @@ export default async function createNewRegisteredUser(formData, dbName, isOrg) {
     password: formData.get("password"),
     isOrg: isOrg === "true",
   };
-
-  let response = await fetch(
-    `${process.env.API_DEST}/${dbName}/Registration/registerUser`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+  try {
+    let response = await fetch(
+      `${process.env.API_DEST}/${dbName}/Registration/registerUser`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       },
-      body: JSON.stringify(data),
-    },
-  );
-
-  return response.ok;
+    );
+  
+    return response.ok;
+  } catch {
+    console.error("createNewRegisteredUser fetch failed.")
+    return false
+  }
 }

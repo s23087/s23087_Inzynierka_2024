@@ -63,7 +63,7 @@ function ProformaMenu({
   );
 }
 
-ProformaMenu.PropTypes = {
+ProformaMenu.propTypes = {
   type: PropTypes.string.isRequired,
   current_role: PropTypes.string.isRequired,
   current_nofitication_qty: PropTypes.number.isRequired,

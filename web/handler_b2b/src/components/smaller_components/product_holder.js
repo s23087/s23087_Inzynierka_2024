@@ -43,7 +43,7 @@ function ProductHolder({ value, deleteValue }) {
   );
 }
 
-ProductHolder.PropTypes = {
+ProductHolder.propTypes = {
   value: PropTypes.string.isRequired,
   deleteValue: PropTypes.func.isRequired,
 };

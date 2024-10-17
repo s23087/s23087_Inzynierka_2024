@@ -21,7 +21,7 @@ namespace database_communicator.Controllers
             _proformaServices = proformaServices;
         }
         [HttpPost]
-        [Route("add")]
+        [Route("add/{userId}")]
         public async Task<IActionResult> AddProforma(AddProforma data, int userId)
         {
             var exist = await _userServices.UserExist(userId);
@@ -123,7 +123,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpDelete]
-        [Route("delete/yours/{proformaId}")]
+        [Route("delete/yours/{proformaId}/user/{userId}")]
         public async Task<IActionResult> DeleteYourProforma(int proformaId, int userId)
         {
             var userExist = await _userServices.UserExist(userId);
@@ -201,7 +201,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpPost]
-        [Route("{userId}/modify")]
+        [Route("modify/{userId}")]
         public async Task<IActionResult> ModifyRequest(ModifyProforma data, int userId)
         {
             var exist = await _userServices.UserExist(userId);

@@ -60,7 +60,7 @@ namespace database_communicator.Controllers
             return Ok();
         }
         [HttpPost]
-        [Route("modifyItem")]
+        [Route("modify")]
         public async Task<IActionResult> ModifyItem(UpdateItem newItem)
         {
             var userExist = await _userServices.UserExist(newItem.UserId);
@@ -81,7 +81,7 @@ namespace database_communicator.Controllers
             return Ok();
         }
         [HttpGet]
-        [Route("getRestInfo")]
+        [Route("get/rest/{itemId}/{currency}/user/{userId}")]
         public async Task<IActionResult> GetRestInfo(int itemId, int userId, string currency)
         {
             var userExist = await _userServices.UserExist(userId);
@@ -92,7 +92,7 @@ namespace database_communicator.Controllers
             return result != null ? Ok(result) : BadRequest();
         }
         [HttpGet]
-        [Route("getRestOrgInfo")]
+        [Route("get/rest/org/{itemId}/{currency}")]
         public async Task<IActionResult> GetRestOrgInfo(int itemId, string currency)
         {
             var exist = await _itemServices.ItemExist(itemId);
@@ -101,7 +101,7 @@ namespace database_communicator.Controllers
             return result != null ? Ok(result) : BadRequest();
         }
         [HttpGet]
-        [Route("items/{currency}")]
+        [Route("get/{currency}")]
         public async Task<IActionResult> GetItems(string currency, int? userId, string? search, string? sort, string? status, string? ean,
             int? qtyL, int? qtyG, int? priceL, int? priceG)
         {
@@ -133,7 +133,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("description")]
+        [Route("get/description/{itemId}")]
         public async Task<IActionResult> GetDescription(int itemId)
         {
             var exist = await _itemServices.ItemExist(itemId);
@@ -142,7 +142,7 @@ namespace database_communicator.Controllers
             return Ok(desc);
         }
         [HttpGet]
-        [Route("bindings")]
+        [Route("get/bindings/{itemId}/{currency}")]
         public async Task<IActionResult> GetBindings(int itemId, string currency)
         {
             var exist = await _itemServices.ItemExist(itemId);
@@ -151,7 +151,7 @@ namespace database_communicator.Controllers
             return Ok(desc);
         }
         [HttpGet]
-        [Route("getItemOwners/{itemId}")]
+        [Route("get/item_owners/{itemId}")]
         public async Task<IActionResult> GetItemOwners(int itemId)
         {
             var exist = await _itemServices.ItemExist(itemId);
@@ -160,7 +160,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpPost]
-        [Route("changeBindings")]
+        [Route("modify/bindings")]
         public async Task<IActionResult> ChangeBindings(ChangeBindings data)
         {
             var userExist = await _userServices.UserExist(data.UserId);

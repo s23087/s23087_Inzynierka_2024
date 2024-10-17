@@ -31,24 +31,37 @@ function ViewInvoiceOffcanvas({
   const [invoicePath, setInvoicePath] = useState("");
   useEffect(() => {
     if (showOffcanvas) {
-      let restInfo = getRestInvoice(invoice.invoiceId, isYourInvoice);
-      restInfo
-        .then((data) => {
+      getRestInvoice(invoice.invoiceId, isYourInvoice)
+      .then((data) => {
+        if (data !== null) {
+          if (data.length === 0) {
+            setRestInfo({
+              tax: 0,
+              currencyValue: 0,
+              currencyName: "not found",
+              currencyDate: "not found",
+              transportCost: 0,
+              paymentType: "not found",
+              note: "not found",
+              items: [],
+            });
+            return;
+          }
           setRestInfo(data);
           setInvoicePath(data.path);
-        })
-        .catch(() => {
+        } else {
           setRestInfo({
             tax: 0,
             currencyValue: 0,
-            currencyName: "error",
-            currencyDate: "error",
+            currencyName: "connection error",
+            currencyDate: "connection error",
             transportCost: 0,
-            paymentType: "error",
-            note: "error",
+            paymentType: "connection error",
+            note: "connection error",
             items: [],
           });
-        });
+        }
+      });
     }
   }, [showOffcanvas, isYourInvoice]);
   // Download bool
@@ -231,7 +244,7 @@ function ViewInvoiceOffcanvas({
   );
 }
 
-ViewInvoiceOffcanvas.PropTypes = {
+ViewInvoiceOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   invoice: PropTypes.object.isRequired,

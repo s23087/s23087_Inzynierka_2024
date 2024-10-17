@@ -57,7 +57,7 @@ function SelectComponent({ selectedQty, actionOneName, actionOne }) {
   );
 }
 
-SelectComponent.PropTypes = {
+SelectComponent.propTypes = {
   selectedQty: PropTypes.number.isRequired,
   actionOneName: PropTypes.string.isRequired,
   actionOne: PropTypes.func.isRequired,
