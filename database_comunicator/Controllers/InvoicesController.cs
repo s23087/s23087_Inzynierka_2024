@@ -11,6 +11,8 @@ namespace database_communicator.Controllers
     [ApiController]
     public class InvoicesController : ControllerBase
     {
+        private const string invoiceNotFoundMessage = "Invoice not found.";
+        private const string userNotFoundMessage = "User not found.";
         private readonly IInvoiceServices _invoicesService;
         private readonly IUserServices _userServices;
         private readonly IOrganizationServices _organizationServices;
@@ -72,7 +74,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetPurchaseInvoiceItems(int invoiceId)
         {
             var invoiceExist = await _invoicesService.InvoiceExist(invoiceId);
-            if (!invoiceExist) return NotFound("Invoice not found.");
+            if (!invoiceExist) return NotFound(invoiceNotFoundMessage);
             var result = await _invoicesService.GetInvoiceItems(invoiceId, true);
             return Ok(result);
         }
@@ -81,7 +83,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetSalesInvoiceItems(int invoiceId)
         {
             var invoiceExist = await _invoicesService.InvoiceExist(invoiceId);
-            if (!invoiceExist) return NotFound("Invoice not found.");
+            if (!invoiceExist) return NotFound(invoiceNotFoundMessage);
             var result = await _invoicesService.GetInvoiceItems(invoiceId, false);
             return Ok(result);
         }
@@ -90,7 +92,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetOrgs(int userId)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             var result = await _invoicesService.GetOrgsForInvoice(userId);
             return Ok(result);
         }
@@ -101,7 +103,7 @@ namespace database_communicator.Controllers
         {
             IEnumerable<GetInvoices> result;
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             if (search != null)
             {
                 result = await _invoicesService.GetPurchaseInvoices(userId, search, sort: sort, dateL, dateG, dueL, dueG,
@@ -135,7 +137,7 @@ namespace database_communicator.Controllers
         {
             IEnumerable<GetInvoices> result;
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             if (search != null)
             {
                 result = await _invoicesService.GetSalesInvoices(userId, search, sort: sort, dateL, dateG, dueL, dueG,
@@ -167,7 +169,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> AddPurchaseInvoice(AddPurchaseInvoice data, int userId)
         {
             var exist = await _userServices.UserExist(data.UserId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             var orgExist = await _organizationServices.OrgExist(data.Seller);
             if (!orgExist) return NotFound("Seller not found.");
             foreach (var itemId in data.InvoiceItems.Select(e => e.ItemId))
@@ -201,7 +203,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> AddSalesInvoice(AddSalesInvoice data, int userId)
         {
             var exist = await _userServices.UserExist(data.UserId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             var orgExist = await _organizationServices.OrgExist(data.Buyer);
             if (!orgExist) return NotFound("Buyer not found.");
             foreach (var itemId in data.InvoiceItems.Select(e => e.ItemId))
@@ -242,7 +244,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetAllSalesItems(int userId, string currency)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             var result = await _itemServices.GetSalesItemList(userId, currency);
             return Ok(result);
         }
@@ -251,9 +253,9 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> DeleteInvoice(int invoiceId, int userId, bool isYourInvoice)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             var invoiceExist = await _invoicesService.InvoiceExist(invoiceId);
-            if (!invoiceExist) return NotFound("Invoice not found.");
+            if (!invoiceExist) return NotFound(invoiceNotFoundMessage);
             var cantBeDeleted = await _invoicesService.CheckIfCreditNoteExist(invoiceId) || await _invoicesService.CheckIfSellingPriceExist(invoiceId);
             if (cantBeDeleted) return BadRequest("That invoice has references to other document. Please delete them first.");
             var invoiceUsers = await _invoicesService.GetInvoiceUser(invoiceId);
@@ -287,7 +289,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetInvoicePath(int invoiceId)
         {
             var invoiceExist = await _invoicesService.InvoiceExist(invoiceId);
-            if (!invoiceExist) return NotFound("Invoice not found.");
+            if (!invoiceExist) return NotFound(invoiceNotFoundMessage);
             var result = await _invoicesService.GetInvoicePath(invoiceId);
             return Ok(result);
         }
@@ -296,7 +298,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetRestPurchaseInvoice(int invoiceId)
         {
             var invoiceExist = await _invoicesService.InvoiceExist(invoiceId);
-            if (!invoiceExist) return NotFound("Invoice not found.");
+            if (!invoiceExist) return NotFound(invoiceNotFoundMessage);
             var result = await _invoicesService.GetRestPurchaseInvoice(invoiceId);
             return Ok(result);
         }
@@ -305,7 +307,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetRestSalesInvoice(int invoiceId)
         {
             var invoiceExist = await _invoicesService.InvoiceExist(invoiceId);
-            if (!invoiceExist) return NotFound("Invoice not found.");
+            if (!invoiceExist) return NotFound(invoiceNotFoundMessage);
             var result = await _invoicesService.GetRestSalesInvoice(invoiceId);
             return Ok(result);
         }
@@ -314,7 +316,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetRestModifyInvoice(int invoiceId)
         {
             var invoiceExist = await _invoicesService.InvoiceExist(invoiceId);
-            if (!invoiceExist) return NotFound("Invoice not found.");
+            if (!invoiceExist) return NotFound(invoiceNotFoundMessage);
             var result = await _invoicesService.GetRestModifyInvoice(invoiceId);
             return Ok(result);
         }
@@ -323,9 +325,9 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> ModifyInvoice(ModifyInvoice data, int userId)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             var invoiceExist = await _invoicesService.InvoiceExist(data.InvoiceId);
-            if (!invoiceExist) return NotFound("Invoice not found.");
+            if (!invoiceExist) return NotFound(invoiceNotFoundMessage);
             var result = await _invoicesService.ModifyInvoice(data);
             if (result)
             {

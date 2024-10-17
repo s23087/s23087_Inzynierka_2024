@@ -10,6 +10,7 @@ namespace database_communicator.Controllers
     [ApiController]
     public class DeliveryController : ControllerBase
     {
+        private const string userNotFoundMessage = "User not found.";
         private readonly IDeliveryServices _deliveryService;
         private readonly IUserServices _userServices;
         private readonly ILogServices _logServices;
@@ -27,7 +28,7 @@ namespace database_communicator.Controllers
             string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             if (search != null)
             {
                 var sResult = await _deliveryService.GetDeliveries(true, userId, search, sort: sort, estimatedL, estimatedG, deliveredL, deliveredG, recipient, status, company, waybill);
@@ -55,7 +56,7 @@ namespace database_communicator.Controllers
             string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             if (search != null)
             {
                 var sResult = await _deliveryService.GetDeliveries(false, userId, search, sort: sort, estimatedL, estimatedG, deliveredL, deliveredG, recipient, status, company, waybill);
@@ -82,7 +83,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> AddDelivery(AddDelivery data)
         {
             var exist = await _userServices.UserExist(data.UserId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             var proExist = await _deliveryService.DeliveryProformaExist(data.ProformaId);
             if (proExist) return BadRequest("Delivery for this proforma already exist.");
             var deliveryId = await _deliveryService.AddDelivery(data);
@@ -109,7 +110,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> AddDeliveryCompany(AddDeliveryComapny data, int userId)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             var companyExist = await _deliveryService.DoesDeliveryCompanyExist(data.CompanyName);
             if (companyExist) return BadRequest("This company already exists.");
             var result = await _deliveryService.AddDeliveryCompany(data.CompanyName);
@@ -138,7 +139,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetUserProformas(int userId)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             var result = await _deliveryService.GetProformaListWithoutDelivery(true, userId);
             return Ok(result);
         }
@@ -147,7 +148,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetClientProformas(int userId)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             var result = await _deliveryService.GetProformaListWithoutDelivery(false, userId);
             return Ok(result);
         }
@@ -156,7 +157,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> DeleteDelivery(int deliveryId, int userId, bool isDeliveryToUser)
         {
             var userExist = await _userServices.UserExist(userId);
-            if (!userExist) return NotFound("User not found.");
+            if (!userExist) return NotFound(userNotFoundMessage);
             var exist = await _deliveryService.DeliveryExist(deliveryId);
             if (!exist) return NotFound("Delivery not found.");
             var owner = await _deliveryService.GetDeliveryOwnerId(deliveryId);
@@ -192,7 +193,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> AddNote(AddNote data)
         {
             var exist = await _userServices.UserExist(data.UserId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             var deliveryExist = await _deliveryService.DeliveryExist(data.DeliveryId);
             if (!deliveryExist) return BadRequest("This delivery do not exists.");
             var result = await _deliveryService.AddNote(data);
@@ -214,7 +215,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> ModifyDelivery(ModifyDelivery data, int userId, bool isDeliveryToUser)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             var deliveryExist = await _deliveryService.DeliveryExist(data.DeliveryId);
             if (!deliveryExist) return NotFound("This delivery do not exists.");
             var owner = await _deliveryService.GetDeliveryOwnerId(data.DeliveryId);

@@ -10,6 +10,8 @@ namespace database_communicator.Controllers
     [ApiController]
     public class OfferController : ControllerBase
     {
+        private const string userNotFoundMessage = "User not found.";
+        private const string pricelistNotFoundMessage = "Pricelist not found.";
         private readonly IOfferServices _offerServices;
         private readonly IUserServices _userServices;
         private readonly ILogServices _logServices;
@@ -24,7 +26,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> AddOffer(AddOffer data)
         {
             var exist = await _userServices.UserExist(data.UserId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             var proExist = await _offerServices.DoesPricelistExist(data.OfferName, data.UserId);
             if (proExist) return BadRequest("This pricelist already exist.");
             var offerId = await _offerServices.CreateOffer(data);
@@ -57,7 +59,7 @@ namespace database_communicator.Controllers
             string? createdL, string? createdG, string? modifiedL, string? modifiedG)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             if (search != null)
             {
                 var sResult = await _offerServices.GetPriceLists(userId, search, sort, status: status, currency: currency, type: type, totalL, totalG, 
@@ -73,9 +75,9 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> DeleteOffer(int offerId, int userId)
         {
             var userExist = await _userServices.UserExist(userId);
-            if (!userExist) return NotFound("User not found.");
+            if (!userExist) return NotFound(userNotFoundMessage);
             var exist = await _offerServices.DoesPricelistExist(offerId);
-            if (!exist) return NotFound("Pricelist not found.");
+            if (!exist) return NotFound(pricelistNotFoundMessage);
             var result = await _offerServices.DeletePricelist(offerId);
             if (!result) return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             var logId = await _logServices.getLogTypeId("Delete");
@@ -95,7 +97,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetItems(int userId, string currency)
         {
             var userExist = await _userServices.UserExist(userId);
-            if (!userExist) return NotFound("User not found.");
+            if (!userExist) return NotFound(userNotFoundMessage);
             var result = await _offerServices.GetItemsForOffers(userId, currency);
             return Ok(result);
         }
@@ -104,9 +106,9 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetOfferItems(int pricelistId, int userId)
         {
             var userExist = await _userServices.UserExist(userId);
-            if (!userExist) return NotFound("User not found.");
+            if (!userExist) return NotFound(userNotFoundMessage);
             var exist = await _offerServices.DoesPricelistExist(pricelistId);
-            if (!exist) return NotFound("Pricelist not found.");
+            if (!exist) return NotFound(pricelistNotFoundMessage);
             var result = await _offerServices.GetOfferItems(pricelistId, userId);
             return Ok(result);
         }
@@ -115,9 +117,9 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetRestPricelist(int pricelistId, int userId)
         {
             var userExist = await _userServices.UserExist(userId);
-            if (!userExist) return NotFound("User not found.");
+            if (!userExist) return NotFound(userNotFoundMessage);
             var exist = await _offerServices.DoesPricelistExist(pricelistId);
-            if (!exist) return NotFound("Pricelist not found.");
+            if (!exist) return NotFound(pricelistNotFoundMessage);
             var result = await _offerServices.GetRestModifyOffer(pricelistId, userId);
             return Ok(result);
         }
@@ -126,9 +128,9 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> ModifyRequest(ModifyPricelist data)
         {
             var exist = await _userServices.UserExist(data.UserId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             var offerExist = await _offerServices.DoesPricelistExist(data.OfferId);
-            if (!offerExist) return NotFound("Pricelist not found.");
+            if (!offerExist) return NotFound(pricelistNotFoundMessage);
             if (data.OfferName != null)
             {
                 var sameExist = await _offerServices.DoesPricelistExist(data.OfferName, data.UserId);

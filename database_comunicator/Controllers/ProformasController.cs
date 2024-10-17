@@ -9,6 +9,8 @@ namespace database_communicator.Controllers
     [ApiController]
     public class ProformasController : ControllerBase
     {
+        private const string userNotFoundMessage = "User not found.";
+        private const string proformaNotFoundMessage = "Proforma not found.";
         private readonly IProformaServices _proformaServices;
         private readonly IUserServices _userServices;
         private readonly ILogServices _logServices;
@@ -25,7 +27,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> AddProforma(AddProforma data, int userId)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             var proUser = await _userServices.UserExist(data.UserId);
             if (!proUser) return NotFound("Chosen user not found.");
             var proExist = await _proformaServices.ProformaExist(data.ProformaNumber, data.SellerId, data.BuyerId);
@@ -54,7 +56,7 @@ namespace database_communicator.Controllers
             int? qtyL, int? qtyG, int? totalL, int? totalG, string? dateL, string? dateG, int? recipient, string? currency)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             if (search != null)
             {
                 var sResult = await _proformaServices.GetProformas(true, userId, search, sort, qtyL, qtyG, totalL, totalG, dateL, dateG, recipient, currency);
@@ -82,7 +84,7 @@ namespace database_communicator.Controllers
             int? qtyL, int? qtyG, int? totalL, int? totalG, string? dateL, string? dateG, int? recipient, string? currency)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             if (search != null)
             {
                 var sResult = await _proformaServices.GetProformas(false, userId, search, sort, qtyL, qtyG, totalL, totalG, dateL, dateG, recipient, currency);
@@ -109,7 +111,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetRestClientProforma(int proformaId)
         {
             var exist = await _proformaServices.ProformaExist(proformaId);
-            if (!exist) return NotFound("Proforma not found.");
+            if (!exist) return NotFound(proformaNotFoundMessage);
             var result = await _proformaServices.GetRestProforma(false, proformaId);
             return Ok(result);
         }
@@ -118,7 +120,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetRestYourProforma(int proformaId)
         {
             var exist = await _proformaServices.ProformaExist(proformaId);
-            if (!exist) return NotFound("Proforma not found.");
+            if (!exist) return NotFound(proformaNotFoundMessage);
             var result = await _proformaServices.GetRestProforma(true, proformaId);
             return Ok(result);
         }
@@ -127,9 +129,9 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> DeleteYourProforma(int proformaId, int userId)
         {
             var userExist = await _userServices.UserExist(userId);
-            if (!userExist) return NotFound("User not found.");
+            if (!userExist) return NotFound(userNotFoundMessage);
             var exist = await _proformaServices.ProformaExist(proformaId);
-            if (!exist) return NotFound("Proforma not found.");
+            if (!exist) return NotFound(proformaNotFoundMessage);
             var deliveryExist = await _proformaServices.DoesDeliveryExist(proformaId);
             if (deliveryExist) return BadRequest("There is existing delivery for this proforma.");
             var owner = await _proformaServices.GetProformaUserId(proformaId);
@@ -157,9 +159,9 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> DeleteClientProforma(int proformaId, int userId)
         {
             var userExist = await _userServices.UserExist(userId);
-            if (!userExist) return NotFound("User not found.");
+            if (!userExist) return NotFound(userNotFoundMessage);
             var exist = await _proformaServices.ProformaExist(proformaId);
-            if (!exist) return NotFound("Proforma not found.");
+            if (!exist) return NotFound(proformaNotFoundMessage);
             var deliveryExist = await _proformaServices.DoesDeliveryExist(proformaId);
             if (deliveryExist) return BadRequest("There is existing delivery for this proforma.");
             var owner = await _proformaServices.GetProformaUserId(proformaId);
@@ -187,7 +189,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetProformaPath(int proformaId)
         {
             var exist = await _proformaServices.ProformaExist(proformaId);
-            if (!exist) return NotFound("Proforma not found.");
+            if (!exist) return NotFound(proformaNotFoundMessage);
             var result = await _proformaServices.GetProformaPath(proformaId) ?? "";
             return Ok(result);
         }
@@ -196,7 +198,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetRestModifyProforma(int proformaId)
         {
             var exist = await _proformaServices.ProformaExist(proformaId);
-            if (!exist) return NotFound("Proforma not found.");
+            if (!exist) return NotFound(proformaNotFoundMessage);
             var result = await _proformaServices.GetRestModifyProforma(proformaId);
             return Ok(result);
         }
@@ -205,7 +207,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> ModifyRequest(ModifyProforma data, int userId)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             if (data.UserId != null)
             {
                 var recExist = await _userServices.UserExist((int)data.UserId);

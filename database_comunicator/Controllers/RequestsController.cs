@@ -10,6 +10,8 @@ namespace database_communicator.Controllers
     [ApiController]
     public class RequestsController : ControllerBase
     {
+        private const string userNotFoundMessage = "User not found.";
+        private const string requestNotFoundMessage = "Requests not found.";
         private readonly IRequestServices _requestServices;
         private readonly IUserServices _userServices;
         private readonly ILogServices _logServices;
@@ -60,7 +62,7 @@ namespace database_communicator.Controllers
             string? type, int? status)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             if (search != null)
             {
                 var sResult = await _requestServices.GetMyRequests(userId,search, sort: sort, dateL, dateG, type, status);
@@ -75,7 +77,7 @@ namespace database_communicator.Controllers
             string? type, int? status)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             if (search != null)
             {
                 var sResult = await _requestServices.GetReceivedRequests(userId, search, sort: sort, dateL, dateG, type, status);
@@ -89,7 +91,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetRestRequest(int requestId)
         {
             var exist = await _requestServices.RequestExist(requestId);
-            if (!exist) return NotFound("Requests not found.");
+            if (!exist) return NotFound(requestNotFoundMessage);
             var result = await _requestServices.GetRestRequest(requestId);
             return Ok(result);
         }
@@ -98,9 +100,9 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> DeleteRequest(int requestId, int userId)
         {
             var userExist = await _userServices.UserExist(userId);
-            if (!userExist) return NotFound("User not found.");
+            if (!userExist) return NotFound(userNotFoundMessage);
             var exist = await _requestServices.RequestExist(requestId);
-            if (!exist) return NotFound("Requests not found.");
+            if (!exist) return NotFound(requestNotFoundMessage);
             var receiver = await _requestServices.GetReceiverId(requestId);
             await _requestServices.DeleteRequest(requestId);
             var logId = await _logServices.getLogTypeId("Delete");
@@ -124,7 +126,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> ModifyRequest(ModifyRequest data, int userId)
         {
             var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound("User not found.");
+            if (!exist) return NotFound(userNotFoundMessage);
             if (data.RecevierId != null)
             {
                 var recExist = await _userServices.UserExist((int)data.RecevierId);
@@ -153,7 +155,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> SetStatus(int requestId, SetRequestStatus data)
         {
             var exist = await _requestServices.RequestExist(requestId);
-            if (!exist) return NotFound("Requests not found.");
+            if (!exist) return NotFound(requestNotFoundMessage);
             var statusId = await _requestServices.GetStatusId(data.StatusName);
             var result = await _requestServices.SetRequestStatus(requestId, statusId, data);
             return result ? Ok() : BadRequest();
@@ -163,7 +165,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetRequestPath(int requestId)
         {
             var exist = await _requestServices.RequestExist(requestId);
-            if (!exist) return NotFound("Requests not found.");
+            if (!exist) return NotFound(requestNotFoundMessage);
             var result = await _requestServices.GetRequestPath(requestId);
             return Ok(result);
         }
@@ -172,7 +174,7 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetRestModifyRequest(int requestId)
         {
             var exist = await _requestServices.RequestExist(requestId);
-            if (!exist) return NotFound("Requests not found.");
+            if (!exist) return NotFound(requestNotFoundMessage);
             var result = await _requestServices.GetRestModifyRequest(requestId);
             return Ok(result);
         }
