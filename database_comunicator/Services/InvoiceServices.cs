@@ -2,6 +2,7 @@
 using database_communicator.Models;
 using database_communicator.Models.DTOs;
 using database_communicator.Utils;
+using database_comunicator.FilterClass;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq.Expressions;
@@ -293,53 +294,18 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Invoice, bool>> dateLCond = dateL == null ?
-                e => true
-                : e => e.InvoiceDate <= DateTime.Parse(dateL);
-
-            Expression<Func<Invoice, bool>> dateGCond = dateG == null ?
-                e => true
-                : e => e.InvoiceDate >= DateTime.Parse(dateG);
-
-            Expression<Func<Invoice, bool>> dueLCond = dueL == null ?
-                e => true
-                : e => e.DueDate <= DateTime.Parse(dueL);
-
-            Expression<Func<Invoice, bool>> dueGCond = dueG == null ?
-                e => true
-                : e => e.DueDate >= DateTime.Parse(dueG);
-
-            Expression<Func<Invoice, bool>> qtyLCond = qtyL == null ?
-                e => true
-                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum() <= qtyL;
-
-            Expression<Func<Invoice, bool>> qtyGCond = qtyG == null ?
-                e => true
-                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum() >= qtyG;
-
-            Expression<Func<Invoice, bool>> totalLCond = totalL == null ?
-                e => true
-                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty * d.Price).Sum() <= totalL;
-
-            Expression<Func<Invoice, bool>> totalGCond = totalG == null ?
-                e => true
-                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty * d.Price).Sum() >= totalG;
-
-            Expression<Func<Invoice, bool>> recipientCond = recipient == null ?
-                e => true
-                : e => e.Seller == recipient;
-
-            Expression<Func<Invoice, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.CurrencyName == currency;
-
-            Expression<Func<Invoice, bool>> paymentStatusCond = paymentStatus == null ?
-                e => true
-                : e => e.PaymentsStatusId == paymentStatus;
-
-            Expression<Func<Invoice, bool>> statusCond = status == null ?
-                e => true
-                : e => e.InSystem == status;
+            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
+            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
+            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
+            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
+            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, true);
+            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, true);
+            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, true);
+            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, true);
+            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, true);
+            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
+            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
+            var statusCond = InvoiceFilters.GetStatusFilter(status);
 
             return await _handlerContext.Invoices
                 .Where(e => !e.SellingPrices.Any())
@@ -387,53 +353,19 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Invoice, bool>> dateLCond = dateL == null ?
-                e => true
-                : e => e.InvoiceDate <= DateTime.Parse(dateL);
+            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
+            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
+            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
+            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
+            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, false);
+            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, false);
+            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, false);
+            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, false);
+            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, false);
+            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
+            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
+            var statusCond = InvoiceFilters.GetStatusFilter(status);
 
-            Expression<Func<Invoice, bool>> dateGCond = dateG == null ?
-                e => true
-                : e => e.InvoiceDate >= DateTime.Parse(dateG);
-
-            Expression<Func<Invoice, bool>> dueLCond = dueL == null ?
-                e => true
-                : e => e.DueDate <= DateTime.Parse(dueL);
-
-            Expression<Func<Invoice, bool>> dueGCond = dueG == null ?
-                e => true
-                : e => e.DueDate >= DateTime.Parse(dueG);
-
-            Expression<Func<Invoice, bool>> qtyLCond = qtyL == null ?
-                e => true
-                : e => e.SellingPrices.Select(d => d.Qty).Sum() <= qtyL;
-
-            Expression<Func<Invoice, bool>> qtyGCond = qtyG == null ?
-                e => true
-                : e => e.SellingPrices.Select(d => d.Qty).Sum() >= qtyG;
-
-            Expression<Func<Invoice, bool>> totalLCond = totalL == null ?
-                e => true
-                : e => e.SellingPrices.Select(d => d.Qty * d.Price).Sum() <= totalL;
-
-            Expression<Func<Invoice, bool>> totalGCond = totalG == null ?
-                e => true
-                : e => e.SellingPrices.Select(d => d.Qty * d.Price).Sum() >= totalG;
-
-            Expression<Func<Invoice, bool>> recipientCond = recipient == null ?
-                e => true
-                : e => e.Buyer == recipient;
-
-            Expression<Func<Invoice, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.CurrencyName == currency;
-
-            Expression<Func<Invoice, bool>> paymentStatusCond = paymentStatus == null ?
-                e => true
-                : e => e.PaymentsStatusId == paymentStatus;
-
-            Expression<Func<Invoice, bool>> statusCond = status == null ?
-                e => true
-                : e => e.InSystem == status;
             var result = await _handlerContext.Invoices
                 .Where(e => e.SellingPrices.Any())
                 .Where(dateLCond)
@@ -477,53 +409,19 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Invoice, bool>> dateLCond = dateL == null ?
-                e => true
-                : e => e.InvoiceDate <= DateTime.Parse(dateL);
+            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
+            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
+            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
+            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
+            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, true);
+            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, true);
+            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, true);
+            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, true);
+            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, true);
+            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
+            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
+            var statusCond = InvoiceFilters.GetStatusFilter(status);
 
-            Expression<Func<Invoice, bool>> dateGCond = dateG == null ?
-                e => true
-                : e => e.InvoiceDate >= DateTime.Parse(dateG);
-
-            Expression<Func<Invoice, bool>> dueLCond = dueL == null ?
-                e => true
-                : e => e.DueDate <= DateTime.Parse(dueL);
-
-            Expression<Func<Invoice, bool>> dueGCond = dueG == null ?
-                e => true
-                : e => e.DueDate >= DateTime.Parse(dueG);
-
-            Expression<Func<Invoice, bool>> qtyLCond = qtyL == null ?
-                e => true
-                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum() <= qtyL;
-
-            Expression<Func<Invoice, bool>> qtyGCond = qtyG == null ?
-                e => true
-                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum() >= qtyG;
-
-            Expression<Func<Invoice, bool>> totalLCond = totalL == null ?
-                e => true
-                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty * d.Price).Sum() <= totalL;
-
-            Expression<Func<Invoice, bool>> totalGCond = totalG == null ?
-                e => true
-                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty * d.Price).Sum() >= totalG;
-
-            Expression<Func<Invoice, bool>> recipientCond = recipient == null ?
-                e => true
-                : e => e.Seller == recipient;
-
-            Expression<Func<Invoice, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.CurrencyName == currency;
-
-            Expression<Func<Invoice, bool>> paymentStatusCond = paymentStatus == null ?
-                e => true
-                : e => e.PaymentsStatusId == paymentStatus;
-
-            Expression<Func<Invoice, bool>> statusCond = status == null ?
-                e => true
-                : e => e.InSystem == status;
             return await _handlerContext.Invoices
                 .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))
                 .Where(e => !e.SellingPrices.Any())
@@ -571,53 +469,19 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Invoice, bool>> dateLCond = dateL == null ?
-                e => true
-                : e => e.InvoiceDate <= DateTime.Parse(dateL);
+            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
+            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
+            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
+            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
+            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, false);
+            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, false);
+            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, false);
+            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, false);
+            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, false);
+            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
+            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
+            var statusCond = InvoiceFilters.GetStatusFilter(status);
 
-            Expression<Func<Invoice, bool>> dateGCond = dateG == null ?
-                e => true
-                : e => e.InvoiceDate >= DateTime.Parse(dateG);
-
-            Expression<Func<Invoice, bool>> dueLCond = dueL == null ?
-                e => true
-                : e => e.DueDate <= DateTime.Parse(dueL);
-
-            Expression<Func<Invoice, bool>> dueGCond = dueG == null ?
-                e => true
-                : e => e.DueDate >= DateTime.Parse(dueG);
-
-            Expression<Func<Invoice, bool>> qtyLCond = qtyL == null ?
-                e => true
-                : e => e.SellingPrices.Select(d => d.Qty).Sum() <= qtyL;
-
-            Expression<Func<Invoice, bool>> qtyGCond = qtyG == null ?
-                e => true
-                : e => e.SellingPrices.Select(d => d.Qty).Sum() >= qtyG;
-
-            Expression<Func<Invoice, bool>> totalLCond = totalL == null ?
-                e => true
-                : e => e.SellingPrices.Select(d => d.Qty * d.Price).Sum() <= totalL;
-
-            Expression<Func<Invoice, bool>> totalGCond = totalG == null ?
-                e => true
-                : e => e.SellingPrices.Select(d => d.Qty * d.Price).Sum() >= totalG;
-
-            Expression<Func<Invoice, bool>> recipientCond = recipient == null ?
-                e => true
-                : e => e.Buyer == recipient;
-
-            Expression<Func<Invoice, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.CurrencyName == currency;
-
-            Expression<Func<Invoice, bool>> paymentStatusCond = paymentStatus == null ?
-                e => true
-                : e => e.PaymentsStatusId == paymentStatus;
-
-            Expression<Func<Invoice, bool>> statusCond = status == null ?
-                e => true
-                : e => e.InSystem == status;
             return await _handlerContext.Invoices
                 .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))
                 .Where(e => e.SellingPrices.Any())
@@ -661,53 +525,19 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Invoice, bool>> dateLCond = dateL == null ?
-                e => true
-                : e => e.InvoiceDate <= DateTime.Parse(dateL);
+            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
+            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
+            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
+            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
+            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, true);
+            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, true);
+            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, true);
+            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, true);
+            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, true);
+            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
+            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
+            var statusCond = InvoiceFilters.GetStatusFilter(status);
 
-            Expression<Func<Invoice, bool>> dateGCond = dateG == null ?
-                e => true
-                : e => e.InvoiceDate >= DateTime.Parse(dateG);
-
-            Expression<Func<Invoice, bool>> dueLCond = dueL == null ?
-                e => true
-                : e => e.DueDate <= DateTime.Parse(dueL);
-
-            Expression<Func<Invoice, bool>> dueGCond = dueG == null ?
-                e => true
-                : e => e.DueDate >= DateTime.Parse(dueG);
-
-            Expression<Func<Invoice, bool>> qtyLCond = qtyL == null ?
-                e => true
-                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum() <= qtyL;
-
-            Expression<Func<Invoice, bool>> qtyGCond = qtyG == null ?
-                e => true
-                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum() >= qtyG;
-
-            Expression<Func<Invoice, bool>> totalLCond = totalL == null ?
-                e => true
-                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty * d.Price).Sum() <= totalL;
-
-            Expression<Func<Invoice, bool>> totalGCond = totalG == null ?
-                e => true
-                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty * d.Price).Sum() >= totalG;
-
-            Expression<Func<Invoice, bool>> recipientCond = recipient == null ?
-                e => true
-                : e => e.Seller == recipient;
-
-            Expression<Func<Invoice, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.CurrencyName == currency;
-
-            Expression<Func<Invoice, bool>> paymentStatusCond = paymentStatus == null ?
-                e => true
-                : e => e.PaymentsStatusId == paymentStatus;
-
-            Expression<Func<Invoice, bool>> statusCond = status == null ?
-                e => true
-                : e => e.InSystem == status;
             return await _handlerContext.Invoices
                 .Where(e => !e.SellingPrices.Any() && e.OwnedItems.SelectMany(d => d.ItemOwners).Any(d => d.IdUser == userId))
                 .Where(dateLCond)
@@ -750,53 +580,19 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Invoice, bool>> dateLCond = dateL == null ?
-                e => true
-                : e => e.InvoiceDate <= DateTime.Parse(dateL);
+            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
+            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
+            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
+            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
+            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, false);
+            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, false);
+            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, false);
+            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, false);
+            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, false);
+            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
+            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
+            var statusCond = InvoiceFilters.GetStatusFilter(status);
 
-            Expression<Func<Invoice, bool>> dateGCond = dateG == null ?
-                e => true
-                : e => e.InvoiceDate >= DateTime.Parse(dateG);
-
-            Expression<Func<Invoice, bool>> dueLCond = dueL == null ?
-                e => true
-                : e => e.DueDate <= DateTime.Parse(dueL);
-
-            Expression<Func<Invoice, bool>> dueGCond = dueG == null ?
-                e => true
-                : e => e.DueDate >= DateTime.Parse(dueG);
-
-            Expression<Func<Invoice, bool>> qtyLCond = qtyL == null ?
-                e => true
-                : e => e.SellingPrices.Select(d => d.Qty).Sum() <= qtyL;
-
-            Expression<Func<Invoice, bool>> qtyGCond = qtyG == null ?
-                e => true
-                : e => e.SellingPrices.Select(d => d.Qty).Sum() >= qtyG;
-
-            Expression<Func<Invoice, bool>> totalLCond = totalL == null ?
-                e => true
-                : e => e.SellingPrices.Select(d => d.Qty * d.Price).Sum() <= totalL;
-
-            Expression<Func<Invoice, bool>> totalGCond = totalG == null ?
-                e => true
-                : e => e.SellingPrices.Select(d => d.Qty * d.Price).Sum() >= totalG;
-
-            Expression<Func<Invoice, bool>> recipientCond = recipient == null ?
-                e => true
-                : e => e.Buyer == recipient;
-
-            Expression<Func<Invoice, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.CurrencyName == currency;
-
-            Expression<Func<Invoice, bool>> paymentStatusCond = paymentStatus == null ?
-                e => true
-                : e => e.PaymentsStatusId == paymentStatus;
-
-            Expression<Func<Invoice, bool>> statusCond = status == null ?
-                e => true
-                : e => e.InSystem == status;
             return await _handlerContext.Invoices
                 .Where(e => e.SellingPrices.Any())
                 .Where(e => e.SellingPrices.Select(e => e.PurchasePrice).Select(d => d.OwnedItem).SelectMany(d => d.ItemOwners).Where(d => d.IdUser == userId).Any())
@@ -839,53 +635,19 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Invoice, bool>> dateLCond = dateL == null ?
-                e => true
-                : e => e.InvoiceDate <= DateTime.Parse(dateL);
+            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
+            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
+            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
+            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
+            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, true);
+            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, true);
+            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, true);
+            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, true);
+            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, true);
+            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
+            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
+            var statusCond = InvoiceFilters.GetStatusFilter(status);
 
-            Expression<Func<Invoice, bool>> dateGCond = dateG == null ?
-                e => true
-                : e => e.InvoiceDate >= DateTime.Parse(dateG);
-
-            Expression<Func<Invoice, bool>> dueLCond = dueL == null ?
-                e => true
-                : e => e.DueDate <= DateTime.Parse(dueL);
-
-            Expression<Func<Invoice, bool>> dueGCond = dueG == null ?
-                e => true
-                : e => e.DueDate >= DateTime.Parse(dueG);
-
-            Expression<Func<Invoice, bool>> qtyLCond = qtyL == null ?
-                e => true
-                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum() <= qtyL;
-
-            Expression<Func<Invoice, bool>> qtyGCond = qtyG == null ?
-                e => true
-                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty).Sum() >= qtyG;
-
-            Expression<Func<Invoice, bool>> totalLCond = totalL == null ?
-                e => true
-                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty * d.Price).Sum() <= totalL;
-
-            Expression<Func<Invoice, bool>> totalGCond = totalG == null ?
-                e => true
-                : e => e.OwnedItems.SelectMany(d => d.PurchasePrices).Select(d => d.Qty * d.Price).Sum() >= totalG;
-
-            Expression<Func<Invoice, bool>> recipientCond = recipient == null ?
-                e => true
-                : e => e.Seller == recipient;
-
-            Expression<Func<Invoice, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.CurrencyName == currency;
-
-            Expression<Func<Invoice, bool>> paymentStatusCond = paymentStatus == null ?
-                e => true
-                : e => e.PaymentsStatusId == paymentStatus;
-
-            Expression<Func<Invoice, bool>> statusCond = status == null ?
-                e => true
-                : e => e.InSystem == status;
             return await _handlerContext.Invoices
                 .Where(e => !e.SellingPrices.Any() && e.OwnedItems.SelectMany(d => d.ItemOwners).Any(d => d.IdUser == userId))
                 .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))
@@ -929,53 +691,19 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Invoice, bool>> dateLCond = dateL == null ?
-                e => true
-                : e => e.InvoiceDate <= DateTime.Parse(dateL);
+            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
+            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
+            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
+            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
+            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, false);
+            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, false);
+            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, false);
+            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, false);
+            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, false);
+            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
+            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
+            var statusCond = InvoiceFilters.GetStatusFilter(status);
 
-            Expression<Func<Invoice, bool>> dateGCond = dateG == null ?
-                e => true
-                : e => e.InvoiceDate >= DateTime.Parse(dateG);
-
-            Expression<Func<Invoice, bool>> dueLCond = dueL == null ?
-                e => true
-                : e => e.DueDate <= DateTime.Parse(dueL);
-
-            Expression<Func<Invoice, bool>> dueGCond = dueG == null ?
-                e => true
-                : e => e.DueDate >= DateTime.Parse(dueG);
-
-            Expression<Func<Invoice, bool>> qtyLCond = qtyL == null ?
-                e => true
-                : e => e.SellingPrices.Select(d => d.Qty).Sum() <= qtyL;
-
-            Expression<Func<Invoice, bool>> qtyGCond = qtyG == null ?
-                e => true
-                : e => e.SellingPrices.Select(d => d.Qty).Sum() >= qtyG;
-
-            Expression<Func<Invoice, bool>> totalLCond = totalL == null ?
-                e => true
-                : e => e.SellingPrices.Select(d => d.Qty * d.Price).Sum() <= totalL;
-
-            Expression<Func<Invoice, bool>> totalGCond = totalG == null ?
-                e => true
-                : e => e.SellingPrices.Select(d => d.Qty * d.Price).Sum() >= totalG;
-
-            Expression<Func<Invoice, bool>> recipientCond = recipient == null ?
-                e => true
-                : e => e.Buyer == recipient;
-
-            Expression<Func<Invoice, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.CurrencyName == currency;
-
-            Expression<Func<Invoice, bool>> paymentStatusCond = paymentStatus == null ?
-                e => true
-                : e => e.PaymentsStatusId == paymentStatus;
-
-            Expression<Func<Invoice, bool>> statusCond = status == null ?
-                e => true
-                : e => e.InSystem == status;
             return await _handlerContext.Invoices
                 .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))
                 .Where(e => e.SellingPrices.Any())

@@ -2,6 +2,7 @@
 using database_communicator.Models;
 using database_communicator.Models.DTOs;
 using database_communicator.Utils;
+using database_comunicator.FilterClass;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -36,29 +37,13 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<OutsideItem, bool>> qtyLCond = qtyL == null ?
-                e => true
-                : e => e.Qty <= qtyL;
+            var qtyLCond = OutsideItemFilters.GetQtyLowerFilter(qtyL);
+            var qtyGCond = OutsideItemFilters.GetQtyGreaterFilter(qtyG);
+            var priceLCond = OutsideItemFilters.GetPriceLowerFilter(priceL);
+            var priceGCond = OutsideItemFilters.GetPriceGreaterFilter(priceG);
+            var sourceCond = OutsideItemFilters.GetSourceFilter(source);
+            var currencyCond = OutsideItemFilters.GetCurrencyFilter(currency);
 
-            Expression<Func<OutsideItem, bool>> qtyGCond = qtyG == null ?
-                e => true
-                : e => e.Qty >= qtyG;
-
-            Expression<Func<OutsideItem, bool>> priceLCond = priceL == null ?
-                e => true
-                : e => e.PurchasePrice <= priceL;
-
-            Expression<Func<OutsideItem, bool>> priceGCond = priceG == null ?
-                e => true
-                : e => e.PurchasePrice >= priceG;
-
-            Expression<Func<OutsideItem, bool>> sourceCond = source == null ?
-                e => true
-                : e => e.OrganizationId == source;
-
-            Expression<Func<OutsideItem, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.CurrencyName == currency;
             return await _handlerContext.OutsideItems
                 .Where(qtyLCond)
                 .Where(qtyGCond)
@@ -91,29 +76,13 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<OutsideItem, bool>> qtyLCond = qtyL == null ?
-                e => true
-                : e => e.Qty <= qtyL;
+            var qtyLCond = OutsideItemFilters.GetQtyLowerFilter(qtyL);
+            var qtyGCond = OutsideItemFilters.GetQtyGreaterFilter(qtyG);
+            var priceLCond = OutsideItemFilters.GetPriceLowerFilter(priceL);
+            var priceGCond = OutsideItemFilters.GetPriceGreaterFilter(priceG);
+            var sourceCond = OutsideItemFilters.GetSourceFilter(source);
+            var currencyCond = OutsideItemFilters.GetCurrencyFilter(currency);
 
-            Expression<Func<OutsideItem, bool>> qtyGCond = qtyG == null ?
-                e => true
-                : e => e.Qty >= qtyG;
-
-            Expression<Func<OutsideItem, bool>> priceLCond = priceL == null ?
-                e => true
-                : e => e.PurchasePrice <= priceL;
-
-            Expression<Func<OutsideItem, bool>> priceGCond = priceG == null ?
-                e => true
-                : e => e.PurchasePrice >= priceG;
-
-            Expression<Func<OutsideItem, bool>> sourceCond = source == null ?
-                e => true
-                : e => e.OrganizationId == source;
-
-            Expression<Func<OutsideItem, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.CurrencyName == currency;
             return await _handlerContext.OutsideItems
                 .Where(e => e.Item.PartNumber.ToLower().Contains(search.ToLower()) || e.Item.ItemName.ToLower().Contains(search.ToLower()))
                 .Where(qtyLCond)

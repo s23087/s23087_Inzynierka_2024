@@ -2,6 +2,7 @@
 using database_communicator.Models;
 using database_communicator.Models.DTOs;
 using database_communicator.Utils;
+using database_comunicator.FilterClass;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -160,9 +161,8 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Organization, bool>> countryCond = country == null ?
-                e => true
-                : e => e.CountryId == country;
+            var countryCond = ClientFilters.GetCountryFilter(country);
+
             return await _handlerContext.Organizations
                 .Where(d => d.OrganizationId != userOrgId && d.AppUsers.Any(x => x.IdUser == userId))
                 .Where(countryCond)
@@ -191,9 +191,8 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Organization, bool>> countryCond = country == null ?
-                e => true
-                : e => e.CountryId == country;
+            var countryCond = ClientFilters.GetCountryFilter(country);
+
             return await _handlerContext.Organizations
                 .Where(e => e.OrganizationId != userOrgId && e.AppUsers.Any(x => x.IdUser == userId))
                 .Where(e => EF.Functions.FreeText(e.OrgName, search) || EF.Functions.FreeText(e.Street, search) || EF.Functions.FreeText(e.City, search))
@@ -223,9 +222,8 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Organization, bool>> countryCond = country == null ?
-                e => true
-                : e => e.CountryId == country;
+            var countryCond = ClientFilters.GetCountryFilter(country);
+
             return await _handlerContext.Organizations
                 .Where(e => e.OrganizationId != userOrgId)
                 .Where(countryCond)
@@ -254,9 +252,8 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Organization, bool>> countryCond = country == null ?
-                e => true
-                : e => e.CountryId == country;
+            var countryCond = ClientFilters.GetCountryFilter(country);
+
             return await _handlerContext.Organizations
                 .Where(d => d.OrganizationId != userOrgId)
                 .Where(d => EF.Functions.FreeText(d.OrgName, search) || EF.Functions.FreeText(d.Street, search) || EF.Functions.FreeText(d.City, search))

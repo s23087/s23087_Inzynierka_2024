@@ -2,6 +2,7 @@
 using database_communicator.Models;
 using database_communicator.Models.DTOs;
 using database_communicator.Utils;
+using database_comunicator.FilterClass;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq;
@@ -206,21 +207,12 @@ namespace database_communicator.Services
         {
             List<GetManyItems> items;
             Func<GetManyItems, bool> statusCond = SortFilterUtils.GetFilterStatus(status);
-            Expression<Func<Item, bool>> eanCond = ean == null ?
-                e => true
-                : e => e.Eans.Any(x => x.EanValue == ean);
-            Expression<Func<GetManyItems, bool>> qtyLCondition = qtyL == null ?
-                e => true
-                : e => e.Qty <= qtyL;
-            Expression<Func<GetManyItems, bool>> qtyGCondition = qtyG == null ?
-                e => true
-                : e => e.Qty >= qtyG;
-            Expression<Func<GetManyItems, bool>> priceLCondition = priceL == null ?
-                e => true
-                : e => e.PurchasePrice <= priceL;
-            Expression<Func<GetManyItems, bool>> priceGCondition = priceG == null ?
-                e => true
-                : e => e.PurchasePrice >= priceG;
+            var eanCond = ItemFilters.GetEanFilter(ean);
+            var qtyLCondition = ItemFilters.GetQtyLowerFilter(qtyL);
+            var qtyGCondition = ItemFilters.GetQtyGreaterFilter(qtyG);
+            var priceLCondition = ItemFilters.GetPriceLowerFilter(priceL);
+            var priceGCondition = ItemFilters.GetPriceGreaterFilter(priceG);
+
             bool direction;
             if (orderBy == null)
             {
@@ -348,21 +340,12 @@ namespace database_communicator.Services
         {
             List<GetManyItems> items;
             Func<GetManyItems, bool> statusCond = SortFilterUtils.GetFilterStatus(status);
-            Expression<Func<Item, bool>> eanCond = ean == null ?
-                e => true
-                : e => e.Eans.Any(x => x.EanValue == ean);
-            Expression<Func<GetManyItems, bool>> qtyLCondition = qtyL == null ?
-                e => true
-                : e => e.Qty <= qtyL;
-            Expression<Func<GetManyItems, bool>> qtyGCondition = qtyG == null ?
-                e => true
-                : e => e.Qty >= qtyG;
-            Expression<Func<GetManyItems, bool>> priceLCondition = priceL == null ?
-                e => true
-                : e => e.PurchasePrice <= priceL;
-            Expression<Func<GetManyItems, bool>> priceGCondition = priceG == null ?
-                e => true
-                : e => e.PurchasePrice >= priceG;
+            var eanCond = ItemFilters.GetEanFilter(ean);
+            var qtyLCondition = ItemFilters.GetQtyLowerFilter(qtyL);
+            var qtyGCondition = ItemFilters.GetQtyGreaterFilter(qtyG);
+            var priceLCondition = ItemFilters.GetPriceLowerFilter(priceL);
+            var priceGCondition = ItemFilters.GetPriceGreaterFilter(priceG);
+
             bool direction;
             if (orderBy == null)
             {
@@ -557,21 +540,12 @@ namespace database_communicator.Services
         {
             List<GetManyItems> items;
             Func<GetManyItems, bool> statusCond = SortFilterUtils.GetFilterStatus(status);
-            Expression<Func<Item, bool>> eanCond = ean == null ?
-                e => true
-                : e => e.Eans.Any(x => x.EanValue == ean);
-            Expression<Func<GetManyItems, bool>> qtyLCondition = qtyL == null ?
-                e => true
-                : e => e.Qty <= qtyL;
-            Expression<Func<GetManyItems, bool>> qtyGCondition = qtyG == null ?
-                e => true
-                : e => e.Qty >= qtyG;
-            Expression<Func<GetManyItems, bool>> priceLCondition = priceL == null ?
-                e => true
-                : e => e.PurchasePrice <= priceL;
-            Expression<Func<GetManyItems, bool>> priceGCondition = priceG == null ?
-                e => true
-                : e => e.PurchasePrice >= priceG;
+            var eanCond = ItemFilters.GetEanFilter(ean);
+            var qtyLCondition = ItemFilters.GetQtyLowerFilter(qtyL);
+            var qtyGCondition = ItemFilters.GetQtyGreaterFilter(qtyG);
+            var priceLCondition = ItemFilters.GetPriceLowerFilter(priceL);
+            var priceGCondition = ItemFilters.GetPriceGreaterFilter(priceG);
+
             bool direction;
             if (orderBy == null)
             {
@@ -682,21 +656,12 @@ namespace database_communicator.Services
         {
             List<GetManyItems> items;
             Func<GetManyItems, bool> statusCond = SortFilterUtils.GetFilterStatus(status);
-            Expression<Func<Item, bool>> eanCond = ean == null ? 
-                e => true 
-                : e => e.Eans.Any(x => x.EanValue == ean);
-            Expression<Func<GetManyItems, bool>> qtyLCondition = qtyL == null ?
-                e => true
-                : e => e.Qty <= qtyL;
-            Expression<Func<GetManyItems, bool>> qtyGCondition = qtyG == null ?
-                e => true
-                : e => e.Qty >= qtyG;
-            Expression<Func<GetManyItems, bool>> priceLCondition = priceL == null ?
-                e => true
-                : e => e.PurchasePrice <= priceL;
-            Expression<Func<GetManyItems, bool>> priceGCondition = priceG == null ?
-                e => true
-                : e => e.PurchasePrice >= priceG;
+            var eanCond = ItemFilters.GetEanFilter(ean);
+            var qtyLCondition = ItemFilters.GetQtyLowerFilter(qtyL);
+            var qtyGCondition = ItemFilters.GetQtyGreaterFilter(qtyG);
+            var priceLCondition = ItemFilters.GetPriceLowerFilter(priceL);
+            var priceGCondition = ItemFilters.GetPriceGreaterFilter(priceG);
+
             bool direction;
             if (orderBy == null)
             {

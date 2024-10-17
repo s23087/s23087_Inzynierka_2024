@@ -2,6 +2,7 @@
 using database_communicator.Models;
 using database_communicator.Models.DTOs;
 using database_communicator.Utils;
+using database_comunicator.FilterClass;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
@@ -135,37 +136,15 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Proforma, bool>> qtyLCond = qtyL == null ?
-                e => true
-                : e => isYourProforma ? e.ProformaFutureItems.Select(d => d.Qty).Sum() <= qtyL : e.ProformaOwnedItems.Select(d => d.Qty).Sum() <= qtyL;
+            var qtyLCond = ProformaFilters.GetQtyLowerFilter(qtyL, isYourProforma);
+            var qtyGCond = ProformaFilters.GetQtyGreaterFilter(qtyG, isYourProforma);
+            var totalLCond = ProformaFilters.GetTotalLowerFilter(totalL, isYourProforma);
+            var totalGCond = ProformaFilters.GetTotalGreaterFilter(totalG, isYourProforma);
+            var dateLCond = ProformaFilters.GetDateLowerFilter(dateL);
+            var dateGCond = ProformaFilters.GetDateGreaterFilter(dateG);
+            var recipientCond = ProformaFilters.GetRecipientFilter(recipient, isYourProforma);
+            var currencyCond = ProformaFilters.GetCurrencyFilter(currency);
 
-            Expression<Func<Proforma, bool>> qtyGCond = qtyG == null ?
-                e => true
-                : e => isYourProforma ? e.ProformaFutureItems.Select(d => d.Qty).Sum() >= qtyG : e.ProformaOwnedItems.Select(d => d.Qty).Sum() >= qtyG;
-
-            Expression<Func<Proforma, bool>> totalLCond = totalL == null ?
-                e => true
-                : e => isYourProforma ? e.ProformaFutureItems.Select(d => d.PurchasePrice * d.Qty).Sum() <= totalL : e.ProformaOwnedItems.Select(d => d.SellingPrice * d.Qty).Sum() <= totalL;
-
-            Expression<Func<Proforma, bool>> totalGCond = totalG == null ?
-                e => true
-                : e => isYourProforma ? e.ProformaFutureItems.Select(d => d.PurchasePrice * d.Qty).Sum() >= totalG : e.ProformaOwnedItems.Select(d => d.SellingPrice * d.Qty).Sum() >= totalG;
-
-            Expression<Func<Proforma, bool>> dateLCond = dateL == null ?
-                e => true
-                : e => e.ProformaDate <= DateTime.Parse(dateL);
-
-            Expression<Func<Proforma, bool>> dateGCond = dateG == null ?
-                e => true
-                : e => e.ProformaDate >= DateTime.Parse(dateG);
-
-            Expression<Func<Proforma, bool>> recipientCond = recipient == null ?
-                e => true
-                : e => isYourProforma ? e.Seller == recipient : e.Buyer == recipient;
-
-            Expression<Func<Proforma, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.CurrencyName == currency;
             return await _handlerContext.Proformas
                 .Where(e => isYourProforma ? e.ProformaFutureItems.Any() : e.ProformaOwnedItems.Any())
                 .Where(qtyLCond)
@@ -203,37 +182,15 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Proforma, bool>> qtyLCond = qtyL == null ?
-                e => true
-                : e => isYourProforma ? e.ProformaFutureItems.Select(d => d.Qty).Sum() <= qtyL : e.ProformaOwnedItems.Select(d => d.Qty).Sum() <= qtyL;
+            var qtyLCond = ProformaFilters.GetQtyLowerFilter(qtyL, isYourProforma);
+            var qtyGCond = ProformaFilters.GetQtyGreaterFilter(qtyG, isYourProforma);
+            var totalLCond = ProformaFilters.GetTotalLowerFilter(totalL, isYourProforma);
+            var totalGCond = ProformaFilters.GetTotalGreaterFilter(totalG, isYourProforma);
+            var dateLCond = ProformaFilters.GetDateLowerFilter(dateL);
+            var dateGCond = ProformaFilters.GetDateGreaterFilter(dateG);
+            var recipientCond = ProformaFilters.GetRecipientFilter(recipient, isYourProforma);
+            var currencyCond = ProformaFilters.GetCurrencyFilter(currency);
 
-            Expression<Func<Proforma, bool>> qtyGCond = qtyG == null ?
-                e => true
-                : e => isYourProforma ? e.ProformaFutureItems.Select(d => d.Qty).Sum() >= qtyG : e.ProformaOwnedItems.Select(d => d.Qty).Sum() >= qtyG;
-
-            Expression<Func<Proforma, bool>> totalLCond = totalL == null ?
-                e => true
-                : e => isYourProforma ? e.ProformaFutureItems.Select(d => d.PurchasePrice * d.Qty).Sum() <= totalL : e.ProformaOwnedItems.Select(d => d.SellingPrice * d.Qty).Sum() <= totalL;
-
-            Expression<Func<Proforma, bool>> totalGCond = totalG == null ?
-                e => true
-                : e => isYourProforma ? e.ProformaFutureItems.Select(d => d.PurchasePrice * d.Qty).Sum() >= totalG : e.ProformaOwnedItems.Select(d => d.SellingPrice * d.Qty).Sum() >= totalG;
-
-            Expression<Func<Proforma, bool>> dateLCond = dateL == null ?
-                e => true
-                : e => e.ProformaDate <= DateTime.Parse(dateL);
-
-            Expression<Func<Proforma, bool>> dateGCond = dateG == null ?
-                e => true
-                : e => e.ProformaDate >= DateTime.Parse(dateG);
-
-            Expression<Func<Proforma, bool>> recipientCond = recipient == null ?
-                e => true
-                : e => isYourProforma ? e.Seller == recipient : e.Buyer == recipient;
-
-            Expression<Func<Proforma, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.CurrencyName == currency;
             return await _handlerContext.Proformas
                 .Where(e => isYourProforma ? e.ProformaFutureItems.Any() : e.ProformaOwnedItems.Any())
                 .Where(e => e.ProformaNumber.ToLower().Contains(search.ToLower()))
@@ -272,37 +229,15 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Proforma, bool>> qtyLCond = qtyL == null ?
-                e => true
-                : e => isYourProforma ? e.ProformaFutureItems.Select(d => d.Qty).Sum() <= qtyL : e.ProformaOwnedItems.Select(d => d.Qty).Sum() <= qtyL;
+            var qtyLCond = ProformaFilters.GetQtyLowerFilter(qtyL, isYourProforma);
+            var qtyGCond = ProformaFilters.GetQtyGreaterFilter(qtyG, isYourProforma);
+            var totalLCond = ProformaFilters.GetTotalLowerFilter(totalL, isYourProforma);
+            var totalGCond = ProformaFilters.GetTotalGreaterFilter(totalG, isYourProforma);
+            var dateLCond = ProformaFilters.GetDateLowerFilter(dateL);
+            var dateGCond = ProformaFilters.GetDateGreaterFilter(dateG);
+            var recipientCond = ProformaFilters.GetRecipientFilter(recipient, isYourProforma);
+            var currencyCond = ProformaFilters.GetCurrencyFilter(currency);
 
-            Expression<Func<Proforma, bool>> qtyGCond = qtyG == null ?
-                e => true
-                : e => isYourProforma ? e.ProformaFutureItems.Select(d => d.Qty).Sum() >= qtyG : e.ProformaOwnedItems.Select(d => d.Qty).Sum() >= qtyG;
-
-            Expression<Func<Proforma, bool>> totalLCond = totalL == null ?
-                e => true
-                : e => isYourProforma ? e.ProformaFutureItems.Select(d => d.PurchasePrice * d.Qty).Sum() <= totalL : e.ProformaOwnedItems.Select(d => d.SellingPrice * d.Qty).Sum() <= totalL;
-
-            Expression<Func<Proforma, bool>> totalGCond = totalG == null ?
-                e => true
-                : e => isYourProforma ? e.ProformaFutureItems.Select(d => d.PurchasePrice * d.Qty).Sum() >= totalG : e.ProformaOwnedItems.Select(d => d.SellingPrice * d.Qty).Sum() >= totalG;
-
-            Expression<Func<Proforma, bool>> dateLCond = dateL == null ?
-                e => true
-                : e => e.ProformaDate <= DateTime.Parse(dateL);
-
-            Expression<Func<Proforma, bool>> dateGCond = dateG == null ?
-                e => true
-                : e => e.ProformaDate >= DateTime.Parse(dateG);
-
-            Expression<Func<Proforma, bool>> recipientCond = recipient == null ?
-                e => true
-                : e => isYourProforma ? e.Seller == recipient : e.Buyer == recipient;
-
-            Expression<Func<Proforma, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.CurrencyName == currency;
             return await _handlerContext.Proformas
                 .Where(e => isYourProforma ? e.ProformaFutureItems.Any() : e.ProformaOwnedItems.Any())
                 .Where(p => p.UserId == userId)
@@ -340,37 +275,15 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Proforma, bool>> qtyLCond = qtyL == null ?
-                e => true
-                : e => isYourProforma ? e.ProformaFutureItems.Select(d => d.Qty).Sum() <= qtyL : e.ProformaOwnedItems.Select(d => d.Qty).Sum() <= qtyL;
+            var qtyLCond = ProformaFilters.GetQtyLowerFilter(qtyL, isYourProforma);
+            var qtyGCond = ProformaFilters.GetQtyGreaterFilter(qtyG, isYourProforma);
+            var totalLCond = ProformaFilters.GetTotalLowerFilter(totalL, isYourProforma);
+            var totalGCond = ProformaFilters.GetTotalGreaterFilter(totalG, isYourProforma);
+            var dateLCond = ProformaFilters.GetDateLowerFilter(dateL);
+            var dateGCond = ProformaFilters.GetDateGreaterFilter(dateG);
+            var recipientCond = ProformaFilters.GetRecipientFilter(recipient, isYourProforma);
+            var currencyCond = ProformaFilters.GetCurrencyFilter(currency);
 
-            Expression<Func<Proforma, bool>> qtyGCond = qtyG == null ?
-                e => true
-                : e => isYourProforma ? e.ProformaFutureItems.Select(d => d.Qty).Sum() >= qtyG : e.ProformaOwnedItems.Select(d => d.Qty).Sum() >= qtyG;
-
-            Expression<Func<Proforma, bool>> totalLCond = totalL == null ?
-                e => true
-                : e => isYourProforma ? e.ProformaFutureItems.Select(d => d.PurchasePrice * d.Qty).Sum() <= totalL : e.ProformaOwnedItems.Select(d => d.SellingPrice * d.Qty).Sum() <= totalL;
-
-            Expression<Func<Proforma, bool>> totalGCond = totalG == null ?
-                e => true
-                : e => isYourProforma ? e.ProformaFutureItems.Select(d => d.PurchasePrice * d.Qty).Sum() >= totalG : e.ProformaOwnedItems.Select(d => d.SellingPrice * d.Qty).Sum() >= totalG;
-
-            Expression<Func<Proforma, bool>> dateLCond = dateL == null ?
-                e => true
-                : e => e.ProformaDate <= DateTime.Parse(dateL);
-
-            Expression<Func<Proforma, bool>> dateGCond = dateG == null ?
-                e => true
-                : e => e.ProformaDate >= DateTime.Parse(dateG);
-
-            Expression<Func<Proforma, bool>> recipientCond = recipient == null ?
-                e => true
-                : e => isYourProforma ? e.Seller == recipient : e.Buyer == recipient;
-
-            Expression<Func<Proforma, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.CurrencyName == currency;
             return await _handlerContext.Proformas
                 .Where(e => isYourProforma ? e.ProformaFutureItems.Any() : e.ProformaOwnedItems.Any())
                 .Where(p => p.UserId == userId)

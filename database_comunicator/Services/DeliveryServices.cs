@@ -2,6 +2,7 @@
 using database_communicator.Models;
 using database_communicator.Models.DTOs;
 using database_communicator.Utils;
+using database_comunicator.FilterClass;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.Metrics;
 using System.Linq.Expressions;
@@ -130,37 +131,15 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Delivery, bool>> estimatedLCond = estimatedL == null ?
-                e => true
-                : e => e.EstimatedDeliveryDate <= DateTime.Parse(estimatedL);
+            var estimatedLCond = DeliveryFilters.GetEstimatedLowerFilter(estimatedL);
+            var estimatedGCond = DeliveryFilters.GetEstimatedGreaterFilter(estimatedG);
+            var deliveredLCond = DeliveryFilters.GetDeliveredLowerFilter(deliveredL);
+            var deliveredGCond = DeliveryFilters.GetDeliveredGreaterFilter(deliveredG);
+            var recipientCond = DeliveryFilters.GetRecipientFilter(recipient, IsDeliveryToUser);
+            var statusCond = DeliveryFilters.GetStatusFilter(status);
+            var companyCond = DeliveryFilters.GetCompanyFilter(company);
+            var waybillCond = DeliveryFilters.GetWaybillFilter(waybill);
 
-            Expression<Func<Delivery, bool>> estimatedGCond = estimatedG == null ?
-                e => true
-                : e => e.EstimatedDeliveryDate >= DateTime.Parse(estimatedG);
-
-            Expression<Func<Delivery, bool>> deliveredLCond = deliveredL == null ?
-                e => true
-                : e => e.DeliveryDate <= DateTime.Parse(deliveredL);
-
-            Expression<Func<Delivery, bool>> deliveredGCond = deliveredG == null ?
-                e => true
-                : e => e.DeliveryDate >= DateTime.Parse(deliveredG);
-
-            Expression<Func<Delivery, bool>> recipientCond = recipient == null ?
-                e => true
-                : e => IsDeliveryToUser ? e.Proforma.Seller == recipient : e.Proforma.Buyer == recipient;
-
-            Expression<Func<Delivery, bool>> statusCond = status == null ?
-                e => true
-                : e => e.DeliveryStatusId == status;
-
-            Expression<Func<Delivery, bool>> companyCond = company == null ?
-                e => true
-                : e => e.DeliveryCompanyId == company;
-
-            Expression<Func<Delivery, bool>> waybillCond = waybill == null ?
-                e => true
-                : e => e.Waybills.Any(x => x.WaybillValue == waybill);
             return await _handlerContext.Deliveries
                 .Where(e => IsDeliveryToUser ? e.Proforma.ProformaFutureItems.Any() : e.Proforma.ProformaOwnedItems.Any())
                 .Where(estimatedLCond)
@@ -198,37 +177,15 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Delivery, bool>> estimatedLCond = estimatedL == null ?
-                e => true
-                : e => e.EstimatedDeliveryDate <= DateTime.Parse(estimatedL);
+            var estimatedLCond = DeliveryFilters.GetEstimatedLowerFilter(estimatedL);
+            var estimatedGCond = DeliveryFilters.GetEstimatedGreaterFilter(estimatedG);
+            var deliveredLCond = DeliveryFilters.GetDeliveredLowerFilter(deliveredL);
+            var deliveredGCond = DeliveryFilters.GetDeliveredGreaterFilter(deliveredG);
+            var recipientCond = DeliveryFilters.GetRecipientFilter(recipient, IsDeliveryToUser);
+            var statusCond = DeliveryFilters.GetStatusFilter(status);
+            var companyCond = DeliveryFilters.GetCompanyFilter(company);
+            var waybillCond = DeliveryFilters.GetWaybillFilter(waybill);
 
-            Expression<Func<Delivery, bool>> estimatedGCond = estimatedG == null ?
-                e => true
-                : e => e.EstimatedDeliveryDate >= DateTime.Parse(estimatedG);
-
-            Expression<Func<Delivery, bool>> deliveredLCond = deliveredL == null ?
-                e => true
-                : e => e.DeliveryDate <= DateTime.Parse(deliveredL);
-
-            Expression<Func<Delivery, bool>> deliveredGCond = deliveredG == null ?
-                e => true
-                : e => e.DeliveryDate >= DateTime.Parse(deliveredG);
-
-            Expression<Func<Delivery, bool>> recipientCond = recipient == null ?
-                e => true
-                : e => IsDeliveryToUser ? e.Proforma.Seller == recipient : e.Proforma.Buyer == recipient;
-
-            Expression<Func<Delivery, bool>> statusCond = status == null ?
-            e => true
-            : e => e.DeliveryStatusId == status;
-
-            Expression<Func<Delivery, bool>> companyCond = company == null ?
-                e => true
-                : e => e.DeliveryCompanyId == company;
-
-            Expression<Func<Delivery, bool>> waybillCond = waybill == null ?
-                e => true
-                : e => e.Waybills.Any(x => x.WaybillValue == waybill);
             return await _handlerContext.Deliveries
                 .Where(e => IsDeliveryToUser ? e.Proforma.ProformaFutureItems.Any() : e.Proforma.ProformaOwnedItems.Any())
                 .Where(e => e.Proforma.UserId == userId)
@@ -266,37 +223,14 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Delivery, bool>> estimatedLCond = estimatedL == null ?
-                e => true
-                : e => e.EstimatedDeliveryDate <= DateTime.Parse(estimatedL);
-
-            Expression<Func<Delivery, bool>> estimatedGCond = estimatedG == null ?
-                e => true
-                : e => e.EstimatedDeliveryDate >= DateTime.Parse(estimatedG);
-
-            Expression<Func<Delivery, bool>> deliveredLCond = deliveredL == null ?
-                e => true
-                : e => e.DeliveryDate <= DateTime.Parse(deliveredL);
-
-            Expression<Func<Delivery, bool>> deliveredGCond = deliveredG == null ?
-                e => true
-                : e => e.DeliveryDate >= DateTime.Parse(deliveredG);
-
-            Expression<Func<Delivery, bool>> recipientCond = recipient == null ?
-                e => true
-                : e => IsDeliveryToUser ? e.Proforma.Seller == recipient : e.Proforma.Buyer == recipient;
-
-            Expression<Func<Delivery, bool>> statusCond = status == null ?
-                e => true
-                : e => e.DeliveryStatusId == status;
-
-            Expression<Func<Delivery, bool>> companyCond = company == null ?
-                e => true
-                : e => e.DeliveryCompanyId == company;
-
-            Expression<Func<Delivery, bool>> waybillCond = waybill == null ?
-                e => true
-                : e => e.Waybills.Any(x => x.WaybillValue == waybill);
+            var estimatedLCond = DeliveryFilters.GetEstimatedLowerFilter(estimatedL);
+            var estimatedGCond = DeliveryFilters.GetEstimatedGreaterFilter(estimatedG);
+            var deliveredLCond = DeliveryFilters.GetDeliveredLowerFilter(deliveredL);
+            var deliveredGCond = DeliveryFilters.GetDeliveredGreaterFilter(deliveredG);
+            var recipientCond = DeliveryFilters.GetRecipientFilter(recipient, IsDeliveryToUser);
+            var statusCond = DeliveryFilters.GetStatusFilter(status);
+            var companyCond = DeliveryFilters.GetCompanyFilter(company);
+            var waybillCond = DeliveryFilters.GetWaybillFilter(waybill);
 
             int searchById;
 
@@ -346,37 +280,14 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Delivery, bool>> estimatedLCond = estimatedL == null ?
-                e => true
-                : e => e.EstimatedDeliveryDate <= DateTime.Parse(estimatedL);
-
-            Expression<Func<Delivery, bool>> estimatedGCond = estimatedG == null ?
-                e => true
-                : e => e.EstimatedDeliveryDate >= DateTime.Parse(estimatedG);
-
-            Expression<Func<Delivery, bool>> deliveredLCond = deliveredL == null ?
-                e => true
-                : e => e.DeliveryDate <= DateTime.Parse(deliveredL);
-
-            Expression<Func<Delivery, bool>> deliveredGCond = deliveredG == null ?
-                e => true
-                : e => e.DeliveryDate >= DateTime.Parse(deliveredG);
-
-            Expression<Func<Delivery, bool>> recipientCond = recipient == null ?
-                e => true
-                : e => IsDeliveryToUser ? e.Proforma.Seller == recipient : e.Proforma.Buyer == recipient;
-
-            Expression<Func<Delivery, bool>> statusCond = status == null ?
-                e => true
-                : e => e.DeliveryStatusId == status;
-
-            Expression<Func<Delivery, bool>> companyCond = company == null ?
-                e => true
-                : e => e.DeliveryCompanyId == company;
-
-            Expression<Func<Delivery, bool>> waybillCond = waybill == null ?
-                e => true
-                : e => e.Waybills.Any(x => x.WaybillValue == waybill);
+            var estimatedLCond = DeliveryFilters.GetEstimatedLowerFilter(estimatedL);
+            var estimatedGCond = DeliveryFilters.GetEstimatedGreaterFilter(estimatedG);
+            var deliveredLCond = DeliveryFilters.GetDeliveredLowerFilter(deliveredL);
+            var deliveredGCond = DeliveryFilters.GetDeliveredGreaterFilter(deliveredG);
+            var recipientCond = DeliveryFilters.GetRecipientFilter(recipient, IsDeliveryToUser);
+            var statusCond = DeliveryFilters.GetStatusFilter(status);
+            var companyCond = DeliveryFilters.GetCompanyFilter(company);
+            var waybillCond = DeliveryFilters.GetWaybillFilter(waybill);
 
             int searchById;
 

@@ -2,6 +2,7 @@
 using database_communicator.Models;
 using database_communicator.Models.DTOs;
 using database_communicator.Utils;
+using database_comunicator.FilterClass;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -86,21 +87,10 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Request, bool>> dateLCond = dateL == null ?
-                e => true
-                : e => e.CreationDate <= DateTime.Parse(dateL);
-
-            Expression<Func<Request, bool>> dateGCond = dateG == null ?
-                e => true
-                : e => e.CreationDate >= DateTime.Parse(dateG);
-
-            Expression<Func<Request, bool>> typeCond = type == null ?
-                e => true
-                : e => e.ObjectType.ObjectTypeName == type;
-
-            Expression<Func<Request, bool>> statusCond = status == null ?
-                e => true
-                : e => e.RequestStatusId == status;
+            var dateLCond = RequestFilters.GetDateLowerFilter(dateL);
+            var dateGCond = RequestFilters.GetDateGreaterFilter(dateG);
+            var typeCond = RequestFilters.GetTypeFilter(type);
+            var statusCond = RequestFilters.GetStatusFilter(status);
 
             return await _handlerContext.Requests
                 .Where(e => e.IdUserCreator == userId)
@@ -132,21 +122,10 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Request, bool>> dateLCond = dateL == null ?
-                e => true
-                : e => e.CreationDate <= DateTime.Parse(dateL);
-
-            Expression<Func<Request, bool>> dateGCond = dateG == null ?
-                e => true
-                : e => e.CreationDate >= DateTime.Parse(dateG);
-
-            Expression<Func<Request, bool>> typeCond = type == null ?
-                e => true
-                : e => e.ObjectType.ObjectTypeName == type;
-
-            Expression<Func<Request, bool>> statusCond = status == null ?
-                e => true
-                : e => e.RequestStatusId == status;
+            var dateLCond = RequestFilters.GetDateLowerFilter(dateL);
+            var dateGCond = RequestFilters.GetDateGreaterFilter(dateG);
+            var typeCond = RequestFilters.GetTypeFilter(type);
+            var statusCond = RequestFilters.GetStatusFilter(status);
 
             return await _handlerContext.Requests
                 .Where(e => e.IdUserCreator == userId && e.Title.ToLower().Contains(search.ToLower()))
@@ -178,21 +157,10 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Request, bool>> dateLCond = dateL == null ?
-                e => true
-                : e => e.CreationDate <= DateTime.Parse(dateL);
-
-            Expression<Func<Request, bool>> dateGCond = dateG == null ?
-                e => true
-                : e => e.CreationDate >= DateTime.Parse(dateG);
-
-            Expression<Func<Request, bool>> typeCond = type == null ?
-                e => true
-                : e => e.ObjectType.ObjectTypeName == type;
-
-            Expression<Func<Request, bool>> statusCond = status == null ?
-                e => true
-                : e => e.RequestStatusId == status;
+            var dateLCond = RequestFilters.GetDateLowerFilter(dateL);
+            var dateGCond = RequestFilters.GetDateGreaterFilter(dateG);
+            var typeCond = RequestFilters.GetTypeFilter(type);
+            var statusCond = RequestFilters.GetStatusFilter(status);
 
             return await _handlerContext.Requests
                 .Where(e => e.IdUserReciver == userId)
@@ -224,21 +192,11 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Request, bool>> dateLCond = dateL == null ?
-                e => true
-                : e => e.CreationDate <= DateTime.Parse(dateL);
+            var dateLCond = RequestFilters.GetDateLowerFilter(dateL);
+            var dateGCond = RequestFilters.GetDateGreaterFilter(dateG);
+            var typeCond = RequestFilters.GetTypeFilter(type);
+            var statusCond = RequestFilters.GetStatusFilter(status);
 
-            Expression<Func<Request, bool>> dateGCond = dateG == null ?
-                e => true
-                : e => e.CreationDate >= DateTime.Parse(dateG);
-
-            Expression<Func<Request, bool>> typeCond = type == null ?
-                e => true
-                : e => e.ObjectType.ObjectTypeName == type;
-
-            Expression<Func<Request, bool>> statusCond = status == null ?
-                e => true
-                : e => e.RequestStatusId == status;
             return await _handlerContext.Requests
                 .Where(e => e.IdUserReciver == userId && e.Title.ToLower().Contains(search.ToLower()))
                 .Where(dateLCond)

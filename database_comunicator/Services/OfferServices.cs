@@ -2,6 +2,7 @@
 using database_communicator.Models;
 using database_communicator.Models.DTOs;
 using database_communicator.Utils;
+using database_comunicator.FilterClass;
 using LINQtoCSV;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -56,41 +57,16 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Offer, bool>> statusCond = status == null ?
-                e => true
-                : e => e.OfferStatus.StatusName == status;
+            var statusCond = OfferFilters.GetStatusFilter(status);
+            var currencyCond = OfferFilters.GetCurrencyFilter(currency);
+            var typeCond = OfferFilters.GetTypeFilter(type);
+            var totalLCond = OfferFilters.GetTotalLowerFilter(totalL);
+            var totalGCond = OfferFilters.GetTotalGreaterFilter(totalG);
+            var createdLCond = OfferFilters.GetCreatedLowerFilter(createdL);
+            var createdGCond = OfferFilters.GetCreatedGreaterFilter(createdG);
+            var modifiedLCond = OfferFilters.GetModifiedLowerFilter(modifiedL);
+            var modifiedGCond = OfferFilters.GetModifiedGreaterFilter(modifiedG);
 
-            Expression<Func<Offer, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.CurrencyName == currency;
-
-            Expression<Func<Offer, bool>> typeCond = type == null ?
-                e => true
-                : e => e.PathToFile.EndsWith(type);
-
-            Expression<Func<Offer, bool>> totalLCond = totalL == null ?
-                e => true
-                : e => e.OfferItems.Count < totalL;
-
-            Expression<Func<Offer, bool>> totalGCond = totalG == null ?
-                e => true
-                : e => e.OfferItems.Count < totalG;
-
-            Expression<Func<Offer, bool>> createdLCond = createdL == null ?
-                e => true
-                : e => e.CreationDate <= DateTime.Parse(createdL);
-
-            Expression<Func<Offer, bool>> createdGCond = createdG == null ?
-                e => true
-                : e => e.CreationDate >= DateTime.Parse(createdG);
-
-            Expression<Func<Offer, bool>> modifiedLCond = modifiedL == null ?
-                e => true
-                : e => e.ModificationDate <= DateTime.Parse(modifiedL);
-
-            Expression<Func<Offer, bool>> modifiedGCond = modifiedG == null ?
-                e => true
-                : e => e.ModificationDate >= DateTime.Parse(modifiedG);
             return await _handlerContext.Offers
                 .Where(e => e.UserId == userId)
                 .Where(statusCond)
@@ -128,41 +104,17 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith("D");
             }
-            Expression<Func<Offer, bool>> statusCond = status == null ?
-                e => true
-                : e => e.OfferStatus.StatusName == status;
 
-            Expression<Func<Offer, bool>> currencyCond = currency == null ?
-                e => true
-                : e => e.CurrencyName == currency;
+            var statusCond = OfferFilters.GetStatusFilter(status);
+            var currencyCond = OfferFilters.GetCurrencyFilter(currency);
+            var typeCond = OfferFilters.GetTypeFilter(type);
+            var totalLCond = OfferFilters.GetTotalLowerFilter(totalL);
+            var totalGCond = OfferFilters.GetTotalGreaterFilter(totalG);
+            var createdLCond = OfferFilters.GetCreatedLowerFilter(createdL);
+            var createdGCond = OfferFilters.GetCreatedGreaterFilter(createdG);
+            var modifiedLCond = OfferFilters.GetModifiedLowerFilter(modifiedL);
+            var modifiedGCond = OfferFilters.GetModifiedGreaterFilter(modifiedG);
 
-            Expression<Func<Offer, bool>> typeCond = type == null ?
-                e => true
-                : e => e.PathToFile.EndsWith(type);
-
-            Expression<Func<Offer, bool>> totalLCond = totalL == null ?
-                e => true
-                : e => e.OfferItems.Count <= totalL;
-
-            Expression<Func<Offer, bool>> totalGCond = totalG == null ?
-                e => true
-                : e => e.OfferItems.Count >= totalG;
-
-            Expression<Func<Offer, bool>> createdLCond = createdL == null ?
-                e => true
-                : e => e.CreationDate <= DateTime.Parse(createdL);
-
-            Expression<Func<Offer, bool>> createdGCond = createdG == null ?
-                e => true
-                : e => e.CreationDate >= DateTime.Parse(createdG);
-
-            Expression<Func<Offer, bool>> modifiedLCond = modifiedL == null ?
-                e => true
-                : e => e.ModificationDate <= DateTime.Parse(modifiedL);
-
-            Expression<Func<Offer, bool>> modifiedGCond = modifiedG == null ?
-                e => true
-                : e => e.ModificationDate >= DateTime.Parse(modifiedG);
             return await _handlerContext.Offers
                 .Where(e => e.UserId == userId)
                 .Where(e => e.OfferName.ToLower().Contains(search.ToLower()))

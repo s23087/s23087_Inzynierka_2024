@@ -383,13 +383,13 @@ namespace database_communicator.Services
                 }).ToListAsync();
 
         }
-        public async Task<bool> CreditDeductionCanBeApplied(int userId, int invoiceid, int itemId, int qty)
+        public async Task<bool> CreditDeductionCanBeApplied(int userId, int invoiceId, int itemId, int qty)
         {
             var exist = await _handlerContext.ItemOwners
-                .AnyAsync(e => e.IdUser == userId && e.InvoiceId == invoiceid && e.OwnedItemId == itemId);
+                .AnyAsync(e => e.IdUser == userId && e.InvoiceId == invoiceId && e.OwnedItemId == itemId);
             if (!exist) return false;
             var currentResult = await _handlerContext.ItemOwners
-                .Where(e => e.IdUser == userId && e.InvoiceId == invoiceid && e.OwnedItemId == itemId)
+                .Where(e => e.IdUser == userId && e.InvoiceId == invoiceId && e.OwnedItemId == itemId)
                 .Select(e => e.Qty).FirstAsync();
             return currentResult - qty >= 0;
         }
