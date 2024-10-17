@@ -44,21 +44,34 @@ namespace database_communicator.Services
             try
             {
                 var plnData = new DateTime(2024, 9, 3, 0, 0, 0, DateTimeKind.Utc);
-                var checkCurrency = await _handlerContext.CurrencyValues.Where(e => e.CurrencyName == data.CurrencyName && e.UpdateDate.Equals(data.CurrencyDate)).AnyAsync();
-                var currVal = new CurrencyValue
+                CurrencyValue currVal;
+                if (data.CurrencyName == "PLN")
                 {
-                    CurrencyName = data.CurrencyName,
-                    UpdateDate = data.CurrencyDate,
-                    CurrencyValue1 = data.CurrencyValue
-                };
-                if (checkCurrency)
+                    currVal = new CurrencyValue
+                    {
+                        CurrencyName = data.CurrencyName,
+                        UpdateDate = plnData,
+                        CurrencyValue1 = 1
+                    };
+                } else
                 {
-                    _handlerContext.CurrencyValues.Update(currVal);
+                    var checkCurrency = await _handlerContext.CurrencyValues.Where(e => e.CurrencyName == data.CurrencyName && e.UpdateDate.Equals(data.CurrencyDate)).AnyAsync();
+                    currVal = new CurrencyValue
+                    {
+                        CurrencyName = data.CurrencyName,
+                        UpdateDate = data.CurrencyDate,
+                        CurrencyValue1 = data.CurrencyValue
+                    };
+                    if (checkCurrency)
+                    {
+                        _handlerContext.CurrencyValues.Update(currVal);
+                    }
+                    else
+                    {
+                        _handlerContext.CurrencyValues.Add(currVal);
+                    }
                 }
-                else
-                {
-                    _handlerContext.CurrencyValues.Add(currVal);
-                }
+
                 await _handlerContext.SaveChangesAsync();
                 var newProforma = new Proforma
                 {
@@ -72,7 +85,7 @@ namespace database_communicator.Services
                     ProformaFilePath = data.Path,
                     Taxes = data.TaxId,
                     PaymentMethodId = data.PaymentId,
-                    CurrencyValueDate = data.CurrencyDate,
+                    CurrencyValueDate = currVal.UpdateDate,
                     CurrencyName = data.CurrencyName,
                     UserId = data.UserId,
                 };
@@ -134,7 +147,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var qtyLCond = ProformaFilters.GetQtyLowerFilter(qtyL, isYourProforma);
             var qtyGCond = ProformaFilters.GetQtyGreaterFilter(qtyG, isYourProforma);
@@ -180,7 +193,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var qtyLCond = ProformaFilters.GetQtyLowerFilter(qtyL, isYourProforma);
             var qtyGCond = ProformaFilters.GetQtyGreaterFilter(qtyG, isYourProforma);
@@ -227,7 +240,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var qtyLCond = ProformaFilters.GetQtyLowerFilter(qtyL, isYourProforma);
             var qtyGCond = ProformaFilters.GetQtyGreaterFilter(qtyG, isYourProforma);
@@ -273,7 +286,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var qtyLCond = ProformaFilters.GetQtyLowerFilter(qtyL, isYourProforma);
             var qtyGCond = ProformaFilters.GetQtyGreaterFilter(qtyG, isYourProforma);

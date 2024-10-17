@@ -166,20 +166,17 @@ namespace database_communicator.Utils
                 orderBy = e => e.ProformaId;
                 return orderBy;
             }
-            else
+            var changedSort = sort[1..];
+            orderBy = changedSort switch
             {
-                var changedSort = sort[1..];
-                orderBy = changedSort switch
-                {
-                    "Number" => e => e.ProformaNumber,
-                    "Date" => e => e.ProformaDate,
-                    "Recipient" => e => isYourProforma ? e.SellerNavigation.OrgName : e.BuyerNavigation.OrgName,
-                    "Qty" => e => isYourProforma ?  e.ProformaFutureItems.Count : e.ProformaOwnedItems.Count,
-                    "Total" => e => isYourProforma ? e.ProformaFutureItems.Select(d => d.PurchasePrice).Sum() : e.ProformaOwnedItems.Select(d => d.SellingPrice).Sum(),
-                    _ => e => e.ProformaId,
-                };
-                return orderBy;
-            }
+                "Number" => e => e.ProformaNumber,
+                "Date" => e => e.ProformaDate,
+                "Recipient" => e => isYourProforma ? e.SellerNavigation.OrgName : e.BuyerNavigation.OrgName,
+                "Qty" => e => isYourProforma ? e.ProformaFutureItems.Count : e.ProformaOwnedItems.Count,
+                "Total" => e => isYourProforma ? e.ProformaFutureItems.Select(d => d.PurchasePrice).Sum() : e.ProformaOwnedItems.Select(d => d.SellingPrice).Sum(),
+                _ => e => e.ProformaId,
+            };
+            return orderBy;
         }
         public static Expression<Func<Offer, Object>> GetPricelistSort(string? sort)
         {

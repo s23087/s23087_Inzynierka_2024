@@ -80,6 +80,7 @@ function ViewItemOffcanvas({
         : getStatusColor(item.statusName),
     marginBottom: ".25rem",
   };
+  const isRestInfoEmpty = () => restInfo.outsideItemInfos.length === 0 && restInfo.ownedItemInfos.length === 0;
   return (
     <Offcanvas
       className="h-100 minScalableWidth"
@@ -94,8 +95,7 @@ function ViewItemOffcanvas({
               <p className="blue-main-text h4 mb-0">Id: {item.itemId}</p>
             </Col>
             <Col xs="4" lg="2" xl="1" className="ps-1 text-end">
-              {restInfo.outsideItemInfos.length === 0 &&
-              restInfo.ownedItemInfos.length === 0 ? null : (
+              {isRestInfoEmpty() ? null : (
                 <Button
                   variant="as-link"
                   onClick={() => {
@@ -133,7 +133,7 @@ function ViewItemOffcanvas({
           <Row>
             <Col xs="12" md="6">
               <Stack className="pt-3" gap={3}>
-                {isOrg && item.users.length > 0 ? (
+                {canUserBeShown() ? (
                   <Form.Group>
                     <ErrorMessage 
                       message="Could not download users."
@@ -226,6 +226,10 @@ function ViewItemOffcanvas({
       </Offcanvas.Body>
     </Offcanvas>
   );
+
+  function canUserBeShown() {
+    return isOrg && item.users.length > 0;
+  }
 }
 
 ViewItemOffcanvas.propTypes = {

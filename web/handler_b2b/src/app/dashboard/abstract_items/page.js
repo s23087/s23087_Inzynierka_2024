@@ -1,4 +1,5 @@
 "use server";
+import PropTypes from "prop-types";
 import WholeFooter from "@/components/footer/whole_footers/whole_footer";
 import OutsideItemsMenu from "@/components/menu/wholeMenu/outside_item_menu";
 import OutsideItemList from "@/components/object_list/outside_item_list";
@@ -8,7 +9,7 @@ import getNotificationCounter from "@/utils/menu/get_nofication_counter";
 import getOutsideItems from "@/utils/outside_items/get_outside_items";
 import getSearchOutsideItems from "@/utils/outside_items/get_search_outside_items";
 
-export default async function OutsideItemsPage({ searchParams }) {
+async function OutsideItemsPage({ searchParams }) {
   const current_role = await getRole();
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
@@ -83,3 +84,9 @@ export default async function OutsideItemsPage({ searchParams }) {
     </main>
   );
 }
+
+OutsideItemsPage.propTypes = {
+  searchParams: PropTypes.object
+}
+
+export default OutsideItemsPage

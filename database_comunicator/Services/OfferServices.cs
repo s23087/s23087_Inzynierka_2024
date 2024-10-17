@@ -55,7 +55,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var statusCond = OfferFilters.GetStatusFilter(status);
             var currencyCond = OfferFilters.GetCurrencyFilter(currency);
@@ -102,7 +102,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
 
             var statusCond = OfferFilters.GetStatusFilter(status);

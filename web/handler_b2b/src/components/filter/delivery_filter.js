@@ -306,42 +306,14 @@ function DeliveryFilterOffcanvas({
                   variant="green"
                   className="w-100"
                   onClick={() => {
-                    let status = document.getElementById("status").value;
-                    if (status !== "none") newParams.set("status", status);
-                    if (status === "none") newParams.delete("status");
-
-                    let recipient = document.getElementById("recipient").value;
-                    if (recipient !== "none")
-                      newParams.set("recipient", recipient);
-                    if (recipient === "none") newParams.delete("recipient");
-
-                    let company = document.getElementById("company").value;
-                    if (company !== "none") newParams.set("company", company);
-                    if (company === "none") newParams.delete("company");
-
-                    let estimatedL =
-                      document.getElementById("estimatedL").value;
-                    if (estimatedL) newParams.set("estimatedL", estimatedL);
-                    if (!estimatedL) newParams.delete("estimatedL");
-
-                    let estimatedG =
-                      document.getElementById("estimatedG").value;
-                    if (estimatedG) newParams.set("estimatedG", estimatedG);
-                    if (!estimatedG) newParams.delete("estimatedG");
-
-                    let deliveredL =
-                      document.getElementById("deliveredL").value;
-                    if (deliveredL) newParams.set("deliveredL", deliveredL);
-                    if (!deliveredL) newParams.delete("deliveredL");
-
-                    let deliveredG =
-                      document.getElementById("deliveredG").value;
-                    if (deliveredG) newParams.set("deliveredG", deliveredG);
-                    if (!deliveredG) newParams.delete("deliveredG");
-
-                    let waybill = document.getElementById("waybill").value;
-                    if (waybill) newParams.set("waybill", waybill);
-                    if (!waybill) newParams.delete("waybill");
+                    setStatusFilter();
+                    setRecipientFilter();
+                    setCompanyFilter();
+                    setEstimatedLowerFilter();
+                    setEstimatedGreaterFilter();
+                    setDeliveredLowerFilter();
+                    setDeliveredGreaterFilter();
+                    setWaybillFilter();
 
                     let sort = document.getElementById("sortValue").value;
                     if (sort != "None") {
@@ -384,6 +356,55 @@ function DeliveryFilterOffcanvas({
       </Container>
     </Offcanvas>
   );
+
+  function setWaybillFilter() {
+    let waybill = document.getElementById("waybill").value;
+    if (waybill) newParams.set("waybill", waybill);
+    if (!waybill) newParams.delete("waybill");
+  }
+
+  function setDeliveredGreaterFilter() {
+    let deliveredG = document.getElementById("deliveredG").value;
+    if (deliveredG) newParams.set("deliveredG", deliveredG);
+    if (!deliveredG) newParams.delete("deliveredG");
+  }
+
+  function setDeliveredLowerFilter() {
+    let deliveredL = document.getElementById("deliveredL").value;
+    if (deliveredL) newParams.set("deliveredL", deliveredL);
+    if (!deliveredL) newParams.delete("deliveredL");
+  }
+
+  function setEstimatedGreaterFilter() {
+    let estimatedG = document.getElementById("estimatedG").value;
+    if (estimatedG) newParams.set("estimatedG", estimatedG);
+    if (!estimatedG) newParams.delete("estimatedG");
+  }
+
+  function setEstimatedLowerFilter() {
+    let estimatedL = document.getElementById("estimatedL").value;
+    if (estimatedL) newParams.set("estimatedL", estimatedL);
+    if (!estimatedL) newParams.delete("estimatedL");
+  }
+
+  function setCompanyFilter() {
+    let company = document.getElementById("company").value;
+    if (company !== "none") newParams.set("company", company);
+    if (company === "none") newParams.delete("company");
+  }
+
+  function setRecipientFilter() {
+    let recipient = document.getElementById("recipient").value;
+    if (recipient !== "none")
+      newParams.set("recipient", recipient);
+    if (recipient === "none") newParams.delete("recipient");
+  }
+
+  function setStatusFilter() {
+    let status = document.getElementById("status").value;
+    if (status !== "none") newParams.set("status", status);
+    if (status === "none") newParams.delete("status");
+  }
 }
 
 DeliveryFilterOffcanvas.propTypes = {

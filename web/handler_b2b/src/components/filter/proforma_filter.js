@@ -294,35 +294,11 @@ function ProformaFilterOffcanvas({
                   variant="green"
                   className="w-100"
                   onClick={() => {
-                    let currencyFilter =
-                      document.getElementById("currencyFilter").value;
-                    if (currencyFilter !== "none")
-                      newParams.set("currency", currencyFilter);
-                    if (currencyFilter === "none") newParams.delete("currency");
-                    let recipient = document.getElementById("recipient").value;
-                    if (recipient !== "none")
-                      newParams.set("recipient", recipient);
-                    if (recipient === "none") newParams.delete("recipient");
-                    let totalL = document.getElementById("totalL").value;
-                    if (validators.haveOnlyNumbers(totalL) && totalL)
-                      newParams.set("totalL", totalL);
-                    if (!totalL) newParams.delete("totalL");
-                    let totalG = document.getElementById("totalG").value;
-                    if (validators.haveOnlyNumbers(totalG) && totalG)
-                      newParams.set("totalG", totalG);
-                    if (!totalG) newParams.delete("totalG");
-                    let qtyG = document.getElementById("qtyG").value;
-                    if (qtyG) newParams.set("qtyG", qtyG);
-                    if (!qtyG) newParams.delete("qtyG");
-                    let qtyL = document.getElementById("qtyL").value;
-                    if (qtyL) newParams.set("qtyL", qtyL);
-                    if (!qtyL) newParams.delete("qtyL");
-                    let dateL = document.getElementById("dateL").value;
-                    if (dateL) newParams.set("dateL", dateL);
-                    if (!dateL) newParams.delete("dateL");
-                    let dateG = document.getElementById("dateG").value;
-                    if (dateG) newParams.set("dateG", dateG);
-                    if (!dateG) newParams.delete("dateG");
+                    setCurrencyFilter();
+                    setRecipientFilter();
+                    setTotalFilter();
+                    setQtyFilter();
+                    setDateFilter();
 
                     let sort = document.getElementById("sortValue").value;
                     if (sort != "None") {
@@ -365,6 +341,49 @@ function ProformaFilterOffcanvas({
       </Container>
     </Offcanvas>
   );
+
+  function setDateFilter() {
+    let dateL = document.getElementById("dateL").value;
+    if (dateL) newParams.set("dateL", dateL);
+    if (!dateL) newParams.delete("dateL");
+    let dateG = document.getElementById("dateG").value;
+    if (dateG) newParams.set("dateG", dateG);
+    if (!dateG) newParams.delete("dateG");
+  }
+
+  function setQtyFilter() {
+    let qtyG = document.getElementById("qtyG").value;
+    if (qtyG) newParams.set("qtyG", qtyG);
+    if (!qtyG) newParams.delete("qtyG");
+    let qtyL = document.getElementById("qtyL").value;
+    if (qtyL) newParams.set("qtyL", qtyL);
+    if (!qtyL) newParams.delete("qtyL");
+  }
+
+  function setTotalFilter() {
+    let totalL = document.getElementById("totalL").value;
+    if (validators.haveOnlyNumbers(totalL) && totalL)
+      newParams.set("totalL", totalL);
+    if (!totalL) newParams.delete("totalL");
+    let totalG = document.getElementById("totalG").value;
+    if (validators.haveOnlyNumbers(totalG) && totalG)
+      newParams.set("totalG", totalG);
+    if (!totalG) newParams.delete("totalG");
+  }
+
+  function setRecipientFilter() {
+    let recipient = document.getElementById("recipient").value;
+    if (recipient !== "none")
+      newParams.set("recipient", recipient);
+    if (recipient === "none") newParams.delete("recipient");
+  }
+
+  function setCurrencyFilter() {
+    let currencyFilter = document.getElementById("currencyFilter").value;
+    if (currencyFilter !== "none")
+      newParams.set("currency", currencyFilter);
+    if (currencyFilter === "none") newParams.delete("currency");
+  }
 }
 
 ProformaFilterOffcanvas.propTypes = {

@@ -219,7 +219,7 @@ namespace database_communicator.Services
                 direction = true;
             } else
             {
-                direction = orderBy.StartsWith("D");
+                direction = orderBy.StartsWith('D');
             }
             var orderByFunc = SortFilterUtils.GetItemSort(orderBy);
             if (currency == "PLN")
@@ -353,7 +353,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = orderBy.StartsWith("D");
+                direction = orderBy.StartsWith('D');
             }
             var orderByFunc = SortFilterUtils.GetItemSort(orderBy);
             if (currency == "PLN")
@@ -553,7 +553,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = orderBy.StartsWith("D");
+                direction = orderBy.StartsWith('D');
             }
             var orderByFunc = SortFilterUtils.GetItemSort(orderBy);
             if (currency == "PLN")
@@ -669,7 +669,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = orderBy.StartsWith("D");
+                direction = orderBy.StartsWith('D');
             }
             var orderByFunc = SortFilterUtils.GetItemSort(orderBy);
             if (currency == "PLN")

@@ -1,4 +1,5 @@
 ﻿using database_communicator.Models;
+using System.Globalization;
 using System.Linq.Expressions;
 
 namespace database_comunicator.FilterClass
@@ -9,25 +10,25 @@ namespace database_comunicator.FilterClass
         {
             return dateL == null ?
                 e => true
-                : e => e.InvoiceDate <= DateTime.Parse(dateL);
+                : e => e.InvoiceDate <= DateTime.ParseExact(dateL, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
         public static Expression<Func<Invoice, bool>> GetDateGreaterFilter(string? dateG)
         {
             return dateG == null ?
                 e => true
-                : e => e.InvoiceDate >= DateTime.Parse(dateG);
+                : e => e.InvoiceDate >= DateTime.ParseExact(dateG, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
         public static Expression<Func<Invoice, bool>> GetDueLowerFilter(string? dueL)
         {
             return dueL == null ?
                 e => true
-                : e => e.DueDate <= DateTime.Parse(dueL);
+                : e => e.DueDate <= DateTime.ParseExact(dueL, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
         public static Expression<Func<Invoice, bool>> GetDueGreaterFilter(string? dueG)
         {
             return dueG == null ?
                 e => true
-                : e => e.DueDate >= DateTime.Parse(dueG);
+                : e => e.DueDate >= DateTime.ParseExact(dueG, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
         public static Expression<Func<Invoice, bool>> GetQtyLowerFilter(int? qtyL, bool isPurchaseInvoice)
         {

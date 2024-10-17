@@ -96,7 +96,7 @@ function ViewCreditNoteOffcanvas({
                     let parsed = JSON.parse(file);
                     let buffer = Buffer.from(parsed.data);
                     let blob = new Blob([buffer], { type: "application/pdf" });
-                    var url = URL.createObjectURL(blob);
+                    let url = URL.createObjectURL(blob);
                     let downloadObject = document.createElement("a");
                     downloadObject.href = url;
                     downloadObject.download = creditPath.substring(

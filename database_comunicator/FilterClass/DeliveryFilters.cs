@@ -1,4 +1,5 @@
 ﻿using database_communicator.Models;
+using System.Globalization;
 using System.Linq.Expressions;
 
 namespace database_comunicator.FilterClass
@@ -9,25 +10,25 @@ namespace database_comunicator.FilterClass
         {
             return estimatedL == null ?
                 e => true
-                : e => e.EstimatedDeliveryDate <= DateTime.Parse(estimatedL);
+                : e => e.EstimatedDeliveryDate <= DateTime.ParseExact(estimatedL, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
         public static Expression<Func<Delivery, bool>> GetEstimatedGreaterFilter(string? estimatedG)
         {
             return estimatedG == null ?
                 e => true
-                : e => e.EstimatedDeliveryDate >= DateTime.Parse(estimatedG);
+                : e => e.EstimatedDeliveryDate >= DateTime.ParseExact(estimatedG, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
         public static Expression<Func<Delivery, bool>> GetDeliveredLowerFilter(string? deliveredL)
         {
             return deliveredL == null ?
                 e => true
-                : e => e.DeliveryDate <= DateTime.Parse(deliveredL);
+                : e => e.DeliveryDate <= DateTime.ParseExact(deliveredL, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
         public static Expression<Func<Delivery, bool>> GetDeliveredGreaterFilter(string? deliveredG)
         {
             return deliveredG == null ?
                 e => true
-                : e => e.DeliveryDate >= DateTime.Parse(deliveredG);
+                : e => e.DeliveryDate >= DateTime.ParseExact(deliveredG, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
 
         public static Expression<Func<Delivery, bool>> GetRecipientFilter(int? recipient, bool IsDeliveryToUser)

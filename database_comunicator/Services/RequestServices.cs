@@ -85,7 +85,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var dateLCond = RequestFilters.GetDateLowerFilter(dateL);
             var dateGCond = RequestFilters.GetDateGreaterFilter(dateG);
@@ -120,7 +120,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var dateLCond = RequestFilters.GetDateLowerFilter(dateL);
             var dateGCond = RequestFilters.GetDateGreaterFilter(dateG);

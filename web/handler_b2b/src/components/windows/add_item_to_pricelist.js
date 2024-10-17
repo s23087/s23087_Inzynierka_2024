@@ -29,18 +29,13 @@ function AddItemToPricelistWindow({
   const [currentProduct, setCurrentProduct] = useState(0);
   useEffect(() => {
     if (modalShow) {
-      const products = getItemsForPricelist(currency);
-      products.then((data) => {
+      getItemsForPricelist(currency)
+      .then((data) => {
         if (data === null) {
           setDownloadError(true);
         } else {
           setDownloadError(false);
-          let newData = data.filter(
-            (e) =>
-              Object.values(addedProducts).findIndex(
-                (x) => x.id == e.itemId,
-              ) === -1,
-          );
+          let newData = getFilteredData(data);
           setProducts(newData);
           if (newData[0]) {
             setChosenPrice(newData[0].purchasePrice.toFixed(2));
@@ -238,6 +233,14 @@ function AddItemToPricelistWindow({
       </Modal.Body>
     </Modal>
   );
+
+  function getFilteredData(data) {
+    return data.filter(
+      (e) => Object.values(addedProducts).findIndex(
+        (x) => x.id == e.itemId
+      ) === -1
+    );
+  }
 }
 
 AddItemToPricelistWindow.propTypes = {

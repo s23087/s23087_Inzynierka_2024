@@ -693,71 +693,23 @@ function InvoiceFilterOffcanvas({
                   }
                   onClick={() => {
                     if (type.includes("Requests")) {
-                      let requestStatus =
-                        document.getElementById("requestStatus").value;
-                      if (requestStatus !== "none")
-                        newParams.set("requestStatus", requestStatus);
-                      if (requestStatus === "none")
-                        newParams.delete("requestStatus");
-
-                      let type = document.getElementById("type").value;
-                      if (type !== "none") newParams.set("type", type);
-                      if (type === "none") newParams.delete("type");
+                      setRequestStatusFilter();
+                      setTypeFilter();
                     } else {
-                      let currency = document.getElementById("currency").value;
-                      if (currency !== "none")
-                        newParams.set("currency", currency);
-                      if (currency === "none") newParams.delete("currency");
-
-                      let recipient =
-                        document.getElementById("recipient").value;
-                      if (recipient !== "none")
-                        newParams.set("recipient", recipient);
-                      if (recipient === "none") newParams.delete("recipient");
-
-                      let status = document.getElementById("status").value;
-                      if (status !== "none") newParams.set("status", status);
-                      if (status === "none") newParams.delete("status");
-
-                      let paymentStatus =
-                        document.getElementById("paymentStatus").value;
-                      if (paymentStatus !== "none")
-                        newParams.set("paymentStatus", paymentStatus);
-                      if (paymentStatus === "none")
-                        newParams.delete("paymentStatus");
+                      setCurrencyFilter();
+                      setRecipientFilter();
+                      setStatusFilter();
+                      setPaymentStatusFilter();
 
                       if (type.includes("invoice")) {
-                        let dueL = document.getElementById("dueL").value;
-                        if (dueL) newParams.set("dueL", dueL);
-                        if (!dueL) newParams.delete("dueL");
-                        let dueG = document.getElementById("dueG").value;
-                        if (dueG) newParams.set("dueG", dueG);
-                        if (!dueG) newParams.delete("dueG");
+                        setDueFilter();
                       }
 
-                      let totalL = document.getElementById("totalL").value;
-                      if (validators.haveOnlyNumbers(totalL) && totalL)
-                        newParams.set("totalL", totalL);
-                      if (!totalL) newParams.delete("totalL");
-                      let totalG = document.getElementById("totalG").value;
-                      if (validators.haveOnlyNumbers(totalG) && totalG)
-                        newParams.set("totalG", totalG);
-                      if (!totalG) newParams.delete("totalG");
-
-                      let qtyG = document.getElementById("qtyG").value;
-                      if (qtyG) newParams.set("qtyG", qtyG);
-                      if (!qtyG) newParams.delete("qtyG");
-                      let qtyL = document.getElementById("qtyL").value;
-                      if (qtyL) newParams.set("qtyL", qtyL);
-                      if (!qtyL) newParams.delete("qtyL");
+                      setTotalFilter();
+                      setQtyFilter();
                     }
 
-                    let dateL = document.getElementById("dateL").value;
-                    if (dateL) newParams.set("dateL", dateL);
-                    if (!dateL) newParams.delete("dateL");
-                    let dateG = document.getElementById("dateG").value;
-                    if (dateG) newParams.set("dateG", dateG);
-                    if (!dateG) newParams.delete("dateG");
+                    setDateFilter();
 
                     let sort = document.getElementById("sortValue").value;
                     if (sort != "None") {
@@ -806,6 +758,86 @@ function InvoiceFilterOffcanvas({
       </Container>
     </Offcanvas>
   );
+
+  function setDateFilter() {
+    let dateL = document.getElementById("dateL").value;
+    if (dateL) newParams.set("dateL", dateL);
+    if (!dateL) newParams.delete("dateL");
+    let dateG = document.getElementById("dateG").value;
+    if (dateG) newParams.set("dateG", dateG);
+    if (!dateG) newParams.delete("dateG");
+  }
+
+  function setQtyFilter() {
+    let qtyG = document.getElementById("qtyG").value;
+    if (qtyG) newParams.set("qtyG", qtyG);
+    if (!qtyG) newParams.delete("qtyG");
+    let qtyL = document.getElementById("qtyL").value;
+    if (qtyL) newParams.set("qtyL", qtyL);
+    if (!qtyL) newParams.delete("qtyL");
+  }
+
+  function setTotalFilter() {
+    let totalL = document.getElementById("totalL").value;
+    if (validators.haveOnlyNumbers(totalL) && totalL)
+      newParams.set("totalL", totalL);
+    if (!totalL) newParams.delete("totalL");
+    let totalG = document.getElementById("totalG").value;
+    if (validators.haveOnlyNumbers(totalG) && totalG)
+      newParams.set("totalG", totalG);
+    if (!totalG) newParams.delete("totalG");
+  }
+
+  function setDueFilter() {
+    let dueL = document.getElementById("dueL").value;
+    if (dueL) newParams.set("dueL", dueL);
+    if (!dueL) newParams.delete("dueL");
+    let dueG = document.getElementById("dueG").value;
+    if (dueG) newParams.set("dueG", dueG);
+    if (!dueG) newParams.delete("dueG");
+  }
+
+  function setPaymentStatusFilter() {
+    let paymentStatus = document.getElementById("paymentStatus").value;
+    if (paymentStatus !== "none")
+      newParams.set("paymentStatus", paymentStatus);
+    if (paymentStatus === "none")
+      newParams.delete("paymentStatus");
+  }
+
+  function setStatusFilter() {
+    let status = document.getElementById("status").value;
+    if (status !== "none") newParams.set("status", status);
+    if (status === "none") newParams.delete("status");
+  }
+
+  function setRecipientFilter() {
+    let recipient = document.getElementById("recipient").value;
+    if (recipient !== "none")
+      newParams.set("recipient", recipient);
+    if (recipient === "none") newParams.delete("recipient");
+  }
+
+  function setCurrencyFilter() {
+    let currency = document.getElementById("currency").value;
+    if (currency !== "none")
+      newParams.set("currency", currency);
+    if (currency === "none") newParams.delete("currency");
+  }
+
+  function setTypeFilter() {
+    let type = document.getElementById("type").value;
+    if (type !== "none") newParams.set("type", type);
+    if (type === "none") newParams.delete("type");
+  }
+
+  function setRequestStatusFilter() {
+    let requestStatus = document.getElementById("requestStatus").value;
+    if (requestStatus !== "none")
+      newParams.set("requestStatus", requestStatus);
+    if (requestStatus === "none")
+      newParams.delete("requestStatus");
+  }
 }
 
 InvoiceFilterOffcanvas.propTypes = {

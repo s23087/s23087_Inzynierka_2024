@@ -233,12 +233,10 @@ function InvoiceList({
       <SelectComponent
         selectedQty={selectedQty}
         actionOneName={
-          type === "Requests" ? "Change status" : "Delete selected"
+          getActionOneName()
         }
         actionOne={
-          type === "Requests"
-            ? () => setShowChangeRequestStatus(true)
-            : () => setShowDeleteSelected(true)
+          getActionOne()
         }
       />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
@@ -622,6 +620,16 @@ function InvoiceList({
       />
     </Container>
   );
+
+  function getActionOneName() {
+    return type === "Requests" ? "Change status" : "Delete selected";
+  }
+
+  function getActionOne() {
+    return type === "Requests"
+      ? () => setShowChangeRequestStatus(true)
+      : () => setShowDeleteSelected(true);
+  }
 }
 
 InvoiceList.propTypes = {

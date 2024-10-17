@@ -19,7 +19,7 @@ namespace database_communicator.Services
             int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, bool? paymentStatus, bool? status);
         public Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string search, int userId, string? sort, string? dateL, string? dateG,
             int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, bool? paymentStatus, bool? status);
-        public Task<bool> CreditDeductionCanBeApplied(int userId, int invoiced, int itemId, int qty);
+        public Task<bool> CreditDeductionCanBeApplied(int userId, int invoiceId, int itemId, int qty);
         public Task<bool> CreditNoteExist(string creditNoteNumber, int invoiceId);
         public Task<bool> CreditNoteExist(int creditNoteId);
         public Task<GetRestCreditNote> GetRestCreditNote(int creditNoteId);
@@ -101,7 +101,7 @@ namespace database_communicator.Services
                             CurrencyName = currencyName,
                             UpdateDate = invoiceCurrencydate,
                             CreditItemId = e.CreditItemId,
-                            Price = e.NewPrice / currencyVal
+                            Price = e.NewPrice / secVal
                         }).ToList();
 
                         await _handlerContext.CalculatedCreditNotePrices.AddRangeAsync(secCalculatedItems);
@@ -177,7 +177,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var dateLCond = CreditNoteFilters.GetDateLowerFilter(dateL);
             var dateGCond = CreditNoteFilters.GetDateGreaterFilter(dateL);
@@ -227,7 +227,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var dateLCond = CreditNoteFilters.GetDateLowerFilter(dateL);
             var dateGCond = CreditNoteFilters.GetDateGreaterFilter(dateL);
@@ -285,7 +285,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var dateLCond = CreditNoteFilters.GetDateLowerFilter(dateL);
             var dateGCond = CreditNoteFilters.GetDateGreaterFilter(dateL);
@@ -335,7 +335,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var dateLCond = CreditNoteFilters.GetDateLowerFilter(dateL);
             var dateGCond = CreditNoteFilters.GetDateGreaterFilter(dateL);

@@ -110,7 +110,7 @@ function PricelistContainer({
                     let parsed = JSON.parse(file);
                     let buffer = Buffer.from(parsed.data);
                     let blob = new Blob([buffer], { type: "application/csv" });
-                    var url = URL.createObjectURL(blob);
+                    let url = URL.createObjectURL(blob);
                     let downloadObject = document.createElement("a");
                     downloadObject.href = url;
                     downloadObject.download = pricelist.path.substring(

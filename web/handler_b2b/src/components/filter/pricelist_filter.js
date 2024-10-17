@@ -274,41 +274,12 @@ function PricelistFilterOffcanvas({
                   variant="green"
                   className="w-100"
                   onClick={() => {
-                    let statusFilter =
-                      document.getElementById("filterStatus").value;
-                    if (statusFilter !== "none")
-                      newParams.set("status", statusFilter);
-                    if (statusFilter === "none") newParams.delete("status");
-                    let currencyFilter =
-                      document.getElementById("currencyFilter").value;
-                    if (currencyFilter !== "none")
-                      newParams.set("currency", currencyFilter);
-                    if (currencyFilter === "none") newParams.delete("currency");
-                    let typeFilter =
-                      document.getElementById("typeFilter").value;
-                    if (typeFilter !== "none")
-                      newParams.set("type", typeFilter);
-                    if (typeFilter === "none") newParams.delete("type");
-                    let totalL = document.getElementById("totalL").value;
-                    if (validators.haveOnlyNumbers(totalL) && totalL)
-                      newParams.set("totalL", totalL);
-                    if (!totalL) newParams.delete("totalL");
-                    let totalG = document.getElementById("totalG").value;
-                    if (validators.haveOnlyNumbers(totalG) && totalG)
-                      newParams.set("totalG", totalG);
-                    if (!totalG) newParams.delete("totalG");
-                    let createdG = document.getElementById("createdG").value;
-                    if (createdG) newParams.set("createdG", createdG);
-                    if (!createdG) newParams.delete("createdG");
-                    let createdL = document.getElementById("createdL").value;
-                    if (createdL) newParams.set("createdL", createdL);
-                    if (!createdL) newParams.delete("createdL");
-                    let modifiedL = document.getElementById("modifiedL").value;
-                    if (modifiedL) newParams.set("modifiedL", modifiedL);
-                    if (!modifiedL) newParams.delete("modifiedL");
-                    let modifiedG = document.getElementById("modifiedG").value;
-                    if (modifiedG) newParams.set("modifiedG", modifiedG);
-                    if (!modifiedG) newParams.delete("modifiedG");
+                    setStatusFilter();
+                    setCurrencyFilter();
+                    setTypeFilter();
+                    setTotalFilter();
+                    setCreatedFilter();
+                    setModifiedFilter();
 
                     let sort = document.getElementById("sortValue").value;
                     if (sort != "None") {
@@ -352,6 +323,56 @@ function PricelistFilterOffcanvas({
       </Container>
     </Offcanvas>
   );
+
+  function setModifiedFilter() {
+    let modifiedL = document.getElementById("modifiedL").value;
+    if (modifiedL) newParams.set("modifiedL", modifiedL);
+    if (!modifiedL) newParams.delete("modifiedL");
+    let modifiedG = document.getElementById("modifiedG").value;
+    if (modifiedG) newParams.set("modifiedG", modifiedG);
+    if (!modifiedG) newParams.delete("modifiedG");
+  }
+
+  function setCreatedFilter() {
+    let createdG = document.getElementById("createdG").value;
+    if (createdG) newParams.set("createdG", createdG);
+    if (!createdG) newParams.delete("createdG");
+    let createdL = document.getElementById("createdL").value;
+    if (createdL) newParams.set("createdL", createdL);
+    if (!createdL) newParams.delete("createdL");
+  }
+
+  function setTotalFilter() {
+    let totalL = document.getElementById("totalL").value;
+    if (validators.haveOnlyNumbers(totalL) && totalL)
+      newParams.set("totalL", totalL);
+    if (!totalL) newParams.delete("totalL");
+    let totalG = document.getElementById("totalG").value;
+    if (validators.haveOnlyNumbers(totalG) && totalG)
+      newParams.set("totalG", totalG);
+    if (!totalG) newParams.delete("totalG");
+  }
+
+  function setTypeFilter() {
+    let typeFilter = document.getElementById("typeFilter").value;
+    if (typeFilter !== "none")
+      newParams.set("type", typeFilter);
+    if (typeFilter === "none") newParams.delete("type");
+  }
+
+  function setCurrencyFilter() {
+    let currencyFilter = document.getElementById("currencyFilter").value;
+    if (currencyFilter !== "none")
+      newParams.set("currency", currencyFilter);
+    if (currencyFilter === "none") newParams.delete("currency");
+  }
+
+  function setStatusFilter() {
+    let statusFilter = document.getElementById("filterStatus").value;
+    if (statusFilter !== "none")
+      newParams.set("status", statusFilter);
+    if (statusFilter === "none") newParams.delete("status");
+  }
 }
 
 PricelistFilterOffcanvas.propTypes = {

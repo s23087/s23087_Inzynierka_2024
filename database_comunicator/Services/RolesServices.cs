@@ -42,7 +42,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             return await _handlerContext.AppUsers
                 .Where(e => e.IdUser != userId && e.OrgUser != null)
@@ -68,7 +68,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             return await _handlerContext.AppUsers
                 .Where(ent => ent.IdUser != userId

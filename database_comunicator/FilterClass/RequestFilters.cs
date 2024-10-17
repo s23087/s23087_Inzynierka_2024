@@ -1,4 +1,5 @@
 ﻿using database_communicator.Models;
+using System.Globalization;
 using System.Linq.Expressions;
 
 namespace database_comunicator.FilterClass
@@ -9,13 +10,13 @@ namespace database_comunicator.FilterClass
         {
             return dateL == null ?
                 e => true
-                : e => e.CreationDate <= DateTime.Parse(dateL);
+                : e => e.CreationDate <= DateTime.ParseExact(dateL, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
         public static Expression<Func<Request, bool>> GetDateGreaterFilter(string? dateG)
         {
             return dateG == null ?
                 e => true
-                : e => e.CreationDate >= DateTime.Parse(dateG);
+                : e => e.CreationDate >= DateTime.ParseExact(dateG, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
         public static Expression<Func<Request, bool>> GetTypeFilter(string? type)
         {

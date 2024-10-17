@@ -129,7 +129,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var estimatedLCond = DeliveryFilters.GetEstimatedLowerFilter(estimatedL);
             var estimatedGCond = DeliveryFilters.GetEstimatedGreaterFilter(estimatedG);
@@ -175,7 +175,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var estimatedLCond = DeliveryFilters.GetEstimatedLowerFilter(estimatedL);
             var estimatedGCond = DeliveryFilters.GetEstimatedGreaterFilter(estimatedG);
@@ -221,7 +221,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var estimatedLCond = DeliveryFilters.GetEstimatedLowerFilter(estimatedL);
             var estimatedGCond = DeliveryFilters.GetEstimatedGreaterFilter(estimatedG);
@@ -278,7 +278,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var estimatedLCond = DeliveryFilters.GetEstimatedLowerFilter(estimatedL);
             var estimatedGCond = DeliveryFilters.GetEstimatedGreaterFilter(estimatedG);

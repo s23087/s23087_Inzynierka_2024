@@ -292,7 +292,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
             var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
@@ -340,62 +340,6 @@ namespace database_communicator.Services
                     + (inv.CurrencyName == "PLN" ? inv.TransportCost : inv.TransportCost * inv.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(string? sort, string? dateL, string? dateG,
-            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
-        {
-            var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
-            bool direction;
-            if (sort == null)
-            {
-                direction = true;
-            }
-            else
-            {
-                direction = sort.StartsWith("D");
-            }
-            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
-            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
-            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
-            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
-            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, false);
-            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, false);
-            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, false);
-            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, false);
-            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, false);
-            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
-            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
-            var statusCond = InvoiceFilters.GetStatusFilter(status);
-
-            var result = await _handlerContext.Invoices
-                .Where(e => e.SellingPrices.Any())
-                .Where(dateLCond)
-                .Where(dateGCond)
-                .Where(dueLCond)
-                .Where(dueGCond)
-                .Where(qtyLCond)
-                .Where(qtyGCond)
-                .Where(totalLCond)
-                .Where(totalGCond)
-                .Where(recipientCond)
-                .Where(currencyCond)
-                .Where(paymentStatusCond)
-                .Where(statusCond)
-                .OrderByWithDirection(sortFunc, direction)
-                .Select(obj => new GetInvoices
-                {
-                    Users = obj.SellingPrices.Select(e => e.User).GroupBy(e => new {e.IdUser, e.Username, e.Surname}).Select(e => e.Key.Username + " " + e.Key.Surname).ToList(),
-                    InvoiceId = obj.InvoiceId,
-                    InvoiceNumber = obj.InvoiceNumber,
-                    ClientName = obj.BuyerNavigation.OrgName,
-                    InvoiceDate = obj.InvoiceDate,
-                    DueDate = obj.DueDate,
-                    PaymentStatus = obj.PaymentsStatus.StatusName,
-                    InSystem = obj.InSystem,
-                    Qty = obj.SellingPrices.Select(d => d.Qty).Sum(),
-                    Price = obj.SellingPrices.Select(d => d.Price * d.Qty).Sum() + obj.TransportCost,
-                }).ToListAsync();
-            return result;
-        }
         public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string search, string? sort, string? dateL, string? dateG,
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
@@ -407,7 +351,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
             var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
@@ -456,62 +400,6 @@ namespace database_communicator.Services
                     + (ent.CurrencyName == "PLN" ? ent.TransportCost : ent.TransportCost * ent.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(string search, string? sort, string? dateL, string? dateG,
-            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
-        {
-            var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
-            bool direction;
-            if (sort == null)
-            {
-                direction = true;
-            }
-            else
-            {
-                direction = sort.StartsWith("D");
-            }
-            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
-            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
-            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
-            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
-            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, false);
-            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, false);
-            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, false);
-            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, false);
-            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, false);
-            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
-            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
-            var statusCond = InvoiceFilters.GetStatusFilter(status);
-
-            return await _handlerContext.Invoices
-                .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))
-                .Where(e => e.SellingPrices.Any())
-                .Where(dateLCond)
-                .Where(dateGCond)
-                .Where(dueLCond)
-                .Where(dueGCond)
-                .Where(qtyLCond)
-                .Where(qtyGCond)
-                .Where(totalLCond)
-                .Where(totalGCond)
-                .Where(recipientCond)
-                .Where(currencyCond)
-                .Where(paymentStatusCond)
-                .Where(statusCond)
-                .OrderByWithDirection(sortFunc, direction)
-                .Select(inst => new GetInvoices
-                {
-                    Users = inst.SellingPrices.Select(e => e.User).GroupBy(e => new { e.IdUser, e.Username, e.Surname }).Select(e => e.Key.Username + " " + e.Key.Surname).ToList(),
-                    InvoiceId = inst.InvoiceId,
-                    InvoiceNumber = inst.InvoiceNumber,
-                    ClientName = inst.BuyerNavigation.OrgName,
-                    InvoiceDate = inst.InvoiceDate,
-                    DueDate = inst.DueDate,
-                    PaymentStatus = inst.PaymentsStatus.StatusName,
-                    InSystem = inst.InSystem,
-                    Qty = inst.SellingPrices.Select(d => d.Qty).Sum(),
-                    Price = inst.SellingPrices.Select(d => d.Price * d.Qty).Sum() + inst.TransportCost,
-                }).ToListAsync();
-        }
         public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string? sort, string? dateL, string? dateG,
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
@@ -523,7 +411,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
             var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
@@ -567,61 +455,6 @@ namespace database_communicator.Services
                     + (instc.CurrencyName == "PLN" ? instc.TransportCost : instc.TransportCost * instc.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(int userId, string? sort, string? dateL, string? dateG,
-            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
-        {
-            var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
-            bool direction;
-            if (sort == null)
-            {
-                direction = true;
-            }
-            else
-            {
-                direction = sort.StartsWith("D");
-            }
-            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
-            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
-            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
-            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
-            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, false);
-            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, false);
-            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, false);
-            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, false);
-            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, false);
-            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
-            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
-            var statusCond = InvoiceFilters.GetStatusFilter(status);
-
-            return await _handlerContext.Invoices
-                .Where(e => e.SellingPrices.Any())
-                .Where(e => e.SellingPrices.Select(e => e.PurchasePrice).Select(d => d.OwnedItem).SelectMany(d => d.ItemOwners).Where(d => d.IdUser == userId).Any())
-                .Where(dateLCond)
-                .Where(dateGCond)
-                .Where(dueLCond)
-                .Where(dueGCond)
-                .Where(qtyLCond)
-                .Where(qtyGCond)
-                .Where(totalLCond)
-                .Where(totalGCond)
-                .Where(recipientCond)
-                .Where(currencyCond)
-                .Where(paymentStatusCond)
-                .Where(statusCond)
-                .OrderByWithDirection(sortFunc, direction)
-                .Select(entity => new GetInvoices
-                {
-                    InvoiceId = entity.InvoiceId,
-                    InvoiceNumber = entity.InvoiceNumber,
-                    ClientName = entity.BuyerNavigation.OrgName,
-                    InvoiceDate = entity.InvoiceDate,
-                    DueDate = entity.DueDate,
-                    PaymentStatus = entity.PaymentsStatus.StatusName,
-                    InSystem = entity.InSystem,
-                    Qty = entity.SellingPrices.Select(d => d.Qty).Sum(),
-                    Price = entity.SellingPrices.Select(d => d.Price * d.Qty).Sum() + entity.TransportCost,
-                }).ToListAsync();
-        }
         public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string search, string? sort, string? dateL, string? dateG,
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
@@ -633,7 +466,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
             var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
@@ -678,6 +511,173 @@ namespace database_communicator.Services
                     + (objs.CurrencyName == "PLN" ? objs.TransportCost : objs.TransportCost * objs.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
+        public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
+        {
+            var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith('D');
+            }
+            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
+            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
+            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
+            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
+            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, false);
+            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, false);
+            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, false);
+            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, false);
+            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, false);
+            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
+            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
+            var statusCond = InvoiceFilters.GetStatusFilter(status);
+
+            var result = await _handlerContext.Invoices
+                .Where(e => e.SellingPrices.Any())
+                .Where(dateLCond)
+                .Where(dateGCond)
+                .Where(dueLCond)
+                .Where(dueGCond)
+                .Where(qtyLCond)
+                .Where(qtyGCond)
+                .Where(totalLCond)
+                .Where(totalGCond)
+                .Where(recipientCond)
+                .Where(currencyCond)
+                .Where(paymentStatusCond)
+                .Where(statusCond)
+                .OrderByWithDirection(sortFunc, direction)
+                .Select(obj => new GetInvoices
+                {
+                    Users = obj.SellingPrices.Select(e => e.User).GroupBy(e => new {e.IdUser, e.Username, e.Surname}).Select(e => e.Key.Username + " " + e.Key.Surname).ToList(),
+                    InvoiceId = obj.InvoiceId,
+                    InvoiceNumber = obj.InvoiceNumber,
+                    ClientName = obj.BuyerNavigation.OrgName,
+                    InvoiceDate = obj.InvoiceDate,
+                    DueDate = obj.DueDate,
+                    PaymentStatus = obj.PaymentsStatus.StatusName,
+                    InSystem = obj.InSystem,
+                    Qty = obj.SellingPrices.Select(d => d.Qty).Sum(),
+                    Price = obj.SellingPrices.Select(d => d.Price * d.Qty).Sum() + obj.TransportCost,
+                }).ToListAsync();
+            return result;
+        }
+        public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(string search, string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
+        {
+            var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith('D');
+            }
+            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
+            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
+            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
+            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
+            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, false);
+            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, false);
+            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, false);
+            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, false);
+            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, false);
+            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
+            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
+            var statusCond = InvoiceFilters.GetStatusFilter(status);
+
+            return await _handlerContext.Invoices
+                .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))
+                .Where(e => e.SellingPrices.Any())
+                .Where(dateLCond)
+                .Where(dateGCond)
+                .Where(dueLCond)
+                .Where(dueGCond)
+                .Where(qtyLCond)
+                .Where(qtyGCond)
+                .Where(totalLCond)
+                .Where(totalGCond)
+                .Where(recipientCond)
+                .Where(currencyCond)
+                .Where(paymentStatusCond)
+                .Where(statusCond)
+                .OrderByWithDirection(sortFunc, direction)
+                .Select(inst => new GetInvoices
+                {
+                    Users = inst.SellingPrices.Select(e => e.User).GroupBy(e => new { e.IdUser, e.Username, e.Surname }).Select(e => e.Key.Username + " " + e.Key.Surname).ToList(),
+                    InvoiceId = inst.InvoiceId,
+                    InvoiceNumber = inst.InvoiceNumber,
+                    ClientName = inst.BuyerNavigation.OrgName,
+                    InvoiceDate = inst.InvoiceDate,
+                    DueDate = inst.DueDate,
+                    PaymentStatus = inst.PaymentsStatus.StatusName,
+                    InSystem = inst.InSystem,
+                    Qty = inst.SellingPrices.Select(d => d.Qty).Sum(),
+                    Price = inst.SellingPrices.Select(d => d.Price * d.Qty).Sum() + inst.TransportCost,
+                }).ToListAsync();
+        }
+        public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(int userId, string? sort, string? dateL, string? dateG,
+            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
+        {
+            var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
+            bool direction;
+            if (sort == null)
+            {
+                direction = true;
+            }
+            else
+            {
+                direction = sort.StartsWith('D');
+            }
+            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
+            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
+            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
+            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
+            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, false);
+            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, false);
+            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, false);
+            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, false);
+            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, false);
+            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
+            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
+            var statusCond = InvoiceFilters.GetStatusFilter(status);
+
+            return await _handlerContext.Invoices
+                .Where(e => e.SellingPrices.Any())
+                .Where(e => e.SellingPrices.Select(e => e.PurchasePrice).Select(d => d.OwnedItem).SelectMany(d => d.ItemOwners).Any(d => d.IdUser == userId))
+                .Where(dateLCond)
+                .Where(dateGCond)
+                .Where(dueLCond)
+                .Where(dueGCond)
+                .Where(qtyLCond)
+                .Where(qtyGCond)
+                .Where(totalLCond)
+                .Where(totalGCond)
+                .Where(recipientCond)
+                .Where(currencyCond)
+                .Where(paymentStatusCond)
+                .Where(statusCond)
+                .OrderByWithDirection(sortFunc, direction)
+                .Select(entity => new GetInvoices
+                {
+                    InvoiceId = entity.InvoiceId,
+                    InvoiceNumber = entity.InvoiceNumber,
+                    ClientName = entity.BuyerNavigation.OrgName,
+                    InvoiceDate = entity.InvoiceDate,
+                    DueDate = entity.DueDate,
+                    PaymentStatus = entity.PaymentsStatus.StatusName,
+                    InSystem = entity.InSystem,
+                    Qty = entity.SellingPrices.Select(d => d.Qty).Sum(),
+                    Price = entity.SellingPrices.Select(d => d.Price * d.Qty).Sum() + entity.TransportCost,
+                }).ToListAsync();
+        }
         public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(int userId, string search, string? sort, string? dateL, string? dateG,
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
@@ -689,7 +689,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
             var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
@@ -906,7 +906,7 @@ namespace database_communicator.Services
                     CreditNotes = e.CreditNotes.Select(e => e.CreditNoteNumber).ToList(),
                 }
                 ).FirstAsync();
-            var itemsInfo = new List<GetInvoiceItemsForTable>();
+            List<GetInvoiceItemsForTable> itemsInfo;
 
             if (invoiceInfo.CurrencyName == "PLN")
             {

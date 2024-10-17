@@ -1,5 +1,6 @@
 ﻿using database_communicator.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
+using System.Globalization;
 using System.Linq.Expressions;
 
 namespace database_comunicator.FilterClass
@@ -40,25 +41,25 @@ namespace database_comunicator.FilterClass
         {
             return createdL == null ?
                 e => true
-                : e => e.CreationDate <= DateTime.Parse(createdL);
+                : e => e.CreationDate <= DateTime.ParseExact(createdL, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
         public static Expression<Func<Offer, bool>> GetCreatedGreaterFilter(string? createdG)
         {
             return createdG == null ?
                 e => true
-                : e => e.CreationDate >= DateTime.Parse(createdG);
+                : e => e.CreationDate >= DateTime.ParseExact(createdG, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
         public static Expression<Func<Offer, bool>> GetModifiedLowerFilter(string? modifiedL)
         {
             return modifiedL == null ?
                 e => true
-                : e => e.ModificationDate <= DateTime.Parse(modifiedL);
+                : e => e.ModificationDate <= DateTime.ParseExact(modifiedL, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
         public static Expression<Func<Offer, bool>> GetModifiedGreaterFilter(string? modifiedG)
         {
             return modifiedG == null ?
                 e => true
-                : e => e.ModificationDate >= DateTime.Parse(modifiedG);
+                : e => e.ModificationDate >= DateTime.ParseExact(modifiedG, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         }
     }
 }

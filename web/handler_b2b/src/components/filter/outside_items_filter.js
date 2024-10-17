@@ -261,31 +261,10 @@ function OutsideItemsFilterOffcanvas({
                   variant="green"
                   className="w-100"
                   onClick={() => {
-                    let currencyFilter =
-                      document.getElementById("currency").value;
-                    if (currencyFilter !== "none")
-                      newParams.set("currency", currencyFilter);
-                    if (currencyFilter === "none") newParams.delete("currency");
-
-                    let source = document.getElementById("source").value;
-                    if (source !== "none") newParams.set("source", source);
-                    if (source === "none") newParams.delete("source");
-
-                    let priceL = document.getElementById("priceL").value;
-                    if (validators.haveOnlyNumbers(priceL) && priceL)
-                      newParams.set("priceL", priceL);
-                    if (!priceL) newParams.delete("priceL");
-                    let priceG = document.getElementById("priceG").value;
-                    if (validators.haveOnlyNumbers(priceG) && priceG)
-                      newParams.set("priceG", priceG);
-                    if (!priceG) newParams.delete("priceG");
-
-                    let qtyG = document.getElementById("qtyG").value;
-                    if (qtyG) newParams.set("qtyG", qtyG);
-                    if (!qtyG) newParams.delete("qtyG");
-                    let qtyL = document.getElementById("qtyL").value;
-                    if (qtyL) newParams.set("qtyL", qtyL);
-                    if (!qtyL) newParams.delete("qtyL");
+                    setCurrencyFilter();
+                    setSourceFilter();
+                    setPriceFilter();
+                    setQtyFilter();
 
                     let sort = document.getElementById("sortValue").value;
                     if (sort != "None") {
@@ -326,6 +305,39 @@ function OutsideItemsFilterOffcanvas({
       </Container>
     </Offcanvas>
   );
+
+  function setQtyFilter() {
+    let qtyG = document.getElementById("qtyG").value;
+    if (qtyG) newParams.set("qtyG", qtyG);
+    if (!qtyG) newParams.delete("qtyG");
+    let qtyL = document.getElementById("qtyL").value;
+    if (qtyL) newParams.set("qtyL", qtyL);
+    if (!qtyL) newParams.delete("qtyL");
+  }
+
+  function setPriceFilter() {
+    let priceL = document.getElementById("priceL").value;
+    if (validators.haveOnlyNumbers(priceL) && priceL)
+      newParams.set("priceL", priceL);
+    if (!priceL) newParams.delete("priceL");
+    let priceG = document.getElementById("priceG").value;
+    if (validators.haveOnlyNumbers(priceG) && priceG)
+      newParams.set("priceG", priceG);
+    if (!priceG) newParams.delete("priceG");
+  }
+
+  function setSourceFilter() {
+    let source = document.getElementById("source").value;
+    if (source !== "none") newParams.set("source", source);
+    if (source === "none") newParams.delete("source");
+  }
+
+  function setCurrencyFilter() {
+    let currencyFilter = document.getElementById("currency").value;
+    if (currencyFilter !== "none")
+      newParams.set("currency", currencyFilter);
+    if (currencyFilter === "none") newParams.delete("currency");
+  }
 }
 
 OutsideItemsFilterOffcanvas.propTypes = {

@@ -35,7 +35,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var qtyLCond = OutsideItemFilters.GetQtyLowerFilter(qtyL);
             var qtyGCond = OutsideItemFilters.GetQtyGreaterFilter(qtyG);
@@ -74,7 +74,7 @@ namespace database_communicator.Services
             }
             else
             {
-                direction = sort.StartsWith("D");
+                direction = sort.StartsWith('D');
             }
             var qtyLCond = OutsideItemFilters.GetQtyLowerFilter(qtyL);
             var qtyGCond = OutsideItemFilters.GetQtyGreaterFilter(qtyG);

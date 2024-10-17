@@ -244,34 +244,10 @@ function ProductFilterOffcanvas({
                   variant="green"
                   className="w-100"
                   onClick={() => {
-                    let statusFilter =
-                      document.getElementById("filterStatus").value;
-                    if (statusFilter !== "none")
-                      newParams.set("status", statusFilter);
-                    if (statusFilter === "none") newParams.delete("status");
-                    let eanFilter = document.getElementById("eanFilter").value;
-                    if (validators.haveOnlyNumbers(eanFilter) && eanFilter)
-                      newParams.set("ean", eanFilter);
-                    if (!eanFilter) newParams.delete("ean");
-                    let qtyGreater = document.getElementById("qtyG").value;
-                    if (validators.haveOnlyNumbers(qtyGreater) && qtyGreater)
-                      newParams.set("qtyG", qtyGreater);
-                    if (!qtyGreater) newParams.delete("qtyG");
-                    let qtyLess = document.getElementById("qtyL").value;
-                    if (validators.haveOnlyNumbers(qtyLess) && qtyLess)
-                      newParams.set("qtyL", qtyLess);
-                    if (!qtyLess) newParams.delete("qtyL");
-                    let priceLess = document.getElementById("priceL").value;
-                    if (validators.haveOnlyNumbers(priceLess) && priceLess)
-                      newParams.set("priceL", priceLess);
-                    if (!priceLess) newParams.delete("priceL");
-                    let priceGreater = document.getElementById("priceG").value;
-                    if (
-                      validators.haveOnlyNumbers(priceGreater) &&
-                      priceGreater
-                    )
-                      newParams.set("priceG", priceGreater);
-                    if (!priceGreater) newParams.delete("priceG");
+                    setStatusFilter();
+                    setEanFilter();
+                    setQtyFilter();
+                    setPriceFilter();
 
                     let sort = document.getElementById("sortValue").value;
                     if (sort != "None") {
@@ -312,6 +288,43 @@ function ProductFilterOffcanvas({
       </Container>
     </Offcanvas>
   );
+
+  function setPriceFilter() {
+    let priceLess = document.getElementById("priceL").value;
+    if (validators.haveOnlyNumbers(priceLess) && priceLess)
+      newParams.set("priceL", priceLess);
+    if (!priceLess) newParams.delete("priceL");
+    let priceGreater = document.getElementById("priceG").value;
+    if (validators.haveOnlyNumbers(priceGreater) &&
+      priceGreater)
+      newParams.set("priceG", priceGreater);
+    if (!priceGreater) newParams.delete("priceG");
+  }
+
+  function setQtyFilter() {
+    let qtyGreater = document.getElementById("qtyG").value;
+    if (validators.haveOnlyNumbers(qtyGreater) && qtyGreater)
+      newParams.set("qtyG", qtyGreater);
+    if (!qtyGreater) newParams.delete("qtyG");
+    let qtyLess = document.getElementById("qtyL").value;
+    if (validators.haveOnlyNumbers(qtyLess) && qtyLess)
+      newParams.set("qtyL", qtyLess);
+    if (!qtyLess) newParams.delete("qtyL");
+  }
+
+  function setEanFilter() {
+    let eanFilter = document.getElementById("eanFilter").value;
+    if (validators.haveOnlyNumbers(eanFilter) && eanFilter)
+      newParams.set("ean", eanFilter);
+    if (!eanFilter) newParams.delete("ean");
+  }
+
+  function setStatusFilter() {
+    let statusFilter = document.getElementById("filterStatus").value;
+    if (statusFilter !== "none")
+      newParams.set("status", statusFilter);
+    if (statusFilter === "none") newParams.delete("status");
+  }
 }
 
 ProductFilterOffcanvas.propTypes = {
