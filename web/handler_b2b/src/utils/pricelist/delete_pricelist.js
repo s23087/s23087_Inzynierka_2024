@@ -50,7 +50,7 @@ export default async function deletePricelist(pricelistId, path) {
       message: "Critical error.",
     };
   } catch {
-    console.error("deletePricelist fetch failed.")
+    console.error("deletePricelist fetch failed.");
     return {
       error: true,
       message: "Connection error.",

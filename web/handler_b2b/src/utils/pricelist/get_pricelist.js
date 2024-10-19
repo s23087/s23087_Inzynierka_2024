@@ -40,7 +40,7 @@ export default async function getPricelists(
 
     return [];
   } catch {
-    console.error("getPricelists fetch failed.")
+    console.error("getPricelists fetch failed.");
     return null;
   }
 }

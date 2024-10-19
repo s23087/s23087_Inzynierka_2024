@@ -29,8 +29,7 @@ function AddItemToPricelistWindow({
   const [currentProduct, setCurrentProduct] = useState(0);
   useEffect(() => {
     if (modalShow) {
-      getItemsForPricelist(currency)
-      .then((data) => {
+      getItemsForPricelist(currency).then((data) => {
         if (data === null) {
           setDownloadError(true);
         } else {
@@ -70,7 +69,12 @@ function AddItemToPricelistWindow({
   // Misc
   const [showSuccess, setShowSuccess] = useState(false);
   return (
-    <Modal size="md" show={modalShow} centered className="px-4 minScalableWidth">
+    <Modal
+      size="md"
+      show={modalShow}
+      centered
+      className="px-4 minScalableWidth"
+    >
       <Modal.Body>
         <Container>
           <Row>
@@ -236,9 +240,8 @@ function AddItemToPricelistWindow({
 
   function getFilteredData(data) {
     return data.filter(
-      (e) => Object.values(addedProducts).findIndex(
-        (x) => x.id == e.itemId
-      ) === -1
+      (e) =>
+        Object.values(addedProducts).findIndex((x) => x.id == e.itemId) === -1,
     );
   }
 }

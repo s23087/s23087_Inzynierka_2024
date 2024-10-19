@@ -5,6 +5,18 @@ using System.Linq.Expressions;
 
 namespace database_comunicator.FilterClass
 {
+    public class OfferFiltersTemplate
+    {
+        public string? Status { get; set; } 
+        public string? Currency { get; set; }
+        public string? Type { get; set; }
+        public int? TotalL { get; set; }
+        public int? TotalG { get; set; }
+        public string? CreatedL { get; set; }
+        public string? CreatedG { get; set; }
+        public string? ModifiedL { get; set; }
+        public string? ModifiedG { get; set; }
+    }
     public static class OfferFilters
     {
         public static Expression<Func<Offer, bool>> GetStatusFilter(string? status)

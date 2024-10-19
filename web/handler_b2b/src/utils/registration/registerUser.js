@@ -27,10 +27,10 @@ export default async function createNewRegisteredUser(formData, dbName, isOrg) {
         body: JSON.stringify(data),
       },
     );
-  
+
     return response.ok;
   } catch {
-    console.error("createNewRegisteredUser fetch failed.")
-    return false
+    console.error("createNewRegisteredUser fetch failed.");
+    return false;
   }
 }

@@ -9,18 +9,18 @@ export default async function getRestModifyProforma(proformaId) {
     const data = await fetch(url, {
       method: "GET",
     });
-  
+
     if (data.ok) {
       return await data.json();
     }
-  
+
     return {
       status: false,
       paymentMethod: "Not found",
       note: "Not found",
     };
   } catch {
-    console.error("getRestModifyProforma fetch failed.")
+    console.error("getRestModifyProforma fetch failed.");
     return {
       status: false,
       paymentMethod: "Connection error.",

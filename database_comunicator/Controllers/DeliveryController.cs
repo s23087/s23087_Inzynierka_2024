@@ -1,6 +1,7 @@
 ﻿using database_communicator.Models;
 using database_communicator.Models.DTOs;
 using database_communicator.Services;
+using database_comunicator.FilterClass;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,14 +28,25 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetToUserDeliveries(int userId, string? search, string? sort,
             string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill)
         {
+            var filters = new DeliveryFiltersTemplate
+            {
+                EstimatedL = estimatedL,
+                EstimatedG = estimatedG,
+                DeliveredL = deliveredL,
+                DeliveredG = deliveredG,
+                Recipient = recipient,
+                Status = status,
+                Company = company,
+                Waybill = waybill
+            };
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound(userNotFoundMessage);
             if (search != null)
             {
-                var sResult = await _deliveryService.GetDeliveries(true, userId, search, sort: sort, estimatedL, estimatedG, deliveredL, deliveredG, recipient, status, company, waybill);
+                var sResult = await _deliveryService.GetDeliveries(true, userId, search, sort: sort, filters);
                 return Ok(sResult);
             }
-            var result = await _deliveryService.GetDeliveries(true, userId, sort: sort, estimatedL, estimatedG, deliveredL, deliveredG, recipient, status, company, waybill);
+            var result = await _deliveryService.GetDeliveries(true, userId, sort: sort, filters);
             return Ok(result);
         }
         [HttpGet]
@@ -42,12 +54,23 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetToUserDeliveries(string? search, string? sort,
             string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill)
         {
+            var filters = new DeliveryFiltersTemplate
+            {
+                EstimatedL = estimatedL,
+                EstimatedG = estimatedG,
+                DeliveredL = deliveredL,
+                DeliveredG = deliveredG,
+                Recipient = recipient,
+                Status = status,
+                Company = company,
+                Waybill = waybill
+            };
             if (search != null)
             {
-                var sResult = await _deliveryService.GetDeliveries(true, search, sort: sort, estimatedL, estimatedG, deliveredL, deliveredG, recipient, status, company, waybill);
+                var sResult = await _deliveryService.GetDeliveries(true, search, sort: sort, filters);
                 return Ok(sResult);
             }
-            var result = await _deliveryService.GetDeliveries(true, sort: sort, estimatedL, estimatedG, deliveredL, deliveredG, recipient, status, company, waybill);
+            var result = await _deliveryService.GetDeliveries(true, sort: sort, filters);
             return Ok(result);
         }
         [HttpGet]
@@ -55,14 +78,25 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetClientDeliveries(int userId, string? search, string? sort,
             string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill)
         {
+            var filters = new DeliveryFiltersTemplate
+            {
+                EstimatedL = estimatedL,
+                EstimatedG = estimatedG,
+                DeliveredL = deliveredL,
+                DeliveredG = deliveredG,
+                Recipient = recipient,
+                Status = status,
+                Company = company,
+                Waybill = waybill
+            };
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound(userNotFoundMessage);
             if (search != null)
             {
-                var sResult = await _deliveryService.GetDeliveries(false, userId, search, sort: sort, estimatedL, estimatedG, deliveredL, deliveredG, recipient, status, company, waybill);
+                var sResult = await _deliveryService.GetDeliveries(false, userId, search, sort: sort, filters);
                 return Ok(sResult);
             }
-            var result = await _deliveryService.GetDeliveries(false, userId, sort: sort, estimatedL, estimatedG, deliveredL, deliveredG, recipient, status, company, waybill);
+            var result = await _deliveryService.GetDeliveries(false, userId, sort: sort, filters);
             return Ok(result);
         }
         [HttpGet]
@@ -70,12 +104,23 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetClientDeliveries(string? search, string? sort,
             string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill)
         {
+            var filters = new DeliveryFiltersTemplate
+            {
+                EstimatedL = estimatedL,
+                EstimatedG = estimatedG,
+                DeliveredL = deliveredL,
+                DeliveredG = deliveredG,
+                Recipient = recipient,
+                Status = status,
+                Company = company,
+                Waybill = waybill
+            };
             if (search != null)
             {
-                var sResult = await _deliveryService.GetDeliveries(false, search, sort: sort, estimatedL, estimatedG, deliveredL, deliveredG, recipient, status, company, waybill);
+                var sResult = await _deliveryService.GetDeliveries(false, search, sort: sort, filters);
                 return Ok(sResult);
             }
-            var result = await _deliveryService.GetDeliveries(false, sort: sort, estimatedL, estimatedG, deliveredL, deliveredG, recipient, status, company, waybill);
+            var result = await _deliveryService.GetDeliveries(false, sort: sort, filters);
             return Ok(result);
         }
         [HttpPost]

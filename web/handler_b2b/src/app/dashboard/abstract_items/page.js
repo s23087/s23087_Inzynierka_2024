@@ -86,7 +86,7 @@ async function OutsideItemsPage({ searchParams }) {
 }
 
 OutsideItemsPage.propTypes = {
-  searchParams: PropTypes.object
-}
+  searchParams: PropTypes.object,
+};
 
-export default OutsideItemsPage
+export default OutsideItemsPage;

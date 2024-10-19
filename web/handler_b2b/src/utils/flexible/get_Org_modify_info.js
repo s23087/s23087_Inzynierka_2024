@@ -11,14 +11,14 @@ export default async function getOrgModifyInfo() {
     const info = await fetch(url, {
       method: "GET",
     });
-  
+
     if (info.ok) {
       return await info.json();
     }
-  
+
     return {};
   } catch {
-    console.error("getOrgModifyInfo fetch failed.")
-    return null
+    console.error("getOrgModifyInfo fetch failed.");
+    return null;
   }
 }

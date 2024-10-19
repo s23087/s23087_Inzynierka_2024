@@ -9,14 +9,14 @@ export default async function getBindings(itemId, currency) {
     const desc = await fetch(url, {
       method: "GET",
     });
-  
+
     if (desc.ok) {
       return await desc.json();
     }
-  
+
     return [];
   } catch {
-    console.error("getBindings fetch failed.")
-    return null
+    console.error("getBindings fetch failed.");
+    return null;
   }
 }

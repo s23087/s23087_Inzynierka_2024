@@ -373,15 +373,13 @@ function ProformaFilterOffcanvas({
 
   function setRecipientFilter() {
     let recipient = document.getElementById("recipient").value;
-    if (recipient !== "none")
-      newParams.set("recipient", recipient);
+    if (recipient !== "none") newParams.set("recipient", recipient);
     if (recipient === "none") newParams.delete("recipient");
   }
 
   function setCurrencyFilter() {
     let currencyFilter = document.getElementById("currencyFilter").value;
-    if (currencyFilter !== "none")
-      newParams.set("currency", currencyFilter);
+    if (currencyFilter !== "none") newParams.set("currency", currencyFilter);
     if (currencyFilter === "none") newParams.delete("currency");
   }
 }

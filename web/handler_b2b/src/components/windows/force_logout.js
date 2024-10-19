@@ -8,7 +8,12 @@ import logout from "@/utils/auth/logout";
 function ForceLogutWindow({ modalShow }) {
   const router = useRouter();
   return (
-    <Modal size="md" show={modalShow} centered className="px-4 minScalableWidth">
+    <Modal
+      size="md"
+      show={modalShow}
+      centered
+      className="px-4 minScalableWidth"
+    >
       <Modal.Body>
         <Container className="mt-3 mb-2">
           <Row>

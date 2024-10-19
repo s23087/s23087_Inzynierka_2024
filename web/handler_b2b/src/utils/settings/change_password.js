@@ -32,12 +32,12 @@ export default async function ChangePassword(state, formData) {
         },
       },
     );
-  
+
     if (info.status === 404) {
       logout();
       redirect("/");
     }
-  
+
     if (info.status === 401) {
       return {
         error: true,
@@ -45,7 +45,7 @@ export default async function ChangePassword(state, formData) {
         completed: true,
       };
     }
-  
+
     if (info.status === 400) {
       return {
         error: true,
@@ -53,21 +53,21 @@ export default async function ChangePassword(state, formData) {
         completed: true,
       };
     }
-  
+
     if (info.ok) {
       return {
         error: false,
         completed: true,
       };
     }
-  
+
     return {
       error: true,
       message: "Ups, something went wrong.",
       completed: true,
     };
   } catch {
-    console.error("ChangePassword fetch failed.")
+    console.error("ChangePassword fetch failed.");
     return {
       error: true,
       message: "Connection error.",

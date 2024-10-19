@@ -7,14 +7,14 @@ export default async function getCurrencyValues(currency) {
     const info = await fetch(url, {
       method: "GET",
     });
-  
+
     if (info.ok) {
       return await info.json();
     }
-  
+
     return {};
   } catch {
-    console.error("getCurrencyValues fetch failed.")
-    return null
+    console.error("getCurrencyValues fetch failed.");
+    return null;
   }
 }

@@ -15,13 +15,12 @@ export default function AddUserPage() {
   const [roles, setRoles] = useState({});
   const [roleDownloadError, setRoleDownloadError] = useState(false);
   useEffect(() => {
-    getRoles()
-    .then((data) => {
-      if (data !== null){
-        setRoleDownloadError(false)
-        setRoles(data)
+    getRoles().then((data) => {
+      if (data !== null) {
+        setRoleDownloadError(false);
+        setRoles(data);
       } else {
-        setRoleDownloadError(true)
+        setRoleDownloadError(true);
       }
     });
   }, []);
@@ -29,7 +28,8 @@ export default function AddUserPage() {
   const [nameError, setNameError] = useState(false);
   const [surnameError, setSurnameError] = useState(false);
   const [passError, setPassError] = useState(false);
-  let isFormErrorActive = () => emailError || nameError || surnameError || passError || roleDownloadError;
+  let isFormErrorActive = () =>
+    emailError || nameError || surnameError || passError || roleDownloadError;
   const [isLoading, setIsLoading] = useState(false);
   const [state, formAction] = useFormState(AddUser, {
     error: false,
@@ -46,7 +46,7 @@ export default function AddUserPage() {
   return (
     <Container className="px-4 pt-4" fluid>
       <Form className="mx-1 mx-xl-4" id="addUserForm" action={formAction}>
-        <ErrorMessage 
+        <ErrorMessage
           message="Could not download role list."
           messageStatus={roleDownloadError}
         />
@@ -58,15 +58,12 @@ export default function AddUserPage() {
             name="email"
             maxLength={350}
             onInput={(e) => {
-              InputValidtor.emailValidator(e.target.value, setEmailError, 350)
+              InputValidtor.emailValidator(e.target.value, setEmailError, 350);
             }}
             isInvalid={emailError}
             placeholder="email"
           />
-          <ErrorMessage 
-            message="Incorrect email."
-            messageStatus={emailError}
-          />
+          <ErrorMessage message="Incorrect email." messageStatus={emailError} />
         </Form.Group>
         <Form.Group className="mb-3" style={maxInputWidth}>
           <Form.Label className="blue-main-text">Name:</Form.Label>
@@ -77,11 +74,15 @@ export default function AddUserPage() {
             isInvalid={nameError}
             maxLength={250}
             onInput={(e) => {
-              InputValidtor.normalStringValidtor(e.target.value, setNameError, 250)
+              InputValidtor.normalStringValidtor(
+                e.target.value,
+                setNameError,
+                250,
+              );
             }}
             placeholder="name"
           />
-          <ErrorMessage 
+          <ErrorMessage
             message="Incorrect username. Cannot be empty or excceed 250 chars."
             messageStatus={nameError}
           />
@@ -95,11 +96,15 @@ export default function AddUserPage() {
             isInvalid={surnameError}
             maxLength={250}
             onInput={(e) => {
-              InputValidtor.normalStringValidtor(e.target.value, setSurnameError, 250)
+              InputValidtor.normalStringValidtor(
+                e.target.value,
+                setSurnameError,
+                250,
+              );
             }}
             placeholder="surname"
           />
-          <ErrorMessage 
+          <ErrorMessage
             message="Incorrect surname. Cannot be empty or excceed 250 chars."
             messageStatus={surnameError}
           />
@@ -113,13 +118,10 @@ export default function AddUserPage() {
             placeholder="password"
             isInvalid={passError}
             onInput={(e) => {
-              InputValidtor.isEmptyValidator(e.target.value, setPassError)
+              InputValidtor.isEmptyValidator(e.target.value, setPassError);
             }}
           />
-          <ErrorMessage 
-            message="Cannot be empty."
-            messageStatus={passError}
-          />
+          <ErrorMessage message="Cannot be empty." messageStatus={passError} />
         </Form.Group>
         <Form.Group className="mb-3" style={maxInputWidth}>
           <Form.Label className="blue-main-text">Role:</Form.Label>

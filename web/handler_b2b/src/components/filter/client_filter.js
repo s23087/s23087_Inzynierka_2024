@@ -30,15 +30,14 @@ function ClientFilterOffcanvas({
   const [countries, setCountries] = useState([]);
   const [errorDownload, setDownloadError] = useState(false);
   useEffect(() => {
-    getCountries()
-      .then((data) => {
-        if (data !== null) {
-          setDownloadError(false)
-          setCountries(data)
-        } else {
-          setDownloadError(true)
-        }
-      })
+    getCountries().then((data) => {
+      if (data !== null) {
+        setDownloadError(false);
+        setCountries(data);
+      } else {
+        setDownloadError(true);
+      }
+    });
   }, []);
   // Styles
   const vhStyle = {

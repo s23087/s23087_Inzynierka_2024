@@ -29,16 +29,15 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
   const [statusesDownloadError, setStatusesDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-        getUsers()
-        .then((data) => {
-          if (data === null) {
-            setUserDownloadError(true)
-          } else {
-            setUserDownloadError(false)
-            setUsers(data);
-            setChoosenUser(data[0].idUser);
-          }
-        })
+      getUsers().then((data) => {
+        if (data === null) {
+          setUserDownloadError(true);
+        } else {
+          setUserDownloadError(false);
+          setUsers(data);
+          setChoosenUser(data[0].idUser);
+        }
+      });
 
       getOrgsList().then((data) => {
         if (data !== null) {
@@ -120,12 +119,11 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
         invoiceDate,
         new Date().toLocaleDateString("en-CA"),
       ).then((data) => {
-          setCurrencyList({
-            error: data.error,
-            rates: data.rates,
-          })
-        }
-        )
+        setCurrencyList({
+          error: data.error,
+          rates: data.rates,
+        });
+      });
     }
   }, [showCurrencyExchange, invoiceDate, choosenCurrency]);
   // Errors

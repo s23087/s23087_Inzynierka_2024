@@ -1,6 +1,7 @@
 ﻿using database_communicator.Models;
 using database_communicator.Models.DTOs;
 using database_communicator.Services;
+using database_comunicator.FilterClass;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -106,6 +107,14 @@ namespace database_communicator.Controllers
             int? qtyL, int? qtyG, int? priceL, int? priceG)
         {
             IEnumerable<GetManyItems> result;
+            var filters = new ItemFiltersTemplate { 
+                Status = status,
+                Ean = ean,
+                QtyL = qtyL,
+                QtyG = qtyG,
+                PriceL = priceL,
+                PriceG = priceG
+            };
             if (userId != null)
             {
                 int correctUser = (int)userId;
@@ -114,21 +123,21 @@ namespace database_communicator.Controllers
                 if (search != null)
                 {
                     string correctSearch = search;
-                    result = await _itemServices.GetItems(currency, correctUser, correctSearch, sort, status, ean, qtyL, qtyG, priceL, priceG);
+                    result = await _itemServices.GetItems(currency, correctUser, correctSearch, orderBy: sort, filters);
                 } else
                 {
-                    result = await _itemServices.GetItems(currency, correctUser, sort, status, ean, qtyL, qtyG, priceL, priceG);
+                    result = await _itemServices.GetItems(currency, correctUser, orderBy: sort, filters);
                 }
                 return Ok(result);
             }
             if (search != null)
             {
                 string correctSearch = search;
-                result = await _itemServices.GetItems(currency, correctSearch, sort, status, ean, qtyL, qtyG, priceL, priceG);
+                result = await _itemServices.GetItems(currency, correctSearch, orderBy: sort, filters);
             }
             else
             {
-                result = await _itemServices.GetItems(currency, sort, status, ean, qtyL, qtyG, priceL, priceG);
+                result = await _itemServices.GetItems(currency, orderBy: sort, filters);
             }
             return Ok(result);
         }

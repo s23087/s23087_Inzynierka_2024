@@ -10,7 +10,12 @@ function AddEanWindow({ modalShow, onHideFunction, addAction, eanExistFun }) {
   const [isInvalid, setIsInvalid] = useState(false);
   const [newEan, setNewEan] = useState("");
   return (
-    <Modal size="md" show={modalShow} centered className="px-4 minScalableWidth">
+    <Modal
+      size="md"
+      show={modalShow}
+      centered
+      className="px-4 minScalableWidth"
+    >
       <Modal.Body>
         <Container>
           <Row>

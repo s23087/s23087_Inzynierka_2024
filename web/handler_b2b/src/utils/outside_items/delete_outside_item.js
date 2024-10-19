@@ -13,7 +13,7 @@ export default async function deleteOutsideItem(itemId, orgId) {
     const info = await fetch(url, {
       method: "Delete",
     });
-  
+
     if (info.status === 404) {
       let text = await info.text();
       if (text === "User not found.") {
@@ -31,7 +31,7 @@ export default async function deleteOutsideItem(itemId, orgId) {
         };
       }
     }
-  
+
     if (info.ok) {
       return {
         error: false,
@@ -43,7 +43,7 @@ export default async function deleteOutsideItem(itemId, orgId) {
       message: await info.text(),
     };
   } catch {
-    console.error("deleteOutsideItem fetch failed.")
+    console.error("deleteOutsideItem fetch failed.");
     return {
       error: true,
       message: "Connection error.",

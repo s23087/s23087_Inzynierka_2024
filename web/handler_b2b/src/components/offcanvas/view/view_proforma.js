@@ -30,10 +30,9 @@ function ViewProformaOffcanvas({
   const [proformaPath, setProformaPath] = useState("");
   useEffect(() => {
     if (showOffcanvas) {
-      getRestProforma(isYourProforma, proforma.proformaId)
-      .then((data) => {
+      getRestProforma(isYourProforma, proforma.proformaId).then((data) => {
         if (data !== null) {
-          if (data.length === 0){
+          if (data.length === 0) {
             setRestInfo({
               taxes: 0,
               currencyValue: 0.0,

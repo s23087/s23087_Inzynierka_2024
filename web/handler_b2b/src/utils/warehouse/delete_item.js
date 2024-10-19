@@ -12,7 +12,7 @@ export default async function deleteItem(itemId) {
     const info = await fetch(url, {
       method: "Delete",
     });
-  
+
     if (info.status == 404) {
       let text = await info.text();
       if (text === "User not found.") logout();
@@ -21,7 +21,7 @@ export default async function deleteItem(itemId) {
         message: text,
       };
     }
-  
+
     if (info.status == 400) {
       let text = await info.text();
       return {
@@ -29,23 +29,22 @@ export default async function deleteItem(itemId) {
         message: text,
       };
     }
-  
+
     if (info.ok) {
       return {
         result: true,
       };
     }
-  
+
     return {
       result: true,
       message: "Critical error.",
     };
   } catch {
-    console.error("deleteItem fetch failed.")
+    console.error("deleteItem fetch failed.");
     return {
       result: true,
       message: "Connection error.",
     };
   }
-
 }

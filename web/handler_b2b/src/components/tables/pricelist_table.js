@@ -49,7 +49,7 @@ function PricelistTable({ items, currency }) {
 
 PricelistTable.propTypes = {
   items: PropTypes.array.isRequired,
-  currency: PropTypes.string.isRequired
+  currency: PropTypes.string.isRequired,
 };
 
 export default PricelistTable;

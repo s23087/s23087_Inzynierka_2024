@@ -27,16 +27,15 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
   const [methodsDownloadError, setMethodsDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      getUsers()
-        .then((data) => {
-          if (data === null) {
-            setUserDownloadError(true)
-          } else {
-            setUserDownloadError(false)
-            setUsers(data);
-            setChoosenUser(data[0].idUser);
-          }
-        })
+      getUsers().then((data) => {
+        if (data === null) {
+          setUserDownloadError(true);
+        } else {
+          setUserDownloadError(false);
+          setUsers(data);
+          setChoosenUser(data[0].idUser);
+        }
+      });
 
       getOrgsList().then((data) => {
         if (data !== null) {
@@ -128,7 +127,8 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
   const [transportError, setTransportError] = useState(false);
   const [documentError, setDocumentError] = useState(false);
   const [dateError, setDateError] = useState(false);
-  const isFormErrorActive = () => proformaError ||
+  const isFormErrorActive = () =>
+    proformaError ||
     transportError ||
     documentError ||
     currencyList.error ||

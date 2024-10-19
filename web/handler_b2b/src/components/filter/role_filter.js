@@ -181,7 +181,7 @@ RoleFilterOffcanvas.propTypes = {
   hideFunction: PropTypes.func.isRequired,
   currentSort: PropTypes.string.isRequired,
   currentDirection: PropTypes.bool.isRequired,
-  rolesToChoose: PropTypes.array.isRequired
+  rolesToChoose: PropTypes.array.isRequired,
 };
 
 export default RoleFilterOffcanvas;

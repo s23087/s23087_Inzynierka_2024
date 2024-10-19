@@ -40,35 +40,32 @@ function ViewItemOffcanvas({
   const [restDownloadError, setRestDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      getRestInfo(currency, item.itemId, isOrg)
-      .then((data) => {
-        if (data !== null){
-          setRestDownloadError(false)
-          setRestInfo(data)
+      getRestInfo(currency, item.itemId, isOrg).then((data) => {
+        if (data !== null) {
+          setRestDownloadError(false);
+          setRestInfo(data);
         } else {
-          setRestDownloadError(true)
+          setRestDownloadError(true);
         }
       });
-      getDescription(item.itemId)
-      .then((data) => {
-        if (data !== null){
-          setDescription(data)
+      getDescription(item.itemId).then((data) => {
+        if (data !== null) {
+          setDescription(data);
         } else {
-          setDescription("Connection error")
+          setDescription("Connection error");
         }
       });
     }
     if (isOrg) {
-      getItemOwners(item.itemId)
-      .then((data) => {
-        if (data !== null){
-          setOwnerDownloadError(false)
+      getItemOwners(item.itemId).then((data) => {
+        if (data !== null) {
+          setOwnerDownloadError(false);
           setUsers(data);
           if (data[0]) {
             setChoosenUser(data[0].idUser);
           }
         } else {
-          setOwnerDownloadError(true)
+          setOwnerDownloadError(true);
         }
       });
     }
@@ -80,7 +77,9 @@ function ViewItemOffcanvas({
         : getStatusColor(item.statusName),
     marginBottom: ".25rem",
   };
-  const isRestInfoEmpty = () => restInfo.outsideItemInfos.length === 0 && restInfo.ownedItemInfos.length === 0;
+  const isRestInfoEmpty = () =>
+    restInfo.outsideItemInfos.length === 0 &&
+    restInfo.ownedItemInfos.length === 0;
   return (
     <Offcanvas
       className="h-100 minScalableWidth"
@@ -135,7 +134,7 @@ function ViewItemOffcanvas({
               <Stack className="pt-3" gap={3}>
                 {canUserBeShown() ? (
                   <Form.Group>
-                    <ErrorMessage 
+                    <ErrorMessage
                       message="Could not download users."
                       messageStatus={ownerDownloadError}
                     />
@@ -192,7 +191,7 @@ function ViewItemOffcanvas({
                 key={choosenUser}
                 fluid
               >
-                <ErrorMessage 
+                <ErrorMessage
                   message="Could not download items data."
                   messageStatus={restDownloadError}
                 />

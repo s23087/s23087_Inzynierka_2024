@@ -9,10 +9,7 @@ export default async function createRequest(file, state, formData) {
   let type = formData.get("type");
   let note = formData.get("note");
   let title = formData.get("title");
-  let message = "Error:";
-  if (!recevier) message += "\nRecevier must not be empty.";
-  if (!note) message += "\nNote must not be empty.";
-  if (!title) message += "\nTitle must not be empty.";
+  let message = validateData(recevier, note, title);
 
   if (message.length > 6) {
     return {
@@ -68,13 +65,7 @@ export default async function createRequest(file, state, formData) {
     });
 
     if (info.status === 404) {
-      if (file) {
-        try {
-          fs.rmSync(fileName);
-        } catch (error) {
-          console.log(error);
-        }
-      }
+      deleteFile(file, fs, fileName);
       let text = await info.text();
       if (text === "Creator not found.") {
         logout();
@@ -93,13 +84,7 @@ export default async function createRequest(file, state, formData) {
     }
 
     if (info.status === 500) {
-      if (file) {
-        try {
-          fs.rmSync(fileName);
-        } catch (error) {
-          console.log(error);
-        }
-      }
+      deleteFile(file, fs, fileName);
       return {
         error: true,
         completed: true,
@@ -150,4 +135,22 @@ export default async function createRequest(file, state, formData) {
       message: "Connection error.",
     };
   }
+}
+
+function deleteFile(file, fs, fileName) {
+  if (file) {
+    try {
+      fs.rmSync(fileName);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+}
+
+function validateData(recevier, note, title) {
+  let message = "Error:";
+  if (!recevier) message += "\nRecevier must not be empty.";
+  if (!note) message += "\nNote must not be empty.";
+  if (!title) message += "\nTitle must not be empty.";
+  return message;
 }

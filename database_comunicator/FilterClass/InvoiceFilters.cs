@@ -4,6 +4,21 @@ using System.Linq.Expressions;
 
 namespace database_comunicator.FilterClass
 {
+    public class InvoiceFiltersTemplate
+    {
+        public string? DateL { get; set; }
+        public string? DateG { get; set; }
+        public string? DueL { get; set; }
+        public string? DueG { get; set; }
+        public int? QtyL { get; set; }
+        public int? QtyG { get; set; } 
+        public int? TotalL { get; set; } 
+        public int? TotalG { get; set; } 
+        public int? Recipient { get; set; }
+        public string? Currency { get; set; } 
+        public int? PaymentStatus { get; set; } 
+        public bool? Status { get; set; }
+    }
     public static class InvoiceFilters
     {
         public static Expression<Func<Invoice, bool>> GetDateLowerFilter(string? dateL)

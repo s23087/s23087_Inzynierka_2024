@@ -16,14 +16,14 @@ export default async function getRestInfo(currency, itemId, isOrg) {
     const info = await fetch(url, {
       method: "GET",
     });
-  
+
     if (info.ok) {
       return await info.json();
     }
-  
+
     return {};
   } catch {
-    console.error("getRestInfo fetch failed.")
-    return null
+    console.error("getRestInfo fetch failed.");
+    return null;
   }
 }

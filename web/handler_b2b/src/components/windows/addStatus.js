@@ -19,7 +19,12 @@ function AddAvailabilityStatusWindow({ modalShow, onHideFunction, statuses }) {
     message: "",
   });
   return (
-    <Modal size="md" show={modalShow} centered className="px-4 minScalableWidth">
+    <Modal
+      size="md"
+      show={modalShow}
+      centered
+      className="px-4 minScalableWidth"
+    >
       <Modal.Body>
         <Container>
           <Row>
@@ -30,10 +35,7 @@ function AddAvailabilityStatusWindow({ modalShow, onHideFunction, statuses }) {
         </Container>
         <Container className="mt-4 mb-2">
           <Form id="statusAddForm" action={formAction}>
-            <ErrorMessage 
-              message={state.message}
-              messageStatus={state.error}
-            />
+            <ErrorMessage message={state.message} messageStatus={state.error} />
             <Form.Group className="mb-4">
               <Form.Label className="blue-main-text">Name:</Form.Label>
               <Form.Control
@@ -56,8 +58,8 @@ function AddAvailabilityStatusWindow({ modalShow, onHideFunction, statuses }) {
                   }
                 }}
               />
-              <ErrorMessage 
-                message="Status already exist or it&apos;s length exceed 150 chars."
+              <ErrorMessage
+                message="Status already exist or it's length exceed 150 chars."
                 messageStatus={nameError}
               />
             </Form.Group>
@@ -79,10 +81,10 @@ function AddAvailabilityStatusWindow({ modalShow, onHideFunction, statuses }) {
                 }}
               />
             </Form.Group>
-            <ErrorMessage 
-                message="Can only be numbers."
-                messageStatus={daysError}
-              />
+            <ErrorMessage
+              message="Can only be numbers."
+              messageStatus={daysError}
+            />
           </Form>
           {state.completed && !state.error ? (
             <Container className="px-5 mt-4">

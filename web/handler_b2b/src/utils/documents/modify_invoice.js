@@ -22,17 +22,7 @@ export default async function updateInvoice(
   let status = formData.get("status") === "true";
   let path = null;
   let note = formData.get("note");
-  let message = "Error:";
-  if (
-    !validators.isPriceFormat(transport) &&
-    !validators.stringIsNotEmpty(transport)
-  )
-    message += "\nPrice must be a decimal and not empty.";
-  if (
-    !validators.lengthSmallerThen(invoiceNumber, 40) &&
-    !validators.stringIsNotEmpty(invoiceNumber)
-  )
-    message += "\nInvoice number cannot be empty and excceed 40 chars.";
+  let message = validateData(transport, invoiceNumber);
 
   if (message.length > 6) {
     return {
@@ -175,4 +165,19 @@ export default async function updateInvoice(
       message: "Connection error.",
     };
   }
+}
+
+function validateData(transport, invoiceNumber) {
+  let message = "Error:";
+  if (
+    !validators.isPriceFormat(transport) &&
+    !validators.stringIsNotEmpty(transport)
+  )
+    message += "\nPrice must be a decimal and not empty.";
+  if (
+    !validators.lengthSmallerThen(invoiceNumber, 40) &&
+    !validators.stringIsNotEmpty(invoiceNumber)
+  )
+    message += "\nInvoice number cannot be empty and excceed 40 chars.";
+  return message;
 }

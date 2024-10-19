@@ -14,7 +14,6 @@ export default async function createProforma(
   state,
   formData,
 ) {
-  let errorMessage = "Error:";
   let chosenUser = formData.get("user");
   let proformaNumber = formData.get("proformaNumber");
   let seller = formData.get("org");
@@ -22,22 +21,16 @@ export default async function createProforma(
   let chosenCurrency = formData.get("currency");
   let transport = formData.get("transport");
   let paymentMethod = formData.get("paymentMethod");
-  if (!paymentMethod) errorMessage += "\nPayment method must not be empty.";
-  if (!chosenCurrency) errorMessage += "\nCurrency must not be empty.";
-  if (!taxes) errorMessage += "\nTaxes must not be empty.";
-  if (!seller) errorMessage += "\nClient must not be empty.";
-  if (!chosenUser) errorMessage += "\nUser must not be empty.";
-  if (
-    !validators.lengthSmallerThen(proformaNumber, 40) ||
-    !validators.stringIsNotEmpty(proformaNumber)
-  )
-    errorMessage += "\nProforma number must not be empty.";
-  if (
-    !validators.isPriceFormat(transport) ||
-    !validators.stringIsNotEmpty(transport)
-  )
-    errorMessage += "\nTransport cost must not be empty and must be decimal.";
-  if (products.length <= 0) errorMessage += "\nProforma must have products.";
+  let errorMessage = validateData(
+    paymentMethod,
+    chosenCurrency,
+    taxes,
+    seller,
+    chosenUser,
+    proformaNumber,
+    transport,
+    products,
+  );
 
   if (errorMessage.length > 6)
     return {
@@ -165,7 +158,7 @@ export default async function createProforma(
         message: "Server error.",
       };
     }
-  
+
     if (info.ok) {
       return {
         error: false,
@@ -190,11 +183,40 @@ export default async function createProforma(
       };
     }
   } catch {
-    console.error("createProforma fetch failed.")
+    console.error("createProforma fetch failed.");
     return {
       error: true,
       completed: true,
       message: "Connection error.",
     };
   }
+}
+function validateData(
+  paymentMethod,
+  chosenCurrency,
+  taxes,
+  seller,
+  chosenUser,
+  proformaNumber,
+  transport,
+  products,
+) {
+  let errorMessage = "Error:";
+  if (!paymentMethod) errorMessage += "\nPayment method must not be empty.";
+  if (!chosenCurrency) errorMessage += "\nCurrency must not be empty.";
+  if (!taxes) errorMessage += "\nTaxes must not be empty.";
+  if (!seller) errorMessage += "\nClient must not be empty.";
+  if (!chosenUser) errorMessage += "\nUser must not be empty.";
+  if (
+    !validators.lengthSmallerThen(proformaNumber, 40) ||
+    !validators.stringIsNotEmpty(proformaNumber)
+  )
+    errorMessage += "\nProforma number must not be empty.";
+  if (
+    !validators.isPriceFormat(transport) ||
+    !validators.stringIsNotEmpty(transport)
+  )
+    errorMessage += "\nTransport cost must not be empty and must be decimal.";
+  if (products.length <= 0) errorMessage += "\nProforma must have products.";
+  return errorMessage;
 }

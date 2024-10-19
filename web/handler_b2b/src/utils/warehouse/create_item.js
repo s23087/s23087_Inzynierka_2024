@@ -101,7 +101,7 @@ export default async function createItem(eans, state, formData) {
       };
     }
   } catch {
-    console.error("createItem fetch failed.")
+    console.error("createItem fetch failed.");
     return {
       error: true,
       completed: true,

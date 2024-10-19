@@ -39,7 +39,7 @@ export default async function getSearchOutsideItems(
 
     return [];
   } catch {
-    console.error("getSearchOutsideItems fetch failed.")
+    console.error("getSearchOutsideItems fetch failed.");
     return null;
   }
 }

@@ -12,7 +12,12 @@ function ChangeStatusWindow({
 }) {
   const [isLoading, setIsLoading] = useState(false);
   return (
-    <Modal size="md" show={modalShow} centered className="px-4 minScalableWidth">
+    <Modal
+      size="md"
+      show={modalShow}
+      centered
+      className="px-4 minScalableWidth"
+    >
       <Modal.Body>
         <Container>
           <Row>

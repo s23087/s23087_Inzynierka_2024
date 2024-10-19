@@ -87,7 +87,7 @@ function ModifyInvoiceOffcanvas({
   const [invoiceNumberError, setInvoiceNumberError] = useState(false);
   const [transportError, setTransportError] = useState(false);
   const [documentError, setDocumentError] = useState(false);
-  const isFormErrorActive = () => 
+  const isFormErrorActive = () =>
     invoiceNumberError ||
     transportError ||
     documentError ||

@@ -66,12 +66,12 @@ export default async function AddUser(state, formData) {
         },
       },
     );
-  
+
     if (info.status === 404) {
       logout();
       redirect("/");
     }
-  
+
     if (info.status === 400) {
       let message = await info.text();
       return {
@@ -80,7 +80,7 @@ export default async function AddUser(state, formData) {
         completed: true,
       };
     }
-  
+
     if (info.ok) {
       return {
         error: false,
@@ -89,7 +89,7 @@ export default async function AddUser(state, formData) {
       };
     }
   } catch {
-    console.error("AddUser fetch failed.")
+    console.error("AddUser fetch failed.");
     return {
       error: false,
       message: "Connection error.",

@@ -18,8 +18,7 @@ function ViewRequestOffcanvas({ showOffcanvas, hideFunction, request, isOrg }) {
   const [requestPath, setRequestPath] = useState("");
   useEffect(() => {
     if (showOffcanvas) {
-      getRestRequest(request.id)
-      .then((data) => {
+      getRestRequest(request.id).then((data) => {
         if (data !== null) {
           setNote(data.note);
           setRequestPath(data.path);

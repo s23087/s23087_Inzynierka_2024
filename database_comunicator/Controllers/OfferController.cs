@@ -1,6 +1,7 @@
 ﻿using database_communicator.Models;
 using database_communicator.Models.DTOs;
 using database_communicator.Services;
+using database_comunicator.FilterClass;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -58,16 +59,25 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetYoursProformas(int userId, string? search, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG, 
             string? createdL, string? createdG, string? modifiedL, string? modifiedG)
         {
+            var filters = new OfferFiltersTemplate{
+                Status = status,
+                Currency = currency,
+                Type = type,
+                TotalL = totalL,
+                TotalG = totalG,
+                CreatedL = createdL,
+                CreatedG = createdG,
+                ModifiedL = modifiedL,
+                ModifiedG = modifiedG
+            };
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound(userNotFoundMessage);
             if (search != null)
             {
-                var sResult = await _offerServices.GetPriceLists(userId, search, sort, status: status, currency: currency, type: type, totalL, totalG, 
-                    createdL, createdG, modifiedL, modifiedG);
+                var sResult = await _offerServices.GetPriceLists(userId, search, sort: sort, filters);
                 return Ok(sResult);
             }
-            var result = await _offerServices.GetPriceLists(userId, sort: sort, status: status, currency: currency, type: type, totalL, totalG, 
-                createdL, createdG, modifiedL, modifiedG);
+            var result = await _offerServices.GetPriceLists(userId, sort: sort, filters);
             return Ok(result);
         }
         [HttpDelete]

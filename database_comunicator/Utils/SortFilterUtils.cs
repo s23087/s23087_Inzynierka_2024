@@ -200,31 +200,5 @@ namespace database_communicator.Utils
                 return orderBy;
             }
         }
-        public static Func<GetManyItems, bool> GetFilterStatus(string? status)
-        {
-            Func<GetManyItems, bool> result;
-            switch (status)
-            {
-                case "war":
-                    result = e => e.StatusName == "In warehouse";
-                    break;
-                case "deli":
-                    result = e => e.StatusName == "In delivery";
-                    break;
-                case "wardeli":
-                    result = e => e.StatusName == "In warehouse | In delivery";
-                    break;
-                case "req":
-                    result = e => e.StatusName == "On request";
-                    break;
-                case "unavail":
-                    result = e => e.StatusName == "Unavailable";
-                    break;
-                default:
-                    result = e => true; 
-                    break;
-            }
-            return result;
-        }
     }
 }

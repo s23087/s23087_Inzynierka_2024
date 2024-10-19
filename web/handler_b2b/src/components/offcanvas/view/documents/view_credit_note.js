@@ -27,17 +27,16 @@ function ViewCreditNoteOffcanvas({
   const [creditPath, setCreditPath] = useState("");
   useEffect(() => {
     if (showOffcanvas) {
-      getRestCreditNote(creditNote.creditNoteId)
-      .then((data) => {
-        if (data !== null){
-          if (data.length === 0){
+      getRestCreditNote(creditNote.creditNoteId).then((data) => {
+        if (data !== null) {
+          if (data.length === 0) {
             setRestInfo({
               creditNoteNumber: "not found",
               currencyName: "not found",
               note: "not found",
               path: "not found",
               creditItems: [],
-            })
+            });
             return;
           }
           setRestInfo(data);
@@ -49,9 +48,9 @@ function ViewCreditNoteOffcanvas({
             note: "connection error",
             path: "connection error",
             creditItems: [],
-          })
+          });
         }
-        })
+      });
     }
   }, [showOffcanvas]);
   // Download bool

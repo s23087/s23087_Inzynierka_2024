@@ -35,10 +35,9 @@ function CurrencyOffcanvas({ showOffcanvas, hideFunction, current_currency }) {
   });
   useEffect(() => {
     if (showOffcanvas) {
-      getCurrencyValues("EUR")
-      .then((data) => {
-        if (data !== null){
-          setEurData(data)
+      getCurrencyValues("EUR").then((data) => {
+        if (data !== null) {
+          setEurData(data);
         } else {
           setEurData({
             rates: [
@@ -47,13 +46,12 @@ function CurrencyOffcanvas({ showOffcanvas, hideFunction, current_currency }) {
                 mid: 0,
               },
             ],
-          })
+          });
         }
       });
-      getCurrencyValues("USD")
-      .then((data) => {
-        if (data !== null){
-          setUsdData(data)
+      getCurrencyValues("USD").then((data) => {
+        if (data !== null) {
+          setUsdData(data);
         } else {
           setUsdData({
             rates: [
@@ -62,7 +60,7 @@ function CurrencyOffcanvas({ showOffcanvas, hideFunction, current_currency }) {
                 mid: 0,
               },
             ],
-          })
+          });
         }
       });
     }
@@ -203,7 +201,7 @@ function CurrencyOffcanvas({ showOffcanvas, hideFunction, current_currency }) {
 CurrencyOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
-  current_currency: PropTypes.string.isRequired
+  current_currency: PropTypes.string.isRequired,
 };
 
 export default CurrencyOffcanvas;

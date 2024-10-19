@@ -47,11 +47,11 @@ function SettingMenu({ role }) {
   async function getLogFile() {
     setIsLoading(true);
     const data = await getLogs();
-    if (data === null){
-      setDownloadError(true)
+    if (data === null) {
+      setDownloadError(true);
       return;
     } else {
-      setDownloadError(false)
+      setDownloadError(false);
     }
     let logsCSV =
       "data:text/csv;charset=utf-8," +
@@ -78,7 +78,7 @@ function SettingMenu({ role }) {
               </Link>
             );
           })}
-          <ErrorMessage 
+          <ErrorMessage
             message="Could not download logs."
             messageStatus={downloadError}
           />
@@ -148,7 +148,7 @@ function SettingMenu({ role }) {
               </Link>
             );
           })}
-          <ErrorMessage 
+          <ErrorMessage
             message="Could not download logs."
             messageStatus={downloadError}
           />

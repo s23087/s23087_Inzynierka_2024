@@ -1,6 +1,7 @@
 ﻿using database_communicator.Models;
 using database_communicator.Models.DTOs;
 using database_communicator.Services;
+using database_comunicator.FilterClass;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -66,17 +67,28 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetUserCreditNote(bool isYourCredit, int userId, string? search, string? sort, string? dateL, string? dateG,
             int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, bool? paymentStatus, bool? status)
         {
+            var filters = new CreditNoteFiltersTemplate
+            {
+                DateL = dateL,
+                DateG = dateG,
+                QtyL = qtyL,
+                QtyG = qtyG,
+                TotalL = totalL,
+                TotalG = totalG,
+                Recipient = recipient,
+                Currency = currency,
+                PaymentStatus = paymentStatus,
+                Status = status
+            };
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("This user does not exists.");
             if (search != null)
             {
-                var result = await _creditNoteServices.GetCreditNotes(isYourCredit, search, userId, sort: sort, dateL, dateG, qtyL, qtyG, totalL, totalG, recipient,
-                    currency, paymentStatus, status);
+                var result = await _creditNoteServices.GetCreditNotes(isYourCredit, search, userId, sort: sort, filters);
                 return Ok(result);
             } else
             {
-                var result = await _creditNoteServices.GetCreditNotes(isYourCredit, userId, sort: sort, dateL, dateG, qtyL, qtyG, totalL, totalG, recipient,
-                    currency, paymentStatus, status);
+                var result = await _creditNoteServices.GetCreditNotes(isYourCredit, userId, sort: sort, filters);
                 return Ok(result);
             }
         }
@@ -85,16 +97,27 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetCreditNote(bool isYourCredit, string? search, string? sort, string? dateL, string? dateG,
             int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, bool? paymentStatus, bool? status)
         {
+            var filters = new CreditNoteFiltersTemplate
+            {
+                DateL = dateL,
+                DateG = dateG,
+                QtyL = qtyL,
+                QtyG = qtyG,
+                TotalL = totalL,
+                TotalG = totalG,
+                Recipient = recipient,
+                Currency = currency,
+                PaymentStatus = paymentStatus,
+                Status = status
+            };
             if (search != null)
             {
-                var result = await _creditNoteServices.GetCreditNotes(isYourCredit, search, sort: sort, dateL, dateG, qtyL, qtyG, totalL, totalG, recipient,
-                    currency, paymentStatus, status);
+                var result = await _creditNoteServices.GetCreditNotes(isYourCredit, search, sort: sort, filters);
                 return Ok(result);
             }
             else
             {
-                var result = await _creditNoteServices.GetCreditNotes(isYourCredit, sort: sort, dateL, dateG, qtyL, qtyG, totalL, totalG, recipient,
-                    currency, paymentStatus, status);
+                var result = await _creditNoteServices.GetCreditNotes(isYourCredit, sort: sort, filters);
                 return Ok(result);
             }
         }

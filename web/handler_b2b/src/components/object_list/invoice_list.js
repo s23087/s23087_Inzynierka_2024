@@ -232,12 +232,8 @@ function InvoiceList({
       </Container>
       <SelectComponent
         selectedQty={selectedQty}
-        actionOneName={
-          getActionOneName()
-        }
-        actionOne={
-          getActionOne()
-        }
+        actionOneName={getActionOneName()}
+        actionOne={getActionOne()}
       />
       <Container style={selectedQty > 0 ? containerMargin : null}></Container>
       {Object.keys(invoices ?? []).length === 0 ? (

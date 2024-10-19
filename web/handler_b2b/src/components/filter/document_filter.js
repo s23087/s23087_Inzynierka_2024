@@ -799,10 +799,8 @@ function InvoiceFilterOffcanvas({
 
   function setPaymentStatusFilter() {
     let paymentStatus = document.getElementById("paymentStatus").value;
-    if (paymentStatus !== "none")
-      newParams.set("paymentStatus", paymentStatus);
-    if (paymentStatus === "none")
-      newParams.delete("paymentStatus");
+    if (paymentStatus !== "none") newParams.set("paymentStatus", paymentStatus);
+    if (paymentStatus === "none") newParams.delete("paymentStatus");
   }
 
   function setStatusFilter() {
@@ -813,15 +811,13 @@ function InvoiceFilterOffcanvas({
 
   function setRecipientFilter() {
     let recipient = document.getElementById("recipient").value;
-    if (recipient !== "none")
-      newParams.set("recipient", recipient);
+    if (recipient !== "none") newParams.set("recipient", recipient);
     if (recipient === "none") newParams.delete("recipient");
   }
 
   function setCurrencyFilter() {
     let currency = document.getElementById("currency").value;
-    if (currency !== "none")
-      newParams.set("currency", currency);
+    if (currency !== "none") newParams.set("currency", currency);
     if (currency === "none") newParams.delete("currency");
   }
 
@@ -833,10 +829,8 @@ function InvoiceFilterOffcanvas({
 
   function setRequestStatusFilter() {
     let requestStatus = document.getElementById("requestStatus").value;
-    if (requestStatus !== "none")
-      newParams.set("requestStatus", requestStatus);
-    if (requestStatus === "none")
-      newParams.delete("requestStatus");
+    if (requestStatus !== "none") newParams.set("requestStatus", requestStatus);
+    if (requestStatus === "none") newParams.delete("requestStatus");
   }
 }
 
@@ -845,7 +839,7 @@ InvoiceFilterOffcanvas.propTypes = {
   hideFunction: PropTypes.func.isRequired,
   currentSort: PropTypes.string.isRequired,
   currentDirection: PropTypes.bool.isRequired,
-  type: PropTypes.string.isRequired
+  type: PropTypes.string.isRequired,
 };
 
 export default InvoiceFilterOffcanvas;

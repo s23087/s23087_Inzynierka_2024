@@ -22,7 +22,7 @@ export default async function getUserOrgName() {
 
     return "";
   } catch {
-    console.error("getUserOrgName fetch failed.")
+    console.error("getUserOrgName fetch failed.");
     return null;
   }
 }

@@ -12,25 +12,11 @@ export default async function createPricelist(
   state,
   formData,
 ) {
-  let errorMessage = "Error:";
   let offerName = formData.get("name");
   let status = formData.get("status");
   let maxQty = formData.get("maxQty");
   let type = formData.get("type");
-  if (!status) errorMessage += "\nStatus must not be empty.";
-  if (
-    !validators.stringIsNotEmpty(offerName) ||
-    !validators.lengthSmallerThen(offerName, 100)
-  ) {
-    errorMessage += "\nOffer name must not be empty or exceed 100 chars.";
-  }
-  if (
-    !validators.stringIsNotEmpty(maxQty) ||
-    !validators.haveOnlyNumbers(maxQty, 100)
-  ) {
-    errorMessage += "\nMax qty must be a number and not empty.";
-  }
-  if (products.length === 0) errorMessage += "\nProducts must note be empty.";
+  let errorMessage = validateData(status, offerName, maxQty, products);
 
   if (errorMessage.length > 6)
     return {
@@ -126,7 +112,7 @@ export default async function createPricelist(
         message: "Server error.",
       };
     }
-  
+
     if (info.ok) {
       return {
         error: false,
@@ -141,11 +127,29 @@ export default async function createPricelist(
       };
     }
   } catch {
-    console.error("createPricelist fetch failed.")
+    console.error("createPricelist fetch failed.");
     return {
       error: true,
       completed: true,
       message: "Connection error.",
     };
   }
+}
+function validateData(status, offerName, maxQty, products) {
+  let errorMessage = "Error:";
+  if (!status) errorMessage += "\nStatus must not be empty.";
+  if (
+    !validators.stringIsNotEmpty(offerName) ||
+    !validators.lengthSmallerThen(offerName, 100)
+  ) {
+    errorMessage += "\nOffer name must not be empty or exceed 100 chars.";
+  }
+  if (
+    !validators.stringIsNotEmpty(maxQty) ||
+    !validators.haveOnlyNumbers(maxQty, 100)
+  ) {
+    errorMessage += "\nMax qty must be a number and not empty.";
+  }
+  if (products.length === 0) errorMessage += "\nProducts must note be empty.";
+  return errorMessage;
 }

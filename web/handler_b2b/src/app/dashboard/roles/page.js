@@ -13,7 +13,7 @@ export default async function RolesPage({ searchParams }) {
   const current_role = await getRole();
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
-  const rolesToChoose = await getRoles() ?? [];
+  const rolesToChoose = (await getRoles()) ?? [];
   let currentSort = searchParams.orderBy ?? ".None";
   let role = searchParams.role;
   let filterActivated = searchParams.orderBy || role;

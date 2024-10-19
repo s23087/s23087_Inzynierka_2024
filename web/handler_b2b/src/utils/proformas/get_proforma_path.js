@@ -9,14 +9,14 @@ export default async function getProformaPath(proformaId) {
     const info = await fetch(url, {
       method: "GET",
     });
-  
+
     if (info.ok) {
       return await info.text();
     }
-  
+
     return null;
   } catch {
-    console.error("getProformaPath fetch failed.")
-    return null
+    console.error("getProformaPath fetch failed.");
+    return null;
   }
 }

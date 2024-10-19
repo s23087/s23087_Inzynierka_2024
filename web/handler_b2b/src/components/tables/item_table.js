@@ -86,7 +86,7 @@ function ItemTable({ restInfo, isOurWarehouse }) {
 
 ItemTable.propTypes = {
   restInfo: PropTypes.object.isRequired,
-  isOurWarehouse: PropTypes.bool.isRequired
+  isOurWarehouse: PropTypes.bool.isRequired,
 };
 
 export default ItemTable;

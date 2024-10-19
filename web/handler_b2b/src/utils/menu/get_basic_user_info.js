@@ -21,7 +21,7 @@ export default async function getBasicInfo() {
       };
     }
   } catch {
-    console.error("getBasicInfo fetch failed.")
+    console.error("getBasicInfo fetch failed.");
     return {
       username: "connection error",
       surname: "connection error",

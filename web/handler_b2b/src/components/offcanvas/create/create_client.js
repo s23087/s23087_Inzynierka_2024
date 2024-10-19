@@ -21,15 +21,14 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
   // Get country and statuses
   useEffect(() => {
     if (showOffcanvas) {
-      getCountries()
-      .then((data) => {
+      getCountries().then((data) => {
         if (data !== null) {
-          setCountriesDownloadError(false)
-          setCountries(data)
+          setCountriesDownloadError(false);
+          setCountries(data);
         } else {
-          setCountriesDownloadError(true)
+          setCountriesDownloadError(true);
         }
-      })
+      });
       getAvailabilityStatuses().then((data) => {
         if (data !== null) {
           setStatuses(data);

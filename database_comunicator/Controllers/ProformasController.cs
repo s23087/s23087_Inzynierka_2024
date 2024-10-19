@@ -1,5 +1,6 @@
 ﻿using database_communicator.Models.DTOs;
 using database_communicator.Services;
+using database_comunicator.FilterClass;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -55,14 +56,25 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetYoursProformas(int userId, string? search, string? sort,
             int? qtyL, int? qtyG, int? totalL, int? totalG, string? dateL, string? dateG, int? recipient, string? currency)
         {
+            var filters = new ProformaFiltersTemplate
+            {
+                QtyL = qtyL,
+                QtyG = qtyG,
+                TotalL = totalL,
+                TotalG = totalG,
+                DateL = dateL,
+                DateG = dateG,
+                Recipient = recipient,
+                Currency = currency
+            };
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound(userNotFoundMessage);
             if (search != null)
             {
-                var sResult = await _proformaServices.GetProformas(true, userId, search, sort, qtyL, qtyG, totalL, totalG, dateL, dateG, recipient, currency);
+                var sResult = await _proformaServices.GetProformas(true, userId, search, sort: sort, filters);
                 return Ok(sResult);
             }
-            var result = await _proformaServices.GetProformas(true, userId, sort, qtyL, qtyG, totalL, totalG, dateL, dateG, recipient, currency);
+            var result = await _proformaServices.GetProformas(true, userId, sort: sort, filters);
             return Ok(result);
         }
         [HttpGet]
@@ -70,12 +82,23 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetYoursProformas(string? search, string? sort,
             int? qtyL, int? qtyG, int? totalL, int? totalG, string? dateL, string? dateG, int? recipient, string? currency)
         {
+            var filters = new ProformaFiltersTemplate
+            {
+                QtyL = qtyL,
+                QtyG = qtyG,
+                TotalL = totalL,
+                TotalG = totalG,
+                DateL = dateL,
+                DateG = dateG,
+                Recipient = recipient,
+                Currency = currency
+            };
             if (search != null)
             {
-                var sResult = await _proformaServices.GetProformas(true, search, sort, qtyL, qtyG, totalL, totalG, dateL, dateG, recipient, currency);
+                var sResult = await _proformaServices.GetProformas(true, search, sort: sort, filters);
                 return Ok(sResult);
             }
-            var result = await _proformaServices.GetProformas(true, sort, qtyL, qtyG, totalL, totalG, dateL, dateG, recipient, currency);
+            var result = await _proformaServices.GetProformas(true, sort: sort, filters);
             return Ok(result);
         }
         [HttpGet]
@@ -83,14 +106,25 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetClientProformas(int userId, string? search, string? sort,
             int? qtyL, int? qtyG, int? totalL, int? totalG, string? dateL, string? dateG, int? recipient, string? currency)
         {
+            var filters = new ProformaFiltersTemplate
+            {
+                QtyL = qtyL,
+                QtyG = qtyG,
+                TotalL = totalL,
+                TotalG = totalG,
+                DateL = dateL,
+                DateG = dateG,
+                Recipient = recipient,
+                Currency = currency
+            };
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound(userNotFoundMessage);
             if (search != null)
             {
-                var sResult = await _proformaServices.GetProformas(false, userId, search, sort, qtyL, qtyG, totalL, totalG, dateL, dateG, recipient, currency);
+                var sResult = await _proformaServices.GetProformas(false, userId, search, sort: sort, filters);
                 return Ok(sResult);
             }
-            var result = await _proformaServices.GetProformas(false, userId, sort, qtyL, qtyG, totalL, totalG, dateL, dateG, recipient, currency);
+            var result = await _proformaServices.GetProformas(false, userId, sort: sort, filters);
             return Ok(result);
         }
         [HttpGet]
@@ -98,12 +132,23 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetClientProformas(string? search, string? sort,
             int? qtyL, int? qtyG, int? totalL, int? totalG, string? dateL, string? dateG, int? recipient, string? currency)
         {
+            var filters = new ProformaFiltersTemplate
+            {
+                QtyL = qtyL,
+                QtyG = qtyG,
+                TotalL = totalL,
+                TotalG = totalG,
+                DateL = dateL,
+                DateG = dateG,
+                Recipient = recipient,
+                Currency = currency
+            };
             if (search != null)
             {
-                var sResult = await _proformaServices.GetProformas(false, search, sort, qtyL, qtyG, totalL, totalG, dateL, dateG, recipient, currency);
+                var sResult = await _proformaServices.GetProformas(false, search, sort: sort, filters);
                 return Ok(sResult);
             }
-            var result = await _proformaServices.GetProformas(false, sort, qtyL, qtyG, totalL, totalG, dateL, dateG, recipient, currency);
+            var result = await _proformaServices.GetProformas(false, sort: sort, filters);
             return Ok(result);
         }
         [HttpGet]

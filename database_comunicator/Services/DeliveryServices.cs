@@ -18,14 +18,10 @@ namespace database_communicator.Services
         public Task<int> AddDelivery(AddDelivery data);
         public Task<bool> DeliveryProformaExist(int proformaId);
         public Task<bool> DeliveryExist(int deliveryId);
-        public Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, string? sort,
-            string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill);
-        public Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, int userId, string? sort,
-            string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill);
-        public Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, string search, string? sort,
-            string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill);
-        public Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, int userId, string search, string? sort,
-            string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill);
+        public Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, string? sort, DeliveryFiltersTemplate filters);
+        public Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, int userId, string? sort, DeliveryFiltersTemplate filters);
+        public Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, string search, string? sort, DeliveryFiltersTemplate filters);
+        public Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, int userId, string search, string? sort, DeliveryFiltersTemplate filters);
         public Task<IEnumerable<GetDeliveryCompany>> GetDeliveryCompanies();
         public Task<IEnumerable<GetDeliveryStatus>> GetDeliveryStatuses();
         public Task<IEnumerable<GetProformaList>> GetProformaListWithoutDelivery(bool IsDeliveryToUser, int userId);
@@ -118,8 +114,7 @@ namespace database_communicator.Services
         {
             return await _handlerContext.Deliveries.AnyAsync(x => x.DeliveryId == deliveryId);
         }
-        public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, string? sort,
-            string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill)
+        public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, string? sort, DeliveryFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetDeliverySort(sort, IsDeliveryToUser);
             bool direction;
@@ -131,14 +126,14 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var estimatedLCond = DeliveryFilters.GetEstimatedLowerFilter(estimatedL);
-            var estimatedGCond = DeliveryFilters.GetEstimatedGreaterFilter(estimatedG);
-            var deliveredLCond = DeliveryFilters.GetDeliveredLowerFilter(deliveredL);
-            var deliveredGCond = DeliveryFilters.GetDeliveredGreaterFilter(deliveredG);
-            var recipientCond = DeliveryFilters.GetRecipientFilter(recipient, IsDeliveryToUser);
-            var statusCond = DeliveryFilters.GetStatusFilter(status);
-            var companyCond = DeliveryFilters.GetCompanyFilter(company);
-            var waybillCond = DeliveryFilters.GetWaybillFilter(waybill);
+            var estimatedLCond = DeliveryFilters.GetEstimatedLowerFilter(filters.EstimatedL);
+            var estimatedGCond = DeliveryFilters.GetEstimatedGreaterFilter(filters.EstimatedG);
+            var deliveredLCond = DeliveryFilters.GetDeliveredLowerFilter(filters.DeliveredL);
+            var deliveredGCond = DeliveryFilters.GetDeliveredGreaterFilter(filters.DeliveredG);
+            var recipientCond = DeliveryFilters.GetRecipientFilter(filters.Recipient, IsDeliveryToUser);
+            var statusCond = DeliveryFilters.GetStatusFilter(filters.Status);
+            var companyCond = DeliveryFilters.GetCompanyFilter(filters.Company);
+            var waybillCond = DeliveryFilters.GetWaybillFilter(filters.Waybill);
 
             return await _handlerContext.Deliveries
                 .Where(e => IsDeliveryToUser ? e.Proforma.ProformaFutureItems.Any() : e.Proforma.ProformaOwnedItems.Any())
@@ -164,8 +159,7 @@ namespace database_communicator.Services
                     Delivered = e.DeliveryDate
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, int userId, string? sort,
-            string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill)
+        public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, int userId, string? sort, DeliveryFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetDeliverySort(sort, IsDeliveryToUser);
             bool direction;
@@ -177,14 +171,14 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var estimatedLCond = DeliveryFilters.GetEstimatedLowerFilter(estimatedL);
-            var estimatedGCond = DeliveryFilters.GetEstimatedGreaterFilter(estimatedG);
-            var deliveredLCond = DeliveryFilters.GetDeliveredLowerFilter(deliveredL);
-            var deliveredGCond = DeliveryFilters.GetDeliveredGreaterFilter(deliveredG);
-            var recipientCond = DeliveryFilters.GetRecipientFilter(recipient, IsDeliveryToUser);
-            var statusCond = DeliveryFilters.GetStatusFilter(status);
-            var companyCond = DeliveryFilters.GetCompanyFilter(company);
-            var waybillCond = DeliveryFilters.GetWaybillFilter(waybill);
+            var estimatedLCond = DeliveryFilters.GetEstimatedLowerFilter(filters.EstimatedL);
+            var estimatedGCond = DeliveryFilters.GetEstimatedGreaterFilter(filters.EstimatedG);
+            var deliveredLCond = DeliveryFilters.GetDeliveredLowerFilter(filters.DeliveredL);
+            var deliveredGCond = DeliveryFilters.GetDeliveredGreaterFilter(filters.DeliveredG);
+            var recipientCond = DeliveryFilters.GetRecipientFilter(filters.Recipient, IsDeliveryToUser);
+            var statusCond = DeliveryFilters.GetStatusFilter(filters.Status);
+            var companyCond = DeliveryFilters.GetCompanyFilter(filters.Company);
+            var waybillCond = DeliveryFilters.GetWaybillFilter(filters.Waybill);
 
             return await _handlerContext.Deliveries
                 .Where(e => IsDeliveryToUser ? e.Proforma.ProformaFutureItems.Any() : e.Proforma.ProformaOwnedItems.Any())
@@ -210,8 +204,7 @@ namespace database_communicator.Services
                     Delivered = obj.DeliveryDate
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, string search, string? sort,
-            string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill)
+        public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, string search, string? sort, DeliveryFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetDeliverySort(sort, IsDeliveryToUser);
             bool direction;
@@ -223,14 +216,14 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var estimatedLCond = DeliveryFilters.GetEstimatedLowerFilter(estimatedL);
-            var estimatedGCond = DeliveryFilters.GetEstimatedGreaterFilter(estimatedG);
-            var deliveredLCond = DeliveryFilters.GetDeliveredLowerFilter(deliveredL);
-            var deliveredGCond = DeliveryFilters.GetDeliveredGreaterFilter(deliveredG);
-            var recipientCond = DeliveryFilters.GetRecipientFilter(recipient, IsDeliveryToUser);
-            var statusCond = DeliveryFilters.GetStatusFilter(status);
-            var companyCond = DeliveryFilters.GetCompanyFilter(company);
-            var waybillCond = DeliveryFilters.GetWaybillFilter(waybill);
+            var estimatedLCond = DeliveryFilters.GetEstimatedLowerFilter(filters.EstimatedL);
+            var estimatedGCond = DeliveryFilters.GetEstimatedGreaterFilter(filters.EstimatedG);
+            var deliveredLCond = DeliveryFilters.GetDeliveredLowerFilter(filters.DeliveredL);
+            var deliveredGCond = DeliveryFilters.GetDeliveredGreaterFilter(filters.DeliveredG);
+            var recipientCond = DeliveryFilters.GetRecipientFilter(filters.Recipient, IsDeliveryToUser);
+            var statusCond = DeliveryFilters.GetStatusFilter(filters.Status);
+            var companyCond = DeliveryFilters.GetCompanyFilter(filters.Company);
+            var waybillCond = DeliveryFilters.GetWaybillFilter(filters.Waybill);
 
             int searchById;
 
@@ -267,8 +260,7 @@ namespace database_communicator.Services
                     Delivered = ent.DeliveryDate
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, int userId, string search, string? sort,
-            string? estimatedL, string? estimatedG, string? deliveredL, string? deliveredG, int? recipient, int? status, int? company, string? waybill)
+        public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, int userId, string search, string? sort, DeliveryFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetDeliverySort(sort, IsDeliveryToUser);
             bool direction;
@@ -280,14 +272,14 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var estimatedLCond = DeliveryFilters.GetEstimatedLowerFilter(estimatedL);
-            var estimatedGCond = DeliveryFilters.GetEstimatedGreaterFilter(estimatedG);
-            var deliveredLCond = DeliveryFilters.GetDeliveredLowerFilter(deliveredL);
-            var deliveredGCond = DeliveryFilters.GetDeliveredGreaterFilter(deliveredG);
-            var recipientCond = DeliveryFilters.GetRecipientFilter(recipient, IsDeliveryToUser);
-            var statusCond = DeliveryFilters.GetStatusFilter(status);
-            var companyCond = DeliveryFilters.GetCompanyFilter(company);
-            var waybillCond = DeliveryFilters.GetWaybillFilter(waybill);
+            var estimatedLCond = DeliveryFilters.GetEstimatedLowerFilter(filters.EstimatedL);
+            var estimatedGCond = DeliveryFilters.GetEstimatedGreaterFilter(filters.EstimatedG);
+            var deliveredLCond = DeliveryFilters.GetDeliveredLowerFilter(filters.DeliveredL);
+            var deliveredGCond = DeliveryFilters.GetDeliveredGreaterFilter(filters.DeliveredG);
+            var recipientCond = DeliveryFilters.GetRecipientFilter(filters.Recipient, IsDeliveryToUser);
+            var statusCond = DeliveryFilters.GetStatusFilter(filters.Status);
+            var companyCond = DeliveryFilters.GetCompanyFilter(filters.Company);
+            var waybillCond = DeliveryFilters.GetWaybillFilter(filters.Waybill);
 
             int searchById;
 

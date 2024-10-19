@@ -12,6 +12,6 @@ export default async function switchNotifStatus(notifId, notifBool) {
       },
     );
   } catch {
-    console.error("switchNotifStatus fetch failed.")
+    console.error("switchNotifStatus fetch failed.");
   }
 }

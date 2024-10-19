@@ -3,6 +3,15 @@ using System.Linq.Expressions;
 
 namespace database_comunicator.FilterClass
 {
+    public class OutsideItemFiltersTemplate
+    {
+        public int? QtyL { get; set; }
+        public int? QtyG { get; set; }
+        public int? PriceL { get; set; }
+        public int? PriceG { get; set; }
+        public int? Source { get; set; }
+        public string? Currency { get; set; }
+    }
     public static class OutsideItemFilters
     {
         public static Expression<Func<OutsideItem, bool>> GetQtyLowerFilter(int? qtyL)

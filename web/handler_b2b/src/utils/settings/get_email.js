@@ -11,14 +11,14 @@ export default async function getUserEmail() {
     const info = await fetch(url, {
       method: "GET",
     });
-  
+
     if (info.ok) {
       return await info.text();
     }
-  
+
     return "Critical error.";
   } catch {
-    console.error("getUserEmail fetch failed.")
+    console.error("getUserEmail fetch failed.");
     return "Connection error.";
   }
 }

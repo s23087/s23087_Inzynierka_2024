@@ -14,7 +14,7 @@ export default async function getNotificationCounter() {
 
     return notifCount;
   } catch {
-    console.error("getNotificationCounter fetch failed.")
+    console.error("getNotificationCounter fetch failed.");
     return 0;
   }
 }

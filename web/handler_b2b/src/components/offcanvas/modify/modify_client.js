@@ -59,15 +59,14 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
           setRestDownloadError(true);
         }
       });
-      getCountries()
-      .then((data) => {
+      getCountries().then((data) => {
         if (data !== null) {
-          setCountriesDownloadError(false)
-          setCountries(data)
+          setCountriesDownloadError(false);
+          setCountries(data);
         } else {
-          setCountriesDownloadError(true)
+          setCountriesDownloadError(true);
         }
-      })
+      });
       getAvailabilityStatuses().then((data) => {
         if (data !== null) {
           setStatuses(data);
@@ -98,15 +97,14 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
           setBindingsDownloadError(true);
         }
       });
-      getUsers()
-        .then((data) => {
-          if (data === null) {
-            setUserDownloadError(true)
-          } else {
-            setUserDownloadError(false)
-            setUsers(data);
-          }
-        })
+      getUsers().then((data) => {
+        if (data === null) {
+          setUserDownloadError(true);
+        } else {
+          setUserDownloadError(false);
+          setUsers(data);
+        }
+      });
     }
   }, [isBindingView]);
   // Errors
@@ -134,7 +132,9 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
       creditError ||
       statusesDownloadError ||
       bindingsDownloadError ||
-      restDownloadError || countriesDownloadError || userDownloadError
+      restDownloadError ||
+      countriesDownloadError ||
+      userDownloadError
     );
   };
   const anyErrorActive = getIsErrorActive();
@@ -245,7 +245,9 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
               messageStatus={
                 statusesDownloadError ||
                 bindingsDownloadError ||
-                restDownloadError || countriesDownloadError || userDownloadError
+                restDownloadError ||
+                countriesDownloadError ||
+                userDownloadError
               }
             />
             <Form

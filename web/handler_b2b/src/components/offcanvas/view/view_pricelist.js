@@ -11,8 +11,7 @@ function ViewPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
   const [pricelistItems, setRestInfo] = useState([]);
   useEffect(() => {
     if (showOffcanvas) {
-      getPricelistItems(pricelist.pricelistId)
-      .then((data) => {
+      getPricelistItems(pricelist.pricelistId).then((data) => {
         if (data === null) {
           setErrorDownload(true);
         } else {

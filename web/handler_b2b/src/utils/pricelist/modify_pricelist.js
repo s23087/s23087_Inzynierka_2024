@@ -14,25 +14,11 @@ export default async function modifyPricelist(
   state,
   formData,
 ) {
-  let errorMessage = "Error:";
   let offerName = formData.get("name");
   let status = formData.get("status");
   let type = formData.get("type");
   let maxQtyForm = formData.get("maxQty");
-  if (!status) errorMessage += "\nStatus must not be empty.";
-  if (
-    !validators.stringIsNotEmpty(offerName) ||
-    !validators.lengthSmallerThen(offerName, 100)
-  ) {
-    errorMessage += "\nOffer name must not be empty or exceed 100 chars.";
-  }
-  if (
-    !validators.stringIsNotEmpty(maxQtyForm) ||
-    !validators.haveOnlyNumbers(maxQtyForm)
-  ) {
-    errorMessage += "\nMax qty must be a number and not empty.";
-  }
-  if (products.length === 0) errorMessage += "\nProducts must note be empty.";
+  let errorMessage = validateData(status, offerName, maxQtyForm, products);
 
   if (errorMessage.length > 6)
     return {
@@ -50,7 +36,7 @@ export default async function modifyPricelist(
       { method: "GET" },
     );
   } catch {
-    console.error("Get status deactivated fetch failed.")
+    console.error("Get status deactivated fetch failed.");
     return {
       error: true,
       completed: true,
@@ -177,7 +163,7 @@ export default async function modifyPricelist(
         message: "Server error.",
       };
     }
-  
+
     if (info.ok) {
       return {
         error: false,
@@ -192,11 +178,29 @@ export default async function modifyPricelist(
       };
     }
   } catch {
-    console.error("Modify offer fetch failed.")
+    console.error("Modify offer fetch failed.");
     return {
       error: true,
       completed: true,
       message: "Connection error.",
     };
   }
+}
+function validateData(status, offerName, maxQtyForm, products) {
+  let errorMessage = "Error:";
+  if (!status) errorMessage += "\nStatus must not be empty.";
+  if (
+    !validators.stringIsNotEmpty(offerName) ||
+    !validators.lengthSmallerThen(offerName, 100)
+  ) {
+    errorMessage += "\nOffer name must not be empty or exceed 100 chars.";
+  }
+  if (
+    !validators.stringIsNotEmpty(maxQtyForm) ||
+    !validators.haveOnlyNumbers(maxQtyForm)
+  ) {
+    errorMessage += "\nMax qty must be a number and not empty.";
+  }
+  if (products.length === 0) errorMessage += "\nProducts must note be empty.";
+  return errorMessage;
 }

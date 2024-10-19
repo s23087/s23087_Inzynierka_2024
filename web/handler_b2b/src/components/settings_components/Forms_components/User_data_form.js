@@ -15,7 +15,7 @@ function ModifyUserForm({ email, name, surname }) {
   const [emailError, setEmailError] = useState(false);
   const [nameError, setNameError] = useState(false);
   const [surnameError, setSurnameError] = useState(false);
-  const isFormErrorActive = () =>  emailError || nameError || surnameError;
+  const isFormErrorActive = () => emailError || nameError || surnameError;
   const [isLoading, setIsLoading] = useState(false);
   const [prevState] = useState({
     email: email,
@@ -48,7 +48,7 @@ function ModifyUserForm({ email, name, surname }) {
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">Email:</Form.Label>
-          <ErrorMessage 
+          <ErrorMessage
             message="Is empty or not a email."
             messageStatus={emailError}
           />
@@ -66,7 +66,7 @@ function ModifyUserForm({ email, name, surname }) {
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">Name:</Form.Label>
-          <ErrorMessage 
+          <ErrorMessage
             message="Is empty or lenght is greater than 250."
             messageStatus={nameError}
           />
@@ -88,7 +88,7 @@ function ModifyUserForm({ email, name, surname }) {
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">Surname:</Form.Label>
-          <ErrorMessage 
+          <ErrorMessage
             message="Is empty or lenght is greater than 200."
             messageStatus={surnameError}
           />

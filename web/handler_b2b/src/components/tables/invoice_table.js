@@ -63,7 +63,7 @@ function InvoiceTable({ items, currency }) {
 
 InvoiceTable.propTypes = {
   items: PropTypes.array.isRequired,
-  currency: PropTypes.string.isRequired
+  currency: PropTypes.string.isRequired,
 };
 
 export default InvoiceTable;

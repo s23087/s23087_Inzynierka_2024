@@ -42,7 +42,7 @@ export default async function getSearchItems(
 
     return [];
   } catch {
-    console.error("getSearchItems fetch failed.")
+    console.error("getSearchItems fetch failed.");
     return null;
   }
 }

@@ -61,7 +61,7 @@ MenuTemplate.propTypes = {
   sidebar_action: PropTypes.func.isRequired,
   user_name: PropTypes.string.isRequired,
   user_window_active_link: PropTypes.string,
-  current_nofitication_qty: PropTypes.number.isRequired
+  current_nofitication_qty: PropTypes.number.isRequired,
 };
 
 export default MenuTemplate;

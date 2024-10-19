@@ -11,8 +11,8 @@ namespace database_communicator.Services
     public interface IOutsideItemServices
     {
 
-        public Task<IEnumerable<GetOutsideItem>> GetItems(string? sort, int? qtyL, int? qtyG, int? priceL, int? priceG, int? source, string? currency);
-        public Task<IEnumerable<GetOutsideItem>> GetItems(string search, string? sort, int? qtyL, int? qtyG, int? priceL, int? priceG, int? source, string? currency);
+        public Task<IEnumerable<GetOutsideItem>> GetItems(string? sort, OutsideItemFiltersTemplate filters);
+        public Task<IEnumerable<GetOutsideItem>> GetItems(string search, string? sort, OutsideItemFiltersTemplate filters);
         public Task<bool> ItemExist(int itemId, int orgId);
         public Task DeleteItem(int itemId, int orgId);
         public Task<IEnumerable<string>> AddItems(CreateOutsideItems data);
@@ -25,7 +25,7 @@ namespace database_communicator.Services
         {
             _handlerContext = handlerContext;
         }
-        public async Task<IEnumerable<GetOutsideItem>> GetItems(string? sort, int? qtyL, int? qtyG, int? priceL, int? priceG, int? source, string? currency)
+        public async Task<IEnumerable<GetOutsideItem>> GetItems(string? sort, OutsideItemFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetOutsideItemSort(sort);
             bool direction;
@@ -37,12 +37,12 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var qtyLCond = OutsideItemFilters.GetQtyLowerFilter(qtyL);
-            var qtyGCond = OutsideItemFilters.GetQtyGreaterFilter(qtyG);
-            var priceLCond = OutsideItemFilters.GetPriceLowerFilter(priceL);
-            var priceGCond = OutsideItemFilters.GetPriceGreaterFilter(priceG);
-            var sourceCond = OutsideItemFilters.GetSourceFilter(source);
-            var currencyCond = OutsideItemFilters.GetCurrencyFilter(currency);
+            var qtyLCond = OutsideItemFilters.GetQtyLowerFilter(filters.QtyL);
+            var qtyGCond = OutsideItemFilters.GetQtyGreaterFilter(filters.QtyG);
+            var priceLCond = OutsideItemFilters.GetPriceLowerFilter(filters.PriceL);
+            var priceGCond = OutsideItemFilters.GetPriceGreaterFilter(filters.PriceG);
+            var sourceCond = OutsideItemFilters.GetSourceFilter(filters.Source);
+            var currencyCond = OutsideItemFilters.GetCurrencyFilter(filters.Currency);
 
             return await _handlerContext.OutsideItems
                 .Where(qtyLCond)
@@ -64,7 +64,7 @@ namespace database_communicator.Services
                     Currency = e.CurrencyName
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetOutsideItem>> GetItems(string search, string? sort, int? qtyL, int? qtyG, int? priceL, int? priceG, int? source, string? currency)
+        public async Task<IEnumerable<GetOutsideItem>> GetItems(string search, string? sort, OutsideItemFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetOutsideItemSort(sort);
             bool direction;
@@ -76,12 +76,12 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var qtyLCond = OutsideItemFilters.GetQtyLowerFilter(qtyL);
-            var qtyGCond = OutsideItemFilters.GetQtyGreaterFilter(qtyG);
-            var priceLCond = OutsideItemFilters.GetPriceLowerFilter(priceL);
-            var priceGCond = OutsideItemFilters.GetPriceGreaterFilter(priceG);
-            var sourceCond = OutsideItemFilters.GetSourceFilter(source);
-            var currencyCond = OutsideItemFilters.GetCurrencyFilter(currency);
+            var qtyLCond = OutsideItemFilters.GetQtyLowerFilter(filters.QtyL);
+            var qtyGCond = OutsideItemFilters.GetQtyGreaterFilter(filters.QtyG);
+            var priceLCond = OutsideItemFilters.GetPriceLowerFilter(filters.PriceL);
+            var priceGCond = OutsideItemFilters.GetPriceGreaterFilter(filters.PriceG);
+            var sourceCond = OutsideItemFilters.GetSourceFilter(filters.Source);
+            var currencyCond = OutsideItemFilters.GetCurrencyFilter(filters.Currency);
 
             return await _handlerContext.OutsideItems
                 .Where(e => e.Item.PartNumber.ToLower().Contains(search.ToLower()) || e.Item.ItemName.ToLower().Contains(search.ToLower()))

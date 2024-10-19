@@ -8,16 +8,13 @@ import validators from "../validators/validator";
 export default async function createClient(state, formData) {
   let nip = formData.get("nip");
   let credit = formData.get("credit");
-  if (!validators.haveOnlyNumbers(nip) && validators.stringIsNotEmpty(nip))
+  if (isNipIncorrect(nip))
     return {
       error: true,
       completed: true,
       message: "Error: Nip must have only numbers.",
     };
-  if (
-    !validators.haveOnlyNumbers(credit) &&
-    validators.stringIsNotEmpty(credit)
-  )
+  if (isCreditIncorrect(credit))
     return {
       error: true,
       completed: true,
@@ -33,40 +30,28 @@ export default async function createClient(state, formData) {
     countryId: formData.get("country"),
   };
 
-  if (
-    !validators.lengthSmallerThen(orgData.orgName, 50) ||
-    !validators.stringIsNotEmpty(orgData.orgName)
-  )
+  if (isOrgNameIncorrect(orgData.orgName))
     return {
       error: true,
       completed: true,
       message: "Error: Org name is empty or length exceed 50 chars.",
     };
 
-  if (
-    !validators.lengthSmallerThen(orgData.street, 200) ||
-    !validators.stringIsNotEmpty(orgData.street)
-  )
+  if (isStreetIncorrect(orgData.street))
     return {
       error: true,
       completed: true,
       message: "Error: Street is empty or length exceed 200 chars.",
     };
 
-  if (
-    !validators.lengthSmallerThen(orgData.city, 200) ||
-    !validators.stringIsNotEmpty(orgData.city)
-  )
+  if (isCityIncorrect(orgData.city))
     return {
       error: true,
       completed: true,
       message: "Error: City is empty or length exceed 200 chars.",
     };
 
-  if (
-    !validators.lengthSmallerThen(orgData.postalCode, 200) ||
-    !validators.stringIsNotEmpty(orgData.postalCode)
-  )
+  if (isPostalCodeIncorrect(orgData.postalCode))
     return {
       error: true,
       completed: true,
@@ -170,4 +155,41 @@ export default async function createClient(state, formData) {
       message: "Connection error",
     };
   }
+}
+function isPostalCodeIncorrect(postalCode) {
+  return (
+    !validators.lengthSmallerThen(postalCode, 200) ||
+    !validators.stringIsNotEmpty(postalCode)
+  );
+}
+
+function isCityIncorrect(city) {
+  return (
+    !validators.lengthSmallerThen(city, 200) ||
+    !validators.stringIsNotEmpty(city)
+  );
+}
+
+function isStreetIncorrect(street) {
+  return (
+    !validators.lengthSmallerThen(street, 200) ||
+    !validators.stringIsNotEmpty(street)
+  );
+}
+
+function isOrgNameIncorrect(orgName) {
+  return (
+    !validators.lengthSmallerThen(orgName, 50) ||
+    !validators.stringIsNotEmpty(orgName)
+  );
+}
+
+function isCreditIncorrect(credit) {
+  return (
+    !validators.haveOnlyNumbers(credit) && validators.stringIsNotEmpty(credit)
+  );
+}
+
+function isNipIncorrect(nip) {
+  return !validators.haveOnlyNumbers(nip) && validators.stringIsNotEmpty(nip);
 }

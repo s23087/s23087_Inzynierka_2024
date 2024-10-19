@@ -89,9 +89,7 @@ function noPathCharactersValidator(string, setter) {
 }
 
 function isEmptyValidator(string, setter) {
-  if (
-    validators.stringIsNotEmpty(string)
-  ) {
+  if (validators.stringIsNotEmpty(string)) {
     setter(false);
   } else {
     setter(true);
@@ -107,7 +105,7 @@ const InputValidtor = {
   onlyNumberValidtor,
   noPathCharactersValidator,
   noNumberStringValidtor,
-  isEmptyValidator
+  isEmptyValidator,
 };
 
 export default InputValidtor;

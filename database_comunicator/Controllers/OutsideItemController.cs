@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 using System;
+using database_comunicator.FilterClass;
 
 namespace database_communicator.Controllers
 {
@@ -27,12 +28,20 @@ namespace database_communicator.Controllers
         [Route("get/items")]
         public async Task<IActionResult> GetOutsideItems(string? search, string? sort, int? qtyL, int? qtyG, int? priceL, int? priceG, int? source, string? currency)
         {
+            var filters = new OutsideItemFiltersTemplate { 
+                QtyL = qtyL,
+                QtyG = qtyG,
+                PriceL = priceL,
+                PriceG = priceG,
+                Source = source,
+                Currency = currency
+            };
             if (search != null)
             {
-                var sResult = await _outsideItemServices.GetItems(search, sort: sort, qtyL, qtyG, priceL, priceG, source, currency);
+                var sResult = await _outsideItemServices.GetItems(search, sort: sort, filters);
                 return Ok(sResult);
             }
-            var result = await _outsideItemServices.GetItems(sort: sort, qtyL, qtyG, priceL, priceG, source, currency);
+            var result = await _outsideItemServices.GetItems(sort: sort, filters);
             return Ok(result);
         }
         [HttpDelete]

@@ -334,8 +334,7 @@ function OutsideItemsFilterOffcanvas({
 
   function setCurrencyFilter() {
     let currencyFilter = document.getElementById("currency").value;
-    if (currencyFilter !== "none")
-      newParams.set("currency", currencyFilter);
+    if (currencyFilter !== "none") newParams.set("currency", currencyFilter);
     if (currencyFilter === "none") newParams.delete("currency");
   }
 }

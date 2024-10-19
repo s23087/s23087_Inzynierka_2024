@@ -355,22 +355,19 @@ function PricelistFilterOffcanvas({
 
   function setTypeFilter() {
     let typeFilter = document.getElementById("typeFilter").value;
-    if (typeFilter !== "none")
-      newParams.set("type", typeFilter);
+    if (typeFilter !== "none") newParams.set("type", typeFilter);
     if (typeFilter === "none") newParams.delete("type");
   }
 
   function setCurrencyFilter() {
     let currencyFilter = document.getElementById("currencyFilter").value;
-    if (currencyFilter !== "none")
-      newParams.set("currency", currencyFilter);
+    if (currencyFilter !== "none") newParams.set("currency", currencyFilter);
     if (currencyFilter === "none") newParams.delete("currency");
   }
 
   function setStatusFilter() {
     let statusFilter = document.getElementById("filterStatus").value;
-    if (statusFilter !== "none")
-      newParams.set("status", statusFilter);
+    if (statusFilter !== "none") newParams.set("status", statusFilter);
     if (statusFilter === "none") newParams.delete("status");
   }
 }

@@ -21,17 +21,18 @@ function ModifyCreditNoteOffcanvas({
   const [restDownloadError, setRestDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      getRestModifyCredit(creditNote.creditNoteId, isYourCredit)
-        .then((data) => {
+      getRestModifyCredit(creditNote.creditNoteId, isYourCredit).then(
+        (data) => {
           if (data === null) {
-            setRestDownloadError(true)
+            setRestDownloadError(true);
           } else {
-            setRestDownloadError(false)
+            setRestDownloadError(false);
             setRestInfo(data);
             prevState.creditNoteNumber = data.creditNumber;
             prevState.note = data.note;
           }
-        })
+        },
+      );
     }
   }, [showOffcanvas]);
   // Rest info

@@ -9,14 +9,14 @@ export default async function getRoles() {
     const data = await fetch(url, {
       method: "GET",
     });
-  
+
     if (data.ok) {
       return await data.json();
     }
-  
+
     return [];
   } catch {
-    console.error("getRoles fetch failed.")
-    return null
+    console.error("getRoles fetch failed.");
+    return null;
   }
 }

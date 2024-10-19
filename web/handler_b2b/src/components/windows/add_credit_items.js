@@ -47,14 +47,7 @@ function AddCreditProductWindow({
           return;
         }
         setDownloadError(false);
-        data.forEach((element) => {
-          let qtyToSunstract = addedProducts
-            .filter((e) => e.id === element.itemId)
-            .reduce((sum, item) => sum + Math.abs(item.qty), 0);
-          if (qtyToSunstract !== 0) {
-            element.qty -= qtyToSunstract;
-          }
-        });
+        filterQtyOfAddedProducts(data);
         setProducts(data);
       });
     }
@@ -237,6 +230,17 @@ function AddCreditProductWindow({
       </Modal.Body>
     </Modal>
   );
+
+  function filterQtyOfAddedProducts(data) {
+    data.forEach((element) => {
+      let qtyToSunstract = addedProducts
+        .filter((e) => e.id === element.itemId)
+        .reduce((sum, item) => sum + Math.abs(item.qty), 0);
+      if (qtyToSunstract !== 0) {
+        element.qty -= qtyToSunstract;
+      }
+    });
+  }
 }
 
 AddCreditProductWindow.propTypes = {

@@ -63,7 +63,7 @@ function CreditNoteTable({ creditItems, currency }) {
 
 CreditNoteTable.propTypes = {
   creditItems: PropTypes.array.isRequired,
-  currency: PropTypes.string.isRequired
+  currency: PropTypes.string.isRequired,
 };
 
 export default CreditNoteTable;

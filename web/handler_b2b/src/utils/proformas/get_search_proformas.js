@@ -20,16 +20,17 @@ export default async function getSearchProformas(
   const dbName = await getDbName();
   const userId = await getUserId();
   let url = "";
-  let params = [];
-  if (sort !== ".None") params.push(`sort=${sort}`);
-  if (qtyL) params.push(`qtyL=${qtyL}`);
-  if (qtyG) params.push(`qtyG=${qtyG}`);
-  if (totalL) params.push(`totalL=${totalL}`);
-  if (totalG) params.push(`totalG=${totalG}`);
-  if (dateL) params.push(`dateL=${dateL}`);
-  if (dateG) params.push(`dateG=${dateG}`);
-  if (recipient) params.push(`recipient=${recipient}`);
-  if (currency) params.push(`currency=${currency}`);
+  let params = getParams(
+    sort,
+    qtyL,
+    qtyG,
+    totalL,
+    totalG,
+    dateL,
+    dateG,
+    recipient,
+    currency,
+  );
   if (isOrg) {
     url = `${process.env.API_DEST}/${dbName}/Proformas/get/${isYourProforma ? "yours" : "clients"}?search=${search}${params.length > 0 ? "&" : ""}${params.join("&")}`;
   } else {
@@ -46,7 +47,31 @@ export default async function getSearchProformas(
 
     return [];
   } catch {
-    console.error("getSearchProformas fetch failed.")
+    console.error("getSearchProformas fetch failed.");
     return null;
   }
+}
+
+function getParams(
+  sort,
+  qtyL,
+  qtyG,
+  totalL,
+  totalG,
+  dateL,
+  dateG,
+  recipient,
+  currency,
+) {
+  let params = [];
+  if (sort !== ".None") params.push(`sort=${sort}`);
+  if (qtyL) params.push(`qtyL=${qtyL}`);
+  if (qtyG) params.push(`qtyG=${qtyG}`);
+  if (totalL) params.push(`totalL=${totalL}`);
+  if (totalG) params.push(`totalG=${totalG}`);
+  if (dateL) params.push(`dateL=${dateL}`);
+  if (dateG) params.push(`dateG=${dateG}`);
+  if (recipient) params.push(`recipient=${recipient}`);
+  if (currency) params.push(`currency=${currency}`);
+  return params;
 }

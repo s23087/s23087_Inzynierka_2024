@@ -22,18 +22,18 @@ export default async function getCurrencyValuesList(
     const info = await fetch(url, {
       method: "GET",
     });
-  
+
     if (info.ok) {
       return await info.json();
     }
-  
+
     return {
       error: true,
       message: "Could not connect to nbp services.",
       rates: [],
     };
   } catch {
-    console.error("getCurrencyValuesList fetch failed.")
+    console.error("getCurrencyValuesList fetch failed.");
     return {
       error: true,
       message: "Connection error.",

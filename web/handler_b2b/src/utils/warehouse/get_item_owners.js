@@ -9,14 +9,14 @@ export default async function getItemOwners(itemId) {
     const data = await fetch(url, {
       method: "GET",
     });
-  
+
     if (data.ok) {
       return await data.json();
     }
-  
+
     return [];
   } catch {
-    console.error("getItemOwners fetch failed.")
-    return null
+    console.error("getItemOwners fetch failed.");
+    return null;
   }
 }

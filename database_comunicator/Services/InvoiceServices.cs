@@ -17,22 +17,14 @@ namespace database_communicator.Services
         public Task<IEnumerable<GetPaymentStatuses>> GetPaymentStatuses();
         public Task<int> AddPurchaseInvoice(AddPurchaseInvoice data);
         public Task<int> AddSalesInvoice(AddSalesInvoice data);
-        public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string? sort, string? dateL, string? dateG,
-            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
-        public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string search, string? sort, string? dateL, string? dateG,
-            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
-        public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string? sort, string? dateL, string? dateG,
-            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
-        public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string search, string? sort, string? dateL, string? dateG,
-            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
-        public Task<IEnumerable<GetInvoices>> GetSalesInvoices(string? sort, string? dateL, string? dateG,
-            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
-        public Task<IEnumerable<GetInvoices>> GetSalesInvoices(string search, string? sort, string? dateL, string? dateG,
-            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
-        public Task<IEnumerable<GetInvoices>> GetSalesInvoices(int userId, string? sort, string? dateL, string? dateG,
-            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
-        public Task<IEnumerable<GetInvoices>> GetSalesInvoices(int userId, string search, string? sort, string? dateL, string? dateG,
-            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status);
+        public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string? sort, InvoiceFiltersTemplate  filters);
+        public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string search, string? sort, InvoiceFiltersTemplate filters);
+        public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string? sort, InvoiceFiltersTemplate filters);
+        public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string search, string? sort, InvoiceFiltersTemplate filters);
+        public Task<IEnumerable<GetInvoices>> GetSalesInvoices(string? sort, InvoiceFiltersTemplate filters);
+        public Task<IEnumerable<GetInvoices>> GetSalesInvoices(string search, string? sort, InvoiceFiltersTemplate filters);
+        public Task<IEnumerable<GetInvoices>> GetSalesInvoices(int userId, string? sort, InvoiceFiltersTemplate filters);
+        public Task<IEnumerable<GetInvoices>> GetSalesInvoices(int userId, string search, string? sort, InvoiceFiltersTemplate filters);
         public Task<IEnumerable<GetInvoicesList>> GetPurchaseInvoicesList();
         public Task<IEnumerable<GetInvoicesList>> GetSalesInvoicesList();
         public Task<IEnumerable<GetInvoiceItems>> GetInvoiceItems(int invoiceId, bool isPurchaseInvoice);
@@ -281,8 +273,7 @@ namespace database_communicator.Services
             }
         }
 
-        public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string? sort, string? dateL, string? dateG,
-            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
+        public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string? sort, InvoiceFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetInvoiceSort(sort, true);
             bool direction;
@@ -294,18 +285,18 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
-            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
-            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
-            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
-            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, true);
-            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, true);
-            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, true);
-            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, true);
-            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, true);
-            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
-            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
-            var statusCond = InvoiceFilters.GetStatusFilter(status);
+            var dateLCond = InvoiceFilters.GetDateLowerFilter(filters.DateL);
+            var dateGCond = InvoiceFilters.GetDateGreaterFilter(filters.DateG);
+            var dueLCond = InvoiceFilters.GetDueLowerFilter(filters.DueL);
+            var dueGCond = InvoiceFilters.GetDueGreaterFilter(filters.DueG);
+            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(filters.QtyL, true);
+            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(filters.QtyG, true);
+            var totalLCond = InvoiceFilters.GetTotalLowerFilter(filters.TotalL, true);
+            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(filters.TotalG, true);
+            var recipientCond = InvoiceFilters.GetRecipientFilter(filters.Recipient, true);
+            var currencyCond = InvoiceFilters.GetCurrencyFilter(filters.Currency);
+            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(filters.PaymentStatus);
+            var statusCond = InvoiceFilters.GetStatusFilter(filters.Status);
 
             return await _handlerContext.Invoices
                 .Where(e => !e.SellingPrices.Any())
@@ -340,8 +331,7 @@ namespace database_communicator.Services
                     + (inv.CurrencyName == "PLN" ? inv.TransportCost : inv.TransportCost * inv.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string search, string? sort, string? dateL, string? dateG,
-            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
+        public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string search, string? sort, InvoiceFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetInvoiceSort(sort, true);
             bool direction;
@@ -353,18 +343,18 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
-            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
-            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
-            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
-            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, true);
-            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, true);
-            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, true);
-            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, true);
-            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, true);
-            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
-            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
-            var statusCond = InvoiceFilters.GetStatusFilter(status);
+            var dateLCond = InvoiceFilters.GetDateLowerFilter(filters.DateL);
+            var dateGCond = InvoiceFilters.GetDateGreaterFilter(filters.DateG);
+            var dueLCond = InvoiceFilters.GetDueLowerFilter(filters.DueL);
+            var dueGCond = InvoiceFilters.GetDueGreaterFilter(filters.DueG);
+            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(filters.QtyL, true);
+            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(filters.QtyG, true);
+            var totalLCond = InvoiceFilters.GetTotalLowerFilter(filters.TotalL, true);
+            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(filters.TotalG, true);
+            var recipientCond = InvoiceFilters.GetRecipientFilter(filters.Recipient, true);
+            var currencyCond = InvoiceFilters.GetCurrencyFilter(filters.Currency);
+            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(filters.PaymentStatus);
+            var statusCond = InvoiceFilters.GetStatusFilter(filters.Status);
 
             return await _handlerContext.Invoices
                 .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))
@@ -400,8 +390,7 @@ namespace database_communicator.Services
                     + (ent.CurrencyName == "PLN" ? ent.TransportCost : ent.TransportCost * ent.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string? sort, string? dateL, string? dateG,
-            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
+        public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string? sort, InvoiceFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetInvoiceSort(sort, true);
             bool direction;
@@ -413,18 +402,18 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
-            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
-            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
-            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
-            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, true);
-            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, true);
-            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, true);
-            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, true);
-            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, true);
-            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
-            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
-            var statusCond = InvoiceFilters.GetStatusFilter(status);
+            var dateLCond = InvoiceFilters.GetDateLowerFilter(filters.DateL);
+            var dateGCond = InvoiceFilters.GetDateGreaterFilter(filters.DateG);
+            var dueLCond = InvoiceFilters.GetDueLowerFilter(filters.DueL);
+            var dueGCond = InvoiceFilters.GetDueGreaterFilter(filters.DueG);
+            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(filters.QtyL, true);
+            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(filters.QtyG, true);
+            var totalLCond = InvoiceFilters.GetTotalLowerFilter(filters.TotalL, true);
+            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(filters.TotalG, true);
+            var recipientCond = InvoiceFilters.GetRecipientFilter(filters.Recipient, true);
+            var currencyCond = InvoiceFilters.GetCurrencyFilter(filters.Currency);
+            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(filters.PaymentStatus);
+            var statusCond = InvoiceFilters.GetStatusFilter(filters.Status);
 
             return await _handlerContext.Invoices
                 .Where(e => !e.SellingPrices.Any() && e.OwnedItems.SelectMany(d => d.ItemOwners).Any(d => d.IdUser == userId))
@@ -455,8 +444,7 @@ namespace database_communicator.Services
                     + (instc.CurrencyName == "PLN" ? instc.TransportCost : instc.TransportCost * instc.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string search, string? sort, string? dateL, string? dateG,
-            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
+        public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string search, string? sort, InvoiceFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetInvoiceSort(sort, true);
             bool direction;
@@ -468,18 +456,18 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
-            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
-            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
-            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
-            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, true);
-            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, true);
-            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, true);
-            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, true);
-            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, true);
-            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
-            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
-            var statusCond = InvoiceFilters.GetStatusFilter(status);
+            var dateLCond = InvoiceFilters.GetDateLowerFilter(filters.DateL);
+            var dateGCond = InvoiceFilters.GetDateGreaterFilter(filters.DateG);
+            var dueLCond = InvoiceFilters.GetDueLowerFilter(filters.DueL);
+            var dueGCond = InvoiceFilters.GetDueGreaterFilter(filters.DueG);
+            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(filters.QtyL, true);
+            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(filters.QtyG, true);
+            var totalLCond = InvoiceFilters.GetTotalLowerFilter(filters.TotalL, true);
+            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(filters.TotalG, true);
+            var recipientCond = InvoiceFilters.GetRecipientFilter(filters.Recipient, true);
+            var currencyCond = InvoiceFilters.GetCurrencyFilter(filters.Currency);
+            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(filters.PaymentStatus);
+            var statusCond = InvoiceFilters.GetStatusFilter(filters.Status);
 
             return await _handlerContext.Invoices
                 .Where(e => !e.SellingPrices.Any() && e.OwnedItems.SelectMany(d => d.ItemOwners).Any(d => d.IdUser == userId))
@@ -511,8 +499,7 @@ namespace database_communicator.Services
                     + (objs.CurrencyName == "PLN" ? objs.TransportCost : objs.TransportCost * objs.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(string? sort, string? dateL, string? dateG,
-            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
+        public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(string? sort, InvoiceFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
             bool direction;
@@ -524,18 +511,18 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
-            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
-            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
-            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
-            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, false);
-            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, false);
-            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, false);
-            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, false);
-            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, false);
-            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
-            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
-            var statusCond = InvoiceFilters.GetStatusFilter(status);
+            var dateLCond = InvoiceFilters.GetDateLowerFilter(filters.DateL);
+            var dateGCond = InvoiceFilters.GetDateGreaterFilter(filters.DateG);
+            var dueLCond = InvoiceFilters.GetDueLowerFilter(filters.DueL);
+            var dueGCond = InvoiceFilters.GetDueGreaterFilter(filters.DueG);
+            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(filters.QtyL, false);
+            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(filters.QtyG, false);
+            var totalLCond = InvoiceFilters.GetTotalLowerFilter(filters.TotalL, false);
+            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(filters.TotalG, false);
+            var recipientCond = InvoiceFilters.GetRecipientFilter(filters.Recipient, false);
+            var currencyCond = InvoiceFilters.GetCurrencyFilter(filters.Currency);
+            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(filters.PaymentStatus);
+            var statusCond = InvoiceFilters.GetStatusFilter(filters.Status);
 
             var result = await _handlerContext.Invoices
                 .Where(e => e.SellingPrices.Any())
@@ -567,8 +554,7 @@ namespace database_communicator.Services
                 }).ToListAsync();
             return result;
         }
-        public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(string search, string? sort, string? dateL, string? dateG,
-            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
+        public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(string search, string? sort, InvoiceFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
             bool direction;
@@ -580,18 +566,18 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
-            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
-            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
-            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
-            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, false);
-            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, false);
-            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, false);
-            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, false);
-            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, false);
-            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
-            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
-            var statusCond = InvoiceFilters.GetStatusFilter(status);
+            var dateLCond = InvoiceFilters.GetDateLowerFilter(filters.DateL);
+            var dateGCond = InvoiceFilters.GetDateGreaterFilter(filters.DateG);
+            var dueLCond = InvoiceFilters.GetDueLowerFilter(filters.DueL);
+            var dueGCond = InvoiceFilters.GetDueGreaterFilter(filters.DueG);
+            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(filters.QtyL, false);
+            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(filters.QtyG, false);
+            var totalLCond = InvoiceFilters.GetTotalLowerFilter(filters.TotalL, false);
+            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(filters.TotalG, false);
+            var recipientCond = InvoiceFilters.GetRecipientFilter(filters.Recipient, false);
+            var currencyCond = InvoiceFilters.GetCurrencyFilter(filters.Currency);
+            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(filters.PaymentStatus);
+            var statusCond = InvoiceFilters.GetStatusFilter(filters.Status);
 
             return await _handlerContext.Invoices
                 .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))
@@ -623,8 +609,7 @@ namespace database_communicator.Services
                     Price = inst.SellingPrices.Select(d => d.Price * d.Qty).Sum() + inst.TransportCost,
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(int userId, string? sort, string? dateL, string? dateG,
-            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
+        public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(int userId, string? sort, InvoiceFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
             bool direction;
@@ -636,18 +621,18 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
-            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
-            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
-            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
-            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, false);
-            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, false);
-            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, false);
-            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, false);
-            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, false);
-            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
-            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
-            var statusCond = InvoiceFilters.GetStatusFilter(status);
+            var dateLCond = InvoiceFilters.GetDateLowerFilter(filters.DateL);
+            var dateGCond = InvoiceFilters.GetDateGreaterFilter(filters.DateG);
+            var dueLCond = InvoiceFilters.GetDueLowerFilter(filters.DueL);
+            var dueGCond = InvoiceFilters.GetDueGreaterFilter(filters.DueG);
+            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(filters.QtyL, false);
+            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(filters.QtyG, false);
+            var totalLCond = InvoiceFilters.GetTotalLowerFilter(filters.TotalL, false);
+            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(filters.TotalG, false);
+            var recipientCond = InvoiceFilters.GetRecipientFilter(filters.Recipient, false);
+            var currencyCond = InvoiceFilters.GetCurrencyFilter(filters.Currency);
+            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(filters.PaymentStatus);
+            var statusCond = InvoiceFilters.GetStatusFilter(filters.Status);
 
             return await _handlerContext.Invoices
                 .Where(e => e.SellingPrices.Any())
@@ -678,8 +663,7 @@ namespace database_communicator.Services
                     Price = entity.SellingPrices.Select(d => d.Price * d.Qty).Sum() + entity.TransportCost,
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(int userId, string search, string? sort, string? dateL, string? dateG,
-            string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
+        public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(int userId, string search, string? sort, InvoiceFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
             bool direction;
@@ -691,18 +675,18 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var dateLCond = InvoiceFilters.GetDateLowerFilter(dateL);
-            var dateGCond = InvoiceFilters.GetDateGreaterFilter(dateG);
-            var dueLCond = InvoiceFilters.GetDueLowerFilter(dueL);
-            var dueGCond = InvoiceFilters.GetDueGreaterFilter(dueG);
-            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(qtyL, false);
-            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(qtyG, false);
-            var totalLCond = InvoiceFilters.GetTotalLowerFilter(totalL, false);
-            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(totalG, false);
-            var recipientCond = InvoiceFilters.GetRecipientFilter(recipient, false);
-            var currencyCond = InvoiceFilters.GetCurrencyFilter(currency);
-            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(paymentStatus);
-            var statusCond = InvoiceFilters.GetStatusFilter(status);
+            var dateLCond = InvoiceFilters.GetDateLowerFilter(filters.DateL);
+            var dateGCond = InvoiceFilters.GetDateGreaterFilter(filters.DateG);
+            var dueLCond = InvoiceFilters.GetDueLowerFilter(filters.DueL);
+            var dueGCond = InvoiceFilters.GetDueGreaterFilter(filters.DueG);
+            var qtyLCond = InvoiceFilters.GetQtyLowerFilter(filters.QtyL, false);
+            var qtyGCond = InvoiceFilters.GetQtyGreaterFilter(filters.QtyG, false);
+            var totalLCond = InvoiceFilters.GetTotalLowerFilter(filters.TotalL, false);
+            var totalGCond = InvoiceFilters.GetTotalGreaterFilter(filters.TotalG, false);
+            var recipientCond = InvoiceFilters.GetRecipientFilter(filters.Recipient, false);
+            var currencyCond = InvoiceFilters.GetCurrencyFilter(filters.Currency);
+            var paymentStatusCond = InvoiceFilters.GetPaymentStatusFilter(filters.PaymentStatus);
+            var statusCond = InvoiceFilters.GetStatusFilter(filters.Status);
 
             return await _handlerContext.Invoices
                 .Where(e => e.InvoiceNumber.ToLower().Contains(search.ToLower()))

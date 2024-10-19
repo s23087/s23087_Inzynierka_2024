@@ -22,7 +22,7 @@ export default async function modifyUserRole(choosenUser, state, formData) {
         "Content-Type": "application/json",
       },
     });
-  
+
     if (info.status == 404) {
       let text = await info.text();
       if (text === "User not found") {
@@ -35,7 +35,7 @@ export default async function modifyUserRole(choosenUser, state, formData) {
         completed: true,
       };
     }
-  
+
     if (info.ok) {
       return {
         error: false,
@@ -50,7 +50,7 @@ export default async function modifyUserRole(choosenUser, state, formData) {
       };
     }
   } catch {
-    console.error("modifyUserRole fetch failed.")
+    console.error("modifyUserRole fetch failed.");
     return {
       error: true,
       message: "Connection error.",

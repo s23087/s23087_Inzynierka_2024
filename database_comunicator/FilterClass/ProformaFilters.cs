@@ -4,6 +4,17 @@ using System.Linq.Expressions;
 
 namespace database_comunicator.FilterClass
 {
+    public class ProformaFiltersTemplate
+    {
+        public int? QtyL { get; set; } 
+        public int? QtyG { get; set; }
+        public int? TotalL { get; set; }
+        public int? TotalG { get; set; }
+        public string? DateL { get; set; }
+        public string? DateG { get; set; }
+        public int? Recipient { get; set; }
+        public string? Currency { get; set; }
+    }
     public static class ProformaFilters
     {
         public static Expression<Func<Proforma, bool>> GetQtyLowerFilter(int? qtyL, bool isYourProforma)

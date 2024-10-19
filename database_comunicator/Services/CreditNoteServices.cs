@@ -11,14 +11,10 @@ namespace database_communicator.Services
     public interface ICreditNoteServices
     {
         public Task<int> AddCreditNote(AddCreditNote data);
-        public Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string? sort, string? dateL, string? dateG,
-            int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, bool? paymentStatus, bool? status);
-        public Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string search, string? sort, string? dateL, string? dateG,
-            int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, bool? paymentStatus, bool? status);
-        public Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, int userId, string? sort, string? dateL, string? dateG,
-            int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, bool? paymentStatus, bool? status);
-        public Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string search, int userId, string? sort, string? dateL, string? dateG,
-            int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, bool? paymentStatus, bool? status);
+        public Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string? sort, CreditNoteFiltersTemplate filters);
+        public Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string search, string? sort, CreditNoteFiltersTemplate filters);
+        public Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, int userId, string? sort, CreditNoteFiltersTemplate filters);
+        public Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string search, int userId, string? sort, CreditNoteFiltersTemplate filters);
         public Task<bool> CreditDeductionCanBeApplied(int userId, int invoiceId, int itemId, int qty);
         public Task<bool> CreditNoteExist(string creditNoteNumber, int invoiceId);
         public Task<bool> CreditNoteExist(int creditNoteId);
@@ -166,8 +162,7 @@ namespace database_communicator.Services
                 return 0;
             }
         }
-        public async Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string? sort, string? dateL, string? dateG,
-            int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, bool? paymentStatus, bool? status)
+        public async Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string? sort, CreditNoteFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetCreditNoteSort(sort);
             bool direction;
@@ -179,16 +174,16 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var dateLCond = CreditNoteFilters.GetDateLowerFilter(dateL);
-            var dateGCond = CreditNoteFilters.GetDateGreaterFilter(dateL);
-            var qtyLCond = CreditNoteFilters.GetQtyLowerFilter(qtyL);
-            var qtyGCond = CreditNoteFilters.GetQtyGreaterFilter(qtyG);
-            var totalLCond = CreditNoteFilters.GetPriceLowerFilter(totalL);
-            var totalGCond = CreditNoteFilters.GetPriceGreaterFilter(totalG);
-            var recipientCond = CreditNoteFilters.GetRecipientFilter(recipient, yourCreditNotes);
-            var currencyCond = CreditNoteFilters.GetCurrencyFilter(currency);
-            var paymentStatusCond = CreditNoteFilters.GetPaymentStatusFilter(paymentStatus);
-            var statusCond = CreditNoteFilters.GetStatusFilter(status);
+            var dateLCond = CreditNoteFilters.GetDateLowerFilter(filters.DateL);
+            var dateGCond = CreditNoteFilters.GetDateGreaterFilter(filters.DateL);
+            var qtyLCond = CreditNoteFilters.GetQtyLowerFilter(filters.QtyL);
+            var qtyGCond = CreditNoteFilters.GetQtyGreaterFilter(filters.QtyG);
+            var totalLCond = CreditNoteFilters.GetPriceLowerFilter(filters.TotalL);
+            var totalGCond = CreditNoteFilters.GetPriceGreaterFilter(filters.TotalG);
+            var recipientCond = CreditNoteFilters.GetRecipientFilter(filters.Recipient, yourCreditNotes);
+            var currencyCond = CreditNoteFilters.GetCurrencyFilter(filters.Currency);
+            var paymentStatusCond = CreditNoteFilters.GetPaymentStatusFilter(filters.PaymentStatus);
+            var statusCond = CreditNoteFilters.GetStatusFilter(filters.Status);
 
             return await _handlerContext.CreditNotes
                 .Where(e => yourCreditNotes ? e.Invoice.OwnedItems.Any() : e.Invoice.SellingPrices.Any())
@@ -216,8 +211,7 @@ namespace database_communicator.Services
                     IsPaid = e.IsPaid
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string search, string? sort, string? dateL, string? dateG,
-            int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, bool? paymentStatus, bool? status)
+        public async Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string search, string? sort, CreditNoteFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetCreditNoteSort(sort);
             bool direction;
@@ -229,16 +223,16 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var dateLCond = CreditNoteFilters.GetDateLowerFilter(dateL);
-            var dateGCond = CreditNoteFilters.GetDateGreaterFilter(dateL);
-            var qtyLCond = CreditNoteFilters.GetQtyLowerFilter(qtyL);
-            var qtyGCond = CreditNoteFilters.GetQtyGreaterFilter(qtyG);
-            var totalLCond = CreditNoteFilters.GetPriceLowerFilter(totalL);
-            var totalGCond = CreditNoteFilters.GetPriceGreaterFilter(totalG);
-            var recipientCond = CreditNoteFilters.GetRecipientFilter(recipient, yourCreditNotes);
-            var currencyCond = CreditNoteFilters.GetCurrencyFilter(currency);
-            var paymentStatusCond = CreditNoteFilters.GetPaymentStatusFilter(paymentStatus);
-            var statusCond = CreditNoteFilters.GetStatusFilter(status);
+            var dateLCond = CreditNoteFilters.GetDateLowerFilter(filters.DateL);
+            var dateGCond = CreditNoteFilters.GetDateGreaterFilter(filters.DateL);
+            var qtyLCond = CreditNoteFilters.GetQtyLowerFilter(filters.QtyL);
+            var qtyGCond = CreditNoteFilters.GetQtyGreaterFilter(filters.QtyG);
+            var totalLCond = CreditNoteFilters.GetPriceLowerFilter(filters.TotalL);
+            var totalGCond = CreditNoteFilters.GetPriceGreaterFilter(filters.TotalG);
+            var recipientCond = CreditNoteFilters.GetRecipientFilter(filters.Recipient, yourCreditNotes);
+            var currencyCond = CreditNoteFilters.GetCurrencyFilter(filters.Currency);
+            var paymentStatusCond = CreditNoteFilters.GetPaymentStatusFilter(filters.PaymentStatus);
+            var statusCond = CreditNoteFilters.GetStatusFilter(filters.Status);
 
             return await _handlerContext.CreditNotes
                 .Where(e => yourCreditNotes ? e.Invoice.OwnedItems.Any() : e.Invoice.SellingPrices.Any())
@@ -274,8 +268,7 @@ namespace database_communicator.Services
                     IsPaid = obj.IsPaid
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, int userId, string? sort, string? dateL, string? dateG,
-            int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, bool? paymentStatus, bool? status)
+        public async Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, int userId, string? sort, CreditNoteFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetCreditNoteSort(sort);
             bool direction;
@@ -287,16 +280,16 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var dateLCond = CreditNoteFilters.GetDateLowerFilter(dateL);
-            var dateGCond = CreditNoteFilters.GetDateGreaterFilter(dateL);
-            var qtyLCond = CreditNoteFilters.GetQtyLowerFilter(qtyL);
-            var qtyGCond = CreditNoteFilters.GetQtyGreaterFilter(qtyG);
-            var totalLCond = CreditNoteFilters.GetPriceLowerFilter(totalL);
-            var totalGCond = CreditNoteFilters.GetPriceGreaterFilter(totalG);
-            var recipientCond = CreditNoteFilters.GetRecipientFilter(recipient, yourCreditNotes);
-            var currencyCond = CreditNoteFilters.GetCurrencyFilter(currency);
-            var paymentStatusCond = CreditNoteFilters.GetPaymentStatusFilter(paymentStatus);
-            var statusCond = CreditNoteFilters.GetStatusFilter(status);
+            var dateLCond = CreditNoteFilters.GetDateLowerFilter(filters.DateL);
+            var dateGCond = CreditNoteFilters.GetDateGreaterFilter(filters.DateL);
+            var qtyLCond = CreditNoteFilters.GetQtyLowerFilter(filters.QtyL);
+            var qtyGCond = CreditNoteFilters.GetQtyGreaterFilter(filters.QtyG);
+            var totalLCond = CreditNoteFilters.GetPriceLowerFilter(filters.TotalL);
+            var totalGCond = CreditNoteFilters.GetPriceGreaterFilter(filters.TotalG);
+            var recipientCond = CreditNoteFilters.GetRecipientFilter(filters.Recipient, yourCreditNotes);
+            var currencyCond = CreditNoteFilters.GetCurrencyFilter(filters.Currency);
+            var paymentStatusCond = CreditNoteFilters.GetPaymentStatusFilter(filters.PaymentStatus);
+            var statusCond = CreditNoteFilters.GetStatusFilter(filters.Status);
 
             return await _handlerContext.CreditNotes
                 .Where(e => e.IdUser == userId)
@@ -324,8 +317,7 @@ namespace database_communicator.Services
                     IsPaid = inst.IsPaid
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string search, int userId, string? sort, string? dateL, string? dateG,
-            int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, bool? paymentStatus, bool? status)
+        public async Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string search, int userId, string? sort, CreditNoteFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetCreditNoteSort(sort);
             bool direction;
@@ -337,16 +329,16 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var dateLCond = CreditNoteFilters.GetDateLowerFilter(dateL);
-            var dateGCond = CreditNoteFilters.GetDateGreaterFilter(dateL);
-            var qtyLCond = CreditNoteFilters.GetQtyLowerFilter(qtyL);
-            var qtyGCond = CreditNoteFilters.GetQtyGreaterFilter(qtyG);
-            var totalLCond = CreditNoteFilters.GetPriceLowerFilter(totalL);
-            var totalGCond = CreditNoteFilters.GetPriceGreaterFilter(totalG);
-            var recipientCond = CreditNoteFilters.GetRecipientFilter(recipient, yourCreditNotes);
-            var currencyCond = CreditNoteFilters.GetCurrencyFilter(currency);
-            var paymentStatusCond = CreditNoteFilters.GetPaymentStatusFilter(paymentStatus);
-            var statusCond = CreditNoteFilters.GetStatusFilter(status);
+            var dateLCond = CreditNoteFilters.GetDateLowerFilter(filters.DateL);
+            var dateGCond = CreditNoteFilters.GetDateGreaterFilter(filters.DateL);
+            var qtyLCond = CreditNoteFilters.GetQtyLowerFilter(filters.QtyL);
+            var qtyGCond = CreditNoteFilters.GetQtyGreaterFilter(filters.QtyG);
+            var totalLCond = CreditNoteFilters.GetPriceLowerFilter(filters.TotalL);
+            var totalGCond = CreditNoteFilters.GetPriceGreaterFilter(filters.TotalG);
+            var recipientCond = CreditNoteFilters.GetRecipientFilter(filters.Recipient, yourCreditNotes);
+            var currencyCond = CreditNoteFilters.GetCurrencyFilter(filters.Currency);
+            var paymentStatusCond = CreditNoteFilters.GetPaymentStatusFilter(filters.PaymentStatus);
+            var statusCond = CreditNoteFilters.GetStatusFilter(filters.Status);
 
             return await _handlerContext.CreditNotes
                 .Where(e => e.IdUser == userId)

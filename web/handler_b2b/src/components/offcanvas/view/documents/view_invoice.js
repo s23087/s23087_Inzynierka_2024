@@ -31,8 +31,7 @@ function ViewInvoiceOffcanvas({
   const [invoicePath, setInvoicePath] = useState("");
   useEffect(() => {
     if (showOffcanvas) {
-      getRestInvoice(invoice.invoiceId, isYourInvoice)
-      .then((data) => {
+      getRestInvoice(invoice.invoiceId, isYourInvoice).then((data) => {
         if (data !== null) {
           if (data.length === 0) {
             setRestInfo({
@@ -106,7 +105,7 @@ function ViewInvoiceOffcanvas({
                     let parsed = JSON.parse(file);
                     let buffer = Buffer.from(parsed.data);
                     let blob = new Blob([buffer], { type: "application/pdf" });
-                    var url = URL.createObjectURL(blob);
+                    let url = URL.createObjectURL(blob);
                     let downloadObject = document.createElement("a");
                     downloadObject.href = url;
                     downloadObject.download = invoicePath.substring(

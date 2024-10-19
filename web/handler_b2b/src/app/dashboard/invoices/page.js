@@ -16,26 +16,7 @@ import getCreditNotes from "@/utils/documents/get_credit_note";
 import getRequests from "@/utils/documents/get_requests";
 import getSearchRequests from "@/utils/documents/get_search_request";
 
-async function getDocuments(
-  docType,
-  org_view,
-  search,
-  currentSort,
-  dateL,
-  dateG,
-  dueL,
-  dueG,
-  qtyL,
-  qtyG,
-  totalL,
-  totalG,
-  recipient,
-  currency,
-  paymentStatus,
-  status,
-  type,
-  requestStatus,
-) {
+async function getDocuments(docType, org_view, search, currentSort, params) {
   switch (docType) {
     case "Sales invoices":
       if (search) {
@@ -43,36 +24,10 @@ async function getDocuments(
           org_view,
           search,
           currentSort,
-          dateL,
-          dateG,
-          dueL,
-          dueG,
-          qtyL,
-          qtyG,
-          totalL,
-          totalG,
-          recipient,
-          currency,
-          paymentStatus,
-          status,
+          params,
         );
       }
-      return await getSalesInvoices(
-        org_view,
-        currentSort,
-        dateL,
-        dateG,
-        dueL,
-        dueG,
-        qtyL,
-        qtyG,
-        totalL,
-        totalG,
-        recipient,
-        currency,
-        paymentStatus,
-        status,
-      );
+      return await getSalesInvoices(org_view, currentSort, params);
     case "Yours credit notes":
       if (search) {
         return await getSearchCreditNotes(
@@ -80,33 +35,10 @@ async function getDocuments(
           true,
           search,
           currentSort,
-          dateL,
-          dateG,
-          qtyL,
-          qtyG,
-          totalL,
-          totalG,
-          recipient,
-          currency,
-          paymentStatus,
-          status,
+          params,
         );
       }
-      return await getCreditNotes(
-        org_view,
-        true,
-        currentSort,
-        dateL,
-        dateG,
-        qtyL,
-        qtyG,
-        totalL,
-        totalG,
-        recipient,
-        currency,
-        paymentStatus,
-        status,
-      );
+      return await getCreditNotes(org_view, true, currentSort, params);
     case "Client credit notes":
       if (search) {
         return await getSearchCreditNotes(
@@ -114,90 +46,36 @@ async function getDocuments(
           false,
           search,
           currentSort,
-          dateL,
-          dateG,
-          qtyL,
-          qtyG,
-          totalL,
-          totalG,
-          recipient,
-          currency,
-          paymentStatus,
-          status,
+          params,
         );
       }
-      return await getCreditNotes(
-        org_view,
-        false,
-        currentSort,
-        dateL,
-        dateG,
-        qtyL,
-        qtyG,
-        totalL,
-        totalG,
-        recipient,
-        currency,
-        paymentStatus,
-        status,
-      );
+      return await getCreditNotes(org_view, false, currentSort, params);
     case "Requests":
       if (search) {
         return await getSearchRequests(
           org_view,
           search,
           currentSort,
-          dateL,
-          dateG,
-          type,
-          requestStatus,
+          params.dateL,
+          params.dateG,
+          params.type,
+          params.requestStatus,
         );
       }
       return await getRequests(
         org_view,
         currentSort,
-        dateL,
-        dateG,
-        type,
-        requestStatus,
+        params.dateL,
+        params.dateG,
+        params.type,
+        params.requestStatus,
       );
   }
   if (search) {
-    return await getSearchYoursInvoices(
-      org_view,
-      search,
-      currentSort,
-      dateL,
-      dateG,
-      dueL,
-      dueG,
-      qtyL,
-      qtyG,
-      totalL,
-      totalG,
-      recipient,
-      currency,
-      paymentStatus,
-      status,
-    );
+    return await getSearchYoursInvoices(org_view, search, currentSort, params);
   }
 
-  return await getYoursInvoices(
-    org_view,
-    currentSort,
-    dateL,
-    dateG,
-    dueL,
-    dueG,
-    qtyL,
-    qtyG,
-    totalL,
-    totalG,
-    recipient,
-    currency,
-    paymentStatus,
-    status,
-  );
+  return await getYoursInvoices(org_view, currentSort, params);
 }
 
 export default async function InvoicesPage({ searchParams }) {
@@ -207,36 +85,23 @@ export default async function InvoicesPage({ searchParams }) {
   const is_org_switch_needed = current_role == "Admin";
   // Filters
   let currentSort = searchParams.orderBy ?? ".None";
-  let dateL = searchParams.dateL;
-  let dateG = searchParams.dateG;
-  let dueL = searchParams.dueL;
-  let dueG = searchParams.dueG;
-  let qtyL = searchParams.qtyL;
-  let qtyG = searchParams.qtyG;
-  let totalL = searchParams.totalL;
-  let totalG = searchParams.totalG;
-  let recipient = searchParams.recipient;
-  let currency = searchParams.currency;
-  let paymentStatus = searchParams.paymentStatus;
-  let status = searchParams.status;
-  let type = searchParams.type;
-  let requestStatus = searchParams.requestStatus;
-  let filterActivated =
-    searchParams.orderBy ||
-    dateL ||
-    dateG ||
-    dueL ||
-    dueG ||
-    qtyL ||
-    qtyG ||
-    totalL ||
-    totalG ||
-    recipient ||
-    currency ||
-    paymentStatus ||
-    status ||
-    requestStatus ||
-    type;
+  let params = {
+    dateL: searchParams.dateL,
+    dateG: searchParams.dateG,
+    dueL: searchParams.dueL,
+    dueG: searchParams.dueG,
+    qtyL: searchParams.qtyL,
+    qtyG: searchParams.qtyG,
+    totalL: searchParams.totalL,
+    totalG: searchParams.totalG,
+    recipient: searchParams.recipient,
+    currency: searchParams.currency,
+    paymentStatus: searchParams.paymentStatus,
+    status: searchParams.status,
+    type: searchParams.type,
+    requestStatus: searchParams.requestStatus,
+  };
+  let filterActivated = getFilterActivated();
   // Rest
   let orgActivated =
     searchParams.isOrg !== undefined ? searchParams.isOrg : false;
@@ -249,41 +114,9 @@ export default async function InvoicesPage({ searchParams }) {
         org_view,
         searchParams.searchQuery,
         currentSort,
-        dateL,
-        dateG,
-        dueL,
-        dueG,
-        qtyL,
-        qtyG,
-        totalL,
-        totalG,
-        recipient,
-        currency,
-        paymentStatus,
-        status,
-        type,
-        requestStatus,
+        params,
       )
-    : await getDocuments(
-        docType,
-        org_view,
-        null,
-        currentSort,
-        dateL,
-        dateG,
-        dueL,
-        dueG,
-        qtyL,
-        qtyG,
-        totalL,
-        totalG,
-        recipient,
-        currency,
-        paymentStatus,
-        status,
-        type,
-        requestStatus,
-      );
+    : await getDocuments(docType, org_view, null, currentSort, params);
   let invoiceLength = invoices ? invoices.length : 0;
   let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
   let pageQty = Math.ceil(invoiceLength / maxInstanceOnPage);
@@ -326,4 +159,24 @@ export default async function InvoicesPage({ searchParams }) {
       />
     </main>
   );
+
+  function getFilterActivated() {
+    return (
+      searchParams.orderBy ||
+      params.dateL ||
+      params.dateG ||
+      params.dueL ||
+      params.dueG ||
+      params.qtyL ||
+      params.qtyG ||
+      params.totalL ||
+      params.totalG ||
+      params.recipient ||
+      params.currency ||
+      params.paymentStatus ||
+      params.status ||
+      params.requestStatus ||
+      params.type
+    );
+  }
 }

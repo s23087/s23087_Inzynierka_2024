@@ -20,7 +20,7 @@ export default async function deleteProforma(isYourProforma, proformaId) {
     const info = await fetch(url, {
       method: "Delete",
     });
-  
+
     if (info.ok) {
       if (path === "") {
         return {
@@ -48,7 +48,7 @@ export default async function deleteProforma(isYourProforma, proformaId) {
       message: await info.text(),
     };
   } catch {
-    console.error("deleteProforma fetch failed.")
+    console.error("deleteProforma fetch failed.");
     return {
       error: true,
       message: "Connection error.",

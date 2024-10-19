@@ -16,7 +16,7 @@ export default async function getDescription(itemId) {
 
     return "";
   } catch {
-    console.error("getDescription fetch failed.")
+    console.error("getDescription fetch failed.");
     return null;
   }
 }

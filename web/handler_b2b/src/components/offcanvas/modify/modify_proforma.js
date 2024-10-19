@@ -27,15 +27,14 @@ function ModifyProformaOffcanvas({
   const [restDownloadError, setRestDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      getUsers()
-        .then((data) => {
-          if (data === null) {
-            setUserDownloadError(true)
-          } else {
-            setUserDownloadError(false)
-            setUsers(data);
-          }
-        })
+      getUsers().then((data) => {
+        if (data === null) {
+          setUserDownloadError(true);
+        } else {
+          setUserDownloadError(false);
+          setUsers(data);
+        }
+      });
 
       getOrgsList().then((data) => {
         if (data !== null) {
@@ -55,21 +54,19 @@ function ModifyProformaOffcanvas({
         }
       });
 
-      getRestModifyProforma(proforma.proformaId)
-        .then((data) => {
-          if (data === null) {
-            setRestDownloadError(true)
-          } else {
-            setRestDownloadError(false)
-            setRestInfo(data);
-            prevState.proformaNumber = proforma.proformaNumber;
-            prevState.transport = proforma.transport;
-            prevState.note = data.note;
-            prevState.status = data.inSystem;
-            prevState.userId = data.userId;
-          }
-          
-        })
+      getRestModifyProforma(proforma.proformaId).then((data) => {
+        if (data === null) {
+          setRestDownloadError(true);
+        } else {
+          setRestDownloadError(false);
+          setRestInfo(data);
+          prevState.proformaNumber = proforma.proformaNumber;
+          prevState.transport = proforma.transport;
+          prevState.note = data.note;
+          prevState.status = data.inSystem;
+          prevState.userId = data.userId;
+        }
+      });
     }
   }, [showOffcanvas]);
   // rest info
@@ -92,7 +89,7 @@ function ModifyProformaOffcanvas({
   const [proformaNumberError, setInvoiceNumberError] = useState(false);
   const [transportError, setTransportError] = useState(false);
   const [documentError, setDocumentError] = useState(false);
-  const isFormErrorActive = () => 
+  const isFormErrorActive = () =>
     proformaNumberError ||
     transportError ||
     documentError ||

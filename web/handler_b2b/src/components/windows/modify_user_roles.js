@@ -24,7 +24,12 @@ function ModifyUserRole({ modalShow, onHideFunction, roleList, user }) {
     display: "block",
   };
   return (
-    <Modal size="md" show={modalShow} centered className="px-4 minScalableWidth">
+    <Modal
+      size="md"
+      show={modalShow}
+      centered
+      className="px-4 minScalableWidth"
+    >
       <Modal.Body>
         <Container>
           <Row>
@@ -45,7 +50,7 @@ function ModifyUserRole({ modalShow, onHideFunction, roleList, user }) {
                 {state.message}
               </p>
             </Row>
-            <ErrorMessage 
+            <ErrorMessage
               message={state.message}
               messageStatus={state.error && state.completed}
             />

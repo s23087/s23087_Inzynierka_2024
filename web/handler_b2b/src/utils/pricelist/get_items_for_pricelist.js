@@ -18,7 +18,7 @@ export default async function getItemsForPricelist(currency) {
 
     return [];
   } catch {
-    console.error("getItemsForPricelist fetch failed.")
+    console.error("getItemsForPricelist fetch failed.");
     return null;
   }
 }

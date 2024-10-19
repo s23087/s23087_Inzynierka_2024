@@ -15,22 +15,15 @@ export default async function CreateCreditNote(
   state,
   formData,
 ) {
-  let errorMessage = "Error:";
-  if (!invoiceId) {
-    errorMessage += "\nInvoice must not be empty.";
-  }
-
   let creditNumber = formData.get("creditNumber");
-  if (
-    !validators.lengthSmallerThen(creditNumber, 40) ||
-    !validators.stringIsNotEmpty(creditNumber)
-  )
-    errorMessage += "\nCredit note number must not be empty.";
   let date = formData.get("date");
-  if (new Date(date) > Date.now())
-    errorMessage += "\nTransport cost must not be empty and must be decimal.";
-  if (products.length <= 0) errorMessage += "\nCredit note must have products.";
-  if (!file) errorMessage += "\nDocument must not be empty.";
+  let errorMessage = validateData(
+    invoiceId,
+    creditNumber,
+    date,
+    products,
+    file,
+  );
 
   if (errorMessage.length > 6)
     return {
@@ -168,4 +161,25 @@ export default async function CreateCreditNote(
       message: "Connection error.",
     };
   }
+}
+
+function validateData(invoiceId, creditNumber, date, products, file) {
+  let errorMessage = "Error:";
+  if (!invoiceId) {
+    errorMessage += "\nInvoice must not be empty.";
+  }
+  if (isCreditNumberIncorrect(creditNumber))
+    errorMessage += "\nCredit note number must not be empty.";
+  if (new Date(date) > Date.now())
+    errorMessage += "\nTransport cost must not be empty and must be decimal.";
+  if (products.length <= 0) errorMessage += "\nCredit note must have products.";
+  if (!file) errorMessage += "\nDocument must not be empty.";
+  return errorMessage;
+}
+
+function isCreditNumberIncorrect(creditNumber) {
+  return (
+    !validators.lengthSmallerThen(creditNumber, 40) ||
+    !validators.stringIsNotEmpty(creditNumber)
+  );
 }

@@ -14,14 +14,10 @@ namespace database_communicator.Services
         public Task<int> AddProforma(AddProforma data);
         public Task<bool> ProformaExist(string number, int sellerId, int buyerId);
         public Task<bool> ProformaExist(int proformaId);
-        public Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, string? sort,
-            int? qtyL, int? qtyG, int? totalL, int? totalG, string? dateL, string? dateG, int? recipient, string? currency);
-        public Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, string search, string? sort,
-            int? qtyL, int? qtyG, int? totalL, int? totalG, string? dateL, string? dateG, int? recipient, string? currency);
-        public Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, int userId, string? sort,
-            int? qtyL, int? qtyG, int? totalL, int? totalG, string? dateL, string? dateG, int? recipient, string? currency);
-        public Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, int userId, string search, string? sort,
-            int? qtyL, int? qtyG, int? totalL, int? totalG, string? dateL, string? dateG, int? recipient, string? currency);
+        public Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, string? sort, ProformaFiltersTemplate filters);
+        public Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, string search, string? sort, ProformaFiltersTemplate filters);
+        public Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, int userId, string? sort, ProformaFiltersTemplate filters);
+        public Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, int userId, string search, string? sort, ProformaFiltersTemplate filters);
         public Task<GetRestProforma> GetRestProforma(bool isYourProforma, int proformaId);
         public Task<bool> DeleteProforma(bool isYourProforma, int proformaId);
         public Task<bool> DoesDeliveryExist(int proformaId);
@@ -136,8 +132,7 @@ namespace database_communicator.Services
                 .Where(e => e.ProformaId == proformaId)
                 .AnyAsync();
         }
-        public async Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, string? sort,
-            int? qtyL, int? qtyG, int? totalL, int? totalG, string? dateL, string? dateG, int? recipient, string? currency)
+        public async Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, string? sort, ProformaFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetProformaSort(sort, isYourProforma);
             bool direction;
@@ -149,14 +144,14 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var qtyLCond = ProformaFilters.GetQtyLowerFilter(qtyL, isYourProforma);
-            var qtyGCond = ProformaFilters.GetQtyGreaterFilter(qtyG, isYourProforma);
-            var totalLCond = ProformaFilters.GetTotalLowerFilter(totalL, isYourProforma);
-            var totalGCond = ProformaFilters.GetTotalGreaterFilter(totalG, isYourProforma);
-            var dateLCond = ProformaFilters.GetDateLowerFilter(dateL);
-            var dateGCond = ProformaFilters.GetDateGreaterFilter(dateG);
-            var recipientCond = ProformaFilters.GetRecipientFilter(recipient, isYourProforma);
-            var currencyCond = ProformaFilters.GetCurrencyFilter(currency);
+            var qtyLCond = ProformaFilters.GetQtyLowerFilter(filters.QtyL, isYourProforma);
+            var qtyGCond = ProformaFilters.GetQtyGreaterFilter(filters.QtyG, isYourProforma);
+            var totalLCond = ProformaFilters.GetTotalLowerFilter(filters.TotalL, isYourProforma);
+            var totalGCond = ProformaFilters.GetTotalGreaterFilter(filters.TotalG, isYourProforma);
+            var dateLCond = ProformaFilters.GetDateLowerFilter(filters.DateL);
+            var dateGCond = ProformaFilters.GetDateGreaterFilter(filters.DateG);
+            var recipientCond = ProformaFilters.GetRecipientFilter(filters.Recipient, isYourProforma);
+            var currencyCond = ProformaFilters.GetCurrencyFilter(filters.Currency);
 
             return await _handlerContext.Proformas
                 .Where(e => isYourProforma ? e.ProformaFutureItems.Any() : e.ProformaOwnedItems.Any())
@@ -182,8 +177,7 @@ namespace database_communicator.Services
                     ClientName = isYourProforma ? e.SellerNavigation.OrgName : e.BuyerNavigation.OrgName
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, string search, string? sort,
-            int? qtyL, int? qtyG, int? totalL, int? totalG, string? dateL, string? dateG, int? recipient, string? currency)
+        public async Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, string search, string? sort, ProformaFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetProformaSort(sort, isYourProforma);
             bool direction;
@@ -195,14 +189,14 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var qtyLCond = ProformaFilters.GetQtyLowerFilter(qtyL, isYourProforma);
-            var qtyGCond = ProformaFilters.GetQtyGreaterFilter(qtyG, isYourProforma);
-            var totalLCond = ProformaFilters.GetTotalLowerFilter(totalL, isYourProforma);
-            var totalGCond = ProformaFilters.GetTotalGreaterFilter(totalG, isYourProforma);
-            var dateLCond = ProformaFilters.GetDateLowerFilter(dateL);
-            var dateGCond = ProformaFilters.GetDateGreaterFilter(dateG);
-            var recipientCond = ProformaFilters.GetRecipientFilter(recipient, isYourProforma);
-            var currencyCond = ProformaFilters.GetCurrencyFilter(currency);
+            var qtyLCond = ProformaFilters.GetQtyLowerFilter(filters.QtyL, isYourProforma);
+            var qtyGCond = ProformaFilters.GetQtyGreaterFilter(filters.QtyG, isYourProforma);
+            var totalLCond = ProformaFilters.GetTotalLowerFilter(filters.TotalL, isYourProforma);
+            var totalGCond = ProformaFilters.GetTotalGreaterFilter(filters.TotalG, isYourProforma);
+            var dateLCond = ProformaFilters.GetDateLowerFilter(filters.DateL);
+            var dateGCond = ProformaFilters.GetDateGreaterFilter(filters.DateG);
+            var recipientCond = ProformaFilters.GetRecipientFilter(filters.Recipient, isYourProforma);
+            var currencyCond = ProformaFilters.GetCurrencyFilter(filters.Currency);
 
             return await _handlerContext.Proformas
                 .Where(e => isYourProforma ? e.ProformaFutureItems.Any() : e.ProformaOwnedItems.Any())
@@ -229,8 +223,7 @@ namespace database_communicator.Services
                     ClientName = isYourProforma ? obj.SellerNavigation.OrgName : obj.BuyerNavigation.OrgName
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, int userId, string? sort,
-            int? qtyL, int? qtyG, int? totalL, int? totalG, string? dateL, string? dateG, int? recipient, string? currency)
+        public async Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, int userId, string? sort, ProformaFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetProformaSort(sort, isYourProforma);
             bool direction;
@@ -242,14 +235,14 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var qtyLCond = ProformaFilters.GetQtyLowerFilter(qtyL, isYourProforma);
-            var qtyGCond = ProformaFilters.GetQtyGreaterFilter(qtyG, isYourProforma);
-            var totalLCond = ProformaFilters.GetTotalLowerFilter(totalL, isYourProforma);
-            var totalGCond = ProformaFilters.GetTotalGreaterFilter(totalG, isYourProforma);
-            var dateLCond = ProformaFilters.GetDateLowerFilter(dateL);
-            var dateGCond = ProformaFilters.GetDateGreaterFilter(dateG);
-            var recipientCond = ProformaFilters.GetRecipientFilter(recipient, isYourProforma);
-            var currencyCond = ProformaFilters.GetCurrencyFilter(currency);
+            var qtyLCond = ProformaFilters.GetQtyLowerFilter(filters.QtyL, isYourProforma);
+            var qtyGCond = ProformaFilters.GetQtyGreaterFilter(filters.QtyG, isYourProforma);
+            var totalLCond = ProformaFilters.GetTotalLowerFilter(filters.TotalL, isYourProforma);
+            var totalGCond = ProformaFilters.GetTotalGreaterFilter(filters.TotalG, isYourProforma);
+            var dateLCond = ProformaFilters.GetDateLowerFilter(filters.DateL);
+            var dateGCond = ProformaFilters.GetDateGreaterFilter(filters.DateG);
+            var recipientCond = ProformaFilters.GetRecipientFilter(filters.Recipient, isYourProforma);
+            var currencyCond = ProformaFilters.GetCurrencyFilter(filters.Currency);
 
             return await _handlerContext.Proformas
                 .Where(e => isYourProforma ? e.ProformaFutureItems.Any() : e.ProformaOwnedItems.Any())
@@ -275,8 +268,7 @@ namespace database_communicator.Services
                     ClientName = isYourProforma ? ent.SellerNavigation.OrgName : ent.BuyerNavigation.OrgName
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, int userId, string search, string? sort,
-            int? qtyL, int? qtyG, int? totalL, int? totalG, string? dateL, string? dateG, int? recipient, string? currency)
+        public async Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, int userId, string search, string? sort, ProformaFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetProformaSort(sort, isYourProforma);
             bool direction;
@@ -288,14 +280,14 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var qtyLCond = ProformaFilters.GetQtyLowerFilter(qtyL, isYourProforma);
-            var qtyGCond = ProformaFilters.GetQtyGreaterFilter(qtyG, isYourProforma);
-            var totalLCond = ProformaFilters.GetTotalLowerFilter(totalL, isYourProforma);
-            var totalGCond = ProformaFilters.GetTotalGreaterFilter(totalG, isYourProforma);
-            var dateLCond = ProformaFilters.GetDateLowerFilter(dateL);
-            var dateGCond = ProformaFilters.GetDateGreaterFilter(dateG);
-            var recipientCond = ProformaFilters.GetRecipientFilter(recipient, isYourProforma);
-            var currencyCond = ProformaFilters.GetCurrencyFilter(currency);
+            var qtyLCond = ProformaFilters.GetQtyLowerFilter(filters.QtyL, isYourProforma);
+            var qtyGCond = ProformaFilters.GetQtyGreaterFilter(filters.QtyG, isYourProforma);
+            var totalLCond = ProformaFilters.GetTotalLowerFilter(filters.TotalL, isYourProforma);
+            var totalGCond = ProformaFilters.GetTotalGreaterFilter(filters.TotalG, isYourProforma);
+            var dateLCond = ProformaFilters.GetDateLowerFilter(filters.DateL);
+            var dateGCond = ProformaFilters.GetDateGreaterFilter(filters.DateG);
+            var recipientCond = ProformaFilters.GetRecipientFilter(filters.Recipient, isYourProforma);
+            var currencyCond = ProformaFilters.GetCurrencyFilter(filters.Currency);
 
             return await _handlerContext.Proformas
                 .Where(e => isYourProforma ? e.ProformaFutureItems.Any() : e.ProformaOwnedItems.Any())

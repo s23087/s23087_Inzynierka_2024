@@ -30,11 +30,8 @@ export default function ChangePasswordPage() {
       <Form className="mx-1 mx-xl-3" id="changePassForm" action={formAction}>
         <Form.Group className="mb-3" style={maxInputWidth}>
           <Form.Label className="blue-main-text">Old Password:</Form.Label>
-          <ErrorMessage 
-            message={state.message}
-            messageStatus={state.error}
-          />
-          <ErrorMessage 
+          <ErrorMessage message={state.message} messageStatus={state.error} />
+          <ErrorMessage
             message="One of password are empty or password are the same."
             messageStatus={isInvalid}
           />
@@ -43,7 +40,7 @@ export default function ChangePasswordPage() {
             type="password"
             name="oldPassword"
             onInput={(e) => {
-              InputValidtor.isEmptyValidator(e.target.value, setIsInvalid)
+              InputValidtor.isEmptyValidator(e.target.value, setIsInvalid);
             }}
             isInvalid={isInvalid}
             placeholder="old password"
@@ -59,7 +56,7 @@ export default function ChangePasswordPage() {
             id="newPassword"
             isInvalid={isInvalid}
             onInput={(e) => {
-              InputValidtor.isEmptyValidator(e.target.value, setIsInvalid)
+              InputValidtor.isEmptyValidator(e.target.value, setIsInvalid);
             }}
             placeholder="new password"
           />
@@ -78,10 +75,7 @@ export default function ChangePasswordPage() {
                 setIsInvalid(true);
                 return;
               }
-              if (
-                newPass.value === "" ||
-                oldPass.value === ""
-              ) {
+              if (newPass.value === "" || oldPass.value === "") {
                 setIsInvalid(true);
                 return;
               }

@@ -7,15 +7,15 @@ export default async function getCurrencyValueByDate(currency, date) {
     const info = await fetch(url, {
       method: "GET",
     });
-  
+
     if (info.ok) {
       let result = await info.json();
       return result.rates[0].mid;
     }
-  
+
     return 0;
   } catch {
-    console.error("getCurrencyValueByDate fetch failed")
-    return null
+    console.error("getCurrencyValueByDate fetch failed");
+    return null;
   }
 }

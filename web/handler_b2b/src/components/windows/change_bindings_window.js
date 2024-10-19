@@ -18,15 +18,14 @@ function ChangeBidningsWindow({
   const [userDownloadError, setUserDownloadError] = useState(false);
   useEffect(() => {
     if (modalShow) {
-      getUsers()
-        .then((data) => {
-          if (data === null) {
-            setUserDownloadError(true)
-          } else {
-            setUserDownloadError(false)
-            setUsers(data);
-          }
-        })
+      getUsers().then((data) => {
+        if (data === null) {
+          setUserDownloadError(true);
+        } else {
+          setUserDownloadError(false);
+          setUsers(data);
+        }
+      });
     }
   }, [modalShow]);
   return (
@@ -45,7 +44,7 @@ function ChangeBidningsWindow({
           </Row>
         </Container>
         <Container className="mt-4 mb-2">
-          <ErrorMessage 
+          <ErrorMessage
             message="Could not download users."
             messageStatus={userDownloadError}
           />
@@ -101,7 +100,9 @@ function ChangeBidningsWindow({
                   className="w-100"
                   disabled={
                     users.filter((e) => e.idUser !== value.userId).length <=
-                      0 || isInvalid || userDownloadError
+                      0 ||
+                    isInvalid ||
+                    userDownloadError
                   }
                   onClick={() => {
                     if (isInvalid) {
@@ -142,7 +143,7 @@ ChangeBidningsWindow.propTypes = {
   modalShow: PropTypes.bool.isRequired,
   onHideFunction: PropTypes.func.isRequired,
   value: PropTypes.object.isRequired,
-  addBinding: PropTypes.func.isRequired
+  addBinding: PropTypes.func.isRequired,
 };
 
 export default ChangeBidningsWindow;

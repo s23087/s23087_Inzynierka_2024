@@ -12,24 +12,23 @@ export default async function getLogs() {
     const data = await fetch(url, {
       method: "GET",
     });
-  
+
     if (data.status === 404) {
-      logout()
+      logout();
       return [];
     }
-  
+
     if (data.status === 401) {
       return [];
     }
-  
+
     if (data.ok) {
       return await data.json();
     }
-  
+
     return [];
   } catch {
-    console.error("getLogs fetch failed.")
+    console.error("getLogs fetch failed.");
     return null;
   }
-
 }

@@ -295,8 +295,7 @@ function ProductFilterOffcanvas({
       newParams.set("priceL", priceLess);
     if (!priceLess) newParams.delete("priceL");
     let priceGreater = document.getElementById("priceG").value;
-    if (validators.haveOnlyNumbers(priceGreater) &&
-      priceGreater)
+    if (validators.haveOnlyNumbers(priceGreater) && priceGreater)
       newParams.set("priceG", priceGreater);
     if (!priceGreater) newParams.delete("priceG");
   }
@@ -321,8 +320,7 @@ function ProductFilterOffcanvas({
 
   function setStatusFilter() {
     let statusFilter = document.getElementById("filterStatus").value;
-    if (statusFilter !== "none")
-      newParams.set("status", statusFilter);
+    if (statusFilter !== "none") newParams.set("status", statusFilter);
     if (statusFilter === "none") newParams.delete("status");
   }
 }

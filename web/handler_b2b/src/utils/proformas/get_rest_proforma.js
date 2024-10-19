@@ -9,14 +9,14 @@ export default async function getRestProforma(isYourProforma, proformaId) {
     const info = await fetch(url, {
       method: "GET",
     });
-  
+
     if (info.ok) {
       return await info.json();
     }
-  
+
     return [];
   } catch {
-    console.error("getRestProforma fetch failed.")
-    return null
+    console.error("getRestProforma fetch failed.");
+    return null;
   }
 }

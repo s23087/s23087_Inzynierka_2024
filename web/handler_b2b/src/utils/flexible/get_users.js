@@ -11,7 +11,7 @@ export default async function getUsers() {
     const info = await fetch(url, {
       method: "GET",
     });
-  
+
     if (info.ok) {
       let result = await info.json();
       const role = await getRole();
@@ -21,10 +21,10 @@ export default async function getUsers() {
       }
       return result;
     }
-  
+
     return [];
   } catch {
-    console.error("getUsers fetch failed.")
-    return null
+    console.error("getUsers fetch failed.");
+    return null;
   }
 }

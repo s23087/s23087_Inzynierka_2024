@@ -67,40 +67,38 @@ function ModifyItemOffcanvas({
     },
   ]);
   const [description, setDescription] = useState(null);
-  const [descriptionDownloadError, setDescriptionDownloadError] = useState(false);
+  const [descriptionDownloadError, setDescriptionDownloadError] =
+    useState(false);
   const [bindingsDownloadError, setBindingsDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas && isOrg) {
       let copyArray = [...item.eans];
       setEans(copyArray);
-      getDescription(item.itemId)
-      .then((data) => {
-        if (data !== null){
-          setDescriptionDownloadError(false)
-          setDescription(data)
+      getDescription(item.itemId).then((data) => {
+        if (data !== null) {
+          setDescriptionDownloadError(false);
+          setDescription(data);
         } else {
-          setDescriptionDownloadError(true)
+          setDescriptionDownloadError(true);
         }
       });
-      getBindings(item.itemId, curenncy)
-      .then((data) => {
-        if (data !== null){
-          setBindingsDownloadError(false)
-          setBindings(data)
+      getBindings(item.itemId, curenncy).then((data) => {
+        if (data !== null) {
+          setBindingsDownloadError(false);
+          setBindings(data);
         } else {
-          setBindingsDownloadError(true)
+          setBindingsDownloadError(true);
         }
       });
     } else if (showOffcanvas) {
       let copyArray = [...item.eans];
       setEans(copyArray);
-      getDescription(item.itemId)
-      .then((data) => {
-        if (data !== null){
-          setDescriptionDownloadError(false)
-          setDescription(data)
+      getDescription(item.itemId).then((data) => {
+        if (data !== null) {
+          setDescriptionDownloadError(false);
+          setDescription(data);
         } else {
-          setDescriptionDownloadError(true)
+          setDescriptionDownloadError(true);
         }
       });
     }
@@ -116,7 +114,10 @@ function ModifyItemOffcanvas({
   const [isLoading, setIsLoading] = useState(false);
   // Error func
   const isFormErrorActive = () =>
-    partnumberError || nameError || descriptionDownloadError || bindingsDownloadError;
+    partnumberError ||
+    nameError ||
+    descriptionDownloadError ||
+    bindingsDownloadError;
   const resetErrors = () => {
     setPartnumberError(false);
     setNameError(false);
@@ -219,9 +220,11 @@ function ModifyItemOffcanvas({
             fluid
           >
             <Form action={formAction} id="modifyItemForm">
-              <ErrorMessage 
+              <ErrorMessage
                 message="Could not download all necessary information."
-                messageStatus={descriptionDownloadError || bindingsDownloadError}
+                messageStatus={
+                  descriptionDownloadError || bindingsDownloadError
+                }
               />
               <Form.Group className="mb-3 maxInputWidth">
                 <Form.Label className="blue-main-text">P/N:</Form.Label>

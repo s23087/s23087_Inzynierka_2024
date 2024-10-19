@@ -60,7 +60,7 @@ export default async function updateItem(eans, prevState, state, formData) {
         },
       },
     );
-  
+
     if (info.status == 400) {
       return {
         error: true,
@@ -68,7 +68,7 @@ export default async function updateItem(eans, prevState, state, formData) {
         message: "This part number exist.",
       };
     }
-  
+
     if (info.status == 404) {
       return {
         error: true,
@@ -76,7 +76,7 @@ export default async function updateItem(eans, prevState, state, formData) {
         message: "This item doesn't exist.",
       };
     }
-  
+
     if (info.ok) {
       return {
         error: false,
@@ -91,12 +91,11 @@ export default async function updateItem(eans, prevState, state, formData) {
       };
     }
   } catch {
-    console.error("updateItem fetch failed.")
+    console.error("updateItem fetch failed.");
     return {
       error: true,
       completed: true,
       message: "Connection error",
     };
   }
-
 }

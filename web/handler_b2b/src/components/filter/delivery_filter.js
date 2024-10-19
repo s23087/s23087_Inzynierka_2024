@@ -395,8 +395,7 @@ function DeliveryFilterOffcanvas({
 
   function setRecipientFilter() {
     let recipient = document.getElementById("recipient").value;
-    if (recipient !== "none")
-      newParams.set("recipient", recipient);
+    if (recipient !== "none") newParams.set("recipient", recipient);
     if (recipient === "none") newParams.delete("recipient");
   }
 

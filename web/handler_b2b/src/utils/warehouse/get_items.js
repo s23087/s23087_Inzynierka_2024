@@ -41,7 +41,7 @@ export default async function getItems(
 
     return [];
   } catch {
-    console.error("getItems fetch failed.")
+    console.error("getItems fetch failed.");
     return null;
   }
 }

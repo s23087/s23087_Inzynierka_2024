@@ -14,10 +14,8 @@ namespace database_communicator.Services
 {
     public interface IOfferServices
     {
-        public Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG,
-            string? createdL, string? createdG, string? modifiedL, string? modifiedG);
-        public Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string search, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG,
-            string? createdL, string? createdG, string? modifiedL, string? modifiedG);
+        public Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string? sort, OfferFiltersTemplate filters);
+        public Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string search, string? sort, OfferFiltersTemplate filters);
         public Task<bool> DoesPricelistExist(int offerId);
         public Task<bool> DoesPricelistExist(string offerName, int userId);
         public Task<bool> DeletePricelist(int offerId);
@@ -44,8 +42,7 @@ namespace database_communicator.Services
         {
             _handlerContext = handlerContext;
         }
-        public async Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG,
-            string? createdL, string? createdG, string? modifiedL, string? modifiedG)
+        public async Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string? sort, OfferFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetPricelistSort(sort);
             bool direction;
@@ -57,15 +54,15 @@ namespace database_communicator.Services
             {
                 direction = sort.StartsWith('D');
             }
-            var statusCond = OfferFilters.GetStatusFilter(status);
-            var currencyCond = OfferFilters.GetCurrencyFilter(currency);
-            var typeCond = OfferFilters.GetTypeFilter(type);
-            var totalLCond = OfferFilters.GetTotalLowerFilter(totalL);
-            var totalGCond = OfferFilters.GetTotalGreaterFilter(totalG);
-            var createdLCond = OfferFilters.GetCreatedLowerFilter(createdL);
-            var createdGCond = OfferFilters.GetCreatedGreaterFilter(createdG);
-            var modifiedLCond = OfferFilters.GetModifiedLowerFilter(modifiedL);
-            var modifiedGCond = OfferFilters.GetModifiedGreaterFilter(modifiedG);
+            var statusCond = OfferFilters.GetStatusFilter(filters.Status);
+            var currencyCond = OfferFilters.GetCurrencyFilter(filters.Currency);
+            var typeCond = OfferFilters.GetTypeFilter(filters.Type);
+            var totalLCond = OfferFilters.GetTotalLowerFilter(filters.TotalL);
+            var totalGCond = OfferFilters.GetTotalGreaterFilter(filters.TotalG);
+            var createdLCond = OfferFilters.GetCreatedLowerFilter(filters.CreatedL);
+            var createdGCond = OfferFilters.GetCreatedGreaterFilter(filters.CreatedG);
+            var modifiedLCond = OfferFilters.GetModifiedLowerFilter(filters.ModifiedL);
+            var modifiedGCond = OfferFilters.GetModifiedGreaterFilter(filters.ModifiedG);
 
             return await _handlerContext.Offers
                 .Where(e => e.UserId == userId)
@@ -91,8 +88,7 @@ namespace database_communicator.Services
                     Currency = obj.CurrencyName
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string search, string? sort, string? status, string? currency, string? type, int? totalL, int? totalG,
-            string? createdL, string? createdG, string? modifiedL, string? modifiedG)
+        public async Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string search, string? sort, OfferFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetPricelistSort(sort);
             bool direction;
@@ -105,15 +101,15 @@ namespace database_communicator.Services
                 direction = sort.StartsWith('D');
             }
 
-            var statusCond = OfferFilters.GetStatusFilter(status);
-            var currencyCond = OfferFilters.GetCurrencyFilter(currency);
-            var typeCond = OfferFilters.GetTypeFilter(type);
-            var totalLCond = OfferFilters.GetTotalLowerFilter(totalL);
-            var totalGCond = OfferFilters.GetTotalGreaterFilter(totalG);
-            var createdLCond = OfferFilters.GetCreatedLowerFilter(createdL);
-            var createdGCond = OfferFilters.GetCreatedGreaterFilter(createdG);
-            var modifiedLCond = OfferFilters.GetModifiedLowerFilter(modifiedL);
-            var modifiedGCond = OfferFilters.GetModifiedGreaterFilter(modifiedG);
+            var statusCond = OfferFilters.GetStatusFilter(filters.Status);
+            var currencyCond = OfferFilters.GetCurrencyFilter(filters.Currency);
+            var typeCond = OfferFilters.GetTypeFilter(filters.Type);
+            var totalLCond = OfferFilters.GetTotalLowerFilter(filters.TotalL);
+            var totalGCond = OfferFilters.GetTotalGreaterFilter(filters.TotalG);
+            var createdLCond = OfferFilters.GetCreatedLowerFilter(filters.CreatedL);
+            var createdGCond = OfferFilters.GetCreatedGreaterFilter(filters.CreatedG);
+            var modifiedLCond = OfferFilters.GetModifiedLowerFilter(filters.ModifiedL);
+            var modifiedGCond = OfferFilters.GetModifiedGreaterFilter(filters.ModifiedG);
 
             return await _handlerContext.Offers
                 .Where(e => e.UserId == userId)

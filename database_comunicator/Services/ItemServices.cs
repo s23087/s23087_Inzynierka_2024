@@ -18,14 +18,10 @@ namespace database_communicator.Services
         public Task<bool> ItemExist(int id);
         public Task<bool> ItemExist(string partNumber);
         public Task<bool> EanExist(IEnumerable<string> eans);
-        public Task<IEnumerable<GetManyItems>> GetItems(string currency, string? orderBy, string? status, string? ean,
-            int? qtyL, int? qtyG, int? priceL, int? priceG);
-        public Task<IEnumerable<GetManyItems>> GetItems(string currency, string search, string? orderBy, string? status, string? ean,
-            int? qtyL, int? qtyG, int? priceL, int? priceG);
-        public Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId, string? orderBy, string? status, string? ean,
-            int? qtyL, int? qtyG, int? priceL, int? priceG);
-        public Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId, string search, string? orderBy, string? status, string? ean,
-            int? qtyL, int? qtyG, int? priceL, int? priceG);
+        public Task<IEnumerable<GetManyItems>> GetItems(string currency, string? orderBy, ItemFiltersTemplate filters);
+        public Task<IEnumerable<GetManyItems>> GetItems(string currency, string search, string? orderBy, ItemFiltersTemplate filters);
+        public Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId, string? orderBy, ItemFiltersTemplate filters);
+        public Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId, string search, string? orderBy, ItemFiltersTemplate filters);
         public Task<GetRestInfo> GetRestOfItem(int id, int userId, string currency);
         public Task<GetRestInfo> GetRestOfItemOrg(int id, string currency);
         public Task<IEnumerable<GetBinding>> GetModifyRestOfItem(int id, string currency);
@@ -202,16 +198,15 @@ namespace database_communicator.Services
                 OwnedItemInfos = result
             };
         }
-        public async Task<IEnumerable<GetManyItems>> GetItems(string currency, string? orderBy, string? status, string? ean,
-            int? qtyL, int? qtyG, int? priceL, int? priceG)
+        public async Task<IEnumerable<GetManyItems>> GetItems(string currency, string? orderBy, ItemFiltersTemplate filters)
         {
             List<GetManyItems> items;
-            Func<GetManyItems, bool> statusCond = SortFilterUtils.GetFilterStatus(status);
-            var eanCond = ItemFilters.GetEanFilter(ean);
-            var qtyLCondition = ItemFilters.GetQtyLowerFilter(qtyL);
-            var qtyGCondition = ItemFilters.GetQtyGreaterFilter(qtyG);
-            var priceLCondition = ItemFilters.GetPriceLowerFilter(priceL);
-            var priceGCondition = ItemFilters.GetPriceGreaterFilter(priceG);
+            var statusCond = ItemFilters.GetStatusFilter(filters.Status);
+            var eanCond = ItemFilters.GetEanFilter(filters.Ean);
+            var qtyLCondition = ItemFilters.GetQtyLowerFilter(filters.QtyL);
+            var qtyGCondition = ItemFilters.GetQtyGreaterFilter(filters.QtyG);
+            var priceLCondition = ItemFilters.GetPriceLowerFilter(filters.PriceL);
+            var priceGCondition = ItemFilters.GetPriceGreaterFilter(filters.PriceG);
 
             bool direction;
             if (orderBy == null)
@@ -335,16 +330,15 @@ namespace database_communicator.Services
                 return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
             }
         }
-        public async Task<IEnumerable<GetManyItems>> GetItems(string currency, string search, string? orderBy, string? status, string? ean,
-            int? qtyL, int? qtyG, int? priceL, int? priceG)
+        public async Task<IEnumerable<GetManyItems>> GetItems(string currency, string search, string? orderBy, ItemFiltersTemplate filters)
         {
             List<GetManyItems> items;
-            Func<GetManyItems, bool> statusCond = SortFilterUtils.GetFilterStatus(status);
-            var eanCond = ItemFilters.GetEanFilter(ean);
-            var qtyLCondition = ItemFilters.GetQtyLowerFilter(qtyL);
-            var qtyGCondition = ItemFilters.GetQtyGreaterFilter(qtyG);
-            var priceLCondition = ItemFilters.GetPriceLowerFilter(priceL);
-            var priceGCondition = ItemFilters.GetPriceGreaterFilter(priceG);
+            var statusCond = ItemFilters.GetStatusFilter(filters.Status);
+            var eanCond = ItemFilters.GetEanFilter(filters.Ean);
+            var qtyLCondition = ItemFilters.GetQtyLowerFilter(filters.QtyL);
+            var qtyGCondition = ItemFilters.GetQtyGreaterFilter(filters.QtyG);
+            var priceLCondition = ItemFilters.GetPriceLowerFilter(filters.PriceL);
+            var priceGCondition = ItemFilters.GetPriceGreaterFilter(filters.PriceG);
 
             bool direction;
             if (orderBy == null)
@@ -535,16 +529,15 @@ namespace database_communicator.Services
                     return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
             }
         }
-        public async Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId, string? orderBy, string? status, string? ean,
-            int? qtyL, int? qtyG, int? priceL, int? priceG)
+        public async Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId, string? orderBy, ItemFiltersTemplate filters)
         {
             List<GetManyItems> items;
-            Func<GetManyItems, bool> statusCond = SortFilterUtils.GetFilterStatus(status);
-            var eanCond = ItemFilters.GetEanFilter(ean);
-            var qtyLCondition = ItemFilters.GetQtyLowerFilter(qtyL);
-            var qtyGCondition = ItemFilters.GetQtyGreaterFilter(qtyG);
-            var priceLCondition = ItemFilters.GetPriceLowerFilter(priceL);
-            var priceGCondition = ItemFilters.GetPriceGreaterFilter(priceG);
+            var statusCond = ItemFilters.GetStatusFilter(filters.Status);
+            var eanCond = ItemFilters.GetEanFilter(filters.Ean);
+            var qtyLCondition = ItemFilters.GetQtyLowerFilter(filters.QtyL);
+            var qtyGCondition = ItemFilters.GetQtyGreaterFilter(filters.QtyG);
+            var priceLCondition = ItemFilters.GetPriceLowerFilter(filters.PriceL);
+            var priceGCondition = ItemFilters.GetPriceGreaterFilter(filters.PriceG);
 
             bool direction;
             if (orderBy == null)
@@ -651,16 +644,15 @@ namespace database_communicator.Services
                     return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
             }
         }
-        public async Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId, string search, string? orderBy, string? status, string? ean,
-            int? qtyL, int? qtyG, int? priceL, int? priceG)
+        public async Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId, string search, string? orderBy, ItemFiltersTemplate filters)
         {
             List<GetManyItems> items;
-            Func<GetManyItems, bool> statusCond = SortFilterUtils.GetFilterStatus(status);
-            var eanCond = ItemFilters.GetEanFilter(ean);
-            var qtyLCondition = ItemFilters.GetQtyLowerFilter(qtyL);
-            var qtyGCondition = ItemFilters.GetQtyGreaterFilter(qtyG);
-            var priceLCondition = ItemFilters.GetPriceLowerFilter(priceL);
-            var priceGCondition = ItemFilters.GetPriceGreaterFilter(priceG);
+            var statusCond = ItemFilters.GetStatusFilter(filters.Status);
+            var eanCond = ItemFilters.GetEanFilter(filters.Ean);
+            var qtyLCondition = ItemFilters.GetQtyLowerFilter(filters.QtyL);
+            var qtyGCondition = ItemFilters.GetQtyGreaterFilter(filters.QtyG);
+            var priceLCondition = ItemFilters.GetPriceLowerFilter(filters.PriceL);
+            var priceGCondition = ItemFilters.GetPriceGreaterFilter(filters.PriceG);
 
             bool direction;
             if (orderBy == null)

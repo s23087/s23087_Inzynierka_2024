@@ -18,10 +18,7 @@ export default async function updateRequest(
   let note = formData.get("note");
   let title = formData.get("title");
   let path = "";
-  let message = "Error:";
-  if (!recevierId) message += "\nRecevier must not be empty.";
-  if (!note) message += "\nNote must not be empty.";
-  if (!title) message += "\nTitle must not be empty.";
+  let message = validateData(recevierId, note, title);
 
   if (message.length > 6) {
     return {
@@ -106,7 +103,7 @@ export default async function updateRequest(
     }
 
     if (info.ok) {
-      if (data.objectType && prevPath !== path) {
+      if (shouldpathNameChange(data, prevPath, path)) {
         try {
           fs.renameSync(prevPath, data.path);
         } catch (error) {
@@ -158,4 +155,16 @@ export default async function updateRequest(
       message: "Connection error.",
     };
   }
+}
+
+function shouldpathNameChange(data, prevPath, path) {
+  return data.objectType && prevPath !== path;
+}
+
+function validateData(recevierId, note, title) {
+  let message = "Error:";
+  if (!recevierId) message += "\nRecevier must not be empty.";
+  if (!note) message += "\nNote must not be empty.";
+  if (!title) message += "\nTitle must not be empty.";
+  return message;
 }

@@ -21,12 +21,7 @@ export default async function updateCreditNote(
   let isPaid = formData.get("isPaid") === "on";
   let path = null;
   let note = formData.get("note");
-  let message = "Error:";
-  if (
-    !validators.lengthSmallerThen(creditNoteNumber, 40) &&
-    !validators.stringIsNotEmpty(creditNoteNumber)
-  )
-    message += "\nInvoice number cannot be empty and excceed 40 chars.";
+  let message = validateData(creditNoteNumber);
 
   if (message.length > 6) {
     return {
@@ -168,4 +163,14 @@ export default async function updateCreditNote(
       message: "Connection error.",
     };
   }
+}
+
+function validateData(creditNoteNumber) {
+  let message = "Error:";
+  if (
+    !validators.lengthSmallerThen(creditNoteNumber, 40) &&
+    !validators.stringIsNotEmpty(creditNoteNumber)
+  )
+    message += "\nInvoice number cannot be empty and excceed 40 chars.";
+  return message;
 }

@@ -17,7 +17,14 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
   const [streetError, setStreetError] = useState(false);
   const [cityError, setCityError] = useState(false);
   const [postalError, setPostalError] = useState(false);
-  const isFormErrorActive = () =>  orgNameError || nipMyError || streetError || cityError || postalError || !countries || orgInfo.street === "connection error";
+  const isFormErrorActive = () =>
+    orgNameError ||
+    nipMyError ||
+    streetError ||
+    cityError ||
+    postalError ||
+    !countries ||
+    orgInfo.street === "connection error";
   const [prevState] = useState({
     orgName: orgInfo.orgName,
     street: orgInfo.street,
@@ -45,7 +52,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">Name:</Form.Label>
-          <ErrorMessage 
+          <ErrorMessage
             message="Is empty or lenght is greater than 50."
             messageStatus={orgNameError}
           />
@@ -67,7 +74,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">Nip:</Form.Label>
-          <ErrorMessage 
+          <ErrorMessage
             message="Is empty, not a number or lenght is greater than 15."
             messageStatus={nipMyError}
           />
@@ -89,7 +96,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">Street:</Form.Label>
-          <ErrorMessage 
+          <ErrorMessage
             message="Is empty or lenght is greater than 200."
             messageStatus={streetError}
           />
@@ -111,7 +118,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">City:</Form.Label>
-          <ErrorMessage 
+          <ErrorMessage
             message="Is empty or lenght is greater than 200."
             messageStatus={cityError}
           />
@@ -133,7 +140,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">Postal code:</Form.Label>
-          <ErrorMessage 
+          <ErrorMessage
             message="Is empty or lenght is greater than 25."
             messageStatus={postalError}
           />

@@ -31,12 +31,12 @@ export default async function changeUserInfo(prevState, state, formData) {
         },
       },
     );
-  
+
     if (info.status === 404) {
       logout();
       redirect("/");
     }
-  
+
     if (info.status === 400) {
       return {
         error: true,
@@ -44,7 +44,7 @@ export default async function changeUserInfo(prevState, state, formData) {
         completed: true,
       };
     }
-  
+
     if (info.ok) {
       return {
         error: false,
@@ -52,14 +52,14 @@ export default async function changeUserInfo(prevState, state, formData) {
         message: "Success! You have changed your info.",
       };
     }
-  
+
     return {
       error: true,
       message: "Critical error.",
       completed: true,
     };
   } catch {
-    console.error("changeUserInfo fetch failed.")
+    console.error("changeUserInfo fetch failed.");
     return {
       error: true,
       message: "Connection error.",

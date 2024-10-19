@@ -21,16 +21,17 @@ export default async function getSearchDeliveries(
   const dbName = await getDbName();
   const userId = await getUserId();
   let url = "";
-  let params = [];
-  if (sort !== ".None") params.push(`sort=${sort}`);
-  if (estimatedL) params.push(`estimatedL=${estimatedL}`);
-  if (estimatedG) params.push(`estimatedG=${estimatedG}`);
-  if (deliveredL) params.push(`deliveredL=${deliveredL}`);
-  if (deliveredG) params.push(`deliveredG=${deliveredG}`);
-  if (recipient) params.push(`recipient=${recipient}`);
-  if (status) params.push(`status=${status}`);
-  if (company) params.push(`company=${company}`);
-  if (waybill) params.push(`waybill=${waybill}`);
+  let params = getParams(
+    sort,
+    estimatedL,
+    estimatedG,
+    deliveredL,
+    deliveredG,
+    recipient,
+    status,
+    company,
+    waybill,
+  );
   if (isOrg) {
     url = `${process.env.API_DEST}/${dbName}/Delivery/get/${isDeliveryToUser ? "user" : "client"}?search=${search}${params.length > 0 ? "&" : ""}${params.join("&")}`;
   } else {
@@ -55,4 +56,28 @@ export default async function getSearchDeliveries(
     console.error("getSearchDeliveries fetch failed.");
     return null;
   }
+}
+
+function getParams(
+  sort,
+  estimatedL,
+  estimatedG,
+  deliveredL,
+  deliveredG,
+  recipient,
+  status,
+  company,
+  waybill,
+) {
+  let params = [];
+  if (sort !== ".None") params.push(`sort=${sort}`);
+  if (estimatedL) params.push(`estimatedL=${estimatedL}`);
+  if (estimatedG) params.push(`estimatedG=${estimatedG}`);
+  if (deliveredL) params.push(`deliveredL=${deliveredL}`);
+  if (deliveredG) params.push(`deliveredG=${deliveredG}`);
+  if (recipient) params.push(`recipient=${recipient}`);
+  if (status) params.push(`status=${status}`);
+  if (company) params.push(`company=${company}`);
+  if (waybill) params.push(`waybill=${waybill}`);
+  return params;
 }

@@ -9,14 +9,14 @@ export default async function getCountries() {
     const info = await fetch(url, {
       method: "GET",
     });
-  
+
     if (info.ok) {
       return await info.json();
     }
-  
+
     return [];
-  } catch  {
-    console.error("getCountries fetch failed.")
-    return null
+  } catch {
+    console.error("getCountries fetch failed.");
+    return null;
   }
 }

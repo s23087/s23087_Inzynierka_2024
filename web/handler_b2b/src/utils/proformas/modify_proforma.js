@@ -24,13 +24,7 @@ export default async function updateProforma(
   let paymentMethod = formData.get("paymentMethod");
   let status = formData.get("status") === "true";
   let path = "";
-  let message = "Error:";
-  if (!proformaNumber || proformaNumber.length > 40)
-    message += "\nProfroma must not be empty or excceed 40 chars.";
-  if (!user) message += "\nRecevier must not be empty.";
-  if (!org) message += "\nClient must not be empty.";
-  if (!transport || !validators.isPriceFormat(transport))
-    message += "\nTransport must be a number and not empty.";
+  let message = validateData(proformaNumber, user, org, transport);
 
   if (message.length > 6) {
     return {
@@ -106,7 +100,7 @@ export default async function updateProforma(
         },
       },
     );
-  
+
     if (info.status === 404) {
       let text = await info.text();
       if (text === "User not found.") logout();
@@ -116,7 +110,7 @@ export default async function updateProforma(
         message: text,
       };
     }
-  
+
     if (info.status === 500) {
       return {
         error: true,
@@ -124,7 +118,7 @@ export default async function updateProforma(
         message: "Server error.",
       };
     }
-  
+
     if (info.ok) {
       if (data.proformaNumber && prevPath !== path) {
         try {
@@ -172,11 +166,22 @@ export default async function updateProforma(
       };
     }
   } catch {
-    console.error("updateProforma fetch failed.")
+    console.error("updateProforma fetch failed.");
     return {
       error: true,
       completed: true,
       message: "Connection error",
     };
   }
+}
+
+function validateData(proformaNumber, user, org, transport) {
+  let message = "Error:";
+  if (!proformaNumber || proformaNumber.length > 40)
+    message += "\nProfroma must not be empty or excceed 40 chars.";
+  if (!user) message += "\nRecevier must not be empty.";
+  if (!org) message += "\nClient must not be empty.";
+  if (!transport || !validators.isPriceFormat(transport))
+    message += "\nTransport must be a number and not empty.";
+  return message;
 }

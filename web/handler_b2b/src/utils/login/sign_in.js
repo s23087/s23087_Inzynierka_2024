@@ -60,7 +60,7 @@ export default async function signIn(state, formData) {
       };
     }
   } catch {
-    console.error("signIn fetch failed")
+    console.error("signIn fetch failed");
     return {
       error: true,
       message: "Connection error.",

@@ -15,16 +15,15 @@ import createPricelist from "@/utils/pricelist/create_pricelist";
 
 function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
   const router = useRouter();
-  const [statusDownloadError, setStatusDownloadError] = useState(false)
+  const [statusDownloadError, setStatusDownloadError] = useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      getOfferStatuses()
-      .then((data) => {
-        if (data === null){
-          setStatusDownloadError(true)
+      getOfferStatuses().then((data) => {
+        if (data === null) {
+          setStatusDownloadError(true);
         } else {
-          setStatusDownloadError(false)
-          setStatuses(data)
+          setStatusDownloadError(false);
+          setStatuses(data);
         }
       });
     }
@@ -39,7 +38,12 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
   // Errors
   const [nameError, setNameError] = useState(false);
   const [maxQtyError, setMaxQtyError] = useState(false);
-  const isFormErrorActive = () => nameError || maxQtyError || statuses.length === 0 || products.length === 0 || statusDownloadError;
+  const isFormErrorActive = () =>
+    nameError ||
+    maxQtyError ||
+    statuses.length === 0 ||
+    products.length === 0 ||
+    statusDownloadError;
   // Misc
   const [isLoading, setIsLoading] = useState(false);
   // Form
@@ -102,10 +106,10 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
         <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0" style={vhStyle} fluid>
             <Form className="mx-1 mx-xl-3" id="offerForm" action={formAction}>
-            <ErrorMessage
-                  message="Could not download the statuses."
-                  messageStatus={statusDownloadError}
-                />
+              <ErrorMessage
+                message="Could not download the statuses."
+                messageStatus={statusDownloadError}
+              />
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Offer name:</Form.Label>
                 <ErrorMessage

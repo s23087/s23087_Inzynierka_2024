@@ -11,14 +11,14 @@ export default async function getNotifications() {
     const desc = await fetch(url, {
       method: "GET",
     });
-  
+
     if (desc.ok) {
       return await desc.json();
     }
-  
+
     return [];
   } catch {
-    console.error("getNotifications fetch failed.")
-    return null
+    console.error("getNotifications fetch failed.");
+    return null;
   }
 }

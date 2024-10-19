@@ -26,15 +26,14 @@ function AddCreditNoteOffcanvas({
     useState(false);
   useEffect(() => {
     if (showOffcanvas) {
-      getUsers()
-        .then((data) => {
-          if (data !== null) {
-            setUserDownloadError(false)
-            setUsers(data);
-          } else {
-            setUserDownloadError(true)
-          }
-        })
+      getUsers().then((data) => {
+        if (data !== null) {
+          setUserDownloadError(false);
+          setUsers(data);
+        } else {
+          setUserDownloadError(true);
+        }
+      });
       const invoiceList = isYourCreditNote
         ? getListOfPurchaseInvoice()
         : getListOfSalesInvoice();
@@ -67,7 +66,7 @@ function AddCreditNoteOffcanvas({
   const [creditNumberError, setCreditNumberError] = useState(false);
   const [documentError, setDocumentError] = useState(false);
   const [dateError, setDateError] = useState(false);
-  const isFormErrorActive = () => 
+  const isFormErrorActive = () =>
     creditNumberError ||
     documentError ||
     dateError ||

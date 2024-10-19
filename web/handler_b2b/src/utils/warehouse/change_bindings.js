@@ -22,7 +22,7 @@ export default async function changeBindings(bindings) {
         },
       },
     );
-  
+
     if (info.status == 500) {
       return {
         error: true,
@@ -30,7 +30,7 @@ export default async function changeBindings(bindings) {
         message: "Server error.",
       };
     }
-  
+
     if (info.status == 404) {
       logout();
       return {
@@ -39,7 +39,7 @@ export default async function changeBindings(bindings) {
         message: "This user doesn't exists.",
       };
     }
-  
+
     if (info.ok) {
       return {
         error: false,
@@ -54,7 +54,7 @@ export default async function changeBindings(bindings) {
       };
     }
   } catch {
-    console.error("changeBindings fetch failed.")
+    console.error("changeBindings fetch failed.");
     return {
       error: true,
       completed: true,

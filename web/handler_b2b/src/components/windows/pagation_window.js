@@ -9,7 +9,12 @@ function PagationWindow({ windowShow, onHideFunction }) {
   const pathName = usePathname();
   const params = useSearchParams();
   return (
-    <Modal size="md" show={windowShow} centered className="px-4 minScalableWidth">
+    <Modal
+      size="md"
+      show={windowShow}
+      centered
+      className="px-4 minScalableWidth"
+    >
       <Modal.Body>
         <Container>
           <Row>

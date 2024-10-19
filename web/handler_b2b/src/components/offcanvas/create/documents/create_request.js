@@ -34,7 +34,7 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
   const [documentError, setDocumentError] = useState(false);
   const [noteError, setNoteError] = useState(false);
   const [titleError, setTitleError] = useState(false);
-  const isFromErrorActive = () => 
+  const isFromErrorActive = () =>
     documentError ||
     noteError ||
     users.length === 0 ||
