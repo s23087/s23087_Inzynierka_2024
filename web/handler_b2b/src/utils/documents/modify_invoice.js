@@ -47,7 +47,6 @@ export default async function updateInvoice(
     try {
       path = await writeFile();
     } catch (error) {
-      writeFile;
       return {
         error: true,
         completed: true,

@@ -81,35 +81,10 @@ export default async function createProforma(
         },
       },
     );
-    if (info.status === 404) {
-      let text = await info.text();
-      if (text === "User not found.") {
-        logout();
-        return {
-          error: true,
-          completed: true,
-          message: "Your user profile does not exists.",
-        };
-      }
-      return {
-        error: true,
-        completed: true,
-        message: "Chosen user do not exists.",
-      };
-    }
-    if (info.status === 400) {
-      return {
-        error: true,
-        completed: true,
-        message: await info.text(),
-      };
-    }
-    if (info.status === 500) {
-      return {
-        error: true,
-        completed: true,
-        message: "Server error.",
-      };
+
+    let fetchError = await checkFetchForError(info)
+    if (fetchError){
+      return fetchError
     }
 
     if (info.ok) {
@@ -168,6 +143,40 @@ export default async function createProforma(
     };
   }
 }
+async function checkFetchForError(info) {
+  if (info.status === 404) {
+    let text = await info.text();
+    if (text === "User not found.") {
+      logout();
+      return {
+        error: true,
+        completed: true,
+        message: "Your user profile does not exists.",
+      };
+    }
+    return {
+      error: true,
+      completed: true,
+      message: "Chosen user do not exists.",
+    };
+  }
+  if (info.status === 400) {
+    return {
+      error: true,
+      completed: true,
+      message: await info.text(),
+    };
+  }
+  if (info.status === 500) {
+    return {
+      error: true,
+      completed: true,
+      message: "Server error.",
+    };
+  }
+  return null
+}
+
 function getTransformedProducts(products, isYourProforma) {
   let transformProducts = [];
   products.forEach((element) => {

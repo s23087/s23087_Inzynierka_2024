@@ -64,16 +64,14 @@ export default async function modifyPricelist(
           completed: true,
           message: "That pricelist already exist.",
         };
+      } else if (fs.existsSync(prevState.path)) {
+        fs.renameSync(prevState.path, fileName);
       } else {
-        if (fs.existsSync(prevState.path)) {
-          fs.renameSync(prevState.path, fileName);
-        } else {
-          return {
-            error: true,
-            completed: true,
-            message: "Original file does not exists.",
-          };
-        }
+        return {
+          error: true,
+          completed: true,
+          message: "Original file does not exists.",
+        };
       }
     } catch (error) {
       console.log(error);
@@ -115,35 +113,10 @@ export default async function modifyPricelist(
         "Content-Type": "application/json",
       },
     });
-    if (info.status === 404) {
-      let text = await info.text();
-      if (text === "User not found.") {
-        logout();
-        return {
-          error: true,
-          completed: true,
-          message: "Your user profile does not exists.",
-        };
-      }
-      return {
-        error: true,
-        completed: true,
-        message: text,
-      };
-    }
-    if (info.status === 400) {
-      return {
-        error: true,
-        completed: true,
-        message: await info.text(),
-      };
-    }
-    if (info.status === 500) {
-      return {
-        error: true,
-        completed: true,
-        message: "Server error.",
-      };
+
+    let fetchError = await checkFetchForError(info)
+    if (fetchError) {
+      return fetchError
     }
 
     if (info.ok) {
@@ -183,6 +156,40 @@ export default async function modifyPricelist(
     };
   }
 }
+async function checkFetchForError(info) {
+  if (info.status === 404) {
+    let text = await info.text();
+    if (text === "User not found.") {
+      logout();
+      return {
+        error: true,
+        completed: true,
+        message: "Your user profile does not exists.",
+      };
+    }
+    return {
+      error: true,
+      completed: true,
+      message: text,
+    };
+  }
+  if (info.status === 400) {
+    return {
+      error: true,
+      completed: true,
+      message: await info.text(),
+    };
+  }
+  if (info.status === 500) {
+    return {
+      error: true,
+      completed: true,
+      message: "Server error.",
+    };
+  }
+  return null
+}
+
 async function getDeactivatedId() {
   try {
     let getDeactivatedId = await fetch(
