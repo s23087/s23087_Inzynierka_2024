@@ -6,10 +6,7 @@ import logout from "../auth/logout";
 import validators from "../validators/validator";
 
 export default async function CreateCreditNote(
-  userOrg,
-  choosenClient,
-  isYourCreditNote,
-  invoiceId,
+  additionalInvoiceInfo,
   products,
   file,
   state,
@@ -18,7 +15,7 @@ export default async function CreateCreditNote(
   let creditNumber = formData.get("creditNumber");
   let date = formData.get("date");
   let errorMessage = validateData(
-    invoiceId,
+    additionalInvoiceInfo.invoiceId,
     creditNumber,
     date,
     products,
@@ -37,7 +34,7 @@ export default async function CreateCreditNote(
   let choosenUser = parseInt(formData.get("user"));
 
   let creditDate = formData.get("date").replaceAll("-", "_");
-  let fileName = `../../database/${dbName}/documents/cn_${creditNumber.replaceAll(/[\\./]/g, "").replaceAll(" ", "_")}_${userId}${userOrg}${choosenClient}_${creditDate}_${Date.now().toString()}.pdf`;
+  let fileName = `../../database/${dbName}/documents/cn_${creditNumber.replaceAll(/[\\./]/g, "").replaceAll(" ", "_")}_${userId}${additionalInvoiceInfo.userOrg}${additionalInvoiceInfo.choosenClient}_${creditDate}_${Date.now().toString()}.pdf`;
   let transformProducts = [];
   products.forEach((element) => {
     transformProducts.push({
@@ -45,7 +42,7 @@ export default async function CreateCreditNote(
       itemId: element.id,
       invoiceId: element.invoiceId,
       purchasePriceId: element.priceId,
-      qty: isYourCreditNote ? element.qty : Math.abs(element.qty),
+      qty: additionalInvoiceInfo.isYourCreditNote ? element.qty : Math.abs(element.qty),
       newPrice: element.price,
     });
     if (element.qty > 0) {
@@ -60,17 +57,7 @@ export default async function CreateCreditNote(
     }
   });
 
-  let creditNoteData = {
-    creditNotenumber: creditNumber,
-    creditNoteDate: formData.get("date"),
-    inSystem: formData.get("status") === "true",
-    isPaid: formData.get("isPaid") === "on",
-    note: formData.get("description") ? formData.get("description") : "",
-    invoiceId: invoiceId,
-    isYourCreditNote: isYourCreditNote,
-    filePath: fileName,
-    creditNoteItems: transformProducts,
-  };
+  let creditNoteData = getData();
 
   const fs = require("node:fs");
   try {
@@ -159,6 +146,20 @@ export default async function CreateCreditNote(
       error: true,
       completed: true,
       message: "Connection error.",
+    };
+  }
+
+  function getData() {
+    return {
+      creditNotenumber: creditNumber,
+      creditNoteDate: formData.get("date"),
+      inSystem: formData.get("status") === "true",
+      isPaid: formData.get("isPaid") === "on",
+      note: formData.get("description") ? formData.get("description") : "",
+      invoiceId: additionalInvoiceInfo.invoiceId,
+      isYourCreditNote: additionalInvoiceInfo.isYourCreditNote,
+      filePath: fileName,
+      creditNoteItems: transformProducts,
     };
   }
 }

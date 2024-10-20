@@ -8,33 +8,19 @@ export default async function getDeliveries(
   isOrg,
   isDeliveryToUser,
   sort,
-  estimatedL,
-  estimatedG,
-  deliveredL,
-  deliveredG,
-  recipient,
-  status,
-  company,
-  waybill,
+  params
 ) {
   const dbName = await getDbName();
   const userId = await getUserId();
   let url = "";
-  let params = getParams(
+  let prepParams = getParams(
     sort,
-    estimatedL,
-    estimatedG,
-    deliveredL,
-    deliveredG,
-    recipient,
-    status,
-    company,
-    waybill,
+    params
   );
   if (isOrg) {
-    url = `${process.env.API_DEST}/${dbName}/Delivery/get/${isDeliveryToUser ? "user" : "client"}${params.length > 0 ? "?" : ""}${params.join("&")}`;
+    url = `${process.env.API_DEST}/${dbName}/Delivery/get/${isDeliveryToUser ? "user" : "client"}${prepParams.length > 0 ? "?" : ""}${prepParams.join("&")}`;
   } else {
-    url = `${process.env.API_DEST}/${dbName}/Delivery/get/${isDeliveryToUser ? "user" : "client"}/${userId}${params.length > 0 ? "?" : ""}${params.join("&")}`;
+    url = `${process.env.API_DEST}/${dbName}/Delivery/get/${isDeliveryToUser ? "user" : "client"}/${userId}${prepParams.length > 0 ? "?" : ""}${prepParams.join("&")}`;
   }
   try {
     const info = await fetch(url, {
@@ -59,24 +45,17 @@ export default async function getDeliveries(
 
 function getParams(
   sort,
-  estimatedL,
-  estimatedG,
-  deliveredL,
-  deliveredG,
-  recipient,
-  status,
-  company,
-  waybill,
+  params
 ) {
-  let params = [];
-  if (sort !== ".None") params.push(`sort=${sort}`);
-  if (estimatedL) params.push(`estimatedL=${estimatedL}`);
-  if (estimatedG) params.push(`estimatedG=${estimatedG}`);
-  if (deliveredL) params.push(`deliveredL=${deliveredL}`);
-  if (deliveredG) params.push(`deliveredG=${deliveredG}`);
-  if (recipient) params.push(`recipient=${recipient}`);
-  if (status) params.push(`status=${status}`);
-  if (company) params.push(`company=${company}`);
-  if (waybill) params.push(`waybill=${waybill}`);
-  return params;
+  let result = [];
+  if (sort !== ".None") result.push(`sort=${sort}`);
+  if (params.estimatedL) result.push(`estimatedL=${params.estimatedL}`);
+  if (params.estimatedG) result.push(`estimatedG=${params.estimatedG}`);
+  if (params.deliveredL) result.push(`deliveredL=${params.deliveredL}`);
+  if (params.deliveredG) result.push(`deliveredG=${params.deliveredG}`);
+  if (params.recipient) result.push(`recipient=${params.recipient}`);
+  if (params.status) result.push(`status=${params.status}`);
+  if (params.company) result.push(`company=${params.company}`);
+  if (params.waybill) result.push(`waybill=${params.waybill}`);
+  return result;
 }

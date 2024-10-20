@@ -204,7 +204,7 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
                   {products.map((value, key) => {
                     return (
                       <ProductHolder
-                        key={key}
+                        key={value}
                         value={value}
                         deleteValue={() => {
                           products.splice(key, 1);

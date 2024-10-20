@@ -22,14 +22,7 @@ export default async function createProforma(
   let transport = formData.get("transport");
   let paymentMethod = formData.get("paymentMethod");
   let errorMessage = validateData(
-    paymentMethod,
-    chosenCurrency,
-    taxes,
-    seller,
-    chosenUser,
-    proformaNumber,
-    transport,
-    products,
+    formData, products
   );
 
   if (errorMessage.length > 6)
@@ -54,16 +47,7 @@ export default async function createProforma(
   let currencyExchangeDate = formData.get("currencyExchange")
     ? formData.get("currencyExchange")
     : formData.get("date");
-  let curVal = 1;
-  let newDate = new Date(currencyExchangeDate);
-  if (chosenCurrency !== "PLN") {
-    if (newDate.getDay() === 0) newDate.setDate(newDate.getDate() - 2); // If is sunday make it friday
-    if (newDate.getDay() === 6) newDate.setDate(newDate.getDate() - 1); // If is saturday make it friday
-    curVal = await getCurrencyValueByDate(
-      chosenCurrency,
-      newDate.toLocaleDateString("en-CA"),
-    );
-  }
+  let curVal = await getCurVal(currencyExchangeDate, chosenCurrency);
 
   if (curVal === 0) {
     return {
@@ -73,27 +57,7 @@ export default async function createProforma(
     };
   }
 
-  let proformaData = {
-    isYourProforma: isYourProforma,
-    proformaNumber: proformaNumber,
-    sellerId: isYourProforma ? parseInt(seller) : orgs.userOrgId,
-    buyerId: isYourProforma ? orgs.userOrgId : parseInt(seller),
-    date: formData.get("date"),
-    transportCost: parseFloat(transport),
-    note: formData.get("description") ? formData.get("description") : "",
-    inSystem: formData.get("status") === "true",
-    path: file ? fileName : null,
-    taxId: parseInt(taxes),
-    paymentId: parseInt(paymentMethod),
-    currencyDate:
-      chosenCurrency === "PLN"
-        ? new Date().toLocaleDateString("en-CA")
-        : currencyExchangeDate,
-    currencyName: chosenCurrency,
-    currencyValue: curVal,
-    userId: parseInt(chosenUser),
-    proformaItems: transformProducts,
-  };
+  let proformaData = getData();
 
   const fs = require("node:fs");
   if (file) {
@@ -190,31 +154,62 @@ export default async function createProforma(
       message: "Connection error.",
     };
   }
+
+  function getData() {
+    return {
+      isYourProforma: isYourProforma,
+      proformaNumber: proformaNumber,
+      sellerId: isYourProforma ? parseInt(seller) : orgs.userOrgId,
+      buyerId: isYourProforma ? orgs.userOrgId : parseInt(seller),
+      date: formData.get("date"),
+      transportCost: parseFloat(transport),
+      note: formData.get("description") ? formData.get("description") : "",
+      inSystem: formData.get("status") === "true",
+      path: file ? fileName : null,
+      taxId: parseInt(taxes),
+      paymentId: parseInt(paymentMethod),
+      currencyDate: chosenCurrency === "PLN"
+        ? new Date().toLocaleDateString("en-CA")
+        : currencyExchangeDate,
+      currencyName: chosenCurrency,
+      currencyValue: curVal,
+      userId: parseInt(chosenUser),
+      proformaItems: transformProducts,
+    };
+  }
 }
+async function getCurVal(currencyExchangeDate, chosenCurrency) {
+  let curVal = 1;
+  let newDate = new Date(currencyExchangeDate);
+  if (chosenCurrency !== "PLN") {
+    if (newDate.getDay() === 0) newDate.setDate(newDate.getDate() - 2); // If is sunday make it friday
+    if (newDate.getDay() === 6) newDate.setDate(newDate.getDate() - 1); // If is saturday make it friday
+    curVal = await getCurrencyValueByDate(
+      chosenCurrency,
+      newDate.toLocaleDateString("en-CA")
+    );
+  }
+  return curVal;
+}
+
 function validateData(
-  paymentMethod,
-  chosenCurrency,
-  taxes,
-  seller,
-  chosenUser,
-  proformaNumber,
-  transport,
+  formData,
   products,
 ) {
   let errorMessage = "Error:";
-  if (!paymentMethod) errorMessage += "\nPayment method must not be empty.";
-  if (!chosenCurrency) errorMessage += "\nCurrency must not be empty.";
-  if (!taxes) errorMessage += "\nTaxes must not be empty.";
-  if (!seller) errorMessage += "\nClient must not be empty.";
-  if (!chosenUser) errorMessage += "\nUser must not be empty.";
+  if (!formData.get("paymentMethod")) errorMessage += "\nPayment method must not be empty.";
+  if (!formData.get("currency")) errorMessage += "\nCurrency must not be empty.";
+  if (!formData.get("taxes")) errorMessage += "\nTaxes must not be empty.";
+  if (!formData.get("org")) errorMessage += "\nClient must not be empty.";
+  if (!formData.get("user")) errorMessage += "\nUser must not be empty.";
   if (
-    !validators.lengthSmallerThen(proformaNumber, 40) ||
-    !validators.stringIsNotEmpty(proformaNumber)
+    !validators.lengthSmallerThen(formData.get("proformaNumber"), 40) ||
+    !validators.stringIsNotEmpty(formData.get("proformaNumber"))
   )
     errorMessage += "\nProforma number must not be empty.";
   if (
-    !validators.isPriceFormat(transport) ||
-    !validators.stringIsNotEmpty(transport)
+    !validators.isPriceFormat(formData.get("transport")) ||
+    !validators.stringIsNotEmpty(formData.get("transport"))
   )
     errorMessage += "\nTransport cost must not be empty and must be decimal.";
   if (products.length <= 0) errorMessage += "\nProforma must have products.";

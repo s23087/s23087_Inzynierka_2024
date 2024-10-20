@@ -64,9 +64,9 @@ function ChangeSelectedStatusWindow({
                   onClick={async () => {
                     setIsActivated(true);
                     let errorCount = 0;
-                    for (let index = 0; index < requestsIds.length; index++) {
+                    for (let val in requestsIds) {
                       let result = await setRequestStatus(
-                        requestsIds[index],
+                        val,
                         "Fulfilled",
                         "",
                       );
@@ -97,9 +97,9 @@ function ChangeSelectedStatusWindow({
                   onClick={async () => {
                     setIsActivated(true);
                     let errorCount = 0;
-                    for (let index = 0; index < requestsIds.length; index++) {
+                    for (let val in requestsIds) {
                       let result = await setRequestStatus(
-                        requestsIds[index],
+                        val,
                         "Request cancelled",
                         "",
                       );

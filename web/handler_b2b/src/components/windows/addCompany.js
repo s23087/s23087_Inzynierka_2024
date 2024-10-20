@@ -119,7 +119,7 @@ function AddDeliveryCompanyWindow({ modalShow, onHideFunction, companies }) {
 AddDeliveryCompanyWindow.propTypes = {
   modalShow: PropTypes.bool.isRequired,
   onHideFunction: PropTypes.func.isRequired,
-  statuses: PropTypes.object.isRequired,
+  companies: PropTypes.array.isRequired,
 };
 
 export default AddDeliveryCompanyWindow;

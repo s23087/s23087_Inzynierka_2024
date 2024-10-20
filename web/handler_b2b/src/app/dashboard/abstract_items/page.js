@@ -14,40 +14,32 @@ async function OutsideItemsPage({ searchParams }) {
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
   let currentSort = searchParams.orderBy ?? ".None";
-  let qtyL = searchParams.qtyL;
-  let qtyG = searchParams.qtyG;
-  let priceL = searchParams.priceL;
-  let priceG = searchParams.priceG;
-  let source = searchParams.source;
-  let currency = searchParams.currency;
+  let params = {
+    qtyL : searchParams.qtyL,
+   qtyG : searchParams.qtyG,
+   priceL : searchParams.priceL,
+   priceG : searchParams.priceG,
+   source : searchParams.source,
+   currency : searchParams.currency,
+  }
   let filterActivated =
     searchParams.orderBy ||
-    qtyL ||
-    qtyG ||
-    priceL ||
-    priceG ||
-    source ||
-    currency;
+    params.qtyL ||
+    params.qtyG ||
+    params.priceL ||
+    params.priceG ||
+    params.source ||
+    params.currency;
   let isSearchTrue = searchParams.searchQuery !== undefined;
   let outsideItems = isSearchTrue
     ? await getSearchOutsideItems(
         searchParams.searchQuery,
         currentSort,
-        qtyL,
-        qtyG,
-        priceL,
-        priceG,
-        source,
-        currency,
+        params
       )
     : await getOutsideItems(
         currentSort,
-        qtyL,
-        qtyG,
-        priceL,
-        priceG,
-        source,
-        currency,
+        params
       );
   let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
   let pageQty = Math.ceil(outsideItems.length / maxInstanceOnPage);

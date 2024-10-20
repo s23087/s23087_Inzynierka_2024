@@ -6,30 +6,12 @@ import getUserId from "../auth/get_user_id";
 export default async function getSearchPricelists(
   search,
   sort,
-  totalL,
-  totalR,
-  status,
-  currency,
-  type,
-  createdL,
-  createdG,
-  modifiedL,
-  modifiedG,
+  params
 ) {
   const dbName = await getDbName();
   const userId = await getUserId();
-  let params = [];
-  if (sort !== ".None") params.push(`sort=${sort}`);
-  if (totalL) params.push(`totalL=${totalL}`);
-  if (totalR) params.push(`totalR=${totalR}`);
-  if (status) params.push(`status=${status}`);
-  if (currency) params.push(`currency=${currency}`);
-  if (type) params.push(`type=${type}`);
-  if (createdL) params.push(`createdL=${createdL}`);
-  if (createdG) params.push(`createdG=${createdG}`);
-  if (modifiedL) params.push(`modifiedL=${modifiedL}`);
-  if (modifiedG) params.push(`modifiedG=${modifiedG}`);
-  let url = `${process.env.API_DEST}/${dbName}/Offer/get/${userId}?search=${search}${params.length > 0 ? "&" : ""}${params.join("&")}`;
+  let prepParams = getPrepParams(sort, params);
+  let url = `${process.env.API_DEST}/${dbName}/Offer/get/${userId}?search=${search}${prepParams.length > 0 ? "&" : ""}${prepParams.join("&")}`;
   console.log(url);
   try {
     const info = await fetch(url, {
@@ -45,4 +27,19 @@ export default async function getSearchPricelists(
     console.error("getSearchPricelists fetch failed.");
     return null;
   }
+}
+
+function getPrepParams(sort, params) {
+  let result = [];
+  if (sort !== ".None") result.push(`sort=${sort}`);
+  if (params.totalL) result.push(`totalL=${params.totalL}`);
+  if (params.totalR) result.push(`totalR=${params.totalR}`);
+  if (params.status) result.push(`status=${params.status}`);
+  if (params.currency) result.push(`currency=${params.currency}`);
+  if (params.type) result.push(`type=${params.type}`);
+  if (params.createdL) result.push(`createdL=${params.createdL}`);
+  if (params.createdG) result.push(`createdG=${params.createdG}`);
+  if (params.modifiedL) result.push(`modifiedL=${params.modifiedL}`);
+  if (params.modifiedG) result.push(`modifiedG=${params.modifiedG}`);
+  return result;
 }

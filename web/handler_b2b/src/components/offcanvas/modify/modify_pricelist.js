@@ -244,10 +244,10 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
                   style={maxHeightScrollContainer}
                   key={resetSeed}
                 >
-                  {products.map((value, key) => {
+                  {products.map((value) => {
                     return (
                       <ProductHolder
-                        key={key}
+                        key={value}
                         value={value}
                         deleteValue={() => {
                           products.splice(key, 1);

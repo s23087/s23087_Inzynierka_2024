@@ -1,6 +1,7 @@
 ﻿using database_communicator.Models;
 using database_communicator.Models.DTOs;
 using database_communicator.Services;
+using database_comunicator.FilterClass;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -102,16 +103,29 @@ namespace database_communicator.Controllers
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
             IEnumerable<GetInvoices> result;
+            var filters = new InvoiceFiltersTemplate
+            {
+                DateL = dateL,
+                DateG = dateG,
+                DueL = dueL,
+                DueG = dueG,
+                QtyL = qtyL,
+                QtyG = qtyG,
+                TotalL = totalL,
+                TotalG = totalG,
+                Recipient = recipient,
+                Currency = currency,
+                PaymentStatus = paymentStatus,
+                Status = status
+            };
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound(userNotFoundMessage);
             if (search != null)
             {
-                result = await _invoicesService.GetPurchaseInvoices(userId, search, sort: sort, dateL, dateG, dueL, dueG,
-                    qtyL, qtyG, totalL, totalG, recipient, currency, paymentStatus, status);
+                result = await _invoicesService.GetPurchaseInvoices(userId, search, sort: sort, filters);
                 return Ok(result);
             }
-            result = await _invoicesService.GetPurchaseInvoices(userId, sort: sort, dateL, dateG, dueL, dueG,
-                    qtyL, qtyG, totalL, totalG, recipient, currency, paymentStatus, status);
+            result = await _invoicesService.GetPurchaseInvoices(userId, sort: sort, filters);
             return Ok(result);
         }
         [HttpGet]
@@ -120,14 +134,27 @@ namespace database_communicator.Controllers
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
             IEnumerable<GetInvoices> result;
+            var filters = new InvoiceFiltersTemplate
+            {
+                DateL = dateL,
+                DateG = dateG,
+                DueL = dueL,
+                DueG = dueG,
+                QtyL = qtyL,
+                QtyG = qtyG,
+                TotalL = totalL,
+                TotalG = totalG,
+                Recipient = recipient,
+                Currency = currency,
+                PaymentStatus = paymentStatus,
+                Status = status
+            };
             if (search != null)
             {
-                result = await _invoicesService.GetPurchaseInvoices(search, sort: sort, dateL, dateG, dueL, dueG,
-                    qtyL, qtyG, totalL, totalG, recipient, currency, paymentStatus, status);
+                result = await _invoicesService.GetPurchaseInvoices(search, sort: sort, filters);
                 return Ok(result);
             }
-            result = await _invoicesService.GetPurchaseInvoices(sort: sort, dateL, dateG, dueL, dueG,
-                    qtyL, qtyG, totalL, totalG, recipient, currency, paymentStatus, status);
+            result = await _invoicesService.GetPurchaseInvoices(sort: sort, filters);
             return Ok(result);
         }
         [HttpGet]
@@ -136,16 +163,29 @@ namespace database_communicator.Controllers
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
             IEnumerable<GetInvoices> result;
+            var filters = new InvoiceFiltersTemplate
+            {
+                DateL = dateL,
+                DateG = dateG,
+                DueL = dueL,
+                DueG = dueG,
+                QtyL = qtyL,
+                QtyG = qtyG,
+                TotalL = totalL,
+                TotalG = totalG,
+                Recipient = recipient,
+                Currency = currency,
+                PaymentStatus = paymentStatus,
+                Status = status
+            };
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound(userNotFoundMessage);
             if (search != null)
             {
-                result = await _invoicesService.GetSalesInvoices(userId, search, sort: sort, dateL, dateG, dueL, dueG,
-                    qtyL, qtyG, totalL, totalG, recipient, currency, paymentStatus, status);
+                result = await _invoicesService.GetSalesInvoices(userId, search, sort: sort, filters);
                 return Ok(result);
             }
-            result = await _invoicesService.GetSalesInvoices(userId, sort: sort, dateL, dateG, dueL, dueG,
-                    qtyL, qtyG, totalL, totalG, recipient, currency, paymentStatus, status);
+            result = await _invoicesService.GetSalesInvoices(userId, sort: sort, filters);
             return Ok(result);
         }
         [HttpGet]
@@ -154,14 +194,27 @@ namespace database_communicator.Controllers
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
             IEnumerable<GetInvoices> result;
+            var filters = new InvoiceFiltersTemplate
+            {
+                DateL = dateL,
+                DateG = dateG,
+                DueL = dueL,
+                DueG = dueG,
+                QtyL = qtyL,
+                QtyG = qtyG,
+                TotalL = totalL,
+                TotalG = totalG,
+                Recipient = recipient,
+                Currency = currency,
+                PaymentStatus = paymentStatus,
+                Status = status
+            };
             if (search != null)
             {
-                result = await _invoicesService.GetSalesInvoices(search, sort: sort, dateL, dateG, dueL, dueG,
-                    qtyL, qtyG, totalL, totalG, recipient, currency, paymentStatus, status);
+                result = await _invoicesService.GetSalesInvoices(search, sort: sort, filters);
                 return Ok(result);
             }
-            result = await _invoicesService.GetSalesInvoices(sort: sort, dateL, dateG, dueL, dueG,
-                    qtyL, qtyG, totalL, totalG, recipient, currency, paymentStatus, status);
+            result = await _invoicesService.GetSalesInvoices(sort: sort, filters);
             return Ok(result);
         }
         [HttpPost]

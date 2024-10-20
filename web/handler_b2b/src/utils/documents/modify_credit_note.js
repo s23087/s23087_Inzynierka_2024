@@ -66,17 +66,7 @@ export default async function updateCreditNote(
     }
   }
 
-  let data = {
-    isYourCredit: isYourCredit,
-    id: creditNoteId,
-    creditNumber:
-      creditNoteNumber !== prevState.creditNoteNumber ? creditNoteNumber : null,
-    date: date !== prevState.date ? date : null,
-    inSystem: status !== prevState.inSystem ? status : null,
-    isPaid: isPaid !== prevState.isPaid ? isPaid : null,
-    path: path ? path : null,
-    note: note !== prevState.note ? note : null,
-  };
+  let data = getData();
 
   try {
     const userId = await getUserId();
@@ -111,37 +101,7 @@ export default async function updateCreditNote(
 
     if (info.ok) {
       if (data.creditNumber) {
-        try {
-          fs.renameSync(prevPath, data.path);
-        } catch (error) {
-          const pathChange = await fetch(
-            `${process.env.API_DEST}/${dbName}/CreditNote/modify?userId=${userId}`,
-            {
-              method: "POST",
-              body: JSON.stringify({
-                isYourCredit: isYourCredit,
-                id: creditNoteId,
-                path: prevPath,
-              }),
-              headers: {
-                "Content-Type": "application/json",
-              },
-            },
-          );
-          if (pathChange.ok) {
-            return {
-              error: true,
-              completed: true,
-              message: "Success with errors! The file has not been renamed.",
-            };
-          } else {
-            return {
-              error: true,
-              completed: true,
-              message: "Critical error. Invoice has been updated but file not.",
-            };
-          }
-        }
+        return await changeObjectPath(prevPath, data, dbName, userId, isYourCredit, creditNoteId)
       }
       return {
         error: false,
@@ -162,6 +122,54 @@ export default async function updateCreditNote(
       completed: true,
       message: "Connection error.",
     };
+  }
+
+  function getData() {
+    return {
+      isYourCredit: isYourCredit,
+      id: creditNoteId,
+      creditNumber: creditNoteNumber !== prevState.creditNoteNumber ? creditNoteNumber : null,
+      date: date !== prevState.date ? date : null,
+      inSystem: status !== prevState.inSystem ? status : null,
+      isPaid: isPaid !== prevState.isPaid ? isPaid : null,
+      path: path ?? null,
+      note: note !== prevState.note ? note : null,
+    };
+  }
+}
+
+async function changeObjectPath(prevPath, data, dbName, userId, isYourCredit, creditNoteId){
+  const fs = require("node:fs")
+  try {
+    fs.renameSync(prevPath, data.path);
+  } catch (error) {
+    const pathChange = await fetch(
+      `${process.env.API_DEST}/${dbName}/CreditNote/modify/${userId}`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          isYourCredit: isYourCredit,
+          id: creditNoteId,
+          path: prevPath,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+    if (pathChange.ok) {
+      return {
+        error: true,
+        completed: true,
+        message: "Success with errors! The file has not been renamed.",
+      };
+    } else {
+      return {
+        error: true,
+        completed: true,
+        message: "Critical error. Invoice has been updated but file not.",
+      };
+    }
   }
 }
 

@@ -19,6 +19,8 @@ namespace database_comunicator.FilterClass
     }
     public static class OfferFilters
     {
+        private const string dateFormat = "yyyy-MM-dd";
+
         public static Expression<Func<Offer, bool>> GetStatusFilter(string? status)
         {
             return status == null ?
@@ -53,25 +55,25 @@ namespace database_comunicator.FilterClass
         {
             return createdL == null ?
                 e => true
-                : e => e.CreationDate <= DateTime.ParseExact(createdL, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                : e => e.CreationDate <= DateTime.ParseExact(createdL, OfferFilters.dateFormat, CultureInfo.InvariantCulture);
         }
         public static Expression<Func<Offer, bool>> GetCreatedGreaterFilter(string? createdG)
         {
             return createdG == null ?
                 e => true
-                : e => e.CreationDate >= DateTime.ParseExact(createdG, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                : e => e.CreationDate >= DateTime.ParseExact(createdG, OfferFilters.dateFormat, CultureInfo.InvariantCulture);
         }
         public static Expression<Func<Offer, bool>> GetModifiedLowerFilter(string? modifiedL)
         {
             return modifiedL == null ?
                 e => true
-                : e => e.ModificationDate <= DateTime.ParseExact(modifiedL, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                : e => e.ModificationDate <= DateTime.ParseExact(modifiedL, OfferFilters.dateFormat, CultureInfo.InvariantCulture);
         }
         public static Expression<Func<Offer, bool>> GetModifiedGreaterFilter(string? modifiedG)
         {
             return modifiedG == null ?
                 e => true
-                : e => e.ModificationDate >= DateTime.ParseExact(modifiedG, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                : e => e.ModificationDate >= DateTime.ParseExact(modifiedG, OfferFilters.dateFormat, CultureInfo.InvariantCulture);
         }
     }
 }

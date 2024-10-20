@@ -21,29 +21,31 @@ namespace database_comunicator.FilterClass
     }
     public static class InvoiceFilters
     {
+        private const string dateFormat = "yyyy-MM-dd";
+
         public static Expression<Func<Invoice, bool>> GetDateLowerFilter(string? dateL)
         {
             return dateL == null ?
                 e => true
-                : e => e.InvoiceDate <= DateTime.ParseExact(dateL, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                : e => e.InvoiceDate <= DateTime.ParseExact(dateL, InvoiceFilters.dateFormat, CultureInfo.InvariantCulture);
         }
         public static Expression<Func<Invoice, bool>> GetDateGreaterFilter(string? dateG)
         {
             return dateG == null ?
                 e => true
-                : e => e.InvoiceDate >= DateTime.ParseExact(dateG, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                : e => e.InvoiceDate >= DateTime.ParseExact(dateG, InvoiceFilters.dateFormat, CultureInfo.InvariantCulture);
         }
         public static Expression<Func<Invoice, bool>> GetDueLowerFilter(string? dueL)
         {
             return dueL == null ?
                 e => true
-                : e => e.DueDate <= DateTime.ParseExact(dueL, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                : e => e.DueDate <= DateTime.ParseExact(dueL, InvoiceFilters.dateFormat, CultureInfo.InvariantCulture);
         }
         public static Expression<Func<Invoice, bool>> GetDueGreaterFilter(string? dueG)
         {
             return dueG == null ?
                 e => true
-                : e => e.DueDate >= DateTime.ParseExact(dueG, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                : e => e.DueDate >= DateTime.ParseExact(dueG, InvoiceFilters.dateFormat, CultureInfo.InvariantCulture);
         }
         public static Expression<Func<Invoice, bool>> GetQtyLowerFilter(int? qtyL, bool isPurchaseInvoice)
         {

@@ -64,12 +64,9 @@ export default async function modifyPricelist(
   orgName = orgName.replace(" ", "");
   let fileName = "";
   let attributeChanged =
-    offerName !== prevState.offerName ||
-    maxQtyForm !== prevState.maxQty ||
-    currency !== prevState.currency ||
-    type !== prevState.type;
+    getAtributeChanged(offerName, prevState, maxQtyForm, currency, type);
   const fs = require("node:fs");
-  if (attributeChanged && status !== deactivatedId) {
+  if (requireNewPath(attributeChanged, status, deactivatedId)) {
     fileName = `src/app/api/pricelist/${orgName}/${offerName.replaceAll(" ", "_").replaceAll(/[^a-zA-Z0-9_]/g, 25 + userId)}${maxQtyForm}${currency}${Date.now().toString()}.${type}`;
     try {
       if (fs.existsSync(fileName)) {
@@ -112,18 +109,7 @@ export default async function modifyPricelist(
     });
   });
 
-  let data = {
-    userId: userId,
-    offerId: offerId,
-    offerName: offerName !== prevState.offerName ? offerName : null,
-    offerStatusId: parseInt(status) !== -1 ? parseInt(status) : null,
-    maxQty:
-      parseInt(maxQtyForm) !== prevState.maxQty ? parseInt(maxQtyForm) : null,
-    currencyName: currency !== prevState.currency ? currency : null,
-    path: fileName === "" ? null : fileName,
-    type: type !== prevState.type ? type : null,
-    items: transformProducts,
-  };
+  let data = getData();
 
   try {
     const info = await fetch(`${process.env.API_DEST}/${dbName}/Offer/modify`, {
@@ -185,7 +171,32 @@ export default async function modifyPricelist(
       message: "Connection error.",
     };
   }
+
+  function getData() {
+    return {
+      userId: userId,
+      offerId: offerId,
+      offerName: offerName !== prevState.offerName ? offerName : null,
+      offerStatusId: parseInt(status) !== -1 ? parseInt(status) : null,
+      maxQty: parseInt(maxQtyForm) !== prevState.maxQty ? parseInt(maxQtyForm) : null,
+      currencyName: currency !== prevState.currency ? currency : null,
+      path: fileName === "" ? null : fileName,
+      type: type !== prevState.type ? type : null,
+      items: transformProducts,
+    };
+  }
 }
+function requireNewPath(attributeChanged, status, deactivatedId) {
+  return attributeChanged && status !== deactivatedId;
+}
+
+function getAtributeChanged(offerName, prevState, maxQtyForm, currency, type) {
+  return offerName !== prevState.offerName ||
+    maxQtyForm !== prevState.maxQty ||
+    currency !== prevState.currency ||
+    type !== prevState.type;
+}
+
 function validateData(status, offerName, maxQtyForm, products) {
   let errorMessage = "Error:";
   if (!status) errorMessage += "\nStatus must not be empty.";

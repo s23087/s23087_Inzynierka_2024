@@ -1,5 +1,6 @@
 "use server";
 
+import PropTypes from "prop-types";
 import WholeFooter from "@/components/footer/whole_footers/whole_footer";
 import DeliveryMenu from "@/components/menu/wholeMenu/delivery_menu";
 import DeliveryList from "@/components/object_list/delivery_list";
@@ -10,30 +11,32 @@ import getSearchDeliveries from "@/utils/deliveries/get_search_deliveries";
 import getBasicInfo from "@/utils/menu/get_basic_user_info";
 import getNotificationCounter from "@/utils/menu/get_nofication_counter";
 
-export default async function DeliveriesPage({ searchParams }) {
+async function DeliveriesPage({ searchParams }) {
   const current_role = await getRole();
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
   const is_org_switch_needed = current_role == "Admin";
   let currentSort = searchParams.orderBy ?? ".None";
-  let estimatedL = searchParams.estimatedL;
-  let estimatedG = searchParams.estimatedG;
-  let deliveredL = searchParams.deliveredL;
-  let deliveredG = searchParams.deliveredG;
-  let recipient = searchParams.recipient;
-  let status = searchParams.status;
-  let company = searchParams.company;
-  let waybill = searchParams.waybill;
+  let params = {
+    estimatedL : searchParams.estimatedL,
+   estimatedG : searchParams.estimatedG,
+   deliveredL : searchParams.deliveredL,
+   deliveredG : searchParams.deliveredG,
+   recipient : searchParams.recipient,
+   status : searchParams.status,
+   company : searchParams.company,
+   waybill : searchParams.waybill,
+  }
   let filterActivated =
     searchParams.orderBy ||
-    estimatedL ||
-    estimatedG ||
-    deliveredL ||
-    deliveredG ||
-    recipient ||
-    status ||
-    company ||
-    waybill;
+    params.estimatedL ||
+    params.estimatedG ||
+    params.deliveredL ||
+    params.deliveredG ||
+    params.recipient ||
+    params.status ||
+    params.company ||
+    params.waybill;
   let type = searchParams.deliveryType
     ? searchParams.deliveryType
     : "Deliveries to user";
@@ -47,27 +50,13 @@ export default async function DeliveriesPage({ searchParams }) {
         type === "Deliveries to user",
         searchParams.searchQuery,
         currentSort,
-        estimatedL,
-        estimatedG,
-        deliveredL,
-        deliveredG,
-        recipient,
-        status,
-        company,
-        waybill,
+        params
       )
     : await getDeliveries(
         org_view,
         type === "Deliveries to user",
         currentSort,
-        estimatedL,
-        estimatedG,
-        deliveredL,
-        deliveredG,
-        recipient,
-        status,
-        company,
-        waybill,
+        params
       );
   let deliveriesLength = deliveries ? deliveries.length : 0;
   let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
@@ -111,3 +100,9 @@ export default async function DeliveriesPage({ searchParams }) {
     </main>
   );
 }
+
+DeliveriesPage.propTypes = {
+  searchParams: PropTypes.object
+}
+
+export default DeliveriesPage

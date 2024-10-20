@@ -1,5 +1,6 @@
 "use server";
 
+import PropTypes from "prop-types";
 import InvoiceMenu from "@/components/menu/wholeMenu/invoice_menu";
 import InvoiceList from "@/components/object_list/invoice_list";
 import WholeFooter from "@/components/footer/whole_footers/whole_footer";
@@ -78,7 +79,7 @@ async function getDocuments(docType, org_view, search, currentSort, params) {
   return await getYoursInvoices(org_view, currentSort, params);
 }
 
-export default async function InvoicesPage({ searchParams }) {
+async function InvoicesPage({ searchParams }) {
   const current_role = await getRole();
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
@@ -180,3 +181,9 @@ export default async function InvoicesPage({ searchParams }) {
     );
   }
 }
+
+InvoicesPage.propTypes = {
+  searchParams: PropTypes.object
+}
+
+export default InvoicesPage

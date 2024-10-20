@@ -5,9 +5,8 @@ import { Container } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import SearchFilterBar from "../menu/search_filter_bar";
 import MoreActionWindow from "../windows/more_action";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import DeleteObjectWindow from "../windows/delete_object";
-import { useRouter } from "next/navigation";
 import InvoiceContainer from "../object_container/documents/yours_invoice_container";
 import CreditNoteContainer from "../object_container/documents/credit_note_contianter";
 import RequestContainer from "../object_container/documents/request_container";
@@ -43,10 +42,7 @@ function getIfSelected(type, document, selected) {
 }
 
 function getDocument(
-  type,
-  document,
-  is_org,
-  selected,
+  documentObject,
   selectAction,
   unselectAction,
   deleteAction,
@@ -55,14 +51,14 @@ function getDocument(
   completeAction,
   rejectAction,
 ) {
-  if (type.includes("note")) {
+  if (documentObject.type.includes("note")) {
     return (
       <CreditNoteContainer
-        key={document.creditNoteId}
-        credit_note={document}
-        is_org={is_org}
-        selected={selected}
-        is_user_type={type.includes("yours")}
+        key={documentObject.document.creditNoteId}
+        credit_note={documentObject.document}
+        is_org={documentObject.is_org}
+        selected={documentObject.selected}
+        is_user_type={documentObject.type.includes("yours")}
         selectAction={selectAction}
         unselectAction={unselectAction}
         viewAction={viewAction}
@@ -71,13 +67,13 @@ function getDocument(
       />
     );
   }
-  if (type.includes("Requests")) {
+  if (documentObject.type.includes("Requests")) {
     return (
       <RequestContainer
-        key={document.id}
-        request={document}
-        is_org={is_org}
-        selected={selected}
+        key={documentObject.document.id}
+        request={documentObject.document}
+        is_org={documentObject.is_org}
+        selected={documentObject.selected}
         selectAction={selectAction}
         unselectAction={unselectAction}
         viewAction={viewAction}
@@ -91,11 +87,11 @@ function getDocument(
 
   return (
     <InvoiceContainer
-      key={document.invoiceId}
-      invoice={document}
-      is_org={is_org}
-      selected={selected}
-      is_user_type={type.includes("Yours")}
+      key={documentObject.document.invoiceId}
+      invoice={documentObject.document}
+      is_org={documentObject.is_org}
+      selected={documentObject.selected}
+      is_user_type={documentObject.type.includes("Yours")}
       selectAction={selectAction}
       unselectAction={unselectAction}
       deleteAction={deleteAction}
@@ -247,24 +243,23 @@ function InvoiceList({
           .slice(invoiceStart, invoiceEnd)
           .map((value) => {
             return getDocument(
-              type,
-              value,
-              orgView,
-              getIfSelected(type, value, selectedDocuments),
+              {
+                type: type,
+                value: value,
+                orgView: orgView,
+                selected: getIfSelected(type, value, selectedDocuments)
+              },
               () => {
                 // Select
                 setSelectedQty(selectedQty + 1);
                 if (type.includes("notes")) {
                   selectedDocuments.push(value.creditNoteId);
-                  return;
                 }
                 if (type.includes("invoice")) {
                   selectedDocuments.push(value.invoiceId);
-                  return;
                 }
                 if (type === "Requests") {
                   selectedDocuments.push(value.id);
-                  return;
                 }
               },
               () => {

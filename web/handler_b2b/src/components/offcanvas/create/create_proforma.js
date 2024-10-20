@@ -404,9 +404,9 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
                   >
                     {currencyList.error
                       ? null
-                      : currencyList.rates.map((val, key) => {
+                      : currencyList.rates.map((val) => {
                           return (
-                            <option key={key} value={val.effectiveDate}>
+                            <option key={val} value={val.effectiveDate}>
                               {val.mid} Date: {val.effectiveDate}
                             </option>
                           );
@@ -484,10 +484,10 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
                   style={maxHeightScrollContainer}
                   key={resetSeed}
                 >
-                  {products.map((value, key) => {
+                  {products.map((value) => {
                     return (
                       <ProductHolder
-                        key={key}
+                        key={value}
                         value={value}
                         deleteValue={() => {
                           products.splice(key, 1);

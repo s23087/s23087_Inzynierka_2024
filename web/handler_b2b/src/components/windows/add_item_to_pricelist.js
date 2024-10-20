@@ -42,11 +42,10 @@ function AddItemToPricelistWindow({
           }
         }
       });
-    } else {
-      if (products[0]) {
-        setChosenPrice(products[0].purchasePrice.toFixed(2));
-        setChosenMargin((0.0).toFixed(2));
-      }
+    }
+    if (products[0] && modalShow) {
+      setChosenPrice(products[0].purchasePrice.toFixed(2));
+      setChosenMargin((0.0).toFixed(2));
     }
   }, [modalShow, addedProducts, currency]);
   const [chosenPrice, setChosenPrice] = useState(0);
@@ -108,7 +107,7 @@ function AddItemToPricelistWindow({
               {products.map((val, key) => {
                 if (val.qty > 0) {
                   return (
-                    <option key={key} value={key}>
+                    <option key={val} value={key}>
                       {val.partnumber +
                         " - " +
                         val.qty +

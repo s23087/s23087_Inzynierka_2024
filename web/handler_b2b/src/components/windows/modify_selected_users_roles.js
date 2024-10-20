@@ -61,9 +61,9 @@ function ModifySelectedUserRole({
                       let formData = new FormData();
                       formData.set("role", role);
                       let errorCount = 0;
-                      for (let index = 0; index < users.length; index++) {
+                      for (let val in users) {
                         let result = await modifyUserRole(
-                          users[index],
+                          val,
                           {},
                           formData,
                         );

@@ -1,5 +1,6 @@
 "use server";
 
+import PropTypes from "prop-types";
 import WholeFooter from "@/components/footer/whole_footers/whole_footer";
 import ProformaMenu from "@/components/menu/wholeMenu/proforma_menu";
 import ProformaList from "@/components/object_list/proforma_list";
@@ -10,30 +11,32 @@ import getNotificationCounter from "@/utils/menu/get_nofication_counter";
 import getProformas from "@/utils/proformas/get_proformas";
 import getSearchProformas from "@/utils/proformas/get_search_proformas";
 
-export default async function ProformasPage({ searchParams }) {
+async function ProformasPage({ searchParams }) {
   const current_role = await getRole();
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
   const is_org_switch_needed = current_role == "Admin";
   let currentSort = searchParams.orderBy ?? ".None";
-  let qtyL = searchParams.qtyL;
-  let qtyG = searchParams.qtyG;
-  let totalL = searchParams.totalL;
-  let totalG = searchParams.totalG;
-  let dateL = searchParams.dateL;
-  let dateG = searchParams.dateG;
-  let recipient = searchParams.recipient;
-  let currency = searchParams.currency;
+  let params = {
+    qtyL : searchParams.qtyL,
+   qtyG : searchParams.qtyG,
+   totalL : searchParams.totalL,
+   totalG : searchParams.totalG,
+   dateL : searchParams.dateL,
+   dateG : searchParams.dateG,
+   recipient : searchParams.recipient,
+   currency : searchParams.currency,
+  }
   let filterActivated =
     searchParams.orderBy ||
-    qtyL ||
-    qtyG ||
-    totalL ||
-    totalG ||
-    dateL ||
-    dateG ||
-    recipient ||
-    currency;
+    params.qtyL ||
+    params.qtyG ||
+    params.totalL ||
+    params.totalG ||
+    params.dateL ||
+    params.dateG ||
+    params.recipient ||
+    params.currency;
   let type = searchParams.proformaType
     ? searchParams.proformaType
     : "Yours proformas";
@@ -47,27 +50,13 @@ export default async function ProformasPage({ searchParams }) {
         type === "Yours proformas",
         searchParams.searchQuery,
         currentSort,
-        qtyL,
-        qtyG,
-        totalL,
-        totalG,
-        dateL,
-        dateG,
-        recipient,
-        currency,
+        params
       )
     : await getProformas(
         org_view,
         type === "Yours proformas",
         currentSort,
-        qtyL,
-        qtyG,
-        totalL,
-        totalG,
-        dateL,
-        dateG,
-        recipient,
-        currency,
+        params
       );
   let proformasLength = proformas ? proformas.length : 0;
   let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
@@ -111,3 +100,9 @@ export default async function ProformasPage({ searchParams }) {
     </main>
   );
 }
+
+ProformasPage.propTypes = {
+  searchParams: PropTypes.object
+}
+
+export default ProformasPage

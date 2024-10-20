@@ -1,5 +1,6 @@
 "use server";
 
+import PropTypes from "prop-types";
 import WholeFooter from "@/components/footer/whole_footers/whole_footer";
 import PricelistMenu from "@/components/menu/wholeMenu/pricelist_menu";
 import PricelistList from "@/components/object_list/pricelist_list";
@@ -9,56 +10,43 @@ import getNotificationCounter from "@/utils/menu/get_nofication_counter";
 import getPricelists from "@/utils/pricelist/get_pricelist";
 import getSearchPricelists from "@/utils/pricelist/get_search_pricelist";
 
-export default async function PricelistPage({ searchParams }) {
+async function PricelistPage({ searchParams }) {
   const current_role = await getRole();
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
-  let createdL = searchParams.createdL;
-  let createdG = searchParams.createdG;
-  let modifiedL = searchParams.modifiedL;
-  let modifiedG = searchParams.modifiedG;
-  let totalL = searchParams.totalL;
-  let totalG = searchParams.totalG;
-  let status = searchParams.status;
-  let currency = searchParams.currency;
-  let type = searchParams.type;
+  let params = {
+    createdL : searchParams.createdL,
+     createdG : searchParams.createdG,
+     modifiedL : searchParams.modifiedL,
+     modifiedG : searchParams.modifiedG,
+     totalL : searchParams.totalL,
+     totalG : searchParams.totalG,
+     status : searchParams.status,
+     currency : searchParams.currency,
+     type : searchParams.type,
+  }
   let filterActivated =
-    totalL ||
-    totalG ||
-    status ||
-    currency ||
-    type ||
-    createdL ||
-    createdG ||
-    modifiedL ||
-    modifiedG;
+  searchParams.orderBy ||
+    params.totalL ||
+    params.totalG ||
+    params.status ||
+    params.currency ||
+    params.type ||
+    params.createdL ||
+    params.createdG ||
+    params.modifiedL ||
+    params.modifiedG;
   let currentSort = searchParams.orderBy ?? ".None";
   let isSearchTrue = searchParams.searchQuery !== undefined;
   let pricelists = isSearchTrue
     ? await getSearchPricelists(
         searchParams.searchQuery,
         currentSort,
-        totalL,
-        totalG,
-        status,
-        currency,
-        type,
-        createdL,
-        createdG,
-        modifiedL,
-        modifiedG,
+        params
       )
     : await getPricelists(
         currentSort,
-        totalL,
-        totalG,
-        status,
-        currency,
-        type,
-        createdL,
-        createdG,
-        modifiedL,
-        modifiedG,
+        params
       );
   let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
   let itemsLength = pricelists === null ? 0 : pricelists.length;
@@ -97,3 +85,9 @@ export default async function PricelistPage({ searchParams }) {
     </main>
   );
 }
+
+PricelistPage.propTypes = {
+  searchParams: PropTypes.object
+}
+
+export default PricelistPage

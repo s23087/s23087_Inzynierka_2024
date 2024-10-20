@@ -1,5 +1,6 @@
 "use server";
 
+import PropTypes from "prop-types";
 import WarehouseMenu from "@/components/menu/wholeMenu/warehouse_menu";
 import WholeFooter from "@/components/footer/whole_footers/whole_footer";
 import ProductList from "@/components/object_list/product_list";
@@ -10,26 +11,28 @@ import getItems from "@/utils/warehouse/get_items";
 import getSearchItems from "@/utils/warehouse/get_search_items";
 import getOrgView from "@/utils/auth/get_org_view";
 
-export default async function WarehousePage({ searchParams }) {
+async function WarehousePage({ searchParams }) {
   const current_role = await getRole();
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
   const is_org_switch_needed = current_role == "Admin";
-  let filterStatus = searchParams.status ?? null;
-  let eanFilter = searchParams.ean ?? null;
   let currentSort = searchParams.orderBy ?? ".None";
-  let qtyL = searchParams.qtyL ?? null;
-  let qtyG = searchParams.qtyG ?? null;
-  let priceL = searchParams.priceL ?? null;
-  let priceG = searchParams.priceG ?? null;
+  let params = {
+    filterStatus : searchParams.status,
+   eanFilter : searchParams.ean,
+    qtyL : searchParams.qtyL,
+   qtyG : searchParams.qtyG,
+   priceL : searchParams.priceL,
+   priceG : searchParams.priceG,
+  }
   let filterActivated =
     searchParams.orderBy ||
-    filterStatus ||
-    eanFilter ||
-    qtyL ||
-    qtyG ||
-    priceL ||
-    priceG;
+    params.filterStatus ||
+    params.eanFilter ||
+    params.qtyL ||
+    params.qtyG ||
+    params.priceL ||
+    params.priceG;
   let orgActivated =
     searchParams.isOrg !== undefined ? searchParams.isOrg : false;
   let org_view = getOrgView(current_role, orgActivated === "true");
@@ -41,23 +44,13 @@ export default async function WarehousePage({ searchParams }) {
         org_view,
         searchParams.searchQuery,
         currentSort,
-        filterStatus,
-        eanFilter,
-        qtyL,
-        qtyG,
-        priceL,
-        priceG,
+        params
       )
     : await getItems(
         currency,
         org_view,
         currentSort,
-        filterStatus,
-        eanFilter,
-        qtyL,
-        qtyG,
-        priceL,
-        priceG,
+        params
       );
   let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
   let productsLength = products ? products.length : 0;
@@ -101,3 +94,9 @@ export default async function WarehousePage({ searchParams }) {
     </main>
   );
 }
+
+WarehousePage.propTypes = {
+  searchParams: PropTypes.object
+}
+
+export default WarehousePage

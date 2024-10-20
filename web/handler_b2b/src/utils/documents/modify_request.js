@@ -40,13 +40,11 @@ export default async function updateRequest(
       };
     }
     try {
-      if (file) {
-        if (prevPath === "")
-          prevPath = `../../database/${dbName}/documents/req_${recevierId}${userId}${objectType.replace(" ", "")}${Date.now().toString()}.pdf`;
-        let buffArray = await file.get("file").arrayBuffer();
-        let buff = new Uint8Array(buffArray);
-        fs.writeFileSync(prevPath, buff);
-      }
+      if (prevPath === "")
+        prevPath = `../../database/${dbName}/documents/req_${recevierId}${userId}${objectType.replace(" ", "")}${Date.now().toString()}.pdf`;
+      let buffArray = await file.get("file").arrayBuffer();
+      let buff = new Uint8Array(buffArray);
+      fs.writeFileSync(prevPath, buff);
       if (objectType !== prevState.objectType) {
         let newPath = prevPath.replace(
           prevState.objectType.replaceAll(" ", ""),
@@ -63,14 +61,7 @@ export default async function updateRequest(
     }
   }
 
-  let data = {
-    requestId: requestId,
-    recevierId: recevierId !== prevState.recevierId ? recevierId : null,
-    objectType: objectType !== prevState.objectType ? objectType : null,
-    path: path ? path : null,
-    note: note !== prevState.note ? note : null,
-    title: title !== prevState.title ? title : null,
-  };
+  let data = getData();
 
   try {
     const info = await fetch(
@@ -104,36 +95,7 @@ export default async function updateRequest(
 
     if (info.ok) {
       if (shouldpathNameChange(data, prevPath, path)) {
-        try {
-          fs.renameSync(prevPath, data.path);
-        } catch (error) {
-          const pathChange = await fetch(
-            `${process.env.API_DEST}/${dbName}/Requests/{userId}/modify?userId=${userId}`,
-            {
-              method: "POST",
-              body: JSON.stringify({
-                requestId: requestId,
-                path: prevPath,
-              }),
-              headers: {
-                "Content-Type": "application/json",
-              },
-            },
-          );
-          if (pathChange.ok) {
-            return {
-              error: true,
-              completed: true,
-              message: "Success with errors! The file has not been renamed.",
-            };
-          } else {
-            return {
-              error: true,
-              completed: true,
-              message: "Critical error. Invoice has been updated but file not.",
-            };
-          }
-        }
+        return await changePath(prevPath, data, dbName, userId, requestId, fs);
       }
       return {
         error: false,
@@ -154,6 +116,50 @@ export default async function updateRequest(
       completed: true,
       message: "Connection error.",
     };
+  }
+
+  function getData() {
+    return {
+      requestId: requestId,
+      recevierId: recevierId !== prevState.recevierId ? recevierId : null,
+      objectType: objectType !== prevState.objectType ? objectType : null,
+      path: path ?? null,
+      note: note !== prevState.note ? note : null,
+      title: title !== prevState.title ? title : null,
+    };
+  }
+}
+
+async function changePath(prevPath, data, dbName, userId, requestId, fs){
+  try {
+    fs.renameSync(prevPath, data.path);
+  } catch (error) {
+    const pathChange = await fetch(
+      `${process.env.API_DEST}/${dbName}/Requests/{userId}/modify/${userId}`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          requestId: requestId,
+          path: prevPath,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+    if (pathChange.ok) {
+      return {
+        error: true,
+        completed: true,
+        message: "Success with errors! The file has not been renamed.",
+      };
+    } else {
+      return {
+        error: true,
+        completed: true,
+        message: "Critical error. Invoice has been updated but file not.",
+      };
+    }
   }
 }
 

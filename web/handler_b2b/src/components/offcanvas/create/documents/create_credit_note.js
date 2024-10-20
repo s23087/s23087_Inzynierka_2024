@@ -79,10 +79,13 @@ function AddCreditNoteOffcanvas({
   const [isLoading, setIsLoading] = useState(false);
   // Form
   const [state, formPurchaseAction] = useFormState(
-    CreateCreditNote.bind(null, userOrg)
-      .bind(null, choosenClient)
-      .bind(null, isYourCreditNote)
-      .bind(null, choosenInvoice)
+    CreateCreditNote
+      .bind(null, {
+        userOrg: userOrg,
+        choosenClient: choosenClient,
+        isYourCreditNote: isYourCreditNote,
+        invoiceId: choosenInvoice
+      })
       .bind(null, products)
       .bind(null, file),
     {
@@ -295,10 +298,10 @@ function AddCreditNoteOffcanvas({
                   style={maxHeightScrollContainer}
                   key={resetSeed}
                 >
-                  {products.map((value, key) => {
+                  {products.map((value) => {
                     return (
                       <ProductHolder
-                        key={key}
+                        key={value}
                         value={value}
                         deleteValue={() => {
                           products.splice(key, 1);

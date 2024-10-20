@@ -12,9 +12,9 @@ export default async function getSearchClients(isOrg, search, sort, country) {
   if (sort !== ".None") params.push(`sort=${sort}`);
   if (country) params.push(`country=${country}`);
   if (isOrg) {
-    url = `${process.env.API_DEST}/${dbName}/Client/get/org/${userId}?search=${search}`;
+    url = `${process.env.API_DEST}/${dbName}/Client/get/org/${userId}?search=${search}${params.length > 0 ? "&" : ""}${params.join("&")}`;
   } else {
-    url = `${process.env.API_DEST}/${dbName}/Client/get/${userId}?search=${search}`;
+    url = `${process.env.API_DEST}/${dbName}/Client/get/${userId}?search=${search}${params.length > 0 ? "&" : ""}${params.join("&")}`;
   }
   try {
     const items = await fetch(url, {

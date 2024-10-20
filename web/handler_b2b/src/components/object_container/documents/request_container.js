@@ -114,7 +114,7 @@ function RequestContainer({
 }
 
 RequestContainer.propTypes = {
-  item: PropTypes.object.isRequired,
+  request: PropTypes.object.isRequired,
   is_org: PropTypes.bool.isRequired,
   selected: PropTypes.bool.isRequired,
   selectAction: PropTypes.func.isRequired,

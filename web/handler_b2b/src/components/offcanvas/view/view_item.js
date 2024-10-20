@@ -181,7 +181,7 @@ function ViewItemOffcanvas({
                 </Container>
                 <Container className="px-1 ms-0" key={description}>
                   <p className="mb-1 blue-main-text">Description:</p>
-                  <p className="mb-1">{description ? description : "-"}</p>
+                  <p className="mb-1">{description ?? "-"}</p>
                 </Container>
               </Stack>
             </Col>

@@ -1,5 +1,6 @@
 "use server";
 
+import PropTypes from "prop-types";
 import ClientMenu from "@/components/menu/wholeMenu/clients_menu";
 import ClientsList from "@/components/object_list/client_list";
 import WholeFooter from "@/components/footer/whole_footers/whole_footer";
@@ -10,7 +11,7 @@ import getClients from "@/utils/clients/get_clients";
 import getSearchClients from "@/utils/clients/get_clients_search";
 import getOrgView from "@/utils/auth/get_org_view";
 
-export default async function ClientsPage({ searchParams }) {
+async function ClientsPage({ searchParams }) {
   const current_role = await getRole();
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
@@ -71,3 +72,9 @@ export default async function ClientsPage({ searchParams }) {
     </main>
   );
 }
+
+ClientsPage.propTypes = {
+  searchParams: PropTypes.object
+}
+
+export default ClientsPage

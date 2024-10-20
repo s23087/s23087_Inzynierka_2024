@@ -8,18 +8,6 @@ import validators from "../validators/validator";
 export default async function createClient(state, formData) {
   let nip = formData.get("nip");
   let credit = formData.get("credit");
-  if (isNipIncorrect(nip))
-    return {
-      error: true,
-      completed: true,
-      message: "Error: Nip must have only numbers.",
-    };
-  if (isCreditIncorrect(credit))
-    return {
-      error: true,
-      completed: true,
-      message: "Error: Nip must have only numbers.",
-    };
   let orgData = {
     orgName: formData.get("name"),
     nip: nip === "" ? null : parseInt(nip),
@@ -28,35 +16,16 @@ export default async function createClient(state, formData) {
     postalCode: formData.get("postal"),
     creditLimit: credit === "" ? null : parseInt(credit),
     countryId: formData.get("country"),
-  };
+  }
+  let errorMessage = validateData(nip, credit, orgData);
 
-  if (isOrgNameIncorrect(orgData.orgName))
+  if (errorMessage.length > 6){
     return {
       error: true,
       completed: true,
-      message: "Error: Org name is empty or length exceed 50 chars.",
+      message: errorMessage,
     };
-
-  if (isStreetIncorrect(orgData.street))
-    return {
-      error: true,
-      completed: true,
-      message: "Error: Street is empty or length exceed 200 chars.",
-    };
-
-  if (isCityIncorrect(orgData.city))
-    return {
-      error: true,
-      completed: true,
-      message: "Error: City is empty or length exceed 200 chars.",
-    };
-
-  if (isPostalCodeIncorrect(orgData.postalCode))
-    return {
-      error: true,
-      completed: true,
-      message: "Error: Postal code is empty or length exceed 25 chars.",
-    };
+  }
 
   const dbName = await getDbName();
   const userId = await getUserId();
@@ -90,6 +59,25 @@ export default async function createClient(state, formData) {
     }
 
     if (info.ok) {
+      return await setAvailabilityStatusesToClient(formData, dbName, userId)
+
+    } else {
+      return {
+        error: true,
+        completed: true,
+        message: "Critical error",
+      };
+    }
+  } catch {
+    console.error("Create client or set status fetch failed.");
+    return {
+      error: true,
+      completed: true,
+      message: "Connection error",
+    };
+  }
+}
+async function setAvailabilityStatusesToClient(formData, dbName, userId){
       let orgId = await info.text();
 
       let statusData = {
@@ -118,7 +106,7 @@ export default async function createClient(state, formData) {
         };
       }
 
-      if (info.status === 500) {
+      if (statusInfo.status === 500) {
         return {
           error: true,
           completed: true,
@@ -140,22 +128,30 @@ export default async function createClient(state, formData) {
         message:
           "Org has been added, but something went wrong with Availability Status. Please change it in modify form.",
       };
-    } else {
-      return {
-        error: true,
-        completed: true,
-        message: "Critical error",
-      };
-    }
-  } catch {
-    console.error("Create client or set status fetch failed.");
-    return {
-      error: true,
-      completed: true,
-      message: "Connection error",
-    };
-  }
 }
+
+function validateData(nip, credit, orgData) {
+  let errorMessage = "Error:";
+  if (isNipIncorrect(nip))
+    errorMessage += "\nNip must have only numbers.";
+
+  if (isCreditIncorrect(credit))
+    errorMessage += "\nCredit limit must have only numbers.";
+
+  if (isOrgNameIncorrect(orgData.orgName))
+    errorMessage += "\nOrg name is empty or length exceed 50 chars.";
+
+  if (isStreetIncorrect(orgData.street))
+    errorMessage += "\nStreet is empty or length exceed 200 chars.";
+
+  if (isCityIncorrect(orgData.city))
+    errorMessage += "\nCity is empty or length exceed 200 chars.";
+
+  if (isPostalCodeIncorrect(orgData.postalCode))
+    errorMessage += "\nPostal code is empty or length exceed 25 chars.";
+  return errorMessage;
+}
+
 function isPostalCodeIncorrect(postalCode) {
   return (
     !validators.lengthSmallerThen(postalCode, 200) ||

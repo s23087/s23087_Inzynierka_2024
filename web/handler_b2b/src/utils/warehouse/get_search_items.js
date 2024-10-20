@@ -8,28 +8,16 @@ export default async function getSearchItems(
   isOrg,
   search,
   sort,
-  status,
-  ean,
-  qtyL,
-  qtyG,
-  priceL,
-  priceG,
+  params
 ) {
   let url = "";
   const dbName = await getDbName();
-  let params = [];
-  if (sort !== ".None") params.push(`sort=${sort}`);
-  if (qtyL) params.push(`qtyL=${qtyL}`);
-  if (qtyG) params.push(`totalR=${qtyG}`);
-  if (priceL) params.push(`qtyL=${qtyL}`);
-  if (priceG) params.push(`totalR=${qtyG}`);
-  if (status) params.push(`status=${status}`);
-  if (ean) params.push(`ean=${ean}`);
+  let prepParams = getPrepParams(sort, params);
   if (isOrg) {
-    url = `${process.env.API_DEST}/${dbName}/Warehouse/items/${currency}?search=${search}${params.length > 0 ? "&" : ""}${params.join("&")}`;
+    url = `${process.env.API_DEST}/${dbName}/Warehouse/items/${currency}?search=${search}${prepParams.length > 0 ? "&" : ""}${prepParams.join("&")}`;
   } else {
     const userId = await getUserId();
-    url = `${process.env.API_DEST}/${dbName}/Warehouse/items/${currency}?userId=${userId}&search=${search}${params.length > 0 ? "&" : ""}${params.join("&")}`;
+    url = `${process.env.API_DEST}/${dbName}/Warehouse/items/${currency}?userId=${userId}&search=${search}${prepParams.length > 0 ? "&" : ""}${prepParams.join("&")}`;
   }
   try {
     const items = await fetch(url, {
@@ -45,4 +33,16 @@ export default async function getSearchItems(
     console.error("getSearchItems fetch failed.");
     return null;
   }
+}
+
+function getPrepParams(sort, params) {
+  let result = [];
+  if (sort !== ".None") result.push(`sort=${sort}`);
+  if (params.qtyL) result.push(`qtyL=${params.qtyL}`);
+  if (params.qtyG) result.push(`totalR=${params.qtyG}`);
+  if (params.priceL) result.push(`qtyL=${params.qtyL}`);
+  if (params.priceG) result.push(`totalR=${params.qtyG}`);
+  if (params.status) result.push(`status=${params.status}`);
+  if (params.ean) result.push(`ean=${params.ean}`);
+  return result;
 }

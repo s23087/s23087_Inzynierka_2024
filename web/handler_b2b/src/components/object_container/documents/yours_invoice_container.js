@@ -169,7 +169,7 @@ function InvoiceContainer({
 }
 
 InvoiceContainer.propTypes = {
-  item: PropTypes.object.isRequired,
+  invoice: PropTypes.object.isRequired,
   is_org: PropTypes.bool.isRequired,
   selected: PropTypes.bool.isRequired,
   is_user_type: PropTypes.bool.isRequired, // If true is user invoice, if false is client invoice

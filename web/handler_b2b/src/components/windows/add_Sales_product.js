@@ -79,7 +79,7 @@ function AddSaleProductWindow({
               {products.map((val, key) => {
                 if (val.qty > 0) {
                   return (
-                    <option key={key} value={key}>
+                    <option key={value} value={key}>
                       {val.partnumber +
                         " - " +
                         val.qty +

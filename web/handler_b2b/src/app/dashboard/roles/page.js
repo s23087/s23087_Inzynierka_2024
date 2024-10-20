@@ -1,5 +1,6 @@
 "use server";
 
+import PropTypes from "prop-types";
 import RolesMenu from "@/components/menu/wholeMenu/roles_menu";
 import WholeFooter from "@/components/footer/whole_footers/whole_footer";
 import getRole from "@/utils/auth/get_role";
@@ -9,7 +10,7 @@ import getUserRoles from "@/utils/roles/get_users_with_roles";
 import RolesList from "@/components/object_list/roles_list";
 import getRoles from "@/utils/roles/get_roles";
 
-export default async function RolesPage({ searchParams }) {
+async function RolesPage({ searchParams }) {
   const current_role = await getRole();
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
@@ -60,3 +61,9 @@ export default async function RolesPage({ searchParams }) {
     </main>
   );
 }
+
+RolesPage.propTypes = {
+  searchParams: PropTypes.object
+}
+
+export default RolesPage

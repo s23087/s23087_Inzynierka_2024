@@ -5,25 +5,21 @@ export default function getDeliveryStatusColor(statusName) {
         backgroundColor: "var(--main-yellow)",
         color: "var(--text-black-color)",
       };
-    case "Delivered with issues":
-      return {
-        backgroundColor: "var(--sec-red)",
-        color: "var(--text-main-color)",
-      };
     case "Preparing":
       return {
         backgroundColor: "var(--main-yellow)",
         color: "var(--text-black-color)",
       };
-    case "Rejected":
-      return {
-        backgroundColor: "var(--sec-red)",
-        color: "var(--text-main-color)",
-      };
-    default:
+    case "Fulfilled":
       return {
         backgroundColor: "var(--main-green)",
         color: "var(--text-black-color)",
+      };
+    default:
+      // Delivered with issues && Rejected
+      return {
+        backgroundColor: "var(--sec-red)",
+        color: "var(--text-main-color)",
       };
   }
 }

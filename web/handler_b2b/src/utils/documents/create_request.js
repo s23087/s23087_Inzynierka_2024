@@ -100,16 +100,7 @@ export default async function createRequest(file, state, formData) {
       };
     } else {
       if (file) {
-        try {
-          fs.rmSync(fileName);
-        } catch (error) {
-          console.log(error);
-          return {
-            error: true,
-            completed: true,
-            message: "Critical file error.",
-          };
-        }
+        return removerFileWithFuncReturn(fileName, "Critical file error.", "Critical error.", fs)
       }
       return {
         error: true,
@@ -119,20 +110,24 @@ export default async function createRequest(file, state, formData) {
     }
   } catch {
     console.error("Create request fetch failed.");
-    try {
-      fs.rmSync(fileName);
-    } catch (error) {
-      console.log(error);
-      return {
-        error: true,
-        completed: true,
-        message: "Connection error. Critical file error.",
-      };
-    }
+    return removerFileWithFuncReturn(fileName, "Connection error. Critical file error.", "Connection error.", fs)
+  }
+}
+
+function removerFileWithFuncReturn(file, errorText, successText, fs){
+  try {
+    fs.rmSync(file);
     return {
       error: true,
       completed: true,
-      message: "Connection error.",
+      message: successText,
+    };
+  } catch (error) {
+    console.log(error);
+    return {
+      error: true,
+      completed: true,
+      message: errorText,
     };
   }
 }

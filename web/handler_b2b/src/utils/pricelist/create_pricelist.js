@@ -45,7 +45,7 @@ export default async function createPricelist(
   }
   orgName = orgName.replace(/[^a-zA-Z0-9]/, "");
   orgName = orgName.replace(" ", "");
-  let fileName = `src/app/api/pricelist/${orgName}/${offerName.replaceAll(" ", "_").replaceAll(/[^a-zA-Z0-9_]/g, 25 + userId)}${maxQty}${currency}${Date.now().toString()}.${type}`;
+  let fileName = `src/app/api/pricelist/${orgName}/${offerName.replaceAll(" ", "_").replaceAll(/\W/g, 25 + userId)}${maxQty}${currency}${Date.now().toString()}.${type}`;
 
   const fs = require("node:fs");
   try {

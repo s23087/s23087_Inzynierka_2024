@@ -76,7 +76,7 @@ export default async function AddUser(state, formData) {
       let message = await info.text();
       return {
         error: true,
-        message: message ? message : "Couldn't create the new user",
+        message: message ?? "Could not create new user",
         completed: true,
       };
     }

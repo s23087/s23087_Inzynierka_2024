@@ -68,19 +68,7 @@ export default async function updateInvoice(
     }
   }
 
-  let data = {
-    isYourInvoice: isYourInvoice,
-    invoiceId: invoiceId,
-    invoiceNumber:
-      invoiceNumber !== prevState.invoiceNumber ? invoiceNumber : null,
-    clientId: client !== -1 ? client : null,
-    transportCost: transport !== prevState.transport ? transport : null,
-    paymentMethod: paymentMethod !== -1 ? paymentMethod : null,
-    paymentStatus: paymentStatus !== -1 ? paymentStatus : null,
-    inSystem: status !== prevState.status ? status : null,
-    path: path ? path : null,
-    note: note !== prevState.note ? note : null,
-  };
+  let data = getData();
 
   try {
     const userId = await getUserId();
@@ -113,37 +101,7 @@ export default async function updateInvoice(
 
     if (info.ok) {
       if (data.invoiceNumber) {
-        try {
-          fs.renameSync(prevPath, data.path);
-        } catch (error) {
-          const pathChange = await fetch(
-            `${process.env.API_DEST}/${dbName}/Invoices/modify/${userId}`,
-            {
-              method: "POST",
-              body: JSON.stringify({
-                isYourInvoice: isYourInvoice,
-                invoiceId: invoiceId,
-                path: prevPath,
-              }),
-              headers: {
-                "Content-Type": "application/json",
-              },
-            },
-          );
-          if (pathChange.ok) {
-            return {
-              error: true,
-              completed: true,
-              message: "Success with errors! The file has not been renamed.",
-            };
-          } else {
-            return {
-              error: true,
-              completed: true,
-              message: "Critical error. Invoice has been updated but file not.",
-            };
-          }
-        }
+        return await changePath(prevPath, data, dbName, userId, isYourInvoice, invoiceId, fs)
       }
       return {
         error: false,
@@ -164,6 +122,55 @@ export default async function updateInvoice(
       completed: true,
       message: "Connection error.",
     };
+  }
+
+  function getData() {
+    return {
+      isYourInvoice: isYourInvoice,
+      invoiceId: invoiceId,
+      invoiceNumber: invoiceNumber !== prevState.invoiceNumber ? invoiceNumber : null,
+      clientId: client !== -1 ? client : null,
+      transportCost: transport !== prevState.transport ? transport : null,
+      paymentMethod: paymentMethod !== -1 ? paymentMethod : null,
+      paymentStatus: paymentStatus !== -1 ? paymentStatus : null,
+      inSystem: status !== prevState.status ? status : null,
+      path: path ?? null,
+      note: note !== prevState.note ? note : null,
+    };
+  }
+}
+
+async function changePath(prevPath, data, dbName, userId, isYourInvoice, invoiceId, fs) {
+  try {
+    fs.renameSync(prevPath, data.path);
+  } catch (error) {
+    const pathChange = await fetch(
+      `${process.env.API_DEST}/${dbName}/Invoices/modify/${userId}`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          isYourInvoice: isYourInvoice,
+          invoiceId: invoiceId,
+          path: prevPath,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+    if (pathChange.ok) {
+      return {
+        error: true,
+        completed: true,
+        message: "Success with errors! The file has not been renamed.",
+      };
+    } else {
+      return {
+        error: true,
+        completed: true,
+        message: "Critical error. Invoice has been updated but file not.",
+      };
+    }
   }
 }
 

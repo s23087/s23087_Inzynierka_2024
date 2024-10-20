@@ -8,33 +8,19 @@ export default async function getSearchProformas(
   isYourProforma,
   search,
   sort,
-  qtyL,
-  qtyG,
-  totalL,
-  totalG,
-  dateL,
-  dateG,
-  recipient,
-  currency,
+  params
 ) {
   const dbName = await getDbName();
   const userId = await getUserId();
   let url = "";
-  let params = getParams(
+  let prepParams = getPrepParams(
     sort,
-    qtyL,
-    qtyG,
-    totalL,
-    totalG,
-    dateL,
-    dateG,
-    recipient,
-    currency,
+    params
   );
   if (isOrg) {
-    url = `${process.env.API_DEST}/${dbName}/Proformas/get/${isYourProforma ? "yours" : "clients"}?search=${search}${params.length > 0 ? "&" : ""}${params.join("&")}`;
+    url = `${process.env.API_DEST}/${dbName}/Proformas/get/${isYourProforma ? "yours" : "clients"}?search=${search}${prepParams.length > 0 ? "&" : ""}${prepParams.join("&")}`;
   } else {
-    url = `${process.env.API_DEST}/${dbName}/Proformas/get/${isYourProforma ? "yours" : "clients"}/${userId}?search=${search}${params.length > 0 ? "&" : ""}${params.join("&")}`;
+    url = `${process.env.API_DEST}/${dbName}/Proformas/get/${isYourProforma ? "yours" : "clients"}/${userId}?search=${search}${prepParams.length > 0 ? "&" : ""}${prepParams.join("&")}`;
   }
   try {
     const info = await fetch(url, {
@@ -52,26 +38,19 @@ export default async function getSearchProformas(
   }
 }
 
-function getParams(
+function getPrepParams(
   sort,
-  qtyL,
-  qtyG,
-  totalL,
-  totalG,
-  dateL,
-  dateG,
-  recipient,
-  currency,
+  params
 ) {
-  let params = [];
-  if (sort !== ".None") params.push(`sort=${sort}`);
-  if (qtyL) params.push(`qtyL=${qtyL}`);
-  if (qtyG) params.push(`qtyG=${qtyG}`);
-  if (totalL) params.push(`totalL=${totalL}`);
-  if (totalG) params.push(`totalG=${totalG}`);
-  if (dateL) params.push(`dateL=${dateL}`);
-  if (dateG) params.push(`dateG=${dateG}`);
-  if (recipient) params.push(`recipient=${recipient}`);
-  if (currency) params.push(`currency=${currency}`);
-  return params;
+  let result = [];
+  if (sort !== ".None") result.push(`sort=${sort}`);
+  if (params.qtyL) result.push(`qtyL=${params.qtyL}`);
+  if (params.qtyG) result.push(`qtyG=${params.qtyG}`);
+  if (params.totalL) result.push(`totalL=${params.totalL}`);
+  if (params.totalG) result.push(`totalG=${params.totalG}`);
+  if (params.dateL) result.push(`dateL=${params.dateL}`);
+  if (params.dateG) result.push(`dateG=${params.dateG}`);
+  if (params.recipient) result.push(`recipient=${params.recipient}`);
+  if (params.currency) result.push(`currency=${params.currency}`);
+  return result;
 }

@@ -26,7 +26,7 @@ function haveOnlyPositiveNumbers(str) {
 }
 
 function haveOnlyIntegers(str) {
-  const reg = /^-{0,1}\d*$/;
+  const reg = /^-?d*$/;
   return reg.test(str);
 }
 

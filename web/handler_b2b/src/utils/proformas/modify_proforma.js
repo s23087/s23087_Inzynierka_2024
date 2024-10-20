@@ -46,13 +46,11 @@ export default async function updateProforma(
       };
     }
     try {
-      if (file) {
-        if (prevPath === "")
-          prevPath = `../../database/${dbName}/documents/pr_${proformaNumber.replaceAll("/", "")}_${user}${orgs.userOrgId}${org}_${userId}${Date.now().toString()}.pdf`;
-        let buffArray = await file.get("file").arrayBuffer();
-        let buff = new Uint8Array(buffArray);
-        fs.writeFileSync(prevPath, buff);
-      }
+      if (prevPath === "")
+        prevPath = `../../database/${dbName}/documents/pr_${proformaNumber.replaceAll("/", "")}_${user}${orgs.userOrgId}${org}_${userId}${Date.now().toString()}.pdf`;
+      let buffArray = await file.get("file").arrayBuffer();
+      let buff = new Uint8Array(buffArray);
+      fs.writeFileSync(prevPath, buff);
       if (proformaNumber !== prevState.proformaNumber) {
         let newPath = prevPath.replace(
           prevState.proformaNumber
@@ -71,23 +69,7 @@ export default async function updateProforma(
     }
   }
 
-  let data = {
-    isYourProforma: isYourProforma,
-    proformaId: proformaId,
-    userId: parseInt(user) !== prevState.userId ? parseInt(user) : null,
-    proformaNumber:
-      proformaNumber !== prevState.proformaNumber ? proformaNumber : null,
-    clientId: parseInt(org) !== -1 ? parseInt(org) : null,
-    transport:
-      parseFloat(transport) !== prevState.transport
-        ? parseFloat(transport)
-        : null,
-    paymentMethodId:
-      parseInt(paymentMethod) !== -1 ? parseInt(paymentMethod) : null,
-    inSystem: status !== prevState.status ? status : null,
-    path: path ? path : null,
-    note: note !== prevState.note ? note : null,
-  };
+  let data = getData();
 
   try {
     const info = await fetch(
@@ -120,38 +102,8 @@ export default async function updateProforma(
     }
 
     if (info.ok) {
-      if (data.proformaNumber && prevPath !== path) {
-        try {
-          fs.renameSync(prevPath, data.path);
-        } catch (error) {
-          const pathChange = await fetch(
-            `${process.env.API_DEST}/${dbName}/Proformas/{userId}/modify`,
-            {
-              method: "POST",
-              body: JSON.stringify({
-                isYourProforma: isYourProforma,
-                proformaId: proformaId,
-                path: prevPath,
-              }),
-              headers: {
-                "Content-Type": "application/json",
-              },
-            },
-          );
-          if (pathChange.ok) {
-            return {
-              error: true,
-              completed: true,
-              message: "Success with errors! The file has not been renamed.",
-            };
-          } else {
-            return {
-              error: true,
-              completed: true,
-              message: "Critical error. Invoice has been updated but file not.",
-            };
-          }
-        }
+      if (needNewPath(data, prevPath, path)) {
+        return await changePath(prevPath, data, dbName, userId, isYourProforma, proformaId, fs);
       }
       return {
         error: false,
@@ -172,6 +124,60 @@ export default async function updateProforma(
       completed: true,
       message: "Connection error",
     };
+  }
+
+  function getData() {
+    return {
+      isYourProforma: isYourProforma,
+      proformaId: proformaId,
+      userId: parseInt(user) !== prevState.userId ? parseInt(user) : null,
+      proformaNumber: proformaNumber !== prevState.proformaNumber ? proformaNumber : null,
+      clientId: parseInt(org) !== -1 ? parseInt(org) : null,
+      transport: parseFloat(transport) !== prevState.transport
+        ? parseFloat(transport)
+        : null,
+      paymentMethodId: parseInt(paymentMethod) !== -1 ? parseInt(paymentMethod) : null,
+      inSystem: status !== prevState.status ? status : null,
+      path: path ?? null,
+      note: note !== prevState.note ? note : null,
+    };
+  }
+}
+function needNewPath(data, prevPath, path) {
+  return data.proformaNumber && prevPath !== path;
+}
+
+async function changePath(prevPath, data, dbName, userId, isYourProforma, proformaId, fs) {
+  try {
+    fs.renameSync(prevPath, data.path);
+  } catch (error) {
+    const pathChange = await fetch(
+      `${process.env.API_DEST}/${dbName}/Proformas/${userId}/modify`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          isYourProforma: isYourProforma,
+          proformaId: proformaId,
+          path: prevPath,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+    if (pathChange.ok) {
+      return {
+        error: true,
+        completed: true,
+        message: "Success with errors! The file has not been renamed.",
+      };
+    } else {
+      return {
+        error: true,
+        completed: true,
+        message: "Critical error. Invoice has been updated but file not.",
+      };
+    }
   }
 }
 

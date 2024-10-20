@@ -170,7 +170,7 @@ function ViewRequestOffcanvas({ showOffcanvas, hideFunction, request, isOrg }) {
                     className="mb-1 noteContainer break-spaces overflow-y-scroll p-2"
                     style={{ maxHeight: "150px" }}
                   >
-                    {note ? note : "-"}
+                    {note ?? "-"}
                   </p>
                 </Container>
                 {isOrg ? (

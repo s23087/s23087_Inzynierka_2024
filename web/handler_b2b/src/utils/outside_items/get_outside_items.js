@@ -5,24 +5,12 @@ import logout from "../auth/logout";
 
 export default async function getOutsideItems(
   sort,
-  qtyL,
-  qtyG,
-  priceL,
-  priceG,
-  source,
-  currency,
+  params
 ) {
   const dbName = await getDbName();
   let url = "";
-  let params = [];
-  if (sort !== ".None") params.push(`sort=${sort}`);
-  if (qtyL) params.push(`qtyL=${qtyL}`);
-  if (qtyG) params.push(`qtyG=${qtyG}`);
-  if (priceL) params.push(`priceL=${priceL}`);
-  if (priceG) params.push(`priceG=${priceG}`);
-  if (source) params.push(`source=${source}`);
-  if (currency) params.push(`currency=${currency}`);
-  url = `${process.env.API_DEST}/${dbName}/OutsideItem/get/items${params.length > 0 ? "?" : ""}${params.join("&")}`;
+  let prepParams = getPrepParams(sort, params);
+  url = `${process.env.API_DEST}/${dbName}/OutsideItem/get/items${prepParams.length > 0 ? "?" : ""}${prepParams.join("&")}`;
   try {
     const info = await fetch(url, {
       method: "GET",
@@ -41,4 +29,16 @@ export default async function getOutsideItems(
     console.error("getOutsideItems fetch failed.");
     return null;
   }
+}
+
+function getPrepParams(sort, params) {
+  let result = [];
+  if (sort !== ".None") result.push(`sort=${sort}`);
+  if (params.qtyL) result.push(`qtyL=${params.qtyL}`);
+  if (params.qtyG) result.push(`qtyG=${params.qtyG}`);
+  if (params.priceL) result.push(`priceL=${params.priceL}`);
+  if (params.priceG) result.push(`priceG=${params.priceG}`);
+  if (params.source) result.push(`source=${params.source}`);
+  if (params.currency) result.push(`currency=${params.currency}`);
+  return result;
 }

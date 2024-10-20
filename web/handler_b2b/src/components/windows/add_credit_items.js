@@ -93,7 +93,7 @@ function AddCreditProductWindow({
               {products.map((val, key) => {
                 if (val.qty > 0) {
                   return (
-                    <option key={key} value={key}>
+                    <option key={val} value={key}>
                       {val.partnumber + " - " + val.qty + " pcs " + val.price}
                     </option>
                   );
