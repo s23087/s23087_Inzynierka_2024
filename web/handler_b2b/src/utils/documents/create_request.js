@@ -57,33 +57,8 @@ export default async function createRequest(file, state, formData) {
       },
     });
 
-    if (info.status === 404) {
-      deleteFile(file, fs, fileName);
-      let text = await info.text();
-      if (text === "Creator not found.") {
-        logout();
-        return {
-          error: true,
-          completed: true,
-          message: "Unauthorized.",
-        };
-      } else {
-        return {
-          error: true,
-          completed: true,
-          message: text,
-        };
-      }
-    }
-
-    if (info.status === 500) {
-      deleteFile(file, fs, fileName);
-      return {
-        error: true,
-        completed: true,
-        message: "Server error.",
-      };
-    }
+    let fetchError = await checkFetchErrors(info, file, fs, fileName)
+    if (fetchError) return fetchError
 
     if (info.ok) {
       return {
@@ -124,6 +99,36 @@ export default async function createRequest(file, state, formData) {
       path: file ? fileName : null,
       note: note,
       title: title,
+    };
+  }
+}
+
+async function checkFetchErrors(info, file, fs, fileName) {
+  if (info.status === 404) {
+    deleteFile(file, fs, fileName);
+    let text = await info.text();
+    if (text === "Creator not found.") {
+      logout();
+      return {
+        error: true,
+        completed: true,
+        message: "Unauthorized.",
+      };
+    } else {
+      return {
+        error: true,
+        completed: true,
+        message: text,
+      };
+    }
+  }
+
+  if (info.status === 500) {
+    deleteFile(file, fs, fileName);
+    return {
+      error: true,
+      completed: true,
+      message: "Server error.",
     };
   }
 }

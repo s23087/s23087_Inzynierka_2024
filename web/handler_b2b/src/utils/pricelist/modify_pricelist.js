@@ -58,20 +58,9 @@ export default async function modifyPricelist(
   if (requireNewPath(attributeChanged, status, deactivatedId)) {
     fileName = `src/app/api/pricelist/${orgName}/${offerName.replaceAll(" ", "_").replaceAll(/\W/g, 25 + userId)}${maxQtyForm}${currency}${Date.now().toString()}.${type}`;
     try {
-      if (fs.existsSync(fileName)) {
-        return {
-          error: true,
-          completed: true,
-          message: "That pricelist already exist.",
-        };
-      } else if (fs.existsSync(prevState.path)) {
-        fs.renameSync(prevState.path, fileName);
-      } else {
-        return {
-          error: true,
-          completed: true,
-          message: "Original file does not exists.",
-        };
+      let result = renameFile(fileName, prevState, fs)
+      if (result) {
+        return result
       }
     } catch (error) {
       console.log(error);
@@ -156,6 +145,25 @@ export default async function modifyPricelist(
     };
   }
 }
+function renameFile(fileName, prevState, fs){
+  if (fs.existsSync(fileName)) {
+    return {
+      error: true,
+      completed: true,
+      message: "That pricelist already exist.",
+    };
+  } else if (fs.existsSync(prevState.path)) {
+    fs.renameSync(prevState.path, fileName);
+    return null
+  } else {
+    return {
+      error: true,
+      completed: true,
+      message: "Original file does not exists.",
+    };
+  }
+}
+
 async function checkFetchForError(info) {
   if (info.status === 404) {
     let text = await info.text();
