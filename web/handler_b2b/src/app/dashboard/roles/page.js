@@ -63,7 +63,7 @@ async function RolesPage({ searchParams }) {
 }
 
 RolesPage.propTypes = {
-  searchParams: PropTypes.object
-}
+  searchParams: PropTypes.object,
+};
 
-export default RolesPage
+export default RolesPage;

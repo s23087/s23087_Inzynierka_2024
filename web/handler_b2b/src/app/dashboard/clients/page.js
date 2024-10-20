@@ -74,7 +74,7 @@ async function ClientsPage({ searchParams }) {
 }
 
 ClientsPage.propTypes = {
-  searchParams: PropTypes.object
-}
+  searchParams: PropTypes.object,
+};
 
-export default ClientsPage
+export default ClientsPage;

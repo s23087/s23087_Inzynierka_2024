@@ -183,7 +183,7 @@ async function InvoicesPage({ searchParams }) {
 }
 
 InvoicesPage.propTypes = {
-  searchParams: PropTypes.object
-}
+  searchParams: PropTypes.object,
+};
 
-export default InvoicesPage
+export default InvoicesPage;

@@ -79,13 +79,12 @@ function AddCreditNoteOffcanvas({
   const [isLoading, setIsLoading] = useState(false);
   // Form
   const [state, formPurchaseAction] = useFormState(
-    CreateCreditNote
-      .bind(null, {
-        userOrg: userOrg,
-        choosenClient: choosenClient,
-        isYourCreditNote: isYourCreditNote,
-        invoiceId: choosenInvoice
-      })
+    CreateCreditNote.bind(null, {
+      userOrg: userOrg,
+      choosenClient: choosenClient,
+      isYourCreditNote: isYourCreditNote,
+      invoiceId: choosenInvoice,
+    })
       .bind(null, products)
       .bind(null, file),
     {

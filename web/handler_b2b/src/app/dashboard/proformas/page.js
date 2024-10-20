@@ -18,15 +18,15 @@ async function ProformasPage({ searchParams }) {
   const is_org_switch_needed = current_role == "Admin";
   let currentSort = searchParams.orderBy ?? ".None";
   let params = {
-    qtyL : searchParams.qtyL,
-   qtyG : searchParams.qtyG,
-   totalL : searchParams.totalL,
-   totalG : searchParams.totalG,
-   dateL : searchParams.dateL,
-   dateG : searchParams.dateG,
-   recipient : searchParams.recipient,
-   currency : searchParams.currency,
-  }
+    qtyL: searchParams.qtyL,
+    qtyG: searchParams.qtyG,
+    totalL: searchParams.totalL,
+    totalG: searchParams.totalG,
+    dateL: searchParams.dateL,
+    dateG: searchParams.dateG,
+    recipient: searchParams.recipient,
+    currency: searchParams.currency,
+  };
   let filterActivated =
     searchParams.orderBy ||
     params.qtyL ||
@@ -50,13 +50,13 @@ async function ProformasPage({ searchParams }) {
         type === "Yours proformas",
         searchParams.searchQuery,
         currentSort,
-        params
+        params,
       )
     : await getProformas(
         org_view,
         type === "Yours proformas",
         currentSort,
-        params
+        params,
       );
   let proformasLength = proformas ? proformas.length : 0;
   let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
@@ -102,7 +102,7 @@ async function ProformasPage({ searchParams }) {
 }
 
 ProformasPage.propTypes = {
-  searchParams: PropTypes.object
-}
+  searchParams: PropTypes.object,
+};
 
-export default ProformasPage
+export default ProformasPage;

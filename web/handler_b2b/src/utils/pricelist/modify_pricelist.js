@@ -63,8 +63,13 @@ export default async function modifyPricelist(
   orgName = orgName.replace(/[^a-zA-Z0-9]/, "");
   orgName = orgName.replace(" ", "");
   let fileName = "";
-  let attributeChanged =
-    getAtributeChanged(offerName, prevState, maxQtyForm, currency, type);
+  let attributeChanged = getAtributeChanged(
+    offerName,
+    prevState,
+    maxQtyForm,
+    currency,
+    type,
+  );
   const fs = require("node:fs");
   if (requireNewPath(attributeChanged, status, deactivatedId)) {
     fileName = `src/app/api/pricelist/${orgName}/${offerName.replaceAll(" ", "_").replaceAll(/[^a-zA-Z0-9_]/g, 25 + userId)}${maxQtyForm}${currency}${Date.now().toString()}.${type}`;
@@ -178,7 +183,8 @@ export default async function modifyPricelist(
       offerId: offerId,
       offerName: offerName !== prevState.offerName ? offerName : null,
       offerStatusId: parseInt(status) !== -1 ? parseInt(status) : null,
-      maxQty: parseInt(maxQtyForm) !== prevState.maxQty ? parseInt(maxQtyForm) : null,
+      maxQty:
+        parseInt(maxQtyForm) !== prevState.maxQty ? parseInt(maxQtyForm) : null,
       currencyName: currency !== prevState.currency ? currency : null,
       path: fileName === "" ? null : fileName,
       type: type !== prevState.type ? type : null,
@@ -191,10 +197,12 @@ function requireNewPath(attributeChanged, status, deactivatedId) {
 }
 
 function getAtributeChanged(offerName, prevState, maxQtyForm, currency, type) {
-  return offerName !== prevState.offerName ||
+  return (
+    offerName !== prevState.offerName ||
     maxQtyForm !== prevState.maxQty ||
     currency !== prevState.currency ||
-    type !== prevState.type;
+    type !== prevState.type
+  );
 }
 
 function validateData(status, offerName, maxQtyForm, products) {

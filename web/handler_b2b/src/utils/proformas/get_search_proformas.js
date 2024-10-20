@@ -8,15 +8,12 @@ export default async function getSearchProformas(
   isYourProforma,
   search,
   sort,
-  params
+  params,
 ) {
   const dbName = await getDbName();
   const userId = await getUserId();
   let url = "";
-  let prepParams = getPrepParams(
-    sort,
-    params
-  );
+  let prepParams = getPrepParams(sort, params);
   if (isOrg) {
     url = `${process.env.API_DEST}/${dbName}/Proformas/get/${isYourProforma ? "yours" : "clients"}?search=${search}${prepParams.length > 0 ? "&" : ""}${prepParams.join("&")}`;
   } else {
@@ -38,10 +35,7 @@ export default async function getSearchProformas(
   }
 }
 
-function getPrepParams(
-  sort,
-  params
-) {
+function getPrepParams(sort, params) {
   let result = [];
   if (sort !== ".None") result.push(`sort=${sort}`);
   if (params.qtyL) result.push(`qtyL=${params.qtyL}`);

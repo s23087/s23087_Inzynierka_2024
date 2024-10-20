@@ -3,12 +3,7 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 
-export default async function getItems(
-  currency,
-  isOrg,
-  sort,
-  params
-) {
+export default async function getItems(currency, isOrg, sort, params) {
   let url = "";
   const dbName = await getDbName();
   let prepParams = getPrepParams(sort, params);

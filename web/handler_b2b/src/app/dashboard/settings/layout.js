@@ -28,7 +28,7 @@ async function Layout({ children }) {
 }
 
 Layout.propTypes = {
-  children: PropTypes.object
-}
+  children: PropTypes.object,
+};
 
-export default Layout
+export default Layout;

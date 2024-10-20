@@ -103,7 +103,15 @@ export default async function updateProforma(
 
     if (info.ok) {
       if (needNewPath(data, prevPath, path)) {
-        return await changePath(prevPath, data, dbName, userId, isYourProforma, proformaId, fs);
+        return await changePath(
+          prevPath,
+          data,
+          dbName,
+          userId,
+          isYourProforma,
+          proformaId,
+          fs,
+        );
       }
       return {
         error: false,
@@ -131,12 +139,15 @@ export default async function updateProforma(
       isYourProforma: isYourProforma,
       proformaId: proformaId,
       userId: parseInt(user) !== prevState.userId ? parseInt(user) : null,
-      proformaNumber: proformaNumber !== prevState.proformaNumber ? proformaNumber : null,
+      proformaNumber:
+        proformaNumber !== prevState.proformaNumber ? proformaNumber : null,
       clientId: parseInt(org) !== -1 ? parseInt(org) : null,
-      transport: parseFloat(transport) !== prevState.transport
-        ? parseFloat(transport)
-        : null,
-      paymentMethodId: parseInt(paymentMethod) !== -1 ? parseInt(paymentMethod) : null,
+      transport:
+        parseFloat(transport) !== prevState.transport
+          ? parseFloat(transport)
+          : null,
+      paymentMethodId:
+        parseInt(paymentMethod) !== -1 ? parseInt(paymentMethod) : null,
       inSystem: status !== prevState.status ? status : null,
       path: path ?? null,
       note: note !== prevState.note ? note : null,
@@ -147,7 +158,15 @@ function needNewPath(data, prevPath, path) {
   return data.proformaNumber && prevPath !== path;
 }
 
-async function changePath(prevPath, data, dbName, userId, isYourProforma, proformaId, fs) {
+async function changePath(
+  prevPath,
+  data,
+  dbName,
+  userId,
+  isYourProforma,
+  proformaId,
+  fs,
+) {
   try {
     fs.renameSync(prevPath, data.path);
   } catch (error) {

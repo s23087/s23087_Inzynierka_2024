@@ -15,7 +15,7 @@ const restrictedPagesAccountant =
 const allowedPagesWarehouseManagerPartOne =
   /^.*\/deliveries.*$|^.*\/notifications.*$|^.*\/settings.*$/;
 const allowedPagesWarehouseManagerPartTwo =
-/^.*\/change_password.*$|^.*\/change_data.*$|^.*\/unauthorized.*$/;
+  /^.*\/change_password.*$|^.*\/change_data.*$|^.*\/unauthorized.*$/;
 
 function checkRestriction(role, url) {
   switch (role) {
@@ -26,7 +26,10 @@ function checkRestriction(role, url) {
     case "Accountant":
       return restrictedPagesAccountant.test(url);
     case "Warehouse Manager":
-      return !allowedPagesWarehouseManagerPartOne.test(url) || !allowedPagesWarehouseManagerPartTwo.test(url);
+      return (
+        !allowedPagesWarehouseManagerPartOne.test(url) ||
+        !allowedPagesWarehouseManagerPartTwo.test(url)
+      );
     default:
       return false;
   }

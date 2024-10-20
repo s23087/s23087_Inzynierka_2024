@@ -15,18 +15,18 @@ async function PricelistPage({ searchParams }) {
   const userInfo = await getBasicInfo();
   const current_nofitication_qty = await getNotificationCounter();
   let params = {
-    createdL : searchParams.createdL,
-     createdG : searchParams.createdG,
-     modifiedL : searchParams.modifiedL,
-     modifiedG : searchParams.modifiedG,
-     totalL : searchParams.totalL,
-     totalG : searchParams.totalG,
-     status : searchParams.status,
-     currency : searchParams.currency,
-     type : searchParams.type,
-  }
+    createdL: searchParams.createdL,
+    createdG: searchParams.createdG,
+    modifiedL: searchParams.modifiedL,
+    modifiedG: searchParams.modifiedG,
+    totalL: searchParams.totalL,
+    totalG: searchParams.totalG,
+    status: searchParams.status,
+    currency: searchParams.currency,
+    type: searchParams.type,
+  };
   let filterActivated =
-  searchParams.orderBy ||
+    searchParams.orderBy ||
     params.totalL ||
     params.totalG ||
     params.status ||
@@ -39,15 +39,8 @@ async function PricelistPage({ searchParams }) {
   let currentSort = searchParams.orderBy ?? ".None";
   let isSearchTrue = searchParams.searchQuery !== undefined;
   let pricelists = isSearchTrue
-    ? await getSearchPricelists(
-        searchParams.searchQuery,
-        currentSort,
-        params
-      )
-    : await getPricelists(
-        currentSort,
-        params
-      );
+    ? await getSearchPricelists(searchParams.searchQuery, currentSort, params)
+    : await getPricelists(currentSort, params);
   let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
   let itemsLength = pricelists === null ? 0 : pricelists.length;
   let pageQty = Math.ceil(itemsLength / maxInstanceOnPage);
@@ -87,7 +80,7 @@ async function PricelistPage({ searchParams }) {
 }
 
 PricelistPage.propTypes = {
-  searchParams: PropTypes.object
-}
+  searchParams: PropTypes.object,
+};
 
-export default PricelistPage
+export default PricelistPage;

@@ -16,10 +16,10 @@ export default async function createClient(state, formData) {
     postalCode: formData.get("postal"),
     creditLimit: credit === "" ? null : parseInt(credit),
     countryId: formData.get("country"),
-  }
+  };
   let errorMessage = validateData(nip, credit, orgData);
 
-  if (errorMessage.length > 6){
+  if (errorMessage.length > 6) {
     return {
       error: true,
       completed: true,
@@ -59,8 +59,7 @@ export default async function createClient(state, formData) {
     }
 
     if (info.ok) {
-      return await setAvailabilityStatusesToClient(formData, dbName, userId)
-
+      return await setAvailabilityStatusesToClient(formData, dbName, userId);
     } else {
       return {
         error: true,
@@ -77,63 +76,62 @@ export default async function createClient(state, formData) {
     };
   }
 }
-async function setAvailabilityStatusesToClient(formData, dbName, userId){
-      let orgId = await info.text();
+async function setAvailabilityStatusesToClient(formData, dbName, userId) {
+  let orgId = await info.text();
 
-      let statusData = {
-        orgId: parseInt(orgId),
-        statusId: parseInt(formData.get("availability")),
-      };
+  let statusData = {
+    orgId: parseInt(orgId),
+    statusId: parseInt(formData.get("availability")),
+  };
 
-      const statusInfo = await fetch(
-        `${process.env.API_DEST}/${dbName}/Client/setAvailabilityStatusesToClient/${userId}`,
-        {
-          method: "POST",
-          body: JSON.stringify(statusData),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
+  const statusInfo = await fetch(
+    `${process.env.API_DEST}/${dbName}/Client/setAvailabilityStatusesToClient/${userId}`,
+    {
+      method: "POST",
+      body: JSON.stringify(statusData),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
 
-      if (statusInfo.status === 404) {
-        let text = await statusInfo.text();
-        if (text === "Your account does not exists.") logout();
-        return {
-          error: true,
-          completed: true,
-          message: text,
-        };
-      }
+  if (statusInfo.status === 404) {
+    let text = await statusInfo.text();
+    if (text === "Your account does not exists.") logout();
+    return {
+      error: true,
+      completed: true,
+      message: text,
+    };
+  }
 
-      if (statusInfo.status === 500) {
-        return {
-          error: true,
-          completed: true,
-          message: "Error: Created organization, but not status. Server error.",
-        };
-      }
+  if (statusInfo.status === 500) {
+    return {
+      error: true,
+      completed: true,
+      message: "Error: Created organization, but not status. Server error.",
+    };
+  }
 
-      if (statusInfo.ok) {
-        return {
-          error: false,
-          completed: true,
-          message: "Success! You had added the new client",
-        };
-      }
+  if (statusInfo.ok) {
+    return {
+      error: false,
+      completed: true,
+      message: "Success! You had added the new client",
+    };
+  }
 
-      return {
-        error: true,
-        completed: true,
-        message:
-          "Org has been added, but something went wrong with Availability Status. Please change it in modify form.",
-      };
+  return {
+    error: true,
+    completed: true,
+    message:
+      "Org has been added, but something went wrong with Availability Status. Please change it in modify form.",
+  };
 }
 
 function validateData(nip, credit, orgData) {
   let errorMessage = "Error:";
-  if (isNipIncorrect(nip))
-    errorMessage += "\nNip must have only numbers.";
+  if (isNipIncorrect(nip)) errorMessage += "\nNip must have only numbers.";
 
   if (isCreditIncorrect(credit))
     errorMessage += "\nCredit limit must have only numbers.";

@@ -50,7 +50,7 @@ async function NotificationsPage({ searchParams }) {
 }
 
 NotificationsPage.propTypes = {
-  searchParams: PropTypes.object
-}
+  searchParams: PropTypes.object,
+};
 
-export default NotificationsPage
+export default NotificationsPage;

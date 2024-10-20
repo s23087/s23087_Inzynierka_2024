@@ -18,15 +18,15 @@ async function DeliveriesPage({ searchParams }) {
   const is_org_switch_needed = current_role == "Admin";
   let currentSort = searchParams.orderBy ?? ".None";
   let params = {
-    estimatedL : searchParams.estimatedL,
-   estimatedG : searchParams.estimatedG,
-   deliveredL : searchParams.deliveredL,
-   deliveredG : searchParams.deliveredG,
-   recipient : searchParams.recipient,
-   status : searchParams.status,
-   company : searchParams.company,
-   waybill : searchParams.waybill,
-  }
+    estimatedL: searchParams.estimatedL,
+    estimatedG: searchParams.estimatedG,
+    deliveredL: searchParams.deliveredL,
+    deliveredG: searchParams.deliveredG,
+    recipient: searchParams.recipient,
+    status: searchParams.status,
+    company: searchParams.company,
+    waybill: searchParams.waybill,
+  };
   let filterActivated =
     searchParams.orderBy ||
     params.estimatedL ||
@@ -50,13 +50,13 @@ async function DeliveriesPage({ searchParams }) {
         type === "Deliveries to user",
         searchParams.searchQuery,
         currentSort,
-        params
+        params,
       )
     : await getDeliveries(
         org_view,
         type === "Deliveries to user",
         currentSort,
-        params
+        params,
       );
   let deliveriesLength = deliveries ? deliveries.length : 0;
   let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
@@ -102,7 +102,7 @@ async function DeliveriesPage({ searchParams }) {
 }
 
 DeliveriesPage.propTypes = {
-  searchParams: PropTypes.object
-}
+  searchParams: PropTypes.object,
+};
 
-export default DeliveriesPage
+export default DeliveriesPage;

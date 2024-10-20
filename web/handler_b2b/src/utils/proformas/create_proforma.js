@@ -21,9 +21,7 @@ export default async function createProforma(
   let chosenCurrency = formData.get("currency");
   let transport = formData.get("transport");
   let paymentMethod = formData.get("paymentMethod");
-  let errorMessage = validateData(
-    formData, products
-  );
+  let errorMessage = validateData(formData, products);
 
   if (errorMessage.length > 6)
     return {
@@ -168,9 +166,10 @@ export default async function createProforma(
       path: file ? fileName : null,
       taxId: parseInt(taxes),
       paymentId: parseInt(paymentMethod),
-      currencyDate: chosenCurrency === "PLN"
-        ? new Date().toLocaleDateString("en-CA")
-        : currencyExchangeDate,
+      currencyDate:
+        chosenCurrency === "PLN"
+          ? new Date().toLocaleDateString("en-CA")
+          : currencyExchangeDate,
       currencyName: chosenCurrency,
       currencyValue: curVal,
       userId: parseInt(chosenUser),
@@ -186,19 +185,18 @@ async function getCurVal(currencyExchangeDate, chosenCurrency) {
     if (newDate.getDay() === 6) newDate.setDate(newDate.getDate() - 1); // If is saturday make it friday
     curVal = await getCurrencyValueByDate(
       chosenCurrency,
-      newDate.toLocaleDateString("en-CA")
+      newDate.toLocaleDateString("en-CA"),
     );
   }
   return curVal;
 }
 
-function validateData(
-  formData,
-  products,
-) {
+function validateData(formData, products) {
   let errorMessage = "Error:";
-  if (!formData.get("paymentMethod")) errorMessage += "\nPayment method must not be empty.";
-  if (!formData.get("currency")) errorMessage += "\nCurrency must not be empty.";
+  if (!formData.get("paymentMethod"))
+    errorMessage += "\nPayment method must not be empty.";
+  if (!formData.get("currency"))
+    errorMessage += "\nCurrency must not be empty.";
   if (!formData.get("taxes")) errorMessage += "\nTaxes must not be empty.";
   if (!formData.get("org")) errorMessage += "\nClient must not be empty.";
   if (!formData.get("user")) errorMessage += "\nUser must not be empty.";

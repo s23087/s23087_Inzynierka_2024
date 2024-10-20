@@ -9,15 +9,12 @@ export default async function getSearchDeliveries(
   isDeliveryToUser,
   search,
   sort,
-  params
+  params,
 ) {
   const dbName = await getDbName();
   const userId = await getUserId();
   let url = "";
-  let prepParams = getParams(
-    sort,
-    params
-  );
+  let prepParams = getParams(sort, params);
   if (isOrg) {
     url = `${process.env.API_DEST}/${dbName}/Delivery/get/${isDeliveryToUser ? "user" : "client"}?search=${search}${prepParams.length > 0 ? "&" : ""}${prepParams.join("&")}`;
   } else {
@@ -44,10 +41,7 @@ export default async function getSearchDeliveries(
   }
 }
 
-function getParams(
-  sort,
-  params
-) {
+function getParams(sort, params) {
   let result = [];
   if (sort !== ".None") result.push(`sort=${sort}`);
   if (params.estimatedL) result.push(`estimatedL=${params.estimatedL}`);

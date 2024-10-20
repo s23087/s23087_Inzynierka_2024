@@ -8,7 +8,7 @@ export default async function getSearchItems(
   isOrg,
   search,
   sort,
-  params
+  params,
 ) {
   let url = "";
   const dbName = await getDbName();

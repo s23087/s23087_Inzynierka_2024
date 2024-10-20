@@ -101,7 +101,14 @@ export default async function updateCreditNote(
 
     if (info.ok) {
       if (data.creditNumber) {
-        return await changeObjectPath(prevPath, data, dbName, userId, isYourCredit, creditNoteId)
+        return await changeObjectPath(
+          prevPath,
+          data,
+          dbName,
+          userId,
+          isYourCredit,
+          creditNoteId,
+        );
       }
       return {
         error: false,
@@ -128,7 +135,10 @@ export default async function updateCreditNote(
     return {
       isYourCredit: isYourCredit,
       id: creditNoteId,
-      creditNumber: creditNoteNumber !== prevState.creditNoteNumber ? creditNoteNumber : null,
+      creditNumber:
+        creditNoteNumber !== prevState.creditNoteNumber
+          ? creditNoteNumber
+          : null,
       date: date !== prevState.date ? date : null,
       inSystem: status !== prevState.inSystem ? status : null,
       isPaid: isPaid !== prevState.isPaid ? isPaid : null,
@@ -138,8 +148,15 @@ export default async function updateCreditNote(
   }
 }
 
-async function changeObjectPath(prevPath, data, dbName, userId, isYourCredit, creditNoteId){
-  const fs = require("node:fs")
+async function changeObjectPath(
+  prevPath,
+  data,
+  dbName,
+  userId,
+  isYourCredit,
+  creditNoteId,
+) {
+  const fs = require("node:fs");
   try {
     fs.renameSync(prevPath, data.path);
   } catch (error) {

@@ -3,11 +3,7 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 
-export default async function getSearchPricelists(
-  search,
-  sort,
-  params
-) {
+export default async function getSearchPricelists(search, sort, params) {
   const dbName = await getDbName();
   const userId = await getUserId();
   let prepParams = getPrepParams(sort, params);

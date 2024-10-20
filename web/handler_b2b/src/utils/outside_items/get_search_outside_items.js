@@ -3,11 +3,7 @@
 import getDbName from "../auth/get_db_name";
 import logout from "../auth/logout";
 
-export default async function getSearchOutsideItems(
-  search,
-  sort,
-  params
-) {
+export default async function getSearchOutsideItems(search, sort, params) {
   const dbName = await getDbName();
   let url = "";
   let prepParams = getPrepParams(sort, params);

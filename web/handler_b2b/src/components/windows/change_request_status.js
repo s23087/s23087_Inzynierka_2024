@@ -65,11 +65,7 @@ function ChangeSelectedStatusWindow({
                     setIsActivated(true);
                     let errorCount = 0;
                     for (let val in requestsIds) {
-                      let result = await setRequestStatus(
-                        val,
-                        "Fulfilled",
-                        "",
-                      );
+                      let result = await setRequestStatus(val, "Fulfilled", "");
                       if (!result) {
                         errorCount++;
                       }

@@ -101,7 +101,15 @@ export default async function updateInvoice(
 
     if (info.ok) {
       if (data.invoiceNumber) {
-        return await changePath(prevPath, data, dbName, userId, isYourInvoice, invoiceId, fs)
+        return await changePath(
+          prevPath,
+          data,
+          dbName,
+          userId,
+          isYourInvoice,
+          invoiceId,
+          fs,
+        );
       }
       return {
         error: false,
@@ -128,7 +136,8 @@ export default async function updateInvoice(
     return {
       isYourInvoice: isYourInvoice,
       invoiceId: invoiceId,
-      invoiceNumber: invoiceNumber !== prevState.invoiceNumber ? invoiceNumber : null,
+      invoiceNumber:
+        invoiceNumber !== prevState.invoiceNumber ? invoiceNumber : null,
       clientId: client !== -1 ? client : null,
       transportCost: transport !== prevState.transport ? transport : null,
       paymentMethod: paymentMethod !== -1 ? paymentMethod : null,
@@ -140,7 +149,15 @@ export default async function updateInvoice(
   }
 }
 
-async function changePath(prevPath, data, dbName, userId, isYourInvoice, invoiceId, fs) {
+async function changePath(
+  prevPath,
+  data,
+  dbName,
+  userId,
+  isYourInvoice,
+  invoiceId,
+  fs,
+) {
   try {
     fs.renameSync(prevPath, data.path);
   } catch (error) {

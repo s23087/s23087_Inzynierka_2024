@@ -18,13 +18,13 @@ async function WarehousePage({ searchParams }) {
   const is_org_switch_needed = current_role == "Admin";
   let currentSort = searchParams.orderBy ?? ".None";
   let params = {
-    filterStatus : searchParams.status,
-   eanFilter : searchParams.ean,
-    qtyL : searchParams.qtyL,
-   qtyG : searchParams.qtyG,
-   priceL : searchParams.priceL,
-   priceG : searchParams.priceG,
-  }
+    filterStatus: searchParams.status,
+    eanFilter: searchParams.ean,
+    qtyL: searchParams.qtyL,
+    qtyG: searchParams.qtyG,
+    priceL: searchParams.priceL,
+    priceG: searchParams.priceG,
+  };
   let filterActivated =
     searchParams.orderBy ||
     params.filterStatus ||
@@ -44,14 +44,9 @@ async function WarehousePage({ searchParams }) {
         org_view,
         searchParams.searchQuery,
         currentSort,
-        params
+        params,
       )
-    : await getItems(
-        currency,
-        org_view,
-        currentSort,
-        params
-      );
+    : await getItems(currency, org_view, currentSort, params);
   let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
   let productsLength = products ? products.length : 0;
   let pageQty = Math.ceil(productsLength / maxInstanceOnPage);
@@ -96,7 +91,7 @@ async function WarehousePage({ searchParams }) {
 }
 
 WarehousePage.propTypes = {
-  searchParams: PropTypes.object
-}
+  searchParams: PropTypes.object,
+};
 
-export default WarehousePage
+export default WarehousePage;

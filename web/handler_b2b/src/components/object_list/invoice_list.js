@@ -247,7 +247,7 @@ function InvoiceList({
                 type: type,
                 value: value,
                 orgView: orgView,
-                selected: getIfSelected(type, value, selectedDocuments)
+                selected: getIfSelected(type, value, selectedDocuments),
               },
               () => {
                 // Select

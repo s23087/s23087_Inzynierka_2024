@@ -130,7 +130,7 @@ export default async function updateRequest(
   }
 }
 
-async function changePath(prevPath, data, dbName, userId, requestId, fs){
+async function changePath(prevPath, data, dbName, userId, requestId, fs) {
   try {
     fs.renameSync(prevPath, data.path);
   } catch (error) {
