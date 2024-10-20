@@ -39,7 +39,7 @@ function SelectComponent({ selectedQty, actionOneName, actionOne }) {
             style={buttonStyle}
             drop="start"
             onClick={() => {
-              setIsClicked(isClicked ? false : true);
+              setIsClicked(!isClicked);
             }}
             bsPrefix="w-100 btn"
           >

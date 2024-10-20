@@ -2,6 +2,7 @@
 
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
+import logout from "../auth/logout";
 
 export default async function getUserOrgName() {
   const dbName = await getDbName();
@@ -12,8 +13,9 @@ export default async function getUserOrgName() {
       method: "GET",
     });
 
-    if (info.status == 404) {
-      return "404";
+    if (info.status === 404) {
+      logout();
+      return null;
     }
 
     if (info.ok) {

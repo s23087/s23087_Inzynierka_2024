@@ -23,14 +23,7 @@ export default async function createRequest(file, state, formData) {
   const userId = await getUserId();
   let fileName = `../../database/${dbName}/documents/req_${recevier}${userId}${type.replace(" ", "")}${Date.now().toString()}.pdf`;
 
-  let requestData = {
-    creatorId: userId,
-    receiverId: recevier,
-    objectType: type,
-    path: file ? fileName : null,
-    note: note,
-    title: title,
-  };
+  let requestData = getData();
 
   const fs = require("node:fs");
   if (file) {
@@ -121,6 +114,17 @@ export default async function createRequest(file, state, formData) {
       "Connection error.",
       fs,
     );
+  }
+
+  function getData() {
+    return {
+      creatorId: userId,
+      receiverId: recevier,
+      objectType: type,
+      path: file ? fileName : null,
+      note: note,
+      title: title,
+    };
   }
 }
 

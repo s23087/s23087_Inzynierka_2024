@@ -40,18 +40,7 @@ export default async function updateRequest(
       };
     }
     try {
-      if (prevPath === "")
-        prevPath = `../../database/${dbName}/documents/req_${recevierId}${userId}${objectType.replace(" ", "")}${Date.now().toString()}.pdf`;
-      let buffArray = await file.get("file").arrayBuffer();
-      let buff = new Uint8Array(buffArray);
-      fs.writeFileSync(prevPath, buff);
-      if (objectType !== prevState.objectType) {
-        let newPath = prevPath.replace(
-          prevState.objectType.replaceAll(" ", ""),
-          objectType.replaceAll(" ", ""),
-        );
-        path = newPath;
-      }
+      path = await writeFile();
     } catch (error) {
       return {
         error: true,
@@ -116,6 +105,22 @@ export default async function updateRequest(
       completed: true,
       message: "Connection error.",
     };
+  }
+
+  async function writeFile() {
+    if (prevPath === "")
+      prevPath = `../../database/${dbName}/documents/req_${recevierId}${userId}${objectType.replace(" ", "")}${Date.now().toString()}.pdf`;
+    let buffArray = await file.get("file").arrayBuffer();
+    let buff = new Uint8Array(buffArray);
+    fs.writeFileSync(prevPath, buff);
+    if (objectType !== prevState.objectType) {
+      let newPath = prevPath.replace(
+        prevState.objectType.replaceAll(" ", ""),
+        objectType.replaceAll(" ", ""),
+      );
+      return newPath;
+    }
+    return path;
   }
 
   function getData() {

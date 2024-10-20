@@ -34,17 +34,8 @@ export default async function createProforma(
   const dbName = await getDbName();
   let proformaDate = formData.get("date").replaceAll("-", "_");
   let fileName = `../../database/${dbName}/documents/pr_${proformaNumber.replaceAll(/[\\./]/g, "").replaceAll(" ", "_")}_${chosenUser}${orgs.userOrgId}${seller}_${proformaDate}${userId}${Date.now().toString()}.pdf`;
-  let transformProducts = [];
-  products.forEach((element) => {
-    transformProducts.push({
-      itemId: isYourProforma ? element.id : element.priceId,
-      qty: element.qty,
-      price: element.price,
-    });
-  });
-  let currencyExchangeDate = formData.get("currencyExchange")
-    ? formData.get("currencyExchange")
-    : formData.get("date");
+  let transformProducts = getTransformedProducts(products, isYourProforma);
+  let currencyExchangeDate = getCurrencyExchangeDate(formData);
   let curVal = await getCurVal(currencyExchangeDate, chosenCurrency);
 
   if (curVal === 0) {
@@ -177,6 +168,24 @@ export default async function createProforma(
     };
   }
 }
+function getTransformedProducts(products, isYourProforma) {
+  let transformProducts = [];
+  products.forEach((element) => {
+    transformProducts.push({
+      itemId: isYourProforma ? element.id : element.priceId,
+      qty: element.qty,
+      price: element.price,
+    });
+  });
+  return transformProducts;
+}
+
+function getCurrencyExchangeDate(formData) {
+  return formData.get("currencyExchange")
+    ? formData.get("currencyExchange")
+    : formData.get("date");
+}
+
 async function getCurVal(currencyExchangeDate, chosenCurrency) {
   let curVal = 1;
   let newDate = new Date(currencyExchangeDate);

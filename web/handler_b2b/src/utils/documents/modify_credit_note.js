@@ -34,7 +34,7 @@ export default async function updateCreditNote(
   const dbName = await getDbName();
   let prevPath = await getCreditPath(creditNoteId);
 
-  if (creditNoteNumber !== prevState.creditNoteNumber || file) {
+  if (fileNeedToBeOverwritten(creditNoteNumber, prevState, file)) {
     if (!prevPath) {
       return {
         error: true,
@@ -43,20 +43,7 @@ export default async function updateCreditNote(
       };
     }
     try {
-      if (file) {
-        let buffArray = await file.get("file").arrayBuffer();
-        let buff = new Uint8Array(buffArray);
-        fs.writeFileSync(prevPath, buff);
-      }
-      if (creditNoteNumber !== prevState.invoiceNumber) {
-        let newPath = prevPath.replace(
-          prevState.creditNoteNumber
-            .replaceAll(/[\\./]/g, "")
-            .replaceAll(" ", "_"),
-          creditNoteNumber.replaceAll(/[\\./]/g, "").replaceAll(" ", "_"),
-        );
-        path = newPath;
-      }
+      path = await writeFile();
     } catch (error) {
       return {
         error: true,
@@ -131,6 +118,24 @@ export default async function updateCreditNote(
     };
   }
 
+  async function writeFile() {
+    if (file) {
+      let buffArray = await file.get("file").arrayBuffer();
+      let buff = new Uint8Array(buffArray);
+      fs.writeFileSync(prevPath, buff);
+    }
+    if (creditNoteNumber !== prevState.invoiceNumber) {
+      let newPath = prevPath.replace(
+        prevState.creditNoteNumber
+          .replaceAll(/[\\./]/g, "")
+          .replaceAll(" ", "_"),
+        creditNoteNumber.replaceAll(/[\\./]/g, "").replaceAll(" ", "_"),
+      );
+      return newPath;
+    }
+    return path;
+  }
+
   function getData() {
     return {
       isYourCredit: isYourCredit,
@@ -146,6 +151,10 @@ export default async function updateCreditNote(
       note: note !== prevState.note ? note : null,
     };
   }
+}
+
+function fileNeedToBeOverwritten(creditNoteNumber, prevState, file) {
+  return creditNoteNumber !== prevState.creditNoteNumber || file;
 }
 
 async function changeObjectPath(

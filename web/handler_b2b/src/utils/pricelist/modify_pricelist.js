@@ -29,35 +29,19 @@ export default async function modifyPricelist(
 
   const userId = await getUserId();
   const dbName = await getDbName();
-  let getDeactivatedId;
-  try {
-    getDeactivatedId = await fetch(
-      `${process.env.API_DEST}/${dbName}/Offer/get/status/deactivated`,
-      { method: "GET" },
-    );
-  } catch {
-    console.error("Get status deactivated fetch failed.");
+  const deactivatedId = await getDeactivatedId();
+  if (!deactivatedId)
     return {
       error: true,
       completed: true,
       message: "Connection error.",
     };
-  }
-  const deactivatedId = await getDeactivatedId.text();
   let orgName = await getUserOrgName();
-  if (orgName === "404") {
-    logout();
-    return {
-      error: true,
-      completed: true,
-      message: "Your account does not exist.",
-    };
-  }
   if (!orgName) {
     return {
       error: true,
       completed: true,
-      message: "Could not connect to server.",
+      message: "Could not download necessary info.",
     };
   }
   orgName = orgName.replace(/[^a-zA-Z0-9]/, "");
@@ -72,7 +56,7 @@ export default async function modifyPricelist(
   );
   const fs = require("node:fs");
   if (requireNewPath(attributeChanged, status, deactivatedId)) {
-    fileName = `src/app/api/pricelist/${orgName}/${offerName.replaceAll(" ", "_").replaceAll(/[^a-zA-Z0-9_]/g, 25 + userId)}${maxQtyForm}${currency}${Date.now().toString()}.${type}`;
+    fileName = `src/app/api/pricelist/${orgName}/${offerName.replaceAll(" ", "_").replaceAll(/\W/g, 25 + userId)}${maxQtyForm}${currency}${Date.now().toString()}.${type}`;
     try {
       if (fs.existsSync(fileName)) {
         return {
@@ -81,8 +65,15 @@ export default async function modifyPricelist(
           message: "That pricelist already exist.",
         };
       } else {
-        if (fs.existsSync(prevState.path))
+        if (fs.existsSync(prevState.path)) {
           fs.renameSync(prevState.path, fileName);
+        } else {
+          return {
+            error: true,
+            completed: true,
+            message: "Original file does not exists.",
+          };
+        }
       }
     } catch (error) {
       console.log(error);
@@ -192,6 +183,19 @@ export default async function modifyPricelist(
     };
   }
 }
+async function getDeactivatedId() {
+  try {
+    let getDeactivatedId = await fetch(
+      `${process.env.API_DEST}/${dbName}/Offer/get/status/deactivated`,
+      { method: "GET" },
+    );
+    return getDeactivatedId.text();
+  } catch {
+    console.error("Get status deactivated fetch failed.");
+    return null;
+  }
+}
+
 function requireNewPath(attributeChanged, status, deactivatedId) {
   return attributeChanged && status !== deactivatedId;
 }

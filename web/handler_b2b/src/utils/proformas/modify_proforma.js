@@ -46,20 +46,7 @@ export default async function updateProforma(
       };
     }
     try {
-      if (prevPath === "")
-        prevPath = `../../database/${dbName}/documents/pr_${proformaNumber.replaceAll("/", "")}_${user}${orgs.userOrgId}${org}_${userId}${Date.now().toString()}.pdf`;
-      let buffArray = await file.get("file").arrayBuffer();
-      let buff = new Uint8Array(buffArray);
-      fs.writeFileSync(prevPath, buff);
-      if (proformaNumber !== prevState.proformaNumber) {
-        let newPath = prevPath.replace(
-          prevState.proformaNumber
-            .replaceAll(/[\\./]/g, "")
-            .replaceAll(" ", "_"),
-          proformaNumber.replaceAll(/[\\./]/g, "").replaceAll(" ", "_"),
-        );
-        path = newPath;
-      }
+      path = await writeFile();
     } catch (error) {
       return {
         error: true,
@@ -132,6 +119,22 @@ export default async function updateProforma(
       completed: true,
       message: "Connection error",
     };
+  }
+
+  async function writeFile() {
+    if (prevPath === "")
+      prevPath = `../../database/${dbName}/documents/pr_${proformaNumber.replaceAll("/", "")}_${user}${orgs.userOrgId}${org}_${userId}${Date.now().toString()}.pdf`;
+    let buffArray = await file.get("file").arrayBuffer();
+    let buff = new Uint8Array(buffArray);
+    fs.writeFileSync(prevPath, buff);
+    if (proformaNumber !== prevState.proformaNumber) {
+      let newPath = prevPath.replace(
+        prevState.proformaNumber.replaceAll(/[\\./]/g, "").replaceAll(" ", "_"),
+        proformaNumber.replaceAll(/[\\./]/g, "").replaceAll(" ", "_"),
+      );
+      return newPath;
+    }
+    return path;
   }
 
   function getData() {

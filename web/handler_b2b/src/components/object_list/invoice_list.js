@@ -41,66 +41,6 @@ function getIfSelected(type, document, selected) {
   return selected.indexOf(document.invoiceId) !== -1;
 }
 
-function getDocument(
-  documentObject,
-  selectAction,
-  unselectAction,
-  deleteAction,
-  viewAction,
-  modifyAction,
-  completeAction,
-  rejectAction,
-) {
-  if (documentObject.type.includes("note")) {
-    return (
-      <CreditNoteContainer
-        key={documentObject.document.creditNoteId}
-        credit_note={documentObject.document}
-        is_org={documentObject.is_org}
-        selected={documentObject.selected}
-        is_user_type={documentObject.type.includes("yours")}
-        selectAction={selectAction}
-        unselectAction={unselectAction}
-        viewAction={viewAction}
-        deleteAction={deleteAction}
-        modifyAction={modifyAction}
-      />
-    );
-  }
-  if (documentObject.type.includes("Requests")) {
-    return (
-      <RequestContainer
-        key={documentObject.document.id}
-        request={documentObject.document}
-        is_org={documentObject.is_org}
-        selected={documentObject.selected}
-        selectAction={selectAction}
-        unselectAction={unselectAction}
-        viewAction={viewAction}
-        deleteAction={deleteAction}
-        modifyAction={modifyAction}
-        completeAction={completeAction}
-        rejectAction={rejectAction}
-      />
-    );
-  }
-
-  return (
-    <InvoiceContainer
-      key={documentObject.document.invoiceId}
-      invoice={documentObject.document}
-      is_org={documentObject.is_org}
-      selected={documentObject.selected}
-      is_user_type={documentObject.type.includes("Yours")}
-      selectAction={selectAction}
-      unselectAction={unselectAction}
-      deleteAction={deleteAction}
-      viewAction={viewAction}
-      modifyAction={modifyAction}
-    />
-  );
-}
-
 function InvoiceList({
   invoices,
   type,
@@ -242,72 +182,81 @@ function InvoiceList({
         Object.values(invoices ?? [])
           .slice(invoiceStart, invoiceEnd)
           .map((value) => {
-            return getDocument(
-              {
-                type: type,
-                value: value,
-                orgView: orgView,
-                selected: getIfSelected(type, value, selectedDocuments),
-              },
-              () => {
-                // Select
-                setSelectedQty(selectedQty + 1);
-                if (type.includes("notes")) {
-                  selectedDocuments.push(value.creditNoteId);
-                }
-                if (type.includes("invoice")) {
-                  selectedDocuments.push(value.invoiceId);
-                }
+            return getDocument();
+
+            function getDocument() {
+              if (type.includes("note")) {
+                return (
+                  <CreditNoteContainer
+                    key={value.creditNoteId}
+                    credit_note={value}
+                    is_org={orgView}
+                    selected={getIfSelected(type, value, selectedDocuments)}
+                    is_user_type={type.includes("yours")}
+                    selectAction={selectAction}
+                    unselectAction={unselectAction}
+                    viewAction={viewAction}
+                    deleteAction={deleteAction}
+                    modifyAction={modifyAction}
+                  />
+                );
+              }
+              if (type.includes("Requests")) {
+                return (
+                  <RequestContainer
+                    key={value.id}
+                    request={value}
+                    is_org={orgView}
+                    selected={getIfSelected(type, value, selectedDocuments)}
+                    selectAction={selectAction}
+                    unselectAction={unselectAction}
+                    viewAction={viewAction}
+                    deleteAction={deleteAction}
+                    modifyAction={modifyAction}
+                    completeAction={completeAction}
+                    rejectAction={rejectAction}
+                  />
+                );
+              }
+
+              return (
+                <InvoiceContainer
+                  key={value.invoiceId}
+                  invoice={value}
+                  is_org={orgView}
+                  selected={getIfSelected(type, value, selectedDocuments)}
+                  is_user_type={type.includes("Yours")}
+                  selectAction={selectAction}
+                  unselectAction={unselectAction}
+                  deleteAction={deleteAction}
+                  viewAction={viewAction}
+                  modifyAction={modifyAction}
+                />
+              );
+            }
+
+            function rejectAction() {
+              return () => {
+                // Reject
                 if (type === "Requests") {
-                  selectedDocuments.push(value.id);
+                  setRequestToReject(value.id);
+                  setShowRejectWindow(true);
                 }
-              },
-              () => {
-                // Unselect
-                let index;
-                if (type.includes("notes")) {
-                  index = selectedDocuments.indexOf(value.creditNoteId);
-                }
-                if (type.includes("invoice")) {
-                  index = selectedDocuments.indexOf(value.invoiceId);
-                }
+              };
+            }
+
+            function completeAction() {
+              return () => {
+                // Complete
                 if (type === "Requests") {
-                  index = selectedDocuments.indexOf(value.id);
+                  setRequestToComplete(value.id);
+                  setShowCompleteWindow(true);
                 }
-                selectedDocuments.splice(index, 1);
-                setSelectedQty(selectedQty - 1);
-              },
-              () => {
-                // Delete
-                if (type.includes("notes")) {
-                  setCreditNoteToDelete(value.creditNoteId);
-                  setShowDeleteCreditNote(true);
-                }
-                if (type.includes("invoice")) {
-                  setInvoiceToDelete(value.invoiceId);
-                  setShowDeleteInvoice(true);
-                }
-                if (type === "Requests") {
-                  setRequestToDelete(value.id);
-                  setShowDeleteRequest(true);
-                }
-              },
-              () => {
-                // View
-                if (type.includes("notes")) {
-                  setCreditToView(value);
-                  setShowViewCredit(true);
-                }
-                if (type.includes("invoice")) {
-                  setInvoiceToView(value);
-                  setShowViewInvoice(true);
-                }
-                if (type === "Requests") {
-                  setRequestToView(value);
-                  setShowViewRequest(true);
-                }
-              },
-              () => {
+              };
+            }
+
+            function modifyAction() {
+              return () => {
                 // Modify
                 if (type.includes("notes")) {
                   setCreditNoteToModify(value);
@@ -321,22 +270,78 @@ function InvoiceList({
                   setRequestToModify(value);
                   setShowModifyRequest(true);
                 }
-              },
-              () => {
-                // Complete
-                if (type === "Requests") {
-                  setRequestToComplete(value.id);
-                  setShowCompleteWindow(true);
+              };
+            }
+
+            function viewAction() {
+              return () => {
+                // View
+                if (type.includes("notes")) {
+                  setCreditToView(value);
+                  setShowViewCredit(true);
                 }
-              },
-              () => {
-                // Reject
-                if (type === "Requests") {
-                  setRequestToReject(value.id);
-                  setShowRejectWindow(true);
+                if (type.includes("invoice")) {
+                  setInvoiceToView(value);
+                  setShowViewInvoice(true);
                 }
-              },
-            );
+                if (type === "Requests") {
+                  setRequestToView(value);
+                  setShowViewRequest(true);
+                }
+              };
+            }
+
+            function deleteAction() {
+              return () => {
+                // Delete
+                if (type.includes("notes")) {
+                  setCreditNoteToDelete(value.creditNoteId);
+                  setShowDeleteCreditNote(true);
+                }
+                if (type.includes("invoice")) {
+                  setInvoiceToDelete(value.invoiceId);
+                  setShowDeleteInvoice(true);
+                }
+                if (type === "Requests") {
+                  setRequestToDelete(value.id);
+                  setShowDeleteRequest(true);
+                }
+              };
+            }
+
+            function unselectAction() {
+              return () => {
+                // Unselect
+                let index;
+                if (type.includes("notes")) {
+                  index = selectedDocuments.indexOf(value.creditNoteId);
+                }
+                if (type.includes("invoice")) {
+                  index = selectedDocuments.indexOf(value.invoiceId);
+                }
+                if (type === "Requests") {
+                  index = selectedDocuments.indexOf(value.id);
+                }
+                selectedDocuments.splice(index, 1);
+                setSelectedQty(selectedQty - 1);
+              };
+            }
+
+            function selectAction() {
+              return () => {
+                // Select
+                setSelectedQty(selectedQty + 1);
+                if (type.includes("notes")) {
+                  selectedDocuments.push(value.creditNoteId);
+                }
+                if (type.includes("invoice")) {
+                  selectedDocuments.push(value.invoiceId);
+                }
+                if (type === "Requests") {
+                  selectedDocuments.push(value.id);
+                }
+              };
+            }
           })
       )}
       <MoreActionWindow

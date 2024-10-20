@@ -36,7 +36,7 @@ export default async function updateInvoice(
   const dbName = await getDbName();
   let prevPath = await getInvoicePath(invoiceId);
 
-  if (invoiceNumber !== prevState.invoiceNumber || file) {
+  if (fileNeedToBeOverwritten(invoiceNumber, prevState, file)) {
     if (!prevPath) {
       return {
         error: true,
@@ -45,21 +45,9 @@ export default async function updateInvoice(
       };
     }
     try {
-      if (file) {
-        let buffArray = await file.get("file").arrayBuffer();
-        let buff = new Uint8Array(buffArray);
-        fs.writeFileSync(prevPath, buff);
-      }
-      if (invoiceNumber !== prevState.invoiceNumber) {
-        let newPath = prevPath.replace(
-          prevState.invoiceNumber
-            .replaceAll(/[\\./]/g, "")
-            .replaceAll(" ", "_"),
-          invoiceNumber.replaceAll(/[\\./]/g, "").replaceAll(" ", "_"),
-        );
-        path = newPath;
-      }
+      path = await writeFile();
     } catch (error) {
+      writeFile;
       return {
         error: true,
         completed: true,
@@ -132,6 +120,22 @@ export default async function updateInvoice(
     };
   }
 
+  async function writeFile() {
+    if (file) {
+      let buffArray = await file.get("file").arrayBuffer();
+      let buff = new Uint8Array(buffArray);
+      fs.writeFileSync(prevPath, buff);
+    }
+    if (invoiceNumber !== prevState.invoiceNumber) {
+      let newPath = prevPath.replace(
+        prevState.invoiceNumber.replaceAll(/[\\./]/g, "").replaceAll(" ", "_"),
+        invoiceNumber.replaceAll(/[\\./]/g, "").replaceAll(" ", "_"),
+      );
+      return newPath;
+    }
+    return path;
+  }
+
   function getData() {
     return {
       isYourInvoice: isYourInvoice,
@@ -147,6 +151,10 @@ export default async function updateInvoice(
       note: note !== prevState.note ? note : null,
     };
   }
+}
+
+function fileNeedToBeOverwritten(invoiceNumber, prevState, file) {
+  return invoiceNumber !== prevState.invoiceNumber || file;
 }
 
 async function changePath(
