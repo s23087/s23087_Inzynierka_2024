@@ -27,8 +27,6 @@ function OutsideItemsFilterOffcanvas({
   const pathName = usePathname();
   const params = useSearchParams();
   const newParams = new URLSearchParams(params);
-  const [isAsc, setIsAsc] = useState(currentDirection);
-  const orderBy = ["Id", "Source", "Qty", "Price", "Partnumber"];
   const [orgs, setOrgs] = useState([]);
   const [errorDownload, setDownloadError] = useState(false);
   useEffect(() => {
@@ -41,6 +39,8 @@ function OutsideItemsFilterOffcanvas({
       }
     });
   }, []);
+  const [isAsc, setIsAsc] = useState(currentDirection);
+  const orderBy = ["Id", "Source", "Qty", "Price", "Partnumber"];
   // Styles
   const vhStyle = {
     height: "81vh",

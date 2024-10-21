@@ -42,10 +42,15 @@ function PricelistFilterOffcanvas({
       placement="bottom"
     >
       <Container className="h-100 w-100 p-0" fluid>
-        <FilterHeader hideFunction={hideFunction} />
+        <FilterHeader 
+          hideFunction={hideFunction}
+        />
         <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0 mx-1 mx-xl-3" style={vhStyle} fluid>
-            <SortOrderComponent isAsc={isAsc} setIsAsc={setIsAsc} />
+          <SortOrderComponent 
+              isAsc={isAsc}
+              setIsAsc={setIsAsc}
+            />
             <Container className="px-1 ms-0 mb-3">
               <p className="blue-main-text">Sort:</p>
               <Form.Select
@@ -275,6 +280,7 @@ function PricelistFilterOffcanvas({
       </Container>
     </Offcanvas>
   );
+
 }
 
 PricelistFilterOffcanvas.propTypes = {
