@@ -11,10 +11,11 @@ import {
 } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import validators from "@/utils/validators/validator";
 import ErrorMessage from "../smaller_components/error_message";
 import getOrgsList from "@/utils/documents/get_orgs_list";
 import FilterHeader from "./filter_header";
+import SetQueryFunc from "./filters_query_functions";
+import SortOrderComponent from "./sort_component";
 
 function OutsideItemsFilterOffcanvas({
   showOffcanvas,
@@ -55,39 +56,14 @@ function OutsideItemsFilterOffcanvas({
       placement="bottom"
     >
       <Container className="h-100 w-100 p-0" fluid>
-        <FilterHeader 
-          hideFunction={hideFunction}
-        />
+        <FilterHeader hideFunction={hideFunction} />
         <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0 mx-1 mx-xl-3" style={vhStyle} fluid>
             <ErrorMessage
               message="Could not download recipients."
               messageStatus={errorDownload}
             />
-            <Container className="px-1 ms-0 pb-3">
-              <p className="mb-1 blue-main-text">Sort order</p>
-              <Stack
-                direction="horizontal"
-                className="align-items-center"
-                style={{ maxWidth: "329px" }}
-              >
-                <Button
-                  className="w-100 me-2"
-                  disabled={isAsc}
-                  onClick={() => setIsAsc(true)}
-                >
-                  Ascending
-                </Button>
-                <Button
-                  className="w-100 ms-2"
-                  variant="red"
-                  disabled={!isAsc}
-                  onClick={() => setIsAsc(false)}
-                >
-                  Descending
-                </Button>
-              </Stack>
-            </Container>
+            <SortOrderComponent isAsc={isAsc} setIsAsc={setIsAsc} />
             <Container className="px-1 ms-0 mb-3">
               <p className="blue-main-text">Sort:</p>
               <Form.Select
@@ -224,7 +200,7 @@ function OutsideItemsFilterOffcanvas({
                   <Form.Select
                     className="input-style"
                     style={maxStyle}
-                    id="currency"
+                    id="currencyFilter"
                     defaultValue={newParams.get("currency") ?? "none"}
                   >
                     <option value="none">None</option>
@@ -243,18 +219,12 @@ function OutsideItemsFilterOffcanvas({
                   variant="green"
                   className="w-100"
                   onClick={() => {
-                    setCurrencyFilter();
-                    setSourceFilter();
-                    setPriceFilter();
-                    setQtyFilter();
+                    SetQueryFunc.setCurrencyFilter(newParams);
+                    SetQueryFunc.setSourceFilter(newParams);
+                    SetQueryFunc.setPriceFilter(newParams);
+                    SetQueryFunc.setQtyFilter(newParams);
 
-                    let sort = document.getElementById("sortValue").value;
-                    if (sort != "None") {
-                      sort = isAsc ? "A" + sort : "D" + sort;
-                      newParams.set("orderBy", sort);
-                    } else {
-                      newParams.delete("orderBy");
-                    }
+                    SetQueryFunc.setSortFilter(newParams, isAsc);
                     router.replace(`${pathName}?${newParams}`);
                     hideFunction();
                   }}
@@ -287,38 +257,6 @@ function OutsideItemsFilterOffcanvas({
       </Container>
     </Offcanvas>
   );
-
-  function setQtyFilter() {
-    let qtyG = document.getElementById("qtyG").value;
-    if (qtyG) newParams.set("qtyG", qtyG);
-    if (!qtyG) newParams.delete("qtyG");
-    let qtyL = document.getElementById("qtyL").value;
-    if (qtyL) newParams.set("qtyL", qtyL);
-    if (!qtyL) newParams.delete("qtyL");
-  }
-
-  function setPriceFilter() {
-    let priceL = document.getElementById("priceL").value;
-    if (validators.haveOnlyNumbers(priceL) && priceL)
-      newParams.set("priceL", priceL);
-    if (!priceL) newParams.delete("priceL");
-    let priceG = document.getElementById("priceG").value;
-    if (validators.haveOnlyNumbers(priceG) && priceG)
-      newParams.set("priceG", priceG);
-    if (!priceG) newParams.delete("priceG");
-  }
-
-  function setSourceFilter() {
-    let source = document.getElementById("source").value;
-    if (source !== "none") newParams.set("source", source);
-    if (source === "none") newParams.delete("source");
-  }
-
-  function setCurrencyFilter() {
-    let currencyFilter = document.getElementById("currency").value;
-    if (currencyFilter !== "none") newParams.set("currency", currencyFilter);
-    if (currencyFilter === "none") newParams.delete("currency");
-  }
 }
 
 OutsideItemsFilterOffcanvas.propTypes = {

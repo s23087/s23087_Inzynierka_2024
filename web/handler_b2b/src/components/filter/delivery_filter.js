@@ -16,6 +16,8 @@ import getOrgsList from "@/utils/documents/get_orgs_list";
 import getDeliveryCompany from "@/utils/deliveries/get_delivery_company";
 import getDeliveryStatuses from "@/utils/deliveries/get_delivery_statuses";
 import FilterHeader from "./filter_header";
+import SetQueryFunc from "./filters_query_functions";
+import SortOrderComponent from "./sort_component";
 
 function DeliveryFilterOffcanvas({
   showOffcanvas,
@@ -76,9 +78,7 @@ function DeliveryFilterOffcanvas({
       placement="bottom"
     >
       <Container className="h-100 w-100 p-0" fluid>
-        <FilterHeader 
-          hideFunction={hideFunction}
-        />
+        <FilterHeader hideFunction={hideFunction} />
         <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0 mx-1 mx-xl-3" style={vhStyle} fluid>
             <ErrorMessage
@@ -93,30 +93,7 @@ function DeliveryFilterOffcanvas({
               message="Could not download companies."
               messageStatus={errorDownloadDeli}
             />
-            <Container className="px-1 ms-0 pb-3">
-              <p className="mb-1 blue-main-text">Sort order</p>
-              <Stack
-                direction="horizontal"
-                className="align-items-center"
-                style={{ maxWidth: "329px" }}
-              >
-                <Button
-                  className="w-100 me-2"
-                  disabled={isAsc}
-                  onClick={() => setIsAsc(true)}
-                >
-                  Ascending
-                </Button>
-                <Button
-                  className="w-100 ms-2"
-                  variant="red"
-                  disabled={!isAsc}
-                  onClick={() => setIsAsc(false)}
-                >
-                  Descending
-                </Button>
-              </Stack>
-            </Container>
+            <SortOrderComponent isAsc={isAsc} setIsAsc={setIsAsc} />
             <Container className="px-1 ms-0 mb-3">
               <p className="blue-main-text">Sort:</p>
               <Form.Select
@@ -229,7 +206,7 @@ function DeliveryFilterOffcanvas({
                   <Form.Select
                     className="input-style"
                     style={maxStyle}
-                    id="status"
+                    id="filterStatus"
                     defaultValue={newParams.get("status") ?? "none"}
                   >
                     <option value="none">None</option>
@@ -288,22 +265,16 @@ function DeliveryFilterOffcanvas({
                   variant="green"
                   className="w-100"
                   onClick={() => {
-                    setStatusFilter();
-                    setRecipientFilter();
-                    setCompanyFilter();
-                    setEstimatedLowerFilter();
-                    setEstimatedGreaterFilter();
-                    setDeliveredLowerFilter();
-                    setDeliveredGreaterFilter();
-                    setWaybillFilter();
+                    SetQueryFunc.setStatusFilter(newParams);
+                    SetQueryFunc.setRecipientFilter(newParams);
+                    SetQueryFunc.setCompanyFilter(newParams);
+                    SetQueryFunc.setEstimatedLowerFilter(newParams);
+                    SetQueryFunc.setEstimatedGreaterFilter(newParams);
+                    SetQueryFunc.setDeliveredLowerFilter(newParams);
+                    SetQueryFunc.setDeliveredGreaterFilter(newParams);
+                    SetQueryFunc.setWaybillFilter(newParams);
 
-                    let sort = document.getElementById("sortValue").value;
-                    if (sort != "None") {
-                      sort = isAsc ? "A" + sort : "D" + sort;
-                      newParams.set("orderBy", sort);
-                    } else {
-                      newParams.delete("orderBy");
-                    }
+                    SetQueryFunc.setSortFilter(newParams, isAsc);
                     router.replace(`${pathName}?${newParams}`);
                     hideFunction();
                   }}
@@ -338,54 +309,6 @@ function DeliveryFilterOffcanvas({
       </Container>
     </Offcanvas>
   );
-
-  function setWaybillFilter() {
-    let waybill = document.getElementById("waybill").value;
-    if (waybill) newParams.set("waybill", waybill);
-    if (!waybill) newParams.delete("waybill");
-  }
-
-  function setDeliveredGreaterFilter() {
-    let deliveredG = document.getElementById("deliveredG").value;
-    if (deliveredG) newParams.set("deliveredG", deliveredG);
-    if (!deliveredG) newParams.delete("deliveredG");
-  }
-
-  function setDeliveredLowerFilter() {
-    let deliveredL = document.getElementById("deliveredL").value;
-    if (deliveredL) newParams.set("deliveredL", deliveredL);
-    if (!deliveredL) newParams.delete("deliveredL");
-  }
-
-  function setEstimatedGreaterFilter() {
-    let estimatedG = document.getElementById("estimatedG").value;
-    if (estimatedG) newParams.set("estimatedG", estimatedG);
-    if (!estimatedG) newParams.delete("estimatedG");
-  }
-
-  function setEstimatedLowerFilter() {
-    let estimatedL = document.getElementById("estimatedL").value;
-    if (estimatedL) newParams.set("estimatedL", estimatedL);
-    if (!estimatedL) newParams.delete("estimatedL");
-  }
-
-  function setCompanyFilter() {
-    let company = document.getElementById("company").value;
-    if (company !== "none") newParams.set("company", company);
-    if (company === "none") newParams.delete("company");
-  }
-
-  function setRecipientFilter() {
-    let recipient = document.getElementById("recipient").value;
-    if (recipient !== "none") newParams.set("recipient", recipient);
-    if (recipient === "none") newParams.delete("recipient");
-  }
-
-  function setStatusFilter() {
-    let status = document.getElementById("status").value;
-    if (status !== "none") newParams.set("status", status);
-    if (status === "none") newParams.delete("status");
-  }
 }
 
 DeliveryFilterOffcanvas.propTypes = {

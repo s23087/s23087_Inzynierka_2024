@@ -82,9 +82,9 @@ export default async function createProforma(
       },
     );
 
-    let fetchError = await checkFetchForError(info)
-    if (fetchError){
-      return fetchError
+    let fetchError = await checkFetchForError(info);
+    if (fetchError) {
+      return fetchError;
     }
 
     if (info.ok) {
@@ -174,7 +174,7 @@ async function checkFetchForError(info) {
       message: "Server error.",
     };
   }
-  return null
+  return null;
 }
 
 function getTransformedProducts(products, isYourProforma) {

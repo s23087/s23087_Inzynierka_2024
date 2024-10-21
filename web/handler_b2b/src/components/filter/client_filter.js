@@ -13,6 +13,8 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import getCountries from "@/utils/flexible/get_countries";
 import ErrorMessage from "../smaller_components/error_message";
 import FilterHeader from "./filter_header";
+import SetQueryFunc from "./filters_query_functions";
+import SortOrderComponent from "./sort_component";
 
 function ClientFilterOffcanvas({
   showOffcanvas,
@@ -53,39 +55,14 @@ function ClientFilterOffcanvas({
       placement="bottom"
     >
       <Container className="h-100 w-100 p-0" fluid>
-        <FilterHeader 
-          hideFunction={hideFunction}
-        />
+        <FilterHeader hideFunction={hideFunction} />
         <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0 mx-1 mx-xl-3" style={vhStyle} fluid>
             <ErrorMessage
               message="Could not download countries."
               messageStatus={errorDownload}
             />
-            <Container className="px-1 ms-0 pb-3">
-              <p className="mb-1 blue-main-text">Sort order</p>
-              <Stack
-                direction="horizontal"
-                className="align-items-center"
-                style={{ maxWidth: "329px" }}
-              >
-                <Button
-                  className="w-100 me-2"
-                  disabled={isAsc}
-                  onClick={() => setIsAsc(true)}
-                >
-                  Ascending
-                </Button>
-                <Button
-                  className="w-100 ms-2"
-                  variant="red"
-                  disabled={!isAsc}
-                  onClick={() => setIsAsc(false)}
-                >
-                  Descending
-                </Button>
-              </Stack>
-            </Container>
+            <SortOrderComponent isAsc={isAsc} setIsAsc={setIsAsc} />
             <Container className="px-1 ms-0 mb-3">
               <p className="blue-main-text">Sort:</p>
               <Form.Select
@@ -139,13 +116,7 @@ function ClientFilterOffcanvas({
                     if (country !== "none") newParams.set("country", country);
                     if (country === "none") newParams.delete("country");
 
-                    let sort = document.getElementById("sortValue").value;
-                    if (sort != "None") {
-                      sort = isAsc ? "A" + sort : "D" + sort;
-                      newParams.set("orderBy", sort);
-                    } else {
-                      newParams.delete("orderBy");
-                    }
+                    SetQueryFunc.setSortFilter(newParams, isAsc);
                     router.replace(`${pathName}?${newParams}`);
                     hideFunction();
                   }}

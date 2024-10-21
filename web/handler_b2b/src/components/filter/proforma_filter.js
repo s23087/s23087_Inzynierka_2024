@@ -11,10 +11,11 @@ import {
 } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import validators from "@/utils/validators/validator";
 import ErrorMessage from "../smaller_components/error_message";
 import getOrgsList from "@/utils/documents/get_orgs_list";
 import FilterHeader from "./filter_header";
+import SetQueryFunc from "./filters_query_functions";
+import SortOrderComponent from "./sort_component";
 
 function ProformaFilterOffcanvas({
   showOffcanvas,
@@ -55,39 +56,14 @@ function ProformaFilterOffcanvas({
       placement="bottom"
     >
       <Container className="h-100 w-100 p-0" fluid>
-        <FilterHeader 
-          hideFunction={hideFunction}
-        />
+        <FilterHeader hideFunction={hideFunction} />
         <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0 mx-1 mx-xl-3" style={vhStyle} fluid>
             <ErrorMessage
               message="Could not download recipients."
               messageStatus={errorDownload}
             />
-            <Container className="px-1 ms-0 pb-3">
-              <p className="mb-1 blue-main-text">Sort order</p>
-              <Stack
-                direction="horizontal"
-                className="align-items-center"
-                style={{ maxWidth: "329px" }}
-              >
-                <Button
-                  className="w-100 me-2"
-                  disabled={isAsc}
-                  onClick={() => setIsAsc(true)}
-                >
-                  Ascending
-                </Button>
-                <Button
-                  className="w-100 ms-2"
-                  variant="red"
-                  disabled={!isAsc}
-                  onClick={() => setIsAsc(false)}
-                >
-                  Descending
-                </Button>
-              </Stack>
-            </Container>
+            <SortOrderComponent isAsc={isAsc} setIsAsc={setIsAsc} />
             <Container className="px-1 ms-0 mb-3">
               <p className="blue-main-text">Sort:</p>
               <Form.Select
@@ -276,19 +252,13 @@ function ProformaFilterOffcanvas({
                   variant="green"
                   className="w-100"
                   onClick={() => {
-                    setCurrencyFilter();
-                    setRecipientFilter();
-                    setTotalFilter();
-                    setQtyFilter();
-                    setDateFilter();
+                    SetQueryFunc.setCurrencyFilter(newParams);
+                    SetQueryFunc.setRecipientFilter(newParams);
+                    SetQueryFunc.setTotalFilter(newParams);
+                    SetQueryFunc.setQtyFilter(newParams);
+                    SetQueryFunc.setDateFilter(newParams);
 
-                    let sort = document.getElementById("sortValue").value;
-                    if (sort != "None") {
-                      sort = isAsc ? "A" + sort : "D" + sort;
-                      newParams.set("orderBy", sort);
-                    } else {
-                      newParams.delete("orderBy");
-                    }
+                    SetQueryFunc.setSortFilter(newParams, isAsc);
                     router.replace(`${pathName}?${newParams}`);
                     hideFunction();
                   }}
@@ -323,47 +293,6 @@ function ProformaFilterOffcanvas({
       </Container>
     </Offcanvas>
   );
-
-  function setDateFilter() {
-    let dateL = document.getElementById("dateL").value;
-    if (dateL) newParams.set("dateL", dateL);
-    if (!dateL) newParams.delete("dateL");
-    let dateG = document.getElementById("dateG").value;
-    if (dateG) newParams.set("dateG", dateG);
-    if (!dateG) newParams.delete("dateG");
-  }
-
-  function setQtyFilter() {
-    let qtyG = document.getElementById("qtyG").value;
-    if (qtyG) newParams.set("qtyG", qtyG);
-    if (!qtyG) newParams.delete("qtyG");
-    let qtyL = document.getElementById("qtyL").value;
-    if (qtyL) newParams.set("qtyL", qtyL);
-    if (!qtyL) newParams.delete("qtyL");
-  }
-
-  function setTotalFilter() {
-    let totalL = document.getElementById("totalL").value;
-    if (validators.haveOnlyNumbers(totalL) && totalL)
-      newParams.set("totalL", totalL);
-    if (!totalL) newParams.delete("totalL");
-    let totalG = document.getElementById("totalG").value;
-    if (validators.haveOnlyNumbers(totalG) && totalG)
-      newParams.set("totalG", totalG);
-    if (!totalG) newParams.delete("totalG");
-  }
-
-  function setRecipientFilter() {
-    let recipient = document.getElementById("recipient").value;
-    if (recipient !== "none") newParams.set("recipient", recipient);
-    if (recipient === "none") newParams.delete("recipient");
-  }
-
-  function setCurrencyFilter() {
-    let currencyFilter = document.getElementById("currencyFilter").value;
-    if (currencyFilter !== "none") newParams.set("currency", currencyFilter);
-    if (currencyFilter === "none") newParams.delete("currency");
-  }
 }
 
 ProformaFilterOffcanvas.propTypes = {

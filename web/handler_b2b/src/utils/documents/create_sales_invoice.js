@@ -132,9 +132,10 @@ export default async function CreateSalesInvoice(
       transportCost: parseFloat(transport),
       invoiceFilePath: fileName,
       taxes: parseInt(formData.get("taxes")),
-      currencyValueDate: chosenCurrency === "PLN"
-        ? new Date().toLocaleDateString("en-CA")
-        : currencyExchangeDate,
+      currencyValueDate:
+        chosenCurrency === "PLN"
+          ? new Date().toLocaleDateString("en-CA")
+          : currencyExchangeDate,
       currencyName: chosenCurrency,
       paymentMethodId: parseInt(formData.get("paymentMethod")),
       paymentsStatusId: parseInt(formData.get("paymentStatus")),
@@ -150,14 +151,17 @@ function getExchangeDate(formData) {
 
 function validateData(invoice, transport, products, file) {
   let message = "Error:";
-  if (!validators.lengthSmallerThen(invoice, 40) ||
-    !validators.stringIsNotEmpty(invoice))
+  if (
+    !validators.lengthSmallerThen(invoice, 40) ||
+    !validators.stringIsNotEmpty(invoice)
+  )
     message += "\nInvoice must not be empty.";
-  if (!validators.isPriceFormat(transport) ||
-    !validators.stringIsNotEmpty(transport))
+  if (
+    !validators.isPriceFormat(transport) ||
+    !validators.stringIsNotEmpty(transport)
+  )
     message += "\nTransport cost must not be empty and must be decimal.";
   if (products.length <= 0) message += "\nInvoice must have products.";
   if (!file) message += "\nDocument must not be empty.";
   return message;
 }
-

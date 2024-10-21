@@ -147,9 +147,10 @@ export default async function CreatePurchaseInvoice(
       transportCost: parseFloat(transport),
       invoiceFilePath: fileName,
       taxes: parseInt(formData.get("taxes")),
-      currencyValueDate: chosenCurrency === "PLN"
-        ? new Date().toLocaleDateString("en-CA")
-        : currencyExchangeDate,
+      currencyValueDate:
+        chosenCurrency === "PLN"
+          ? new Date().toLocaleDateString("en-CA")
+          : currencyExchangeDate,
       currencyName: chosenCurrency,
       paymentMethodId: parseInt(formData.get("paymentMethod")),
       paymentsStatusId: parseInt(formData.get("paymentStatus")),
@@ -168,11 +169,11 @@ async function getCurrencyValues(currencyExchangeDate) {
     if (newDate.getDay() === 6) newDate.setDate(newDate.getDate() - 1); // If is saturday make it friday
     euroVal = await getCurrencyValueByDate(
       "EUR",
-      newDate.toLocaleDateString("en-CA")
+      newDate.toLocaleDateString("en-CA"),
     );
     usdVal = await getCurrencyValueByDate(
       "USD",
-      newDate.toLocaleDateString("en-CA")
+      newDate.toLocaleDateString("en-CA"),
     );
   } else {
     euroVal = await getCurrencyValueByDate("EUR", currencyExchangeDate);
@@ -189,14 +190,17 @@ function getExchangeDate(formData) {
 
 function validateData(invoiceNumber, transport, products, file) {
   let errorMessage = "Error:";
-  if (!validators.lengthSmallerThen(invoiceNumber, 40) ||
-    !validators.stringIsNotEmpty(invoiceNumber))
+  if (
+    !validators.lengthSmallerThen(invoiceNumber, 40) ||
+    !validators.stringIsNotEmpty(invoiceNumber)
+  )
     errorMessage += "\nInvoice must not be empty.";
-  if (!validators.isPriceFormat(transport) ||
-    !validators.stringIsNotEmpty(transport))
+  if (
+    !validators.isPriceFormat(transport) ||
+    !validators.stringIsNotEmpty(transport)
+  )
     errorMessage += "\nTransport cost must not be empty and must be decimal.";
   if (products.length <= 0) errorMessage += "\nInvoice must have products.";
   if (!file) errorMessage += "\nDocument must not be empty.";
   return errorMessage;
 }
-

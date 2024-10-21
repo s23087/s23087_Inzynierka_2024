@@ -11,12 +11,13 @@ import {
 } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import validators from "@/utils/validators/validator";
 import ErrorMessage from "../smaller_components/error_message";
 import getOrgsList from "@/utils/documents/get_orgs_list";
 import getPaymentStatuses from "@/utils/documents/get_payment_statuses";
 import getRequestStatuses from "@/utils/documents/get_request_statuses";
 import FilterHeader from "./filter_header";
+import SetQueryFunc from "./filters_query_functions";
+import SortOrderComponent from "./sort_component";
 
 function getOrderBy(type) {
   if (type.includes("invoice"))
@@ -91,9 +92,7 @@ function InvoiceFilterOffcanvas({
       placement="bottom"
     >
       <Container className="h-100 w-100 p-0" fluid>
-        <FilterHeader 
-          hideFunction={hideFunction}
-        />
+        <FilterHeader hideFunction={hideFunction} />
         <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0 mx-1 mx-xl-3" style={vhStyle} fluid>
             <ErrorMessage
@@ -108,30 +107,7 @@ function InvoiceFilterOffcanvas({
               message="Could not download request statuses."
               messageStatus={errorDownloadReq}
             />
-            <Container className="px-1 ms-0 pb-3">
-              <p className="mb-1 blue-main-text">Sort order</p>
-              <Stack
-                direction="horizontal"
-                className="align-items-center"
-                style={{ maxWidth: "329px" }}
-              >
-                <Button
-                  className="w-100 me-2"
-                  disabled={isAsc}
-                  onClick={() => setIsAsc(true)}
-                >
-                  Ascending
-                </Button>
-                <Button
-                  className="w-100 ms-2"
-                  variant="red"
-                  disabled={!isAsc}
-                  onClick={() => setIsAsc(false)}
-                >
-                  Descending
-                </Button>
-              </Stack>
-            </Container>
+            <SortOrderComponent isAsc={isAsc} setIsAsc={setIsAsc} />
             <Container className="px-1 ms-0 mb-3">
               <p className="blue-main-text">Sort:</p>
               <Form.Select
@@ -375,7 +351,7 @@ function InvoiceFilterOffcanvas({
                       <Form.Select
                         className="input-style"
                         style={maxStyle}
-                        id="status"
+                        id="filterStatus"
                         defaultValue={newParams.get("status") ?? "none"}
                       >
                         <option value="none">None</option>
@@ -537,7 +513,7 @@ function InvoiceFilterOffcanvas({
                       <Form.Select
                         className="input-style"
                         style={maxStyle}
-                        id="currency"
+                        id="currencyFilter"
                         defaultValue={newParams.get("currency") ?? "none"}
                       >
                         <option value="none">None</option>
@@ -568,7 +544,7 @@ function InvoiceFilterOffcanvas({
                       <Form.Select
                         className="input-style"
                         style={maxStyle}
-                        id="status"
+                        id="filterStatus"
                         defaultValue={newParams.get("status") ?? "none"}
                       >
                         <option value="none">None</option>
@@ -621,7 +597,7 @@ function InvoiceFilterOffcanvas({
                       <Form.Select
                         className="input-style"
                         style={maxStyle}
-                        id="type"
+                        id="typeFilter"
                         defaultValue={newParams.get("type") ?? "none"}
                       >
                         <option value="none">None</option>
@@ -675,31 +651,25 @@ function InvoiceFilterOffcanvas({
                   }
                   onClick={() => {
                     if (type.includes("Requests")) {
-                      setRequestStatusFilter();
-                      setTypeFilter();
+                      SetQueryFunc.setRequestStatusFilter(newParams);
+                      SetQueryFunc.setTypeFilter(newParams);
                     } else {
-                      setCurrencyFilter();
-                      setRecipientFilter();
-                      setStatusFilter();
-                      setPaymentStatusFilter();
+                      SetQueryFunc.setCurrencyFilter(newParams);
+                      SetQueryFunc.setRecipientFilter(newParams);
+                      SetQueryFunc.setStatusFilter(newParams);
+                      SetQueryFunc.setPaymentStatusFilter(newParams);
 
                       if (type.includes("invoice")) {
-                        setDueFilter();
+                        SetQueryFunc.setDueFilter(newParams);
                       }
 
-                      setTotalFilter();
-                      setQtyFilter();
+                      SetQueryFunc.setTotalFilter(newParams);
+                      SetQueryFunc.setQtyFilter(newParams);
                     }
 
-                    setDateFilter();
+                    SetQueryFunc.setDateFilter(newParams);
 
-                    let sort = document.getElementById("sortValue").value;
-                    if (sort != "None") {
-                      sort = isAsc ? "A" + sort : "D" + sort;
-                      newParams.set("orderBy", sort);
-                    } else {
-                      newParams.delete("orderBy");
-                    }
+                    SetQueryFunc.setSortFilter(newParams, isAsc);
                     router.replace(`${pathName}?${newParams}`);
                     hideFunction();
                   }}
@@ -740,80 +710,6 @@ function InvoiceFilterOffcanvas({
       </Container>
     </Offcanvas>
   );
-
-  function setDateFilter() {
-    let dateL = document.getElementById("dateL").value;
-    if (dateL) newParams.set("dateL", dateL);
-    if (!dateL) newParams.delete("dateL");
-    let dateG = document.getElementById("dateG").value;
-    if (dateG) newParams.set("dateG", dateG);
-    if (!dateG) newParams.delete("dateG");
-  }
-
-  function setQtyFilter() {
-    let qtyG = document.getElementById("qtyG").value;
-    if (qtyG) newParams.set("qtyG", qtyG);
-    if (!qtyG) newParams.delete("qtyG");
-    let qtyL = document.getElementById("qtyL").value;
-    if (qtyL) newParams.set("qtyL", qtyL);
-    if (!qtyL) newParams.delete("qtyL");
-  }
-
-  function setTotalFilter() {
-    let totalL = document.getElementById("totalL").value;
-    if (validators.haveOnlyNumbers(totalL) && totalL)
-      newParams.set("totalL", totalL);
-    if (!totalL) newParams.delete("totalL");
-    let totalG = document.getElementById("totalG").value;
-    if (validators.haveOnlyNumbers(totalG) && totalG)
-      newParams.set("totalG", totalG);
-    if (!totalG) newParams.delete("totalG");
-  }
-
-  function setDueFilter() {
-    let dueL = document.getElementById("dueL").value;
-    if (dueL) newParams.set("dueL", dueL);
-    if (!dueL) newParams.delete("dueL");
-    let dueG = document.getElementById("dueG").value;
-    if (dueG) newParams.set("dueG", dueG);
-    if (!dueG) newParams.delete("dueG");
-  }
-
-  function setPaymentStatusFilter() {
-    let paymentStatus = document.getElementById("paymentStatus").value;
-    if (paymentStatus !== "none") newParams.set("paymentStatus", paymentStatus);
-    if (paymentStatus === "none") newParams.delete("paymentStatus");
-  }
-
-  function setStatusFilter() {
-    let status = document.getElementById("status").value;
-    if (status !== "none") newParams.set("status", status);
-    if (status === "none") newParams.delete("status");
-  }
-
-  function setRecipientFilter() {
-    let recipient = document.getElementById("recipient").value;
-    if (recipient !== "none") newParams.set("recipient", recipient);
-    if (recipient === "none") newParams.delete("recipient");
-  }
-
-  function setCurrencyFilter() {
-    let currency = document.getElementById("currency").value;
-    if (currency !== "none") newParams.set("currency", currency);
-    if (currency === "none") newParams.delete("currency");
-  }
-
-  function setTypeFilter() {
-    let type = document.getElementById("type").value;
-    if (type !== "none") newParams.set("type", type);
-    if (type === "none") newParams.delete("type");
-  }
-
-  function setRequestStatusFilter() {
-    let requestStatus = document.getElementById("requestStatus").value;
-    if (requestStatus !== "none") newParams.set("requestStatus", requestStatus);
-    if (requestStatus === "none") newParams.delete("requestStatus");
-  }
 }
 
 InvoiceFilterOffcanvas.propTypes = {

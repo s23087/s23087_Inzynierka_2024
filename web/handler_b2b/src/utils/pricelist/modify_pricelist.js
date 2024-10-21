@@ -58,9 +58,9 @@ export default async function modifyPricelist(
   if (requireNewPath(attributeChanged, status, deactivatedId)) {
     fileName = `src/app/api/pricelist/${orgName}/${offerName.replaceAll(" ", "_").replaceAll(/\W/g, 25 + userId)}${maxQtyForm}${currency}${Date.now().toString()}.${type}`;
     try {
-      let result = renameFile(fileName, prevState, fs)
+      let result = renameFile(fileName, prevState, fs);
       if (result) {
-        return result
+        return result;
       }
     } catch (error) {
       console.log(error);
@@ -103,9 +103,9 @@ export default async function modifyPricelist(
       },
     });
 
-    let fetchError = await checkFetchForError(info)
+    let fetchError = await checkFetchForError(info);
     if (fetchError) {
-      return fetchError
+      return fetchError;
     }
 
     if (info.ok) {
@@ -145,7 +145,7 @@ export default async function modifyPricelist(
     };
   }
 }
-function renameFile(fileName, prevState, fs){
+function renameFile(fileName, prevState, fs) {
   if (fs.existsSync(fileName)) {
     return {
       error: true,
@@ -154,7 +154,7 @@ function renameFile(fileName, prevState, fs){
     };
   } else if (fs.existsSync(prevState.path)) {
     fs.renameSync(prevState.path, fileName);
-    return null
+    return null;
   } else {
     return {
       error: true,
@@ -195,7 +195,7 @@ async function checkFetchForError(info) {
       message: "Server error.",
     };
   }
-  return null
+  return null;
 }
 
 async function getDeactivatedId() {

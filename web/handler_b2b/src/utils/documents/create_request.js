@@ -57,8 +57,8 @@ export default async function createRequest(file, state, formData) {
       },
     });
 
-    let fetchError = await checkFetchErrors(info, file, fs, fileName)
-    if (fetchError) return fetchError
+    let fetchError = await checkFetchErrors(info, file, fs, fileName);
+    if (fetchError) return fetchError;
 
     if (info.ok) {
       return {

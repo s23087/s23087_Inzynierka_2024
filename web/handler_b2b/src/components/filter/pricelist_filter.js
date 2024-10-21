@@ -11,8 +11,9 @@ import {
 } from "react-bootstrap";
 import { useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import validators from "@/utils/validators/validator";
 import FilterHeader from "./filter_header";
+import SetQueryFunc from "./filters_query_functions";
+import SortOrderComponent from "./sort_component";
 
 function PricelistFilterOffcanvas({
   showOffcanvas,
@@ -41,35 +42,10 @@ function PricelistFilterOffcanvas({
       placement="bottom"
     >
       <Container className="h-100 w-100 p-0" fluid>
-        <FilterHeader 
-          hideFunction={hideFunction}
-        />
+        <FilterHeader hideFunction={hideFunction} />
         <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0 mx-1 mx-xl-3" style={vhStyle} fluid>
-            <Container className="px-1 ms-0 pb-3">
-              <p className="mb-1 blue-main-text">Sort order</p>
-              <Stack
-                direction="horizontal"
-                className="align-items-center"
-                style={{ maxWidth: "329px" }}
-              >
-                <Button
-                  className="w-100 me-2"
-                  disabled={isAsc}
-                  onClick={() => setIsAsc(true)}
-                >
-                  Ascending
-                </Button>
-                <Button
-                  className="w-100 ms-2"
-                  variant="red"
-                  disabled={!isAsc}
-                  onClick={() => setIsAsc(false)}
-                >
-                  Descending
-                </Button>
-              </Stack>
-            </Container>
+            <SortOrderComponent isAsc={isAsc} setIsAsc={setIsAsc} />
             <Container className="px-1 ms-0 mb-3">
               <p className="blue-main-text">Sort:</p>
               <Form.Select
@@ -256,20 +232,14 @@ function PricelistFilterOffcanvas({
                   variant="green"
                   className="w-100"
                   onClick={() => {
-                    setStatusFilter();
-                    setCurrencyFilter();
-                    setTypeFilter();
-                    setTotalFilter();
-                    setCreatedFilter();
-                    setModifiedFilter();
+                    SetQueryFunc.setStatusFilter(newParams);
+                    SetQueryFunc.setCurrencyFilter(newParams);
+                    SetQueryFunc.setTypeFilter(newParams);
+                    SetQueryFunc.setTotalFilter(newParams);
+                    SetQueryFunc.setCreatedFilter(newParams);
+                    SetQueryFunc.setModifiedFilter(newParams);
 
-                    let sort = document.getElementById("sortValue").value;
-                    if (sort != "None") {
-                      sort = isAsc ? "A" + sort : "D" + sort;
-                      newParams.set("orderBy", sort);
-                    } else {
-                      newParams.delete("orderBy");
-                    }
+                    SetQueryFunc.setSortFilter(newParams, isAsc);
                     router.replace(`${pathName}?${newParams}`);
                     hideFunction();
                   }}
@@ -305,53 +275,6 @@ function PricelistFilterOffcanvas({
       </Container>
     </Offcanvas>
   );
-
-  function setModifiedFilter() {
-    let modifiedL = document.getElementById("modifiedL").value;
-    if (modifiedL) newParams.set("modifiedL", modifiedL);
-    if (!modifiedL) newParams.delete("modifiedL");
-    let modifiedG = document.getElementById("modifiedG").value;
-    if (modifiedG) newParams.set("modifiedG", modifiedG);
-    if (!modifiedG) newParams.delete("modifiedG");
-  }
-
-  function setCreatedFilter() {
-    let createdG = document.getElementById("createdG").value;
-    if (createdG) newParams.set("createdG", createdG);
-    if (!createdG) newParams.delete("createdG");
-    let createdL = document.getElementById("createdL").value;
-    if (createdL) newParams.set("createdL", createdL);
-    if (!createdL) newParams.delete("createdL");
-  }
-
-  function setTotalFilter() {
-    let totalL = document.getElementById("totalL").value;
-    if (validators.haveOnlyNumbers(totalL) && totalL)
-      newParams.set("totalL", totalL);
-    if (!totalL) newParams.delete("totalL");
-    let totalG = document.getElementById("totalG").value;
-    if (validators.haveOnlyNumbers(totalG) && totalG)
-      newParams.set("totalG", totalG);
-    if (!totalG) newParams.delete("totalG");
-  }
-
-  function setTypeFilter() {
-    let typeFilter = document.getElementById("typeFilter").value;
-    if (typeFilter !== "none") newParams.set("type", typeFilter);
-    if (typeFilter === "none") newParams.delete("type");
-  }
-
-  function setCurrencyFilter() {
-    let currencyFilter = document.getElementById("currencyFilter").value;
-    if (currencyFilter !== "none") newParams.set("currency", currencyFilter);
-    if (currencyFilter === "none") newParams.delete("currency");
-  }
-
-  function setStatusFilter() {
-    let statusFilter = document.getElementById("filterStatus").value;
-    if (statusFilter !== "none") newParams.set("status", statusFilter);
-    if (statusFilter === "none") newParams.delete("status");
-  }
 }
 
 PricelistFilterOffcanvas.propTypes = {
