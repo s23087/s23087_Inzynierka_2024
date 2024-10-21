@@ -126,7 +126,7 @@ function ModifyDeliveryOffcanvas({
           <Container className="p-0" style={vhStyle} fluid>
             <Form
               className="mx-1 mx-xl-3 ps-1"
-              id="createDelivery"
+              id="modifyDelivery"
               action={formAction}
             >
               <ErrorMessage
@@ -249,7 +249,7 @@ function ModifyDeliveryOffcanvas({
                         e.preventDefault();
                         setIsLoading(true);
 
-                        let form = document.getElementById("createDelivery");
+                        let form = document.getElementById("modifyDelivery");
                         form.requestSubmit();
                       }}
                     >

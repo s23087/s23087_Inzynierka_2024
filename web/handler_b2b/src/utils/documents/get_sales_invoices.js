@@ -3,6 +3,25 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 
+function getPrepParams(sort, params) {
+  let prepParams = [];
+  if (sort !== ".None") prepParams.push(`sort=${sort}`);
+  if (params.dateL) prepParams.push(`dateL=${params.dateL}`);
+  if (params.dateG) prepParams.push(`dateG=${params.dateG}`);
+  if (params.dueL) prepParams.push(`dueL=${params.dueL}`);
+  if (params.dueG) prepParams.push(`dueG=${params.dueG}`);
+  if (params.qtyL) prepParams.push(`qtyL=${params.qtyL}`);
+  if (params.qtyG) prepParams.push(`qtyG=${params.qtyG}`);
+  if (params.totalL) prepParams.push(`totalL=${params.totalL}`);
+  if (params.totalG) prepParams.push(`totalG=${params.totalG}`);
+  if (params.recipient) prepParams.push(`recipient=${params.recipient}`);
+  if (params.currency) prepParams.push(`currency=${params.currency}`);
+  if (params.paymentStatus)
+    prepParams.push(`paymentStatus=${params.paymentStatus}`);
+  if (params.status) prepParams.push(`status=${params.status}`);
+  return prepParams;
+}
+
 export default async function getSalesInvoices(isOrg, sort, params) {
   let url = "";
   let prepParams = getPrepParams(sort, params);
@@ -27,23 +46,4 @@ export default async function getSalesInvoices(isOrg, sort, params) {
     console.error("getSalesInvoices fetch failed.");
     return null;
   }
-}
-
-function getPrepParams(sort, params) {
-  let result = [];
-  if (sort !== ".None") result.push(`sort=${sort}`);
-  if (params.dateL) result.push(`dateL=${params.dateL}`);
-  if (params.dateG) result.push(`dateG=${params.dateG}`);
-  if (params.dueL) result.push(`dueL=${params.dueL}`);
-  if (params.dueG) result.push(`dueG=${params.dueG}`);
-  if (params.qtyL) result.push(`qtyL=${params.qtyL}`);
-  if (params.qtyG) result.push(`qtyG=${params.qtyG}`);
-  if (params.totalL) result.push(`totalL=${params.totalL}`);
-  if (params.totalG) result.push(`totalG=${params.totalG}`);
-  if (params.recipient) result.push(`recipient=${params.recipient}`);
-  if (params.currency) result.push(`currency=${params.currency}`);
-  if (params.paymentStatus)
-    result.push(`paymentStatus=${params.paymentStatus}`);
-  if (params.status) result.push(`status=${params.status}`);
-  return result;
 }
