@@ -18,12 +18,10 @@ function ProformaMenu({
   user,
 }) {
   const [sidebarShow, setSidebarShow] = useState(false);
-  const showSidebar = () => setSidebarShow(true);
-  const hideSidebar = () => setSidebarShow(false);
   return (
     <nav className="fixed-top main-bg z-1">
       <MenuTemplate
-        sidebar_action={showSidebar}
+        sidebar_action={() => setSidebarShow(true)}
         user_name={user.username + " " + user.surname}
         current_nofitication_qty={current_nofitication_qty}
       >
@@ -50,7 +48,7 @@ function ProformaMenu({
         user_name={user.username + " " + user.surname}
         org_name={user.orgName}
         offcanvasShow={sidebarShow}
-        onHideAction={hideSidebar}
+        onHideAction={() => setSidebarShow(false)}
       >
         <Navlinks
           role={current_role}
