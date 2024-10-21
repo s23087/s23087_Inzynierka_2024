@@ -25,7 +25,7 @@ export default async function deleteRequest(requestId) {
       if (path === "") {
         return {
           error: false,
-          message: "Success!",
+          message: "Success! Deleted request.",
         };
       }
       const fs = require("node:fs");
@@ -33,7 +33,7 @@ export default async function deleteRequest(requestId) {
         fs.rmSync(path);
         return {
           error: false,
-          message: "Success!",
+          message: "Success!  Deleted request.",
         };
       } catch (error) {
         console.log(error);

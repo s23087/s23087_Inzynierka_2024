@@ -21,12 +21,38 @@ import createProforma from "@/utils/proformas/create_proforma";
 
 function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
   const router = useRouter();
+  // download errors
   const [userDownloadError, setUserDownloadError] = useState(false);
   const [orgDownloadError, setOrgDownloadError] = useState(false);
   const [taxesDownloadError, setTaxesDownloadError] = useState(false);
   const [methodsDownloadError, setMethodsDownloadError] = useState(false);
+  // options
+  const [users, setUsers] = useState([]);
+  const [orgs, setOrgs] = useState({
+    restOrgs: [],
+  });
+  const [taxes, setTaxes] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
   useEffect(() => {
     if (showOffcanvas) {
+      getTaxes().then((data) => {
+        if (data !== null) {
+          setTaxes(data);
+          setTaxesDownloadError(false);
+        } else {
+          setTaxesDownloadError(true);
+        }
+      });
+
+      getPaymentMethods().then((data) => {
+        if (data !== null) {
+          setMethodsDownloadError(false);
+          setPaymentMethods(data);
+        } else {
+          setMethodsDownloadError(true);
+        }
+      });
+
       getUsers().then((data) => {
         if (data === null) {
           setUserDownloadError(true);
@@ -45,32 +71,8 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
           setOrgDownloadError(true);
         }
       });
-      getTaxes().then((data) => {
-        if (data !== null) {
-          setTaxes(data);
-          setTaxesDownloadError(false);
-        } else {
-          setTaxesDownloadError(true);
-        }
-      });
-
-      getPaymentMethods().then((data) => {
-        if (data !== null) {
-          setMethodsDownloadError(false);
-          setPaymentMethods(data);
-        } else {
-          setMethodsDownloadError(true);
-        }
-      });
     }
   }, [showOffcanvas]);
-  // options
-  const [users, setUsers] = useState([]);
-  const [orgs, setOrgs] = useState({
-    restOrgs: [],
-  });
-  const [taxes, setTaxes] = useState([]);
-  const [paymentMethods, setPaymentMethods] = useState([]);
   // products
   const [showProductWindow, setShowProductWindow] = useState(false);
   const [showSalesProductWindow, setShowSalesProductWindow] = useState(false);
@@ -155,17 +157,17 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
     },
   );
   // Styles
-  const maxStyle = {
-    maxWidth: "393px",
-  };
-  const vhStyle = {
-    height: "81vh",
-  };
   const hidden = {
     display: "none",
   };
   const unhidden = {
     display: "block",
+  };
+  const maxStyle = {
+    maxWidth: "393px",
+  };
+  const vhStyle = {
+    height: "81vh",
   };
   const buttonStyle = {
     maxWidth: "250px",
