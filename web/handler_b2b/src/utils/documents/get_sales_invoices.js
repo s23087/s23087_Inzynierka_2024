@@ -36,7 +36,7 @@ export default async function getSalesInvoices(isOrg, sort, params) {
     const items = await fetch(url, {
       method: "GET",
     });
-
+    
     if (items.ok) {
       return await items.json();
     }
