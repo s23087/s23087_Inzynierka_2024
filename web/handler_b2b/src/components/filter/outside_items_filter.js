@@ -1,4 +1,3 @@
-import Image from "next/image";
 import PropTypes from "prop-types";
 import {
   Offcanvas,
@@ -10,12 +9,12 @@ import {
   Form,
   InputGroup,
 } from "react-bootstrap";
-import CloseIcon from "../../../public/icons/close_black.png";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import validators from "@/utils/validators/validator";
 import ErrorMessage from "../smaller_components/error_message";
 import getOrgsList from "@/utils/documents/get_orgs_list";
+import FilterHeader from "./filter_header";
 
 function OutsideItemsFilterOffcanvas({
   showOffcanvas,
@@ -56,26 +55,9 @@ function OutsideItemsFilterOffcanvas({
       placement="bottom"
     >
       <Container className="h-100 w-100 p-0" fluid>
-        <Offcanvas.Header className="border-bottom-grey px-xl-5">
-          <Container className="px-3" fluid>
-            <Row>
-              <Col xs="9" className="d-flex align-items-center">
-                <p className="blue-main-text h4 mb-0">Filter/Sort by</p>
-              </Col>
-              <Col xs="3" className="text-end pe-0">
-                <Button
-                  variant="as-link"
-                  onClick={() => {
-                    hideFunction();
-                  }}
-                  className="pe-0"
-                >
-                  <Image src={CloseIcon} alt="Close" />
-                </Button>
-              </Col>
-            </Row>
-          </Container>
-        </Offcanvas.Header>
+        <FilterHeader 
+          hideFunction={hideFunction}
+        />
         <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0 mx-1 mx-xl-3" style={vhStyle} fluid>
             <ErrorMessage
