@@ -425,9 +425,9 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                   >
                     {currencyList.error
                       ? null
-                      : currencyList.rates.map((val, key) => {
+                      : currencyList.rates.map((val) => {
                           return (
-                            <option key={key} value={val.effectiveDate}>
+                            <option key={val} value={val.effectiveDate}>
                               {val.mid} Date: {val.effectiveDate}
                             </option>
                           );
@@ -527,7 +527,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                   {products.map((value, key) => {
                     return (
                       <ProductHolder
-                        key={key}
+                        key={value}
                         value={value}
                         deleteValue={() => {
                           products.splice(key, 1);

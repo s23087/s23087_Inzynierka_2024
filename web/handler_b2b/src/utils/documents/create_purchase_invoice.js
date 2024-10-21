@@ -12,21 +12,9 @@ export default async function CreatePurchaseInvoice(
   state,
   formData,
 ) {
-  let errorMessage = "Error:";
   let invoiceNumber = formData.get("invoice");
-  if (
-    !validators.lengthSmallerThen(invoiceNumber, 40) ||
-    !validators.stringIsNotEmpty(invoiceNumber)
-  )
-    errorMessage += "\nInvoice must not be empty.";
   let transport = formData.get("transport");
-  if (
-    !validators.isPriceFormat(transport) ||
-    !validators.stringIsNotEmpty(transport)
-  )
-    errorMessage += "\nTransport cost must not be empty and must be decimal.";
-  if (products.length <= 0) errorMessage += "\nInvoice must have products.";
-  if (!file) errorMessage += "\nDocument must not be empty.";
+  let errorMessage = validateData(invoiceNumber, transport, products, file);
 
   if (errorMessage.length > 6)
     return {
@@ -50,27 +38,8 @@ export default async function CreatePurchaseInvoice(
   });
 
   let chosenCurrency = formData.get("currency");
-  let currencyExchangeDate = formData.get("currencyExchange")
-    ? formData.get("currencyExchange")
-    : formData.get("date");
-  let euroVal;
-  let usdVal;
-  let newDate = new Date(currencyExchangeDate);
-  if (newDate.getDay() === 0 || newDate.getDay() === 6) {
-    if (newDate.getDay() === 0) newDate.setDate(newDate.getDate() - 2); // If is sunday make it friday
-    if (newDate.getDay() === 6) newDate.setDate(newDate.getDate() - 1); // If is saturday make it friday
-    euroVal = await getCurrencyValueByDate(
-      "EUR",
-      newDate.toLocaleDateString("en-CA"),
-    );
-    usdVal = await getCurrencyValueByDate(
-      "USD",
-      newDate.toLocaleDateString("en-CA"),
-    );
-  } else {
-    euroVal = await getCurrencyValueByDate("EUR", currencyExchangeDate);
-    usdVal = await getCurrencyValueByDate("USD", currencyExchangeDate);
-  }
+  let currencyExchangeDate = getExchangeDate(formData);
+  let { euroVal, usdVal } = await getCurrencyValues(currencyExchangeDate);
 
   if (euroVal === null || usdVal === null) {
     return {
@@ -88,29 +57,7 @@ export default async function CreatePurchaseInvoice(
     };
   }
 
-  let purchaseInvoiceData = {
-    userId: parseInt(formData.get("user")),
-    invoiceNumber: invoiceNumber,
-    seller: parseInt(seller),
-    buyer: orgs.userOrgId,
-    invoiceDate: formData.get("date"),
-    dueDate: formData.get("dueDate"),
-    note: formData.get("description") ? formData.get("description") : "",
-    inSystem: formData.get("status") === "true",
-    transportCost: parseFloat(transport),
-    invoiceFilePath: fileName,
-    taxes: parseInt(formData.get("taxes")),
-    currencyValueDate:
-      chosenCurrency === "PLN"
-        ? new Date().toLocaleDateString("en-CA")
-        : currencyExchangeDate,
-    currencyName: chosenCurrency,
-    paymentMethodId: parseInt(formData.get("paymentMethod")),
-    paymentsStatusId: parseInt(formData.get("paymentStatus")),
-    euroValue: euroVal,
-    usdValue: usdVal,
-    invoiceItems: transformProducts,
-  };
+  let purchaseInvoiceData = getData();
 
   const fs = require("node:fs");
   try {
@@ -186,4 +133,70 @@ export default async function CreatePurchaseInvoice(
       message: "Connection error.",
     };
   }
+
+  function getData() {
+    return {
+      userId: parseInt(formData.get("user")),
+      invoiceNumber: invoiceNumber,
+      seller: parseInt(seller),
+      buyer: orgs.userOrgId,
+      invoiceDate: formData.get("date"),
+      dueDate: formData.get("dueDate"),
+      note: formData.get("description") ? formData.get("description") : "",
+      inSystem: formData.get("status") === "true",
+      transportCost: parseFloat(transport),
+      invoiceFilePath: fileName,
+      taxes: parseInt(formData.get("taxes")),
+      currencyValueDate: chosenCurrency === "PLN"
+        ? new Date().toLocaleDateString("en-CA")
+        : currencyExchangeDate,
+      currencyName: chosenCurrency,
+      paymentMethodId: parseInt(formData.get("paymentMethod")),
+      paymentsStatusId: parseInt(formData.get("paymentStatus")),
+      euroValue: euroVal,
+      usdValue: usdVal,
+      invoiceItems: transformProducts,
+    };
+  }
 }
+async function getCurrencyValues(currencyExchangeDate) {
+  let euroVal;
+  let usdVal;
+  let newDate = new Date(currencyExchangeDate);
+  if (newDate.getDay() === 0 || newDate.getDay() === 6) {
+    if (newDate.getDay() === 0) newDate.setDate(newDate.getDate() - 2); // If is sunday make it friday
+    if (newDate.getDay() === 6) newDate.setDate(newDate.getDate() - 1); // If is saturday make it friday
+    euroVal = await getCurrencyValueByDate(
+      "EUR",
+      newDate.toLocaleDateString("en-CA")
+    );
+    usdVal = await getCurrencyValueByDate(
+      "USD",
+      newDate.toLocaleDateString("en-CA")
+    );
+  } else {
+    euroVal = await getCurrencyValueByDate("EUR", currencyExchangeDate);
+    usdVal = await getCurrencyValueByDate("USD", currencyExchangeDate);
+  }
+  return { euroVal, usdVal };
+}
+
+function getExchangeDate(formData) {
+  return formData.get("currencyExchange")
+    ? formData.get("currencyExchange")
+    : formData.get("date");
+}
+
+function validateData(invoiceNumber, transport, products, file) {
+  let errorMessage = "Error:";
+  if (!validators.lengthSmallerThen(invoiceNumber, 40) ||
+    !validators.stringIsNotEmpty(invoiceNumber))
+    errorMessage += "\nInvoice must not be empty.";
+  if (!validators.isPriceFormat(transport) ||
+    !validators.stringIsNotEmpty(transport))
+    errorMessage += "\nTransport cost must not be empty and must be decimal.";
+  if (products.length <= 0) errorMessage += "\nInvoice must have products.";
+  if (!file) errorMessage += "\nDocument must not be empty.";
+  return errorMessage;
+}
+

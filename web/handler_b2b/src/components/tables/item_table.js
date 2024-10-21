@@ -33,9 +33,9 @@ function ItemTable({ restInfo, isOurWarehouse }) {
       </thead>
       <tbody key={restInfo}>
         {isOurWarehouse
-          ? Object.values(restInfo.ownedItemInfos).map((value, key) => {
+          ? Object.values(restInfo.ownedItemInfos).map((value) => {
               return (
-                <tr key={key}>
+                <tr key={value}>
                   <td>
                     <p className="mb-0">
                       {value.organizationName + "\n" + value.invoiceNumber}
@@ -55,9 +55,9 @@ function ItemTable({ restInfo, isOurWarehouse }) {
                 </tr>
               );
             })
-          : Object.values(restInfo.outsideItemInfos).map((value, key) => {
+          : Object.values(restInfo.outsideItemInfos).map((value) => {
               return (
-                <tr key={key}>
+                <tr key={value}>
                   <td>
                     <p className="mb-0">{value.organizationName}</p>
                   </td>

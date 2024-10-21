@@ -11,21 +11,9 @@ export default async function CreateSalesInvoice(
   state,
   formData,
 ) {
-  let message = "Error:";
   let invoice = formData.get("invoice");
-  if (
-    !validators.lengthSmallerThen(invoice, 40) ||
-    !validators.stringIsNotEmpty(invoice)
-  )
-    message += "\nInvoice must not be empty.";
   let transport = formData.get("transport");
-  if (
-    !validators.isPriceFormat(transport) ||
-    !validators.stringIsNotEmpty(transport)
-  )
-    message += "\nTransport cost must not be empty and must be decimal.";
-  if (products.length <= 0) message += "\nInvoice must have products.";
-  if (!file) message += "\nDocument must not be empty.";
+  let message = validateData(invoice, transport, products, file);
 
   if (message.length > 6)
     return {
@@ -51,31 +39,9 @@ export default async function CreateSalesInvoice(
   });
 
   let chosenCurrency = formData.get("currency");
-  let currencyExchangeDate = formData.get("currencyExchange")
-    ? formData.get("currencyExchange")
-    : formData.get("date");
+  let currencyExchangeDate = getExchangeDate(formData);
 
-  let invoiceData = {
-    userId: parseInt(formData.get("user")),
-    invoiceNumber: invoice,
-    seller: orgs.userOrgId,
-    buyer: parseInt(org),
-    invoiceDate: formData.get("date"),
-    dueDate: formData.get("dueDate"),
-    note: formData.get("description") ? formData.get("description") : "",
-    inSystem: formData.get("status") === "true",
-    transportCost: parseFloat(transport),
-    invoiceFilePath: fileName,
-    taxes: parseInt(formData.get("taxes")),
-    currencyValueDate:
-      chosenCurrency === "PLN"
-        ? new Date().toLocaleDateString("en-CA")
-        : currencyExchangeDate,
-    currencyName: chosenCurrency,
-    paymentMethodId: parseInt(formData.get("paymentMethod")),
-    paymentsStatusId: parseInt(formData.get("paymentStatus")),
-    invoiceItems: transformProducts,
-  };
+  let invoiceData = getData();
 
   const fs = require("node:fs");
   try {
@@ -152,4 +118,46 @@ export default async function CreateSalesInvoice(
       message: "Connection error.",
     };
   }
+
+  function getData() {
+    return {
+      userId: parseInt(formData.get("user")),
+      invoiceNumber: invoice,
+      seller: orgs.userOrgId,
+      buyer: parseInt(org),
+      invoiceDate: formData.get("date"),
+      dueDate: formData.get("dueDate"),
+      note: formData.get("description") ? formData.get("description") : "",
+      inSystem: formData.get("status") === "true",
+      transportCost: parseFloat(transport),
+      invoiceFilePath: fileName,
+      taxes: parseInt(formData.get("taxes")),
+      currencyValueDate: chosenCurrency === "PLN"
+        ? new Date().toLocaleDateString("en-CA")
+        : currencyExchangeDate,
+      currencyName: chosenCurrency,
+      paymentMethodId: parseInt(formData.get("paymentMethod")),
+      paymentsStatusId: parseInt(formData.get("paymentStatus")),
+      invoiceItems: transformProducts,
+    };
+  }
 }
+function getExchangeDate(formData) {
+  return formData.get("currencyExchange")
+    ? formData.get("currencyExchange")
+    : formData.get("date");
+}
+
+function validateData(invoice, transport, products, file) {
+  let message = "Error:";
+  if (!validators.lengthSmallerThen(invoice, 40) ||
+    !validators.stringIsNotEmpty(invoice))
+    message += "\nInvoice must not be empty.";
+  if (!validators.isPriceFormat(transport) ||
+    !validators.stringIsNotEmpty(transport))
+    message += "\nTransport cost must not be empty and must be decimal.";
+  if (products.length <= 0) message += "\nInvoice must have products.";
+  if (!file) message += "\nDocument must not be empty.";
+  return message;
+}
+
