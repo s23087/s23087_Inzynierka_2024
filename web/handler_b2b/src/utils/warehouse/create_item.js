@@ -5,6 +5,14 @@ import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 import validators from "../validators/validator";
 
+/**
+ * Sends request to create item in database.
+ * @param  {[Array]} eans Any array of string containing ean values.
+ * @param  {[Object]} state Previous state of object bonded to this function.
+ * @param  {[FormData]} formData Contain form data.
+ * @return {[Object]}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default async function createItem(eans, state, formData) {
   const userId = await getUserId();
   let data = {

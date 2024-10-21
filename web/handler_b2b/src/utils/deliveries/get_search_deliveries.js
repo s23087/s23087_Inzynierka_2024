@@ -41,6 +41,12 @@ export default async function getSearchDeliveries(
   }
 }
 
+/**
+ * Prepares params for joining to url.
+ * @param  {[string]} sort Name of attribute that items will be sorted. Frist char indicates direction. D for descending and A for ascending.
+ * @param  {[Object]} params Object that contains properties that items will be filtered by.
+ * @return {[Object]}      Array of strings with prepared parameters.
+ */
 function getParams(sort, params) {
   let result = [];
   if (sort !== ".None") result.push(`sort=${sort}`);

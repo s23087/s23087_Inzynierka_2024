@@ -4,6 +4,12 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 
+/**
+ * Sends request to modify item bindings in database.
+ * @param  {[Array]} bindings Any array of object containing all bindings values.
+ * @return {[Object]}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default async function changeBindings(bindings) {
   const userId = await getUserId();
   let data = {

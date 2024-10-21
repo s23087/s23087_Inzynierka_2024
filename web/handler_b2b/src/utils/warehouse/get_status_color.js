@@ -1,3 +1,8 @@
+/**
+ * Return name of css variable. If name do not match correct name will return always green (default is the colour of "Fulfilled" status). Status names: In delivery, On request, Unavailable.
+ * @param  {[String]} statusName The name of status.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default function getStatusColor(statusName) {
   switch (statusName) {
     case "In delivery":

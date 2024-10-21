@@ -2,6 +2,11 @@
 
 import getDbName from "../auth/get_db_name";
 
+/**
+ * Sends request to get a description of chosen item.
+ * @param  {[Number]} itemId Item id.
+ * @return {[Object]}     String containing description. If connection was lost return null.
+ */
 export default async function getDescription(itemId) {
   const dbName = await getDbName();
   let url = `${process.env.API_DEST}/${dbName}/Warehouse/get/description/${itemId}`;

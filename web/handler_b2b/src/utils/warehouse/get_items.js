@@ -3,6 +3,14 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 
+/**
+ * Sends request to get items. Can be filtered or sorted using sort and param arguments.
+ * @param  {[string]} currency Name of currency.
+ * @param  {[boolean]} isOrg True if org view is activated, otherwise false.
+ * @param  {[string]} sort Name of attribute that items will be sorted. Frist char indicates direction. D for descending and A for ascending. This param cannot be omitted.
+ * @param  {[Object]} params Object that contains properties that items will be filtered by. This param cannot be omitted.
+ * @return {[Object]}      Array of object that contains item information. If connection was lost return null.
+ */
 export default async function getItems(currency, isOrg, sort, params) {
   let url = "";
   const dbName = await getDbName();
@@ -29,6 +37,12 @@ export default async function getItems(currency, isOrg, sort, params) {
   }
 }
 
+/**
+ * Prepares params for joining to url.
+ * @param  {[string]} sort Name of attribute that items will be sorted. Frist char indicates direction. D for descending and A for ascending.
+ * @param  {[Object]} params Object that contains properties that items will be filtered by.
+ * @return {[Object]}      Array of strings with prepared parameters.
+ */
 function getPrepParams(sort, params) {
   let result = [];
   if (sort !== ".None") result.push(`sort=${sort}`);

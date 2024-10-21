@@ -5,18 +5,42 @@ import { cookies } from "next/headers";
 import SessionManagment from "./utils/auth/session_managment";
 import getRole from "./utils/auth/get_role";
 
+/**
+ * Regex that tells which sites unauthorized user cannot access.
+ */
 const protectedRoutes = /^.*dashboard.*$/;
+/**
+ * Regex that tells which sites "Solo" role cannot access.
+ */
 const restrictedPagesSolo =
   /^.*docType=Requests$|^.*\/roles.*$|^.*\/settings\/add_user.*$/;
+  /**
+ * Regex that tells which sites "Merchant" role cannot access.
+ */
 const restrictedPagesMerchant =
   /^.*\/roles.*$|^.*\/settings\/add_user.*$|^.*\/dashboard\/abstract_items.*$|^.*\/settings\/change_organization.*$/;
+  /**
+ * Regex that tells which sites "Accountant" role cannot access.
+ */
 const restrictedPagesAccountant =
   /^.*\/roles.*$|^.*\/pricelist.*$|^.*\/settings\/add_user.*$|^.*\/settings\/change_organization.*$/;
+  /**
+ * Regex that tells which sites "Warehouse Manager" role cannot access. Part one.
+ */
 const allowedPagesWarehouseManagerPartOne =
   /^.*\/deliveries.*$|^.*\/notifications.*$|^.*\/settings.*$/;
+  /**
+ * Regex that tells which sites "Warehouse Manager" role cannot access. Part two.
+ */
 const allowedPagesWarehouseManagerPartTwo =
   /^.*\/change_password.*$|^.*\/change_data.*$|^.*\/unauthorized.*$/;
 
+/**
+ * Checks if role can access url. Return always false if role is not matched to one of those: Solo, Merchant, Accountant, Warehouse Manager. This function is case sensitive. 
+ * @param  {[string]} role Role name.
+ * @param  {[string]} url Accessed url.
+ * @return {[boolean]}      True if role can access, otherwise false.
+ */
 function checkRestriction(role, url) {
   switch (role) {
     case "Solo":
@@ -35,6 +59,10 @@ function checkRestriction(role, url) {
   }
 }
 
+/**
+ * Middleware that check if user can access chosen resources.
+ * @param req Incoming Request
+ */
 export default async function middleware(req) {
   const path = req.nextUrl.href;
   const isProtectedRoute = protectedRoutes.test(path);
