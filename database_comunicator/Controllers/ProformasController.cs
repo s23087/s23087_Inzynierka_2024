@@ -56,19 +56,19 @@ namespace database_communicator.Controllers
         public async Task<IActionResult> GetYoursProformas(int userId, string? search, string? sort,
             int? qtyL, int? qtyG, int? totalL, int? totalG, string? dateL, string? dateG, int? recipient, string? currency)
         {
+            var exist = await _userServices.UserExist(userId);
+            if (!exist) return NotFound(userNotFoundMessage);
             var filters = new ProformaFiltersTemplate
             {
+                DateL = dateL,
+                DateG = dateG,
+                Recipient = recipient,
+                Currency = currency,
                 QtyL = qtyL,
                 QtyG = qtyG,
                 TotalL = totalL,
                 TotalG = totalG,
-                DateL = dateL,
-                DateG = dateG,
-                Recipient = recipient,
-                Currency = currency
             };
-            var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound(userNotFoundMessage);
             if (search != null)
             {
                 var sResult = await _proformaServices.GetProformas(true, userId, search, sort: sort, filters);
@@ -111,11 +111,11 @@ namespace database_communicator.Controllers
                 QtyL = qtyL,
                 QtyG = qtyG,
                 TotalL = totalL,
-                TotalG = totalG,
-                DateL = dateL,
                 DateG = dateG,
                 Recipient = recipient,
-                Currency = currency
+                Currency = currency,
+                TotalG = totalG,
+                DateL = dateL,
             };
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound(userNotFoundMessage);

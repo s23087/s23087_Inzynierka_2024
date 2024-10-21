@@ -33,7 +33,7 @@ export default async function deleteRequest(requestId) {
         fs.rmSync(path);
         return {
           error: false,
-          message: "Success!  Deleted request.",
+          message: "Success! Deleted request.",
         };
       } catch (error) {
         console.log(error);

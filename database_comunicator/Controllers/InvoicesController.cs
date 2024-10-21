@@ -139,15 +139,15 @@ namespace database_communicator.Controllers
                 DateL = dateL,
                 DateG = dateG,
                 DueL = dueL,
-                DueG = dueG,
-                QtyL = qtyL,
-                QtyG = qtyG,
-                TotalL = totalL,
                 TotalG = totalG,
                 Recipient = recipient,
                 Currency = currency,
                 PaymentStatus = paymentStatus,
-                Status = status
+                Status = status,
+                DueG = dueG,
+                QtyL = qtyL,
+                QtyG = qtyG,
+                TotalL = totalL,
             };
             if (search != null)
             {
@@ -169,14 +169,14 @@ namespace database_communicator.Controllers
                 DateG = dateG,
                 DueL = dueL,
                 DueG = dueG,
+                Recipient = recipient,
+                Currency = currency,
+                PaymentStatus = paymentStatus,
+                Status = status,
                 QtyL = qtyL,
                 QtyG = qtyG,
                 TotalL = totalL,
                 TotalG = totalG,
-                Recipient = recipient,
-                Currency = currency,
-                PaymentStatus = paymentStatus,
-                Status = status
             };
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound(userNotFoundMessage);
@@ -197,15 +197,15 @@ namespace database_communicator.Controllers
             var filters = new InvoiceFiltersTemplate
             {
                 DateL = dateL,
-                DateG = dateG,
-                DueL = dueL,
-                DueG = dueG,
-                QtyL = qtyL,
                 QtyG = qtyG,
                 TotalL = totalL,
                 TotalG = totalG,
                 Recipient = recipient,
                 Currency = currency,
+                DateG = dateG,
+                DueL = dueL,
+                DueG = dueG,
+                QtyL = qtyL,
                 PaymentStatus = paymentStatus,
                 Status = status
             };
