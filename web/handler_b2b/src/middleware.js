@@ -37,9 +37,9 @@ const allowedPagesWarehouseManagerPartTwo =
 
 /**
  * Checks if role can access url. Return always false if role is not matched to one of those: Solo, Merchant, Accountant, Warehouse Manager. This function is case sensitive. 
- * @param  {[string]} role Role name.
- * @param  {[string]} url Accessed url.
- * @return {[boolean]}      True if role can access, otherwise false.
+ * @param  {string} role Role name.
+ * @param  {string} url Accessed url.
+ * @return {boolean}      True if role can access, otherwise false.
  */
 function checkRestriction(role, url) {
   switch (role) {

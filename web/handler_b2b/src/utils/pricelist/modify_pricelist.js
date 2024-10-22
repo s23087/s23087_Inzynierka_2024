@@ -6,6 +6,19 @@ import logout from "../auth/logout";
 import validators from "../validators/validator";
 import getUserOrgName from "./get_org_name";
 
+const fs = require("node:fs");
+
+/**
+ * Sends request to modify pricelist. When data is unchanged the attribute in request will be null. If user do not exist server will logout them.
+ * @param  {Array<object>} products Array of products.
+ * @param  {string} currency Currency shortcut name.
+ * @param  {Number} offerId Offer id.
+ * @param  {object} prevState Object that contain information about previous state of chosen item.
+ * @param  {object} state Previous state of object bonded to this function.
+ * @param  {FormData} formData Contain form data.
+ * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default async function modifyPricelist(
   products,
   currency,
@@ -54,11 +67,11 @@ export default async function modifyPricelist(
     currency,
     type,
   );
-  const fs = require("node:fs");
+
   if (requireNewPath(attributeChanged, status, deactivatedId)) {
     fileName = `src/app/api/pricelist/${orgName}/${offerName.replaceAll(" ", "_").replaceAll(/\W/g, 25 + userId)}${maxQtyForm}${currency}${Date.now().toString()}.${type}`;
     try {
-      let result = renameFile(fileName, prevState, fs);
+      let result = renameFile(fileName, prevState);
       if (result) {
         return result;
       }
@@ -129,7 +142,10 @@ export default async function modifyPricelist(
       message: "Connection error.",
     };
   }
-
+  /**
+   * Organize information into object for fetch.
+   * @return {object} 
+   */
   function getData() {
     return {
       userId: userId,
@@ -145,7 +161,14 @@ export default async function modifyPricelist(
     };
   }
 }
-function renameFile(fileName, prevState, fs) {
+/**
+ * Rename file. If error occur return object, otherwise return null.
+ * @param {string} fileName New file name.
+ * @param  {object} prevState Previous state of pricelist.
+ * @return {object}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
+function renameFile(fileName, prevState) {
   if (fs.existsSync(fileName)) {
     return {
       error: true,
@@ -163,7 +186,12 @@ function renameFile(fileName, prevState, fs) {
     };
   }
 }
-
+/**
+ * Check response for error. If no error occurred return null. If error 404 with text "User not found." is recivied, the user will be logout.
+ * @param {Response} info Fetch response.
+ * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 async function checkFetchForError(info) {
   if (info.status === 404) {
     let text = await info.text();
@@ -198,6 +226,10 @@ async function checkFetchForError(info) {
   return null;
 }
 
+/**
+ * Fetch for "Deactivated" status id. If connection lost return null.
+ * @return {Promise<string>}      Return id of status "Deactivated".
+ */
 async function getDeactivatedId() {
   try {
     let getDeactivatedId = await fetch(
@@ -210,11 +242,26 @@ async function getDeactivatedId() {
     return null;
   }
 }
-
+/**
+ * Checks if pricelist path should be changed.
+ * @param  {object} attributeChanged Boolean that tells if at least one attribute changed.
+ * @param  {object} status Chosen status id.
+ * @param  {string} deactivatedId Status id with name "Deactivated".
+ * @return {boolean} True if attribute changes and status is stil active, otherwise false.
+ */
 function requireNewPath(attributeChanged, status, deactivatedId) {
   return attributeChanged && status !== deactivatedId;
 }
 
+/**
+ * Check if at least one of given attribute has changed.
+ * @param  {string} offerName Offer name.
+ * @param  {object} prevState Object that contain information about previous state of chosen item.
+ * @param  {string} maxQtyForm Max showed number of product in pricelist.
+ * @param  {string} currency Currency shortcut name.
+ * @param  {string} type Pricelist type.
+ * @return {boolean} True if at least one changed, otherwise false.
+ */
 function getAtributeChanged(offerName, prevState, maxQtyForm, currency, type) {
   return (
     offerName !== prevState.offerName ||
@@ -224,6 +271,14 @@ function getAtributeChanged(offerName, prevState, maxQtyForm, currency, type) {
   );
 }
 
+/**
+ * Validate given form data.
+ * @param  {string} status Status id.
+ * @param  {string} offerName Offer name.
+ * @param  {string} maxQtyForm Max showed number of product in pricelist.
+ * @param  {Array<object>} products Transport cost in form of string.
+ * @return {string} Return error message. If no error occurred retrun only "Error:"
+ */
 function validateData(status, offerName, maxQtyForm, products) {
   let errorMessage = "Error:";
   if (!status) errorMessage += "\nStatus must not be empty.";

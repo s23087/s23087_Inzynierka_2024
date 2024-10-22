@@ -4,6 +4,12 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import getProformaPath from "./get_proforma_path";
 
+/**
+ * Sends request to delete proforma.
+ * @param  {boolean} isYourProforma Is proforma type "Yours proformas".
+ * @param  {Number} proformaId Proforma id.
+ * @return {Promise<object>}      Return object containing property error {bool} and message {string}. If error is true that action was unsuccessful.
+ */
 export default async function deleteProforma(isYourProforma, proformaId) {
   const dbName = await getDbName();
   const path = await getProformaPath(proformaId);

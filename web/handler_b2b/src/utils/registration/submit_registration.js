@@ -4,6 +4,14 @@ import { redirect } from "next/navigation";
 import initDb from "./createDb";
 import createNewRegisteredUser from "./registerUser";
 
+/**
+ * Create database, log, document and pricelist folder with given names.
+ * @param  {string} dbfile Database file name.
+ * @param  {string} logFile Database log file name.
+ * @param  {string} docFile Document file name.
+ * @param  {string} pricelistFile Pricelist file name.
+ * @return {boolean}      Return true if no error occurred. Otherwise false
+ */
 function createFolders(dbfile, logFile, docFile, pricelistFile) {
   const fs = require("node:fs");
   try {
@@ -21,6 +29,14 @@ function createFolders(dbfile, logFile, docFile, pricelistFile) {
   }
 }
 
+/**
+ * Delete database, log, document and pricelist folder with given names.
+ * @param  {string} dbfile Database file name.
+ * @param  {string} logFile Database log file name.
+ * @param  {string} docFile Document file name.
+ * @param  {string} pricelistFile Pricelist file name.
+ * @return {boolean}      Return true if no error occurred. Otherwise false
+ */
 function deleteFolders(dbfile, logFile, docFile, pricelistFile) {
   const fs = require("node:fs");
   try {
@@ -33,6 +49,11 @@ function deleteFolders(dbfile, logFile, docFile, pricelistFile) {
   }
 }
 
+/**
+ * Sends request to create new database and first user. Depend on result will redirect user to appropriate site.
+ * @param  {boolean} is_org Any array of string containing ean values.
+ * @param  {FormData} formData Contain form data.
+ */
 async function registerUser(is_org, formData) {
   let orgName = formData.get("company");
   let folderName = orgName.replace(/[^a-zA-Z0-9]/, "");
@@ -46,20 +67,18 @@ async function registerUser(is_org, formData) {
   fileCreation = createFolders(dbFilePath, dbLogPath, docPath, pricelistFile);
 
   if (fileCreation) {
-    let registerResult = false;
     try {
       let creationResult = await initDb(folderName);
       if (!creationResult) {
-        deleteFolders(dbFilePath, dbLogPath, docPath, pricelistFile);
-        redirect("failure");
+        throw new Error("Db creation failed")
       }
-      registerResult = await createNewRegisteredUser(
+      let registerResult = await createNewRegisteredUser(
         formData,
         folderName,
         is_org,
       );
       if (!registerResult) {
-        redirect("failure");
+        throw new Error("Registration failed")
       }
     } catch (error) {
       deleteFolders(dbFilePath, dbLogPath, docPath, pricelistFile);

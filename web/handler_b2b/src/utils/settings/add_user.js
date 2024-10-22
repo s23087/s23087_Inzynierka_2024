@@ -6,6 +6,13 @@ import validators from "../validators/validator";
 import logout from "../auth/logout";
 import { redirect } from "next/navigation";
 
+/**
+ * Sends request to create new user.
+ * @param  {object} state Previous state of object bonded to this function.
+ * @param  {FormData} formData Contain form data.
+ * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default async function AddUser(state, formData) {
   let data = {
     email: formData.get("email"),

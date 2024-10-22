@@ -6,6 +6,20 @@ import logout from "../auth/logout";
 import validators from "../validators/validator";
 import getProformaPath from "./get_proforma_path";
 
+const fs = require("node:fs");
+
+/**
+ * Sends request to modify proforma. When data is unchanged the attribute in request will be null.
+ * @param  {FormData} file FormData object containing file binary data.
+ * @param  {object} orgs Object containg user organization name.
+ * @param  {object} prevState Object that contain information about previous state of chosen item.
+ * @param  {Number} proformaId Proforma id.
+ * @param  {boolean} isYourProforma Is proforma type "Yours proformas".
+ * @param  {object} state Previous state of object bonded to this function.
+ * @param  {FormData} formData Contain form data.
+ * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default async function updateProforma(
   file,
   orgs,
@@ -15,8 +29,7 @@ export default async function updateProforma(
   state,
   formData,
 ) {
-  const fs = require("node:fs");
-  let user = parseInt(formData.get("user"));
+  let user = formData.get("user");
   let proformaNumber = formData.get("proformaNumber");
   let note = formData.get("note");
   let org = formData.get("org");
@@ -96,8 +109,7 @@ export default async function updateProforma(
           dbName,
           userId,
           isYourProforma,
-          proformaId,
-          fs,
+          proformaId
         );
       }
       return {
@@ -120,7 +132,10 @@ export default async function updateProforma(
       message: "Connection error",
     };
   }
-
+  /**
+   * Overwrite file with new data.
+   * @return {Promise<string>} String containing path where file exist or will exist after renaming.
+   */
   async function writeFile() {
     if (prevPath === "")
       prevPath = `../../database/${dbName}/documents/pr_${proformaNumber.replaceAll("/", "")}_${user}${orgs.userOrgId}${org}_${userId}${Date.now().toString()}.pdf`;
@@ -137,6 +152,10 @@ export default async function updateProforma(
     return path;
   }
 
+  /**
+   * Organize information into object for fetch.
+   * @return {object} 
+   */
   function getData() {
     return {
       isYourProforma: isYourProforma,
@@ -157,10 +176,28 @@ export default async function updateProforma(
     };
   }
 }
+/**
+ * Checks if proforma path should be changed.
+ * @param  {object} data Data from modify request.
+ * @param  {object} prevPath Previous path.
+ * @param  {string} path Modified path name.
+ * @return {boolean} 
+ */
 function needNewPath(data, prevPath, path) {
   return data.proformaNumber && prevPath !== path;
 }
 
+/**
+ * Sent request to change path in chosen proforma and rename file.
+ * @param  {object} prevPath Previous path.
+ * @param  {object} data Data from modify request.
+ * @param  {string} dbName Database name.
+ * @param  {Number} userId User id.
+ * @param  {boolean} isYourProforma Is proforma type "Yours proformas".
+ * @param  {Number} proformaId Proforma id.
+ * @return {Promise<object>} Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 async function changePath(
   prevPath,
   data,
@@ -168,7 +205,6 @@ async function changePath(
   userId,
   isYourProforma,
   proformaId,
-  fs,
 ) {
   try {
     fs.renameSync(prevPath, data.path);
@@ -203,6 +239,14 @@ async function changePath(
   }
 }
 
+/**
+ * Validate given form data.
+ * @param  {string} proformaNumber Proforma number.
+ * @param  {string} user User id.
+ * @param  {string} org Organization id.
+ * @param  {string} transport Transport cost in form of string.
+ * @return {string} Return error message. If no error occurred retrun only "Error:"
+ */
 function validateData(proformaNumber, user, org, transport) {
   let message = "Error:";
   if (!proformaNumber || proformaNumber.length > 40)

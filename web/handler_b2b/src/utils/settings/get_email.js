@@ -3,6 +3,10 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 
+/**
+ * Sends request to get user email.
+ * @return {Promise<string>}     String containing email. If error return string containing error message.
+ */
 export default async function getUserEmail() {
   const dbName = await getDbName();
   const userId = await getUserId();

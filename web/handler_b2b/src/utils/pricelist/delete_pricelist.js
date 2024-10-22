@@ -4,6 +4,12 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 
+/**
+ * Sends request to delete pricelist. If user is not found in database server will logout the user.
+ * @param  {Number} pricelistId Pricelist id.
+ * @param  {string} path Pricelist file path.
+ * @return {Promise<object>}      Return object containing property error {bool} and message {string}. If error is true that action was unsuccessful.
+ */
 export default async function deletePricelist(pricelistId, path) {
   const dbName = await getDbName();
   const userId = await getUserId();

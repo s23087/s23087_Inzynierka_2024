@@ -26,7 +26,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpPost]
-        [Route("modify/{notifId}/is_read_/{isRead}")]
+        [Route("modify/{notifId}/is_read/{isRead}")]
         public async Task<IActionResult> SetNotification(int notifId, bool isRead)
         {
             var exist = await _notificationServices.NotifExists(notifId);

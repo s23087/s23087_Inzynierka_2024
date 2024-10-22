@@ -4,6 +4,12 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 
+/**
+ * Sends request to delete chosen outside item. If user do not exist server will logout them.
+ * @param  {Number} itemId Item id.
+ * @param  {Number} orgId Organization id item belong to.
+ * @return {Promise<object>}      Object with properties result {bool} and message {string}. If result is true, then item has been successfully deleted. Message is only return when there's error.
+ */
 export default async function deleteOutsideItem(itemId, orgId) {
   const dbName = await getDbName();
   const userId = await getUserId();

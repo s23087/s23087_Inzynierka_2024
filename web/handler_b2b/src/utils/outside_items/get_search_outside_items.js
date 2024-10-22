@@ -3,6 +3,13 @@
 import getDbName from "../auth/get_db_name";
 import logout from "../auth/logout";
 
+/**
+ * Sends request to get outside items that part number or name contains search string. Can be filtered or sorted using sort and param arguments.
+ * @param  {string} search Searched phrase.
+ * @param  {string} sort Name of attribute that items will be sorted. Frist char indicates direction. D for descending and A for ascending. This param cannot be omitted.
+ * @param  {object} params Object that contains properties that items will be filtered by. This param cannot be omitted.
+ * @return {Promise<Array<Object>>}      Array of objects that contain outside item information. If connection was lost return null.
+ */
 export default async function getSearchOutsideItems(search, sort, params) {
   const dbName = await getDbName();
   let url = "";
@@ -30,9 +37,9 @@ export default async function getSearchOutsideItems(search, sort, params) {
 
 /**
  * Prepares params for joining to url.
- * @param  {[string]} sort Name of attribute that items will be sorted. Frist char indicates direction. D for descending and A for ascending.
- * @param  {[Object]} params Object that contains properties that items will be filtered by.
- * @return {[Object]}      Array of strings with prepared parameters.
+ * @param  {string} sort Name of attribute that items will be sorted. Frist char indicates direction. D for descending and A for ascending.
+ * @param  {object} params Object that contains properties that items will be filtered by.
+ * @return {Array<string>}      Array of strings with prepared parameters.
  */
 function getPrepParams(sort, params) {
   let result = [];

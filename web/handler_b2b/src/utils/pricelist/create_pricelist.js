@@ -6,6 +6,15 @@ import logout from "../auth/logout";
 import validators from "../validators/validator";
 import getUserOrgName from "./get_org_name";
 
+/**
+ * Sends request to create pricelist. If user is not found in database server will logout them.
+ * @param  {Array<object>} products Array of products.
+ * @param  {string} currency Currency shortcut name.
+ * @param  {object} state Previous state of object bonded to this function.
+ * @param  {FormData} formData Contain form data.
+ * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default async function createPricelist(
   products,
   currency,
@@ -135,6 +144,14 @@ export default async function createPricelist(
     };
   }
 }
+/**
+ * Validate given form data.
+ * @param  {string} status Status id.
+ * @param  {string} offerName Offer name.
+ * @param  {string} maxQtyForm Max showed number of product in pricelist.
+ * @param  {Array<object>} products Transport cost in form of string.
+ * @return {string} Return error message. If no error occurred retrun only "Error:"
+ */
 function validateData(status, offerName, maxQty, products) {
   let errorMessage = "Error:";
   if (!status) errorMessage += "\nStatus must not be empty.";

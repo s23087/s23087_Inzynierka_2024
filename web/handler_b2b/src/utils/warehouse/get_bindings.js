@@ -4,9 +4,9 @@ import getDbName from "../auth/get_db_name";
 
 /**
  * Sends request to get item associations with users.
- * @param  {[String]} currency Name of currency.
- * @param  {[Number]} itemId Item id.
- * @return {[Object]}      Array of object that contains item bindings information. If connection was lost return null.
+ * @param  {string} currency Name of currency.
+ * @param  {Number} itemId Item id.
+ * @return {Promise<Array<Object>>}      Array of object that contains item bindings information. If connection was lost return null.
  */
 export default async function getBindings(itemId, currency) {
   const dbName = await getDbName();

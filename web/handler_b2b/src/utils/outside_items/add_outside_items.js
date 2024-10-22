@@ -6,6 +6,15 @@ import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 import validators from "../validators/validator";
 
+/**
+ * Sends request to add outside items from file. File is updated asynchronous and even if function return already something pipeline may still progress. 
+ * If user do not exist server will logout them.
+ * @param  {FormData} file Formdata with a csv file data in binary.
+ * @param  {object} state Previous state of object bonded to this function.
+ * @param  {FormData} formData Contain form data.
+ * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default async function addOutsideItems(file, state, formData) {
   const userId = await getUserId();
   const dbName = await getDbName();

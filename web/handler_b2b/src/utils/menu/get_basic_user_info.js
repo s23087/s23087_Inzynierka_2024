@@ -3,6 +3,10 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 
+/**
+ * Sends request to get basic info of current user.
+ * @return {Promise<object>} Object containing username, surname and orgName of user. If error occur it's message will be passed.
+ */
 export default async function getBasicInfo() {
   const dbName = await getDbName();
   const userId = await getUserId();

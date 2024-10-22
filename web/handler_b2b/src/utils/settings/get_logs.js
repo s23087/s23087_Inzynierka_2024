@@ -4,6 +4,10 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 
+/**
+ * Sends request to get application logs. Retrun empty array when encouters the error. When 404 error is encounter it will logout user.
+ * @return {Promise<Array<Object>}      Array of objects that contain logs information. If connection was lost return null.
+ */
 export default async function getLogs() {
   const dbName = await getDbName();
   const userId = await getUserId();

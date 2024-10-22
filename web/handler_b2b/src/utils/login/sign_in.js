@@ -4,6 +4,12 @@ import validators from "@/utils/validators/validator";
 import { redirect } from "next/navigation";
 import SessionManagment from "../auth/session_managment";
 
+/**
+ * Sends request to authorize user. If authorization is success it will redirect user to dashboard. If not it will return error object.
+ * @param  {object} state Previous state of object bonded to this function.
+ * @param  {FormData} formData Contain form data.
+ * @return {Promise<object>}      Return object containing property: error {bool} and message {string}. If error is true that action was unsuccessful.
+ */
 export default async function signIn(state, formData) {
   let data = {
     email: formData.get("email"),

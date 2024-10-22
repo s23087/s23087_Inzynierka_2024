@@ -1,5 +1,12 @@
 "use server";
 
+/**
+ * Sends request to create new first user.
+ * @param  {FormData} formData Contain form data.
+ * @param  {string} dbName Database name.
+ * @param  {boolean} isOrg Is the account organization type (true) or solo (false).
+ * @return {Promise<boolean>}      Result of operation. If true success, otherwise failure.
+ */
 export default async function createNewRegisteredUser(formData, dbName, isOrg) {
   let nip = formData.get("nip");
   nip = nip === "" ? null : parseInt(nip);

@@ -5,6 +5,14 @@ import getDbName from "../auth/get_db_name";
 import logout from "../auth/logout";
 import { redirect } from "next/navigation";
 
+/**
+ * Sends request to modify user profile information. When data is unchanged the attribute in request will be null.
+ * @param  {object} prevState Object that contain information about previous state of chosen item.
+ * @param  {object} state Previous state of object bonded to this function.
+ * @param  {FormData} formData Contain form data.
+ * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default async function changeUserInfo(prevState, state, formData) {
   const userId = await getUserId();
   const dbName = await getDbName();

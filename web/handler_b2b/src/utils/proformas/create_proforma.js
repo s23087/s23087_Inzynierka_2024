@@ -6,6 +6,17 @@ import logout from "../auth/logout";
 import getCurrencyValueByDate from "../flexible/get_chosen_currency_value";
 import validators from "../validators/validator";
 
+/**
+ * Sends request to create proforma.
+ * @param  {Array<object>} products Products added to proforma.
+ * @param  {FormData} file FormData object containing file binary data.
+ * @param  {object} orgs Object containg user organization name.
+ * @param  {boolean} isYourProforma Is proforma type "Yours proformas".
+ * @param  {object} state Previous state of object bonded to this function.
+ * @param  {FormData} formData Contain form data.
+ * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default async function createProforma(
   products,
   file,
@@ -119,6 +130,10 @@ export default async function createProforma(
     };
   }
 
+  /**
+   * Organize information into object for fetch.
+   * @return {object} 
+   */
   function getData() {
     return {
       isYourProforma: isYourProforma,
@@ -143,6 +158,12 @@ export default async function createProforma(
     };
   }
 }
+/**
+ * Check response for error statuses. If no error occurred return null.
+ * @param  {Response} info Fetch response.
+ * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 async function checkFetchForError(info) {
   if (info.status === 404) {
     let text = await info.text();
@@ -177,6 +198,12 @@ async function checkFetchForError(info) {
   return null;
 }
 
+/**
+ * Check response for error statuses. If no error occurred return null.
+ * @param  {Array<object>} products Products added to proforma.
+ * @param  {boolean} isYourProforma Is proforma type "Yours proformas".
+ * @return {Array<object>}      Return products prepared for fetch data.
+ */
 function getTransformedProducts(products, isYourProforma) {
   let transformProducts = [];
   products.forEach((element) => {
@@ -189,12 +216,23 @@ function getTransformedProducts(products, isYourProforma) {
   return transformProducts;
 }
 
+/**
+ * If different date from proforma date was chosen for currency value then return chosen date, otherwise return proforma date.
+ * @param  {FormData} formData Contain form data.
+ * @return {string}      Date in string (yyyy-MM-dd).
+ */
 function getCurrencyExchangeDate(formData) {
   return formData.get("currencyExchange")
     ? formData.get("currencyExchange")
     : formData.get("date");
 }
 
+/**
+ * Return value of chosen currency in given date from NBP site. If date is sunday or saturday then it will take date from last friday.
+ * @param  {string} currencyExchangeDate Date in string (yyyy-MM-dd).
+ * @param  {string} chosenCurrency Shortcut for currency
+ * @return {Promise<Number>}      Currency value from NBP site.
+ */
 async function getCurVal(currencyExchangeDate, chosenCurrency) {
   let curVal = 1;
   let newDate = new Date(currencyExchangeDate);
@@ -209,6 +247,12 @@ async function getCurVal(currencyExchangeDate, chosenCurrency) {
   return curVal;
 }
 
+/**
+ * Validate form data.
+ * @param  {FormData} formData Contain form data.
+ * @param  {Array<object>} products Products added to proforma.
+ * @return {string}      Error message. If no error occurred only "Error:" is returned.
+ */
 function validateData(formData, products) {
   let errorMessage = "Error:";
   if (!formData.get("paymentMethod"))

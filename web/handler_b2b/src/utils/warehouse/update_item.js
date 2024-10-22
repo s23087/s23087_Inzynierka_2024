@@ -5,12 +5,12 @@ import getUserId from "../auth/get_user_id";
 import validators from "../validators/validator";
 
 /**
- * Sends request to modify chosen item.
- * @param  {[Array]} eans Any array of string containing ean values.
- * @param  {[Object]} prevState Object that contain information about previous state of chosen item.
- * @param  {[Object]} state Previous state of object bonded to this function.
- * @param  {[FormData]} formData Contain form data.
- * @return {[Object]}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * Sends request to modify chosen item. When data is unchanged the attribute in request will be null.
+ * @param  {Array} eans Any array of string containing ean values.
+ * @param  {object} prevState Object that contain information about previous state of chosen item.
+ * @param  {object} state Previous state of object bonded to this function.
+ * @param  {FormData} formData Contain form data.
+ * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
  * Completed will always be true, to deliver information to component that action has been completed.
  */
 export default async function updateItem(eans, prevState, state, formData) {
@@ -91,6 +91,11 @@ export default async function updateItem(eans, prevState, state, formData) {
     };
   }
 }
+/**
+ * Validate form data.
+ * @param  {FormData} formData Contain form data.
+ * @return {string}      Return error message. "Error:" means no error occurred.
+ */
 function validateData(formData) {
   let message = "Error:";
   if (!validators.lengthSmallerThen(formData.get("name"), 250) ||

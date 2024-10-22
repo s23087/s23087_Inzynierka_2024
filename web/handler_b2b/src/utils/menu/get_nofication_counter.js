@@ -3,6 +3,10 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 
+/**
+ * Sends request to get number of user notifications.
+ * @return {Promise<Number>}      Number of user notifications.
+ */
 export default async function getNotificationCounter() {
   const dbName = await getDbName();
   const userId = await getUserId();

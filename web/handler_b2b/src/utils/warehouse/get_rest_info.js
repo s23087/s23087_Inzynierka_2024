@@ -5,10 +5,10 @@ import getUserId from "../auth/get_user_id";
 
 /**
  * Sends request to get rest information of chosen item from invoices and outside items data.
- * @param  {[String]} currency Name of currency.
- * @param  {[Number]} itemId Item id.
- * @param  {[boolean]} isOrg True if org view is activated, otherwise false.
- * @return {[Object]}      Object containing rest item information. If connection was lost return null.
+ * @param  {string} currency Name of currency.
+ * @param  {Number} itemId Item id.
+ * @param  {boolean} isOrg True if org view is activated, otherwise false.
+ * @return {Object}      Object containing rest item information. If connection was lost return null.
  */
 export default async function getRestInfo(currency, itemId, isOrg) {
   const dbName = await getDbName();
