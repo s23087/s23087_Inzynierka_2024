@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { useFormState } from "react-dom";
 import Toastes from "@/components/smaller_components/toast";
 import { useRouter } from "next/navigation";
-import validators from "@/utils/validators/validator";
 import getUsers from "@/utils/flexible/get_users";
 import getOrgsList from "@/utils/documents/get_orgs_list";
 import getTaxes from "@/utils/documents/get_taxes";
@@ -16,9 +15,18 @@ import AddProductWindow from "@/components/windows/addProduct";
 import getCurrencyValuesList from "@/utils/flexible/get_currency_values_list";
 import AddSaleProductWindow from "@/components/windows/add_Sales_product";
 import ErrorMessage from "@/components/smaller_components/error_message";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 import createProforma from "@/utils/proformas/create_proforma";
 
+/**
+ * Create offcanvas that allow to create proforma.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {boolean} props.isYourProforma If type equal to "Yours proformas" then true, otherwise false.
+ * @return {JSX.Element} Offcanvas element
+ */
 function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
   const router = useRouter();
   // download errors
@@ -26,13 +34,15 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
   const [orgDownloadError, setOrgDownloadError] = useState(false);
   const [taxesDownloadError, setTaxesDownloadError] = useState(false);
   const [methodsDownloadError, setMethodsDownloadError] = useState(false);
-  // options
+  // download data holders
   const [users, setUsers] = useState([]);
   const [orgs, setOrgs] = useState({
     restOrgs: [],
   });
   const [taxes, setTaxes] = useState([]);
   const [paymentMethods, setPaymentMethods] = useState([]);
+  const [chosenUser, setChosenUser] = useState();
+  // download data
   useEffect(() => {
     if (showOffcanvas) {
       getTaxes().then((data) => {
@@ -59,7 +69,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
         } else {
           setUserDownloadError(false);
           setUsers(data);
-          setChoosenUser(data[0].idUser);
+          setChosenUser(data[0].idUser);
         }
       });
 
@@ -73,62 +83,62 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
       });
     }
   }, [showOffcanvas]);
-  // products
+  // useState for showing add product window
   const [showProductWindow, setShowProductWindow] = useState(false);
+  // useState for showing add sales product window
   const [showSalesProductWindow, setShowSalesProductWindow] = useState(false);
+  // products holder
   const [products, setProducts] = useState([]);
+  // Product element key to rerender when product array change
   const [resetSeed, setResetSeed] = useState(false);
-  // File
+  // File holder
   const [file, setFile] = useState();
-  // Chossen user
-  const [choosenUser, setChoosenUser] = useState();
-  // Curenncy exchange value
+  // useState for showing currency exchange input
   const [showCurrencyExchange, setShowCurrencyExchange] = useState(false);
-  const [choosenCurrency, setChoosenCurrency] = useState("PLN");
+  // User chosen currency holder
+  const [chosenCurrency, setChosenCurrency] = useState("PLN");
+  // User chosen invoice date
   const [invoiceDate, setInvoiceDate] = useState(
     new Date().toLocaleDateString("en-CA"),
   );
+  // Currency download holder
   const [currencyList, setCurrencyList] = useState({
     error: false,
     message: "",
     rates: [],
   });
+  // download currency data
   useEffect(() => {
     if (showCurrencyExchange) {
       if (Date.parse(invoiceDate) > Date.now()) {
         setCurrencyList({
           error: true,
-          message: "There is no exisitng value for this proforma date.",
+          message: "There is no existing value for this proforma date.",
           rates: [],
         });
         return;
       }
-      let list = getCurrencyValuesList(
-        choosenCurrency,
+      getCurrencyValuesList(
+        chosenCurrency,
         invoiceDate,
         new Date().toLocaleDateString("en-CA"),
-      );
-      list
-        .then((data) =>
+      ).then((data) =>
           setCurrencyList({
             error: data.error,
+            message: data.message,
             rates: data.rates,
           }),
         )
-        .catch(() => {
-          setCurrencyList({
-            error: true,
-            message: "Critical error",
-            rates: [],
-          });
-        });
     }
-  }, [showCurrencyExchange, invoiceDate, choosenCurrency]);
-  // Errors
+  }, [showCurrencyExchange, invoiceDate, chosenCurrency]);
+  // Form errors
   const [proformaError, setProformaError] = useState(false);
   const [transportError, setTransportError] = useState(false);
   const [documentError, setDocumentError] = useState(false);
   const [dateError, setDateError] = useState(false);
+  /**
+   * Check if form can be submitted
+  */
   const isFormErrorActive = () =>
     proformaError ||
     transportError ||
@@ -141,9 +151,9 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
     methodsDownloadError ||
     orgs.restOrgs.length === 0 ||
     products.length === 0;
-  // Misc
+  // True if create action is running
   const [isLoading, setIsLoading] = useState(false);
-  // Form
+  // Form action
   const [state, createProformaAction] = useFormState(
     createProforma
       .bind(null, products)
@@ -235,7 +245,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
                   name="user"
                   disabled={products.length > 0}
                   onChange={(e) => {
-                    setChoosenUser(e.target.value);
+                    setChosenUser(e.target.value);
                   }}
                 >
                   {Object.values(users).map((value) => {
@@ -252,7 +262,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
                   Proforma Number:
                 </Form.Label>
                 <ErrorMessage
-                  message="Is empty, not a number or lenght is greater than 40."
+                  message="Is empty, not a number or length is greater than 40."
                   messageStatus={proformaError}
                 />
                 <Form.Control
@@ -262,7 +272,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
                   placeholder="proforma number"
                   isInvalid={proformaError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setProformaError,
                       40,
@@ -281,7 +291,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
                   }
                 >
                   <p className="mb-0 text-start mb-1 warning-text small-text">
-                    Warning! The choosen day is not a week day, therfore
+                    Warning! The chosen day is not a week day, therefore
                     currency values will be taken from last friday.
                   </p>
                 </Row>
@@ -306,7 +316,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
                         }}
                       />
                       <ErrorMessage
-                        message="Date excceed today's date."
+                        message="Date exceed today's date."
                         messageStatus={dateError}
                       />
                     </Form.Group>
@@ -375,7 +385,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
                         onChange={(e) => {
                           if (e.target.value != "PLN") {
                             setShowCurrencyExchange(true);
-                            setChoosenCurrency(e.target.value);
+                            setChosenCurrency(e.target.value);
                           } else {
                             setShowCurrencyExchange(false);
                           }
@@ -431,14 +441,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
                   placeholder="transport cost"
                   isInvalid={transportError}
                   onInput={(e) => {
-                    if (
-                      validators.isPriceFormat(e.target.value) &&
-                      validators.stringIsNotEmpty(e.target.value)
-                    ) {
-                      setTransportError(false);
-                    } else {
-                      setTransportError(true);
-                    }
+                    InputValidator.decimalValidator(e.target.value, setTransportError)
                   }}
                 />
               </Form.Group>
@@ -486,7 +489,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
                   style={maxHeightScrollContainer}
                   key={resetSeed}
                 >
-                  {products.map((value) => {
+                  {products.map((value, key) => {
                     return (
                       <ProductHolder
                         key={value}
@@ -615,8 +618,8 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
           addFunction={(val) => {
             products.push(val);
           }}
-          userId={choosenUser}
-          currency={choosenCurrency}
+          userId={chosenUser}
+          currency={chosenCurrency}
           addedProductsQty={products.length}
         />
         <Toastes.ErrorToast
@@ -641,6 +644,9 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
     </Offcanvas>
   );
 
+  /**
+   * Reset form state
+  */
   function resetState() {
     state.error = false;
     state.completed = false;

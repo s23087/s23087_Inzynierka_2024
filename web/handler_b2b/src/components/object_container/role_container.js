@@ -3,6 +3,17 @@ import Image from "next/image";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import user_small_icon from "../../../public/icons/user_small_icon.png";
 
+/**
+ * Create element that represent role object
+ * @component
+ * @param {Object} props
+ * @param {{userId: Number, username: string, surname: string, roleName: string}} props.role Object value
+ * @param {boolean} props.selected True if container should show as selected
+ * @param {Function} props.selectAction Action that will activated after clicking select button
+ * @param {Function} props.unselectAction Action that will activated after clicking unselect button
+ * @param {Function} props.modifyAction Action that will activated after clicking modify button
+ * @return {JSX.Element} Container element
+ */
 function RoleContainer({
   role,
   selected,
@@ -10,6 +21,7 @@ function RoleContainer({
   unselectAction,
   modifyAction,
 }) {
+  // Styles
   const containerBg = {
     backgroundColor: "var(--sec-blue)",
   };

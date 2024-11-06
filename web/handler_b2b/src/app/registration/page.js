@@ -10,8 +10,8 @@ import RegistrationChooser from "../../components/registration/registration_choo
 import GrayQuestionmark from "../../../public/icons/gray_questionmark.png";
 
 export default function Registration() {
+  // useState for showing user difference window
   const [show, setShow] = useState(false);
-
   const openUserInfo = () => setShow(true);
   const closeUserInfo = () => setShow(false);
 

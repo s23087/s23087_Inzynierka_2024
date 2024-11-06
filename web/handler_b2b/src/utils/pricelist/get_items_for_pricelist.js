@@ -4,9 +4,9 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 
 /**
- * Sends request to get available items for proforma to add.
+ * Sends request to get available items for pricelist to add.
  * @param {string} currency Shortcut name of currency.
- * @return {Promise<Array<Object>>}      Return array of objects containing available items to add in proforma. If connection is lost return null.
+ * @return {Promise<Array<{itemId: Number, partnumber: string, qty: Number, purchasePrice: Number}>>} Return array of objects containing available items to add in pricelist. If connection is lost return null.
  */
 export default async function getItemsForPricelist(currency) {
   const dbName = await getDbName();

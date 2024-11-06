@@ -42,7 +42,7 @@ namespace database_communicator.Services
                 var creditNote = new CreditNote
                 {
                     CreditNoteDate = data.CreditNoteDate,
-                    CreditNoteNumber = data.CreditNotenumber,
+                    CreditNoteNumber = data.CreditNoteNumber,
                     InSystem = data.InSystem,
                     Note = data.Note,
                     InvoiceId = data.InvoiceId,

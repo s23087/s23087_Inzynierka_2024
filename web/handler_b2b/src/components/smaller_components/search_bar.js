@@ -5,6 +5,10 @@ import { Container, Form, Button, Stack, InputGroup } from "react-bootstrap";
 import Image from "next/image";
 import search_icons from "../../../public/icons/icon_search.png";
 
+/**
+ * Create search bar. Return input of search bar into query param "searchInput" after user clicking enter and set page to 1.
+ * @returns {JSX.Element} Container element
+ */
 export default function SearchBar() {
   const router = useRouter();
   const pathName = usePathname();

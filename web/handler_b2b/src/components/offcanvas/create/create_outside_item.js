@@ -10,9 +10,23 @@ import CloseIcon from "../../../../public/icons/close_black.png";
 import ErrorMessage from "@/components/smaller_components/error_message";
 import addOutsideItems from "@/utils/outside_items/add_outside_items";
 
+/**
+ * Create offcanvas that allow to import outside items from file.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @return {JSX.Element} Offcanvas element
+ */
 function AddOutsideItemsOffcanvas({ showOffcanvas, hideFunction }) {
   const router = useRouter();
+  // download data holder
+  const [orgs, setOrgs] = useState({
+    restOrgs: [],
+  });
+  // download error
   const [errorDownload, setDownloadError] = useState(false);
+  // download data
   useEffect(() => {
     if (showOffcanvas) {
       getOrgsList().then((data) => {
@@ -25,17 +39,13 @@ function AddOutsideItemsOffcanvas({ showOffcanvas, hideFunction }) {
       });
     }
   }, [showOffcanvas]);
-  // options
-  const [orgs, setOrgs] = useState({
-    restOrgs: [],
-  });
-  // File
+  // File holder
   const [file, setFile] = useState();
-  // Errors
+  // Form errors
   const [documentError, setDocumentError] = useState(false);
-  // Misc
+  // True if create action is running
   const [isLoading, setIsLoading] = useState(false);
-  // Form
+  // Form action
   const [state, addItemsAction] = useFormState(
     addOutsideItems.bind(null, file),
     {
@@ -159,7 +169,7 @@ function AddOutsideItemsOffcanvas({ showOffcanvas, hideFunction }) {
                 <p>
                   Column with * can be empty. Column Ean can have multiple
                   variables. If column has more then one ean please use the
-                  comma character to seperate them. For example: 1234,124234.
+                  comma character to separate them. For example: 1234,124234.
                 </p>
               </Container>
               <Container className="main-grey-bg p-3 fixed-bottom w-100" fluid>
@@ -230,6 +240,9 @@ function AddOutsideItemsOffcanvas({ showOffcanvas, hideFunction }) {
     </Offcanvas>
   );
 
+  /**
+   * Reset form state
+  */
   function resetState() {
     state.error = false;
     state.completed = false;

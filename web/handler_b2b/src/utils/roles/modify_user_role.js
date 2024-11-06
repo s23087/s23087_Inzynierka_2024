@@ -7,17 +7,17 @@ import logout from "../auth/logout";
 
 /**
  * Sends request to change user role.
- * @param  {Number} choosenUser Object that contain information about previous state of chosen item.
- * @param  {object} state Previous state of object bonded to this function.
+ * @param  {Number} chosenUser Object that contain information about previous state of chosen item.
+ * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
  * @param  {FormData} formData Contain form data.
- * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
  * Completed will always be true, to deliver information to component that action has been completed.
  */
-export default async function modifyUserRole(choosenUser, state, formData) {
+export default async function modifyUserRole(chosenUser, state, formData) {
   const userId = await getUserId();
   let data = {
     userId: userId,
-    choosenUserId: choosenUser,
+    chosenUserId: chosenUser,
     roleName: formData.get("role"),
   };
 

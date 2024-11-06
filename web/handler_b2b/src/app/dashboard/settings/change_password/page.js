@@ -5,19 +5,23 @@ import { useState } from "react";
 import { useFormState } from "react-dom";
 import { Form, Container, Button, Stack } from "react-bootstrap";
 import ChangePassword from "@/utils/settings/change_password";
-import ForceLogutWindow from "@/components/windows/force_logout";
+import ForceLogoutWindow from "@/components/windows/force_logout";
 import ErrorMessage from "@/components/smaller_components/error_message";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 
 export default function ChangePasswordPage() {
   const router = useRouter();
+  // True if password is invalid
   const [isInvalid, setIsInvalid] = useState(false);
+  // True if modify action is running
   const [isLoading, setIsLoading] = useState(false);
+  // Form action
   const [state, formAction] = useFormState(ChangePassword, {
     error: false,
     completed: false,
     message: "",
   });
+  // Styles
   const buttonStyle = {
     width: "220px",
     height: "55px",
@@ -40,7 +44,7 @@ export default function ChangePasswordPage() {
             type="password"
             name="oldPassword"
             onInput={(e) => {
-              InputValidtor.isEmptyValidator(e.target.value, setIsInvalid);
+              InputValidator.isEmptyValidator(e.target.value, setIsInvalid);
             }}
             isInvalid={isInvalid}
             placeholder="old password"
@@ -56,7 +60,7 @@ export default function ChangePasswordPage() {
             id="newPassword"
             isInvalid={isInvalid}
             onInput={(e) => {
-              InputValidtor.isEmptyValidator(e.target.value, setIsInvalid);
+              InputValidator.isEmptyValidator(e.target.value, setIsInvalid);
             }}
             placeholder="new password"
           />
@@ -105,7 +109,7 @@ export default function ChangePasswordPage() {
           Go back
         </Button>
       </Stack>
-      <ForceLogutWindow modalShow={!state.error && state.completed} />
+      <ForceLogoutWindow modalShow={!state.error && state.completed} />
     </Container>
   );
 }

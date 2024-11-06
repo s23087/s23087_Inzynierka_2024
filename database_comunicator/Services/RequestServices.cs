@@ -237,12 +237,12 @@ namespace database_communicator.Services
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
             try
             {
-                if (data.RecevierId != null)
+                if (data.ReceiverId != null)
                 {
                     await _handlerContext.Requests
                         .Where(e => e.RequestId == data.RequestId)
                         .ExecuteUpdateAsync(setters =>
-                            setters.SetProperty(s => s.IdUserReciver, data.RecevierId)
+                            setters.SetProperty(s => s.IdUserReciver, data.ReceiverId)
                         );
                 }
                 if (data.Title != null)
@@ -334,7 +334,7 @@ namespace database_communicator.Services
                 .Where(((e) => e.RequestId == requestId))
                 .Select(e => new GetRestModifyRequest
                 {
-                    RecevierId = e.IdUserReciver,
+                    ReceiverId = e.IdUserReciver,
                     Note = e.Note,
                 }).FirstAsync();
         }

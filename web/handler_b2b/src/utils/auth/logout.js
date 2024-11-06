@@ -1,9 +1,12 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import SessionManagment from "./session_managment";
+import SessionManagement from "./session_management";
 
+/**
+ * Logout current user and redirect to login site.
+ */
 export default async function logout() {
-  SessionManagment.deleteSession();
+  SessionManagement.deleteSession();
   redirect("/");
 }

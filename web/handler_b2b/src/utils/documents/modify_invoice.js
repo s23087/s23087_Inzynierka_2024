@@ -5,6 +5,19 @@ import getUserId from "../auth/get_user_id";
 import validators from "../validators/validator";
 import { getInvoicePath } from "./get_document_path";
 
+const fs = require("node:fs");
+
+/**
+ * Sends request to modify invoice. When data is unchanged the attribute in request will be null.
+ * @param  {FormData} file FormData object containing file binary data.
+ * @param  {boolean} isYourInvoice Is invoice type "Yours invoices".
+ * @param  {Number} invoiceId Invoice id.
+ * @param  {{invoiceNumber: string, client: Number, transport: Number, paymentMethod: Number, paymentStatus: Number, status: boolean, note: string}} prevState Object that contain information about previous state of chosen invoice.
+ * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
+ * @param  {FormData} formData Contain form data.
+ * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default async function updateInvoice(
   file,
   isYourInvoice,
@@ -13,7 +26,6 @@ export default async function updateInvoice(
   state,
   formData,
 ) {
-  const fs = require("node:fs");
   let invoiceNumber = formData.get("invoice");
   let transport = formData.get("transport");
   let client = parseInt(formData.get("org"));
@@ -95,7 +107,6 @@ export default async function updateInvoice(
           userId,
           isYourInvoice,
           invoiceId,
-          fs,
         );
       }
       return {
@@ -119,6 +130,10 @@ export default async function updateInvoice(
     };
   }
 
+  /**
+   * Overwrite file with new data.
+   * @return {Promise<string>} String containing path where file exist or will exist after renaming.
+   */
   async function writeFile() {
     if (file) {
       let buffArray = await file.get("file").arrayBuffer();
@@ -135,6 +150,10 @@ export default async function updateInvoice(
     return path;
   }
 
+  /**
+   * Organize information into object for fetch.
+   * @return {object}
+   */
   function getData() {
     return {
       isYourInvoice: isYourInvoice,
@@ -151,11 +170,28 @@ export default async function updateInvoice(
     };
   }
 }
-
+/**
+ * Checks if invoice file should be changed.
+ * @param  {object} invoiceNumber Invoice number.
+ * @param  {object} prevState Object that contain information about previous state of chosen invoice.
+ * @param  {FormData} file FormData object containing file binary data.
+ * @return {boolean}
+ */
 function fileNeedToBeOverwritten(invoiceNumber, prevState, file) {
   return invoiceNumber !== prevState.invoiceNumber || file;
 }
 
+/**
+ * Sent request to change path in chosen invoice and rename file.
+ * @param  {object} prevPath Previous path.
+ * @param  {object} data Data from modify request.
+ * @param  {string} dbName Database name.
+ * @param  {Number} userId User id.
+ * @param  {boolean} isYourInvoice Is invoice type "Yours invoices".
+ * @param  {Number} invoiceId Invoice id.
+ * @return {Promise<object>} Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 async function changePath(
   prevPath,
   data,
@@ -163,7 +199,6 @@ async function changePath(
   userId,
   isYourInvoice,
   invoiceId,
-  fs,
 ) {
   try {
     fs.renameSync(prevPath, data.path);
@@ -198,6 +233,12 @@ async function changePath(
   }
 }
 
+/**
+ * Validate given form data.
+ * @param  {string} transport Transport cost.
+ * @param  {string} invoiceNumber Invoice number.
+ * @return {string} Return error message. If no error occurred return only "Error:"
+ */
 function validateData(transport, invoiceNumber) {
   let message = "Error:";
   if (
@@ -209,6 +250,6 @@ function validateData(transport, invoiceNumber) {
     !validators.lengthSmallerThen(invoiceNumber, 40) &&
     !validators.stringIsNotEmpty(invoiceNumber)
   )
-    message += "\nInvoice number cannot be empty and excceed 40 chars.";
+    message += "\nInvoice number cannot be empty and exceed 40 chars.";
   return message;
 }

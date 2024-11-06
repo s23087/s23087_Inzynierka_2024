@@ -58,7 +58,7 @@ namespace database_communicator.Services
                     OrgName = e.SoloUserId != null ? e.SoloUser!.Organizations.OrgName : e.OrgUser!.Organizations.OrgName,
                 }).FirstAsync();
             var result = await _handlerContext.Organizations
-                .Where(e => !e.SoloUsers.Any() && !e.OrgUsers.Any())
+                .Where(e => e.AppUsers.Any( x => x.IdUser == userId))
                 .Select(e => new RestOrgs
                 {
                     OrgId = e.OrganizationId,

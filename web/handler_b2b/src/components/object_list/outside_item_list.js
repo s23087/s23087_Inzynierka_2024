@@ -7,14 +7,25 @@ import SearchFilterBar from "../menu/search_filter_bar";
 import MoreActionWindow from "../windows/more_action";
 import { useSearchParams, useRouter } from "next/navigation";
 import DeleteObjectWindow from "../windows/delete_object";
-import SelectComponent from "../smaller_components/select_compontent";
-import getPagationInfo from "@/utils/flexible/get_page_info";
-import AbstractItemContainer from "../object_container/abstrac_item_container";
+import SelectComponent from "../smaller_components/select_component";
+import getPaginationInfo from "@/utils/flexible/get_page_info";
+import OutsideItemContainer from "../object_container/outside_item_container";
 import AddOutsideItemsOffcanvas from "../offcanvas/create/create_outside_item";
 import deleteOutsideItem from "@/utils/outside_items/delete_outside_item";
 import OutsideItemsFilterOffcanvas from "../filter/outside_items_filter";
 import DeleteSelectedWindow from "../windows/delete_selected";
 
+/**
+ * Return component that showcase outside item objects, search bar, filter, more action element and selected element.
+ * @component
+ * @param {object} props Component props
+ * @param {Array<{users: Array<string>|undefined, partnumber: string, itemId: Number, orgId: Number, orgName: string, price: Number, qty: Number, currency: string}>} props.items Array containing outside item objects.
+ * @param {Number} props.itemsStart Starting index of outside items subarray.
+ * @param {Number} props.itemsEnd Ending index of outside items subarray.
+ * @param {boolean} props.filterActive If filter is activated then true, otherwise false.
+ * @param {string} props.currentSort Current value of "sort" query parameter
+ * @return {JSX.Element} Container element
+ */
 function OutsideItemList({
   items,
   itemsStart,
@@ -22,25 +33,25 @@ function OutsideItemList({
   filterActive,
   currentSort,
 }) {
-  // Delete item
-  const [showDeleteItem, setShowDeleteItem] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState(null);
-  const [isErrorDelete, setIsErrorDelete] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  // More action
-  const [showMoreAction, setShowMoreAction] = useState(false);
-  const [isShowAddItems, setShowAddItems] = useState(false);
-  // Seleted
-  const [selectedQty, setSelectedQty] = useState(0);
-  const [selectedItems] = useState([]);
-  // Filter
-  const [showFilter, setShowFilter] = useState(false);
-  // mass action
-  const [showDeleteSelected, setShowDeleteSelected] = useState(false);
-  const [deleteSelectedErrorMess, setDeleteSelectedErrorMess] = useState("");
   // Nav
   const router = useRouter();
   const params = useSearchParams();
+  // Delete item
+  const [showDeleteItem, setShowDeleteItem] = useState(false); // useState for showing delete window
+  const [itemToDelete, setItemToDelete] = useState(null); // holder of object chosen to delete
+  const [isErrorDelete, setIsErrorDelete] = useState(false); // true if delete action failed
+  const [errorMessage, setErrorMessage] = useState("");
+  // More action
+  const [showMoreAction, setShowMoreAction] = useState(false); // useState for showing more action window
+  const [isShowAddItems, setShowAddItems] = useState(false); // useState for showing create offcanvas
+  // Selected
+  const [selectedQty, setSelectedQty] = useState(0); // Number of selected objects
+  const [selectedItems] = useState([]); // Selected items keys
+  // Filter
+  const [showFilter, setShowFilter] = useState(false); // useState for showing filter offcanvas
+  // mass action
+  const [showDeleteSelected, setShowDeleteSelected] = useState(false); // useState for showing mass action delete window
+  const [deleteSelectedErrorMess, setDeleteSelectedErrorMess] = useState(""); // error message of mass delete action
   // Styles
   const containerMargin = {
     height: "67px",
@@ -67,7 +78,6 @@ function OutsideItemList({
       </Container>
       <SelectComponent
         selectedQty={selectedQty}
-        additonalMargin={true}
         actionOneName="Delete selected"
         actionOne={() => setShowDeleteSelected(true)}
       />
@@ -81,7 +91,7 @@ function OutsideItemList({
           .slice(itemsStart, itemsEnd)
           .map((value) => {
             return (
-              <AbstractItemContainer
+              <OutsideItemContainer
                 key={[value.itemId, value.orgId]}
                 abstract_item={value}
                 selected={
@@ -119,9 +129,9 @@ function OutsideItemList({
         selectAllOnPage={() => {
           selectedItems.splice(0, selectedItems.length);
           setSelectedQty(0);
-          let pagationInfo = getPagationInfo(params);
+          let paginationInfo = getPaginationInfo(params);
           Object.values(items ?? [])
-            .slice(pagationInfo.start, pagationInfo.end)
+            .slice(paginationInfo.start, paginationInfo.end)
             .forEach((e) => selectedItems.push([e.itemId, e.orgId]));
           setSelectedQty(selectedItems.length);
           setShowMoreAction(false);
@@ -197,7 +207,7 @@ function OutsideItemList({
             router.refresh();
           } else {
             setDeleteSelectedErrorMess(
-              `Error: Could not delete this proformas (${failures.join(",")}).`,
+              `Error: Could not delete this items (${failures.join(",")}).`,
             );
             setIsErrorDelete(true);
             router.refresh();

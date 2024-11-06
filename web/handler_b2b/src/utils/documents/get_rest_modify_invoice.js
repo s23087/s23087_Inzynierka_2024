@@ -2,6 +2,12 @@
 
 import getDbName from "../auth/get_db_name";
 
+/**
+ * Sends request to get rest information of chosen invoice needed to modify. If not found return object without properties.
+ * Otherwise return object with properties: transport, paymentMethod and note.
+ * @param {Number} invoiceId Invoice id.
+ * @return {Promise<{transport: Number, paymentMethod: string, note: string}>} Object that contain invoice information. If connection was lost return null.
+ */
 export default async function getRestModifyInvoice(invoiceId) {
   const dbName = await getDbName();
   let url = `${process.env.API_DEST}/${dbName}/Invoices/get/rest/modify/${invoiceId}`;

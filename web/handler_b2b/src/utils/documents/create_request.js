@@ -4,12 +4,22 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 
+const fs = require("node:fs");
+
+/**
+ * Sends request to create sales invoice.
+ * @param  {FormData} file FormData object containing file binary data.
+ * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
+ * @param  {FormData} formData Contain form data.
+ * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default async function createRequest(file, state, formData) {
-  let recevier = parseInt(formData.get("user"));
+  let receiver = parseInt(formData.get("user"));
   let type = formData.get("type");
   let note = formData.get("note");
   let title = formData.get("title");
-  let message = validateData(recevier, note, title);
+  let message = validateData(receiver, note, title);
 
   if (message.length > 6) {
     return {
@@ -21,11 +31,10 @@ export default async function createRequest(file, state, formData) {
 
   const dbName = await getDbName();
   const userId = await getUserId();
-  let fileName = `../../database/${dbName}/documents/req_${recevier}${userId}${type.replace(" ", "")}${Date.now().toString()}.pdf`;
+  let fileName = `../../database/${dbName}/documents/req_${receiver}${userId}${type.replace(" ", "")}${Date.now().toString()}.pdf`;
 
   let requestData = getData();
 
-  const fs = require("node:fs");
   if (file) {
     try {
       if (fs.existsSync(fileName)) {
@@ -57,7 +66,7 @@ export default async function createRequest(file, state, formData) {
       },
     });
 
-    let fetchError = await checkFetchErrors(info, file, fs, fileName);
+    let fetchError = await checkFetchErrors(info, file, fileName);
     if (fetchError) return fetchError;
 
     if (info.ok) {
@@ -72,7 +81,6 @@ export default async function createRequest(file, state, formData) {
           fileName,
           "Critical file error.",
           "Critical error.",
-          fs,
         );
       }
       return {
@@ -87,14 +95,16 @@ export default async function createRequest(file, state, formData) {
       fileName,
       "Connection error. Critical file error.",
       "Connection error.",
-      fs,
     );
   }
-
+  /**
+   * Organize information into object for fetch.
+   * @return {object}
+   */
   function getData() {
     return {
       creatorId: userId,
-      receiverId: recevier,
+      receiverId: receiver,
       objectType: type,
       path: file ? fileName : null,
       note: note,
@@ -103,9 +113,17 @@ export default async function createRequest(file, state, formData) {
   }
 }
 
-async function checkFetchErrors(info, file, fs, fileName) {
+/**
+ * Check if file exist and then delete.
+ * @param  {Response} info Response of any fetch request.
+ * @param  {string} file File data.
+ * @param  {string} fileName Name of file to remove if error occurs.
+ * @return {object} Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
+async function checkFetchErrors(info, file, fileName) {
   if (info.status === 404) {
-    deleteFile(file, fs, fileName);
+    deleteFile(file, fileName);
     let text = await info.text();
     if (text === "Creator not found.") {
       logout();
@@ -124,7 +142,7 @@ async function checkFetchErrors(info, file, fs, fileName) {
   }
 
   if (info.status === 500) {
-    deleteFile(file, fs, fileName);
+    deleteFile(file, fileName);
     return {
       error: true,
       completed: true,
@@ -133,7 +151,15 @@ async function checkFetchErrors(info, file, fs, fileName) {
   }
 }
 
-function removerFileWithFuncReturn(file, errorText, successText, fs) {
+/**
+ * Delete file and return object with action result.
+ * @param  {string} file File data.
+ * @param  {string} errorText Error text of result.
+ * @param  {string} successText Error text of success.
+ * @return {object} Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
+function removerFileWithFuncReturn(file, errorText, successText) {
   try {
     fs.rmSync(file);
     return {
@@ -151,7 +177,13 @@ function removerFileWithFuncReturn(file, errorText, successText, fs) {
   }
 }
 
-function deleteFile(file, fs, fileName) {
+/**
+ * Check if file exist and then delete.
+ * @param  {string} file File data.
+ * @param  {string} fileName Name of file to remove.
+ * @return {string}      Error message. If no error occurred only "Error:" is returned.
+ */
+function deleteFile(file, fileName) {
   if (file) {
     try {
       fs.rmSync(fileName);
@@ -161,9 +193,16 @@ function deleteFile(file, fs, fileName) {
   }
 }
 
-function validateData(recevier, note, title) {
+/**
+ * Validate form data.
+ * @param  {string} receiver Receiver user id.
+ * @param  {string} note User id.
+ * @param  {string} title Request title.
+ * @return {string}      Error message. If no error occurred only "Error:" is returned.
+ */
+function validateData(receiver, note, title) {
   let message = "Error:";
-  if (!recevier) message += "\nRecevier must not be empty.";
+  if (!receiver) message += "\nReceiver must not be empty.";
   if (!note) message += "\nNote must not be empty.";
   if (!title) message += "\nTitle must not be empty.";
   return message;

@@ -4,6 +4,22 @@ import { Container, Row, Col } from "react-bootstrap";
 import ContainerButtons from "@/components/smaller_components/container_buttons";
 import user_small_icon from "../../../../public/icons/user_small_icon.png";
 
+/**
+ * Create element that represent request object. If org view is true then button will switch up to show reject and complete options.
+ * @component
+ * @param {Object} props
+ * @param {{id: Number, username: string, status: string, objectType: string, creationDate: string, title: string}} props.request Object value
+ * @param {boolean} props.is_org True if org view is enabled
+ * @param {boolean} props.selected True if container should show as selected
+ * @param {Function} props.selectAction Action that will activated after clicking select button
+ * @param {Function} props.unselectAction Action that will activated after clicking unselect button
+ * @param {Function} props.deleteAction Action that will activated after clicking delete button
+ * @param {Function} props.viewAction Action that will activated after clicking view button
+ * @param {Function} props.modifyAction Action that will activated after clicking modify button
+ * @param {Function} props.completeAction Action that will activated after clicking complete button
+ * @param {Function} props.rejectAction Action that will activated after clicking reject button
+ * @return {JSX.Element} Container element
+ */
 function RequestContainer({
   request,
   is_org,
@@ -16,6 +32,7 @@ function RequestContainer({
   completeAction,
   rejectAction,
 }) {
+  // Styles
   const statusColorMap = {
     Fulfilled: "var(--main-green)",
     "In progress": "var(--main-yellow)",
@@ -39,18 +56,20 @@ function RequestContainer({
     >
       <Row>
         <Col xs="12" md="12" lg="7" xl="5">
-          <Row className="mb-2">
-            <Col className="d-flex">
-              <Image
-                src={user_small_icon}
-                alt="user small icon"
-                className="me-2 mt-1"
-              />
-              <span className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1">
-                <p className="mb-0">{request.username}</p>
-              </span>
-            </Col>
-          </Row>
+          {is_org ? (
+            <Row className="mb-2">
+              <Col className="d-flex">
+                <Image
+                  src={user_small_icon}
+                  alt="user small icon"
+                  className="me-2 mt-1"
+                />
+                <span className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1">
+                  <p className="mb-0">{request.username}</p>
+                </span>
+              </Col>
+            </Row>
+          ) : null}
           <Row className="mb-2">
             <Col xs="6" className="pe-1">
               <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2">

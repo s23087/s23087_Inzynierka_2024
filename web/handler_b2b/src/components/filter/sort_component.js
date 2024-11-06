@@ -1,6 +1,14 @@
 import PropTypes from "prop-types";
 import { Container, Stack, Button } from "react-bootstrap";
 
+/**
+ * Create element allowing to chose sort order.
+ * @component
+ * @param {object} props
+ * @param {boolean} props.isAsc useState variable. If true then ascending button is disabled, otherwise descending button is disabled
+ * @param {Function} props.setIsAsc useState function from isAsc variable
+ * @return {JSX.Element} Container element
+ */
 function SortOrderComponent({ isAsc, setIsAsc }) {
   return (
     <Container className="px-1 ms-0 pb-3">

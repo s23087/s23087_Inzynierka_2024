@@ -5,6 +5,17 @@ import logout from "@/utils/auth/logout";
 import close_button from "../../../../public/icons/close_black.png";
 import user_settings_icon from "../../../../public/icons/user_settings_icon.png";
 
+/**
+ * Create sidebar menu.
+ * @component
+ * @param {Object} props
+ * @param {string} props.user_name Full username (name + surname)
+ * @param {string} props.org_name User organization name
+ * @param {Object} props.children Elements tha will be placed below user info and above logout button
+ * @param {boolean} props.offcanvasShow Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.onHideAction Function that set offcanvasShow parameter to false.
+ * @return {JSX.Element} Offcanvas element
+ */
 function CustomSidebar({
   user_name,
   org_name,
@@ -12,6 +23,7 @@ function CustomSidebar({
   offcanvasShow,
   onHideAction,
 }) {
+  // Styles
   const sidebarStyle = {
     width: "281px",
   };

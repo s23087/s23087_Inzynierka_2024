@@ -6,7 +6,18 @@ import { Modal, Container, Row, Col, Form, Button } from "react-bootstrap";
 import validators from "@/utils/validators/validator";
 import ErrorMessage from "../smaller_components/error_message";
 
+/**
+ * Modal element that allow to add ean to product.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.modalShow Modal show parameter.
+ * @param {Function} props.onHideFunction Function that will close modal (set modalShow to false).
+ * @param {Function} props.addAction Action that add new ean to product ean.
+ * @param {Function} props.eanExistFun Function that will check if new ean does already exist in product ean's.
+ * @return {JSX.Element} Modal element
+ */
 function AddEanWindow({ modalShow, onHideFunction, addAction, eanExistFun }) {
+  // Input error
   const [isInvalid, setIsInvalid] = useState(false);
   const [newEan, setNewEan] = useState("");
   return (

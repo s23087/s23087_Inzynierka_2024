@@ -6,15 +6,23 @@ import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import Link from "next/link";
 import signIn from "@/utils/login/sign_in";
 import ErrorMessage from "../smaller_components/error_message";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 
+/**
+ * Create login form.
+ * @component
+ * @return {JSX.Element} Form element
+ */
 export default function LoginForm() {
+  // Form action
   const [state, formAction] = useFormState(signIn, {
     error: false,
     message: "",
   });
+  // Form errors
   const [emailError, setEmailError] = useState(false);
-  const [companyIdError, setComapnyIdError] = useState(false);
+  const [companyIdError, setCompanyIdError] = useState(false);
+  // True if login action is running
   const [isLoading, setIsLoading] = useState(false);
   return (
     <Form action={formAction} id="loginFrom">
@@ -31,9 +39,9 @@ export default function LoginForm() {
           placeholder="company id"
           isInvalid={state.error || companyIdError}
           onInput={(e) =>
-            InputValidtor.noPathCharactersValidator(
+            InputValidator.noPathCharactersValidator(
               e.target.value,
-              setComapnyIdError,
+              setCompanyIdError,
             )
           }
         />
@@ -47,7 +55,7 @@ export default function LoginForm() {
           name="email"
           placeholder="email"
           onInput={(e) =>
-            InputValidtor.emailValidator(e.target.value, setEmailError, 350)
+            InputValidator.emailValidator(e.target.value, setEmailError, 350)
           }
           maxLength={350}
           isInvalid={state.error || emailError}

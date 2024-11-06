@@ -7,10 +7,10 @@ import { redirect } from "next/navigation";
 
 /**
  * Sends request to modify user profile information. When data is unchanged the attribute in request will be null.
- * @param  {object} prevState Object that contain information about previous state of chosen item.
- * @param  {object} state Previous state of object bonded to this function.
+ * @param  {{email: string, name: string, surname: string}} prevState Object that contain information about previous state of chosen item.
+ * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
  * @param  {FormData} formData Contain form data.
- * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
  * Completed will always be true, to deliver information to component that action has been completed.
  */
 export default async function changeUserInfo(prevState, state, formData) {
@@ -48,7 +48,7 @@ export default async function changeUserInfo(prevState, state, formData) {
     if (info.status === 400) {
       return {
         error: true,
-        message: "This email exist alredy.",
+        message: "This email exist already.",
         completed: true,
       };
     }

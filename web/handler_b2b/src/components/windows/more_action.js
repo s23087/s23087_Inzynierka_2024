@@ -5,6 +5,20 @@ import { Modal, Container, Row, Col, Stack, Button } from "react-bootstrap";
 import Image from "next/image";
 import CloseIcon from "../../../public/icons/close_black.png";
 
+/**
+ * Modal element that show list of actions for user to choose. List contains: 
+ * create, select all on page, select all, deselect.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.modalShow Modal show parameter.
+ * @param {string} props.instanceName Name of object for create action.
+ * @param {Function} props.addAction Add function for create action.
+ * @param {Function} props.selectAllOnPage Function that will select all object in page.
+ * @param {Function} props.selectAll Function that will select all object.
+ * @param {Function} props.deselectAll Function that will deselect all object.
+ * @param {boolean} props.withAdd If true create action is visible, otherwise is hidden. Default value is true.
+ * @return {JSX.Element} Modal element
+ */
 function MoreActionWindow({
   modalShow,
   onHideFunction,

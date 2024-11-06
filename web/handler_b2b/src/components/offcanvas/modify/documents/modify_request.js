@@ -7,18 +7,42 @@ import Toastes from "@/components/smaller_components/toast";
 import { useRouter } from "next/navigation";
 import CloseIcon from "../../../../../public/icons/close_black.png";
 import ErrorMessage from "@/components/smaller_components/error_message";
-import getReceviers from "@/utils/documents/get_request_users";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import getReceivers from "@/utils/documents/get_request_users";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 import getRestModifyRequest from "@/utils/documents/get_rest_modify_request";
 import updateRequest from "@/utils/documents/modify_request";
 
+/**
+ * Create offcanvas that allow to modify chosen request.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {{id: Number, objectType: string, title: string, status: string}} props.request Chosen request to view.
+ * @return {JSX.Element} Offcanvas element
+ */
 function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
   const router = useRouter();
+  // download holders
+  const [restInfo, setRestInfo] = useState({
+    receiverId: 0,
+    note: "is loading",
+  });
+  const [users, setUsers] = useState([]);
+  // Request previous data holder
+  const [prevState] = useState({
+    receiverId: 0,
+    objectType: "",
+    note: "",
+    title: "",
+  });
+  // Download errors
   const [userDownloadError, setUserDownloadError] = useState(false);
   const [restDownloadError, setRestDownloadError] = useState(false);
+  // Download data
   useEffect(() => {
     if (showOffcanvas) {
-      getReceviers().then((data) => {
+      getReceivers().then((data) => {
         if (data !== null) {
           setUserDownloadError(false);
           setUsers(data);
@@ -34,44 +58,34 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
         }
         setRestDownloadError(false);
         setRestInfo(data);
-        prevState.recevierId = data.recevierId;
+        prevState.receiverId = data.receiverId;
         prevState.note = data.note;
       });
       prevState.objectType = request.objectType;
       prevState.title = request.title;
     }
   }, [showOffcanvas]);
-  // rest info
-  const [restInfo, setRestInfo] = useState({
-    recevierId: 0,
-    note: "is loading",
-  });
-  const [prevState] = useState({
-    recevierId: 0,
-    objectType: "",
-    note: "",
-    title: "",
-  });
-  // options
-  const [users, setUsers] = useState([]);
-  // File
+  // File holder
   const [file, setFile] = useState();
-  // Errors
+  // Form errors
   const [documentError, setDocumentError] = useState(false);
   const [noteError, setNoteError] = useState(false);
   const [titleError, setTitleError] = useState(false);
+  /**
+   * Check is form can be submitted
+  */
   const isFormErrorActive = () =>
     documentError ||
     noteError ||
     titleError ||
     users.length === 0 ||
     request.status !== "In progress" ||
-    restInfo.recevierId === 0 ||
+    restInfo.receiverId === 0 ||
     userDownloadError ||
     restDownloadError;
-  // Misc
+  // True if modify action is running
   const [isLoading, setIsLoading] = useState(false);
-  // Form
+  // Form action
   const [state, formAction] = useFormState(
     updateRequest.bind(null, file).bind(null, prevState).bind(null, request.id),
     {
@@ -107,6 +121,8 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
                   onClick={() => {
                     hideFunction();
                     resetState();
+                    setNoteError(false);
+                    setDocumentError(false);
                     document.getElementById("requestModifyForm").reset();
                     if (!state.error && state.complete) {
                       router.refresh();
@@ -132,13 +148,13 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
                 messageStatus={userDownloadError || restDownloadError}
               />
               <ErrorMessage
-                message="You can't modify request if the status is diffrent then 'In progress.'"
+                message="You can't modify request if the status is different then 'In progress.'"
                 messageStatus={request.status !== "In progress"}
               />
               <Form.Group className="mb-4">
                 <Form.Label className="blue-main-text">Title:</Form.Label>
                 <ErrorMessage
-                  message="Is empty or lenght is greater than 100."
+                  message="Is empty or length is greater than 100."
                   messageStatus={titleError}
                 />
                 <Form.Control
@@ -149,7 +165,7 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
                   id="title"
                   isInvalid={titleError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setTitleError,
                       100,
@@ -163,8 +179,8 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
                 <Form.Select
                   className="input-style shadow-sm maxInputWidth"
                   name="user"
-                  key={restInfo.recevierId}
-                  defaultValue={restInfo.recevierId}
+                  key={restInfo.receiverId}
+                  defaultValue={restInfo.receiverId}
                 >
                   {Object.values(users).map((value) => {
                     return (
@@ -233,7 +249,7 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
                   defaultValue={restInfo.note}
                   isInvalid={noteError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setNoteError,
                       500,
@@ -283,6 +299,8 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
                         } else {
                           resetState();
                         }
+                        setNoteError(false);
+                        setDocumentError(false);
                       }}
                     >
                       Cancel
@@ -305,6 +323,8 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
           message={state.message}
           onHideFun={() => {
             resetState();
+            setNoteError(false);
+            setDocumentError(false);
             document.getElementById("requestModifyForm").reset();
             hideFunction();
             router.refresh();
@@ -318,8 +338,6 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
     state.error = false;
     state.completed = false;
     state.message = "";
-    setNoteError(false);
-    setDocumentError(false);
     setIsLoading(false);
   }
 }

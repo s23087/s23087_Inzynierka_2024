@@ -6,8 +6,8 @@
 
         public string Info { get; set; } = null!;
 
-        public string ObjectType { get; set; }
-        public string Referance { get; set; } = null!;
+        public string ObjectType { get; set; } = null!;
+        public string Reference { get; set; } = null!;
         public bool IsRead { get; set; }
     }
 }

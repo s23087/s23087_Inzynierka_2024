@@ -2,6 +2,12 @@
 
 import getDbName from "../auth/get_db_name";
 
+/**
+ * Sends request to get rest information of chosen credit note. If not found return object without properties. Other wise return object with properties:
+ *  creditNoteNumber, currencyName, note, path and creditItems.
+ * @param creditId Credit note id.
+ * @return {Promise<{creditNoteNumber: string, currencyName: string, note: string, path: string, creditItems: Array<{creditItemId: Number, partnumber: string, itemName: string, qty: Number, price: Number}>}>} Object that that contain invoice information. If connection was lost return null.
+ */
 export default async function getRestCreditNote(creditId) {
   const dbName = await getDbName();
   let url = `${process.env.API_DEST}/${dbName}/CreditNote/rest/${creditId}`;

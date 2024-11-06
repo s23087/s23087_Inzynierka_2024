@@ -6,6 +6,15 @@ import NotificationContainer from "../object_container/notification_container";
 import switchNotifStatus from "@/utils/notifs/switch_notif_status";
 import { useRouter } from "next/navigation";
 
+/**
+ * Return component that showcase notification objects, search bar, filter, more action element and selected element.
+ * @component
+ * @param {object} props Component props
+ * @param {Array<{notificationId: Number, info: string, objectType: string, reference: string, isRead: boolean}>} props.notifs Array containing notification objects.
+ * @param {Number} props.notifStart Starting index of notifications subarray.
+ * @param {Number} props.notifEnd Ending index of notifications subarray.
+ * @return {JSX.Element} Container element
+ */
 function NotificationList({ notifs, notifStart, notifEnd }) {
   const router = useRouter();
   return (

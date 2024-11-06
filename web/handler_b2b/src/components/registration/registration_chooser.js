@@ -1,6 +1,10 @@
 import { Container, Row, Col } from "react-bootstrap";
 import UserChooser from "./user_type_input";
 
+/**
+ * Return element that allow user to choose witch registration type he wants to perform.
+ * @return {JSX.Element} Container element
+ */
 export default function RegistrationChooser() {
   return (
     <Container className="text-center">

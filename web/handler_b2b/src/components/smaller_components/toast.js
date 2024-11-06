@@ -7,6 +7,15 @@ const toastStyle = {
   whiteSpace: "pre-line",
 };
 
+/**
+ * Create Toast element with error message.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showToast True if toast should be visible, otherwise false.
+ * @param {string} props.message Error message.
+ * @param {Function} props.onHideFun Function that will activate after clicking "X" button.
+ * @return {JSX.Element} Toast element
+ */
 function ErrorToast({ showToast, message, onHideFun }) {
   return (
     <Toast
@@ -29,6 +38,15 @@ ErrorToast.propTypes = {
   onHideFun: PropTypes.func.isRequired,
 };
 
+/**
+ * Create Toast element with success message.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showToast True if toast should be visible, otherwise false.
+ * @param {string} props.message Success message.
+ * @param {Function} props.onHideFun Function that will activate after clicking "X" button.
+ * @return {JSX.Element} Toast element
+ */
 function SuccessToast({ showToast, message, onHideFun }) {
   return (
     <Toast

@@ -30,7 +30,7 @@ namespace database_communicator.Controllers
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound("This user does not exists.");
-            var creditExist = await _creditNoteServices.CreditNoteExist(data.CreditNotenumber, data.InvoiceId);
+            var creditExist = await _creditNoteServices.CreditNoteExist(data.CreditNoteNumber, data.InvoiceId);
             if (creditExist) return BadRequest("Credit note with that number already exist.");
             foreach (var item in data.CreditNoteItems.Select(e => new {e.ItemId, e.InvoiceId, e.UserId, e.Qty}))
             {
@@ -47,7 +47,7 @@ namespace database_communicator.Controllers
             var result = await _creditNoteServices.AddCreditNote(data);
             if (result == 0) return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             var logId = await _logServices.getLogTypeId("Create");
-            var desc = $"User with id {userId} has created the credit note {data.CreditNotenumber} for user with id {data.CreditNoteItems.Select(e => e.UserId).First()}.";
+            var desc = $"User with id {userId} has created the credit note {data.CreditNoteNumber} for user with id {data.CreditNoteItems.Select(e => e.UserId).First()}.";
             await _logServices.CreateActionLog(desc, userId, logId);
             if (data.CreditNoteItems.Select(e => e.UserId).First() != userId)
             {
@@ -55,7 +55,7 @@ namespace database_communicator.Controllers
                 await _notificationServices.CreateNotification(new CreateNotification
                 {
                     UserId = data.CreditNoteItems.Select(e => e.UserId).First(),
-                    Info = $"The credit note with number {data.CreditNotenumber} has been added by {userFull}.",
+                    Info = $"The credit note with number {data.CreditNoteNumber} has been added by {userFull}.",
                     ObjectType = data.IsYourCreditNote ? "Yours credit notes" : "Client credit notes",
                     Referance = $"{result}"
                 });

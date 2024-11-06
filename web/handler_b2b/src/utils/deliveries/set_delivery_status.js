@@ -2,6 +2,12 @@
 
 import getDbName from "../auth/get_db_name";
 
+/**
+ * Sends request to change delivery status.
+ * @param  {number} deliveryId Delivery id.
+ * @param  {string} statusName Name of the status (Fulfilled, In transport, Delivered with issues, Preparing, Rejected).
+ * @return {Promise<Boolean>}      Return true if operation succeed, otherwise false.
+ */
 export default async function setDeliveryStatus(deliveryId, statusName) {
   const dbName = await getDbName();
   let data = {

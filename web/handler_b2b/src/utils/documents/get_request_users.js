@@ -2,9 +2,13 @@
 
 import getDbName from "../auth/get_db_name";
 
-export default async function getReceviers() {
+/**
+ * Sends request to get request receivers lists.
+ * @return {Promise<Array<{idUser: Number, username: string, surname: string}>>} Array of objects that contain receiver information. If connection was lost return null.
+ */
+export default async function getReceivers() {
   const dbName = await getDbName();
-  let url = `${process.env.API_DEST}/${dbName}/Requests/get/receviers`;
+  let url = `${process.env.API_DEST}/${dbName}/Requests/get/receivers`;
   try {
     const info = await fetch(url, {
       method: "GET",
@@ -16,7 +20,7 @@ export default async function getReceviers() {
 
     return [];
   } catch {
-    console.error("getReceviers fetch failed.");
+    console.error("getReceivers fetch failed.");
     return null;
   }
 }

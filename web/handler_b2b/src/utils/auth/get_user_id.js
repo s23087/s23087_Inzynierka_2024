@@ -1,11 +1,15 @@
 "use server";
 
 import { cookies } from "next/headers";
-import SessionManagment from "./session_managment";
+import SessionManagement from "./session_management";
 
+/**
+ * Decrypt session cookie to get current user id. If not found return null.
+ * @return {Promise<Number>} User id.
+ */
 export default async function getUserId() {
   const cookie = cookies().get("session")?.value;
-  const session = await SessionManagment.decrypt(cookie);
+  const session = await SessionManagement.decrypt(cookie);
 
-  return session.userId;
+  return session.userId ?? null;
 }

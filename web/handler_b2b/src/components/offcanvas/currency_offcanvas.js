@@ -8,15 +8,30 @@ import { Offcanvas, Container, Row, Col, Button } from "react-bootstrap";
 import getCurrencyValues from "@/utils/flexible/get_currency_values";
 import dropdown_big_down from "../../../public/icons/dropdown_big_down.png";
 import CurrencyHolder from "../smaller_components/currency_holder";
+
+/**
+ * Create offcanvas that allow to change current currency. It using query param "currency" to return chosen currency.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {string} props.current_currency Name of current currency in shortcut.
+ * @return {JSX.Element} Offcanvas element
+ */
 function CurrencyOffcanvas({ showOffcanvas, hideFunction, current_currency }) {
   const router = useRouter();
   const pathName = usePathname();
   const params = useSearchParams();
   const newParams = new URLSearchParams(params);
+  /**
+   * Action that set query param
+   * @param {string} newCurr name of currency to be set as query param
+   */
   const changeCurrency = (newCurr) => {
     newParams.set("currency", newCurr);
     router.replace(`${pathName}?${newParams}`);
   };
+  // Currency values holder
   const [eurData, setEurData] = useState({
     rates: [
       {
@@ -33,6 +48,7 @@ function CurrencyOffcanvas({ showOffcanvas, hideFunction, current_currency }) {
       },
     ],
   });
+  // Currency values download
   useEffect(() => {
     if (showOffcanvas) {
       getCurrencyValues("EUR").then((data) => {
@@ -65,6 +81,7 @@ function CurrencyOffcanvas({ showOffcanvas, hideFunction, current_currency }) {
       });
     }
   }, [showOffcanvas]);
+  // Styles
   const spanStyle = {
     width: "80px",
     height: "40px",

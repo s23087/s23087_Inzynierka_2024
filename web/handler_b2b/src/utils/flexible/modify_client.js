@@ -5,13 +5,22 @@ import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 import validators from "../validators/validator";
 
+/**
+ * Sends request to modify organization. When data is unchanged the attribute in request will be null. If user do not exist server will logout them.
+ * @param  {Number} orgId Organization id.
+ * @param  {{ orgName: string, street: string, city: string, postalCode: string, statusId: Number}} prevState Object that contain information about previous state of chosen item.
+ * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
+ * @param  {FormData} formData Contain form data.
+ * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default async function modifyClient(orgId, prevState, state, formData) {
   const userId = await getUserId();
   let nip = formData.get("nip");
   let credit = formData.get("credit");
   let messageError = validateData(orgId, formData);
 
-  if (messageError.length > 7) {
+  if (messageError.length > 6) {
     return {
       error: true,
       completed: true,
@@ -51,6 +60,8 @@ export default async function modifyClient(orgId, prevState, state, formData) {
 
     if (info.ok) {
       return await setAvailabilityStatusesToClient(
+        info,
+        formData,
         prevState,
         orgId,
         dbName,
@@ -71,7 +82,10 @@ export default async function modifyClient(orgId, prevState, state, formData) {
       message: "Connection error.",
     };
   }
-
+  /**
+   * Organize information into object for fetch.
+   * @return {object}
+   */
   function getData() {
     return {
       orgId: orgId,
@@ -95,8 +109,20 @@ export default async function modifyClient(orgId, prevState, state, formData) {
     };
   }
 }
-
+/**
+ * Sends request to set availability status to chosen organization. If user do not exist server will logout them.
+ * @param  {Response} info Response of modify client fetch
+ * @param  {FormData} formData
+ * @param  {object} prevState Object that contain information about previous state of chosen item.
+ * @param  {Number} orgId Organization id.
+ * @param  {string} dbName Database name.
+ * @param  {Number} userId Current user id.
+ * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 async function setAvailabilityStatusesToClient(
+  info,
+  formData,
   prevState,
   orgId,
   dbName,
@@ -168,8 +194,14 @@ async function setAvailabilityStatusesToClient(
   };
 }
 
+/**
+ * Validate given form data.
+ * @param  {string} orgId Organization id.
+ * @param  {FormData} formData
+ * @return {string} Return error message. If no error occurred retrun only "Error:"
+ */
 function validateData(orgId, formData) {
-  let messageError = "Errors:";
+  let messageError = "Error:";
 
   if (!orgId) messageError += "\nOrg Id not found";
   if (

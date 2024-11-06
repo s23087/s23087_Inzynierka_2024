@@ -4,6 +4,15 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 
+/**
+ * Sends request to create delivery.
+ * @param  {Array<string>} waybills Array that contain waybills.
+ * @param  {boolean} isDeliveryToUser If delivery is of type "Deliveries to user" it value is true, otherwise false.
+ * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
+ * @param  {FormData} formData Contain form data.
+ * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default async function createDelivery(
   waybills,
   isDeliveryToUser,

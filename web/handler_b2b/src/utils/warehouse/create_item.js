@@ -8,9 +8,9 @@ import validators from "../validators/validator";
 /**
  * Sends request to create item in database. If user do not exist server will logout them.
  * @param  {Array<string>} eans Any array of string containing ean values.
- * @param  {object} state Previous state of object bonded to this function.
+ * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
  * @param  {FormData} formData Contain form data.
- * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
  * Completed will always be true, to deliver information to component that action has been completed.
  */
 export default async function createItem(eans, state, formData) {

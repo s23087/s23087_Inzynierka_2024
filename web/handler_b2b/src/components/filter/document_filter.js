@@ -19,6 +19,11 @@ import FilterHeader from "./filter_header";
 import SetQueryFunc from "./filters_query_functions";
 import SortOrderComponent from "./sort_component";
 
+/**
+ * Depend on document type return sort option
+ * @param {string} type document current type
+ * @return {Array<string>} Return sort option of chosen type
+ */
 function getOrderBy(type) {
   if (type.includes("invoice"))
     return ["Number", "Date", "Qty", "Total", "Due"];
@@ -26,6 +31,17 @@ function getOrderBy(type) {
   return ["Title", "Date"];
 }
 
+/**
+ * Create offcanvas that allow to filter and sort document objects.
+ * @component
+ * @param {object} props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {string} props.currentSort Current sort value
+ * @param {boolean} props.currentDirection True if ascending, false if descending.
+ * @param {string} props.type Document type name
+ * @return {JSX.Element} Offcanvas element
+ */
 function InvoiceFilterOffcanvas({
   showOffcanvas,
   hideFunction,
@@ -37,14 +53,19 @@ function InvoiceFilterOffcanvas({
   const pathName = usePathname();
   const params = useSearchParams();
   const newParams = new URLSearchParams(params);
+  // True is ascending order is enabled
   const [isAsc, setIsAsc] = useState(currentDirection);
+  // Order options
   const orderBy = getOrderBy(type);
+  // download data holder
   const [orgs, setOrgs] = useState([]);
   const [paymentStatuses, setPaymentStatuses] = useState([]);
   const [requestStatuses, setRequestStatuses] = useState([]);
+  // download errors
   const [errorDownloadOrg, setDownloadErrorOrg] = useState(false);
   const [errorDownloadPay, setDownloadErrorPay] = useState(false);
   const [errorDownloadReq, setDownloadErrorReq] = useState(false);
+  // download data
   useEffect(() => {
     if (!type.includes("Request")) {
       getOrgsList().then((data) => {
@@ -114,7 +135,7 @@ function InvoiceFilterOffcanvas({
                 className="input-style"
                 id="sortValue"
                 style={maxStyle}
-                defaultValue={currentSort.substring(1, currentSort.lenght)}
+                defaultValue={currentSort.substring(1, currentSort.length)}
               >
                 <option value="None">None</option>
                 {Object.values(orderBy).map((val) => {

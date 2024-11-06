@@ -57,7 +57,7 @@ namespace database_communicator.Services
                     NotificationId = e.NotificationId,
                     Info = e.Info,
                     ObjectType = e.ObjectType.ObjectTypeName,
-                    Referance = e.Referance,
+                    Reference = e.Referance,
                     IsRead = e.IsRead
                 })
                 .OrderBy(e => e.IsRead)

@@ -1,6 +1,14 @@
 import { Stack, Table } from "react-bootstrap";
 import PropTypes from "prop-types";
 
+/**
+ * Create a table that holds credit note items. If there are not items empty element shall be returned.
+ * @component
+ * @param {object} props Component props
+ * @param {Array<{partnumber: string, itemName: string, qty: Number, price: Number}>} props.creditItems Array with object that contain items.
+ * @param {string} props.currency Shortcut of currency name.
+ * @return {JSX.Element} Table element
+ */
 function CreditNoteTable({ creditItems, currency }) {
   if (creditItems.length === 0) {
     return <></>;

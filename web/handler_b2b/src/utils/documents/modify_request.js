@@ -5,6 +5,17 @@ import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 import { getRequestPath } from "./get_document_path";
 
+const fs = require("node:fs");
+/**
+ * Sends request to modify request. When data is unchanged the attribute in request will be null. If user do not exist server will logout them.
+ * @param  {FormData} file FormData with a file data in binary.
+ * @param  {{receiverId: Number, objectType: string, note: string, title: string}} prevState Object that contain information about previous state of chosen item.
+ * @param  {Number} requestId Request id.
+ * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
+ * @param  {FormData} formData Contain form data.
+ * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default async function updateRequest(
   file,
   prevState,
@@ -12,13 +23,12 @@ export default async function updateRequest(
   state,
   formData,
 ) {
-  const fs = require("node:fs");
-  let recevierId = parseInt(formData.get("user"));
+  let receiverId = parseInt(formData.get("user"));
   let objectType = formData.get("type");
   let note = formData.get("note");
   let title = formData.get("title");
   let path = "";
-  let message = validateData(recevierId, note, title);
+  let message = validateData(receiverId, note, title);
 
   if (message.length > 6) {
     return {
@@ -83,8 +93,8 @@ export default async function updateRequest(
     }
 
     if (info.ok) {
-      if (shouldpathNameChange(data, prevPath, path)) {
-        return await changePath(prevPath, data, dbName, userId, requestId, fs);
+      if (shouldPathNameChange(data, prevPath, path)) {
+        return await changePath(prevPath, data, dbName, userId, requestId);
       }
       return {
         error: false,
@@ -106,10 +116,13 @@ export default async function updateRequest(
       message: "Connection error.",
     };
   }
-
+  /**
+   * Overwrite file with new data.
+   * @return {Promise<string>} String containing path where file exist or will exist after renaming.
+   */
   async function writeFile() {
     if (prevPath === "")
-      prevPath = `../../database/${dbName}/documents/req_${recevierId}${userId}${objectType.replace(" ", "")}${Date.now().toString()}.pdf`;
+      prevPath = `../../database/${dbName}/documents/req_${receiverId}${userId}${objectType.replace(" ", "")}${Date.now().toString()}.pdf`;
     let buffArray = await file.get("file").arrayBuffer();
     let buff = new Uint8Array(buffArray);
     fs.writeFileSync(prevPath, buff);
@@ -122,11 +135,14 @@ export default async function updateRequest(
     }
     return path;
   }
-
+  /**
+   * Organize information into object for fetch.
+   * @return {object}
+   */
   function getData() {
     return {
       requestId: requestId,
-      recevierId: recevierId !== prevState.recevierId ? recevierId : null,
+      receiverId: receiverId !== prevState.receiverId ? receiverId : null,
       objectType: objectType !== prevState.objectType ? objectType : null,
       path: path ?? null,
       note: note !== prevState.note ? note : null,
@@ -134,13 +150,22 @@ export default async function updateRequest(
     };
   }
 }
-
-async function changePath(prevPath, data, dbName, userId, requestId, fs) {
+/**
+ * Sent request to change path in chosen request and rename file.
+ * @param  {object} prevPath Previous path.
+ * @param  {object} data Data from modify request.
+ * @param  {string} dbName Database name.
+ * @param  {Number} userId User id.
+ * @param  {Number} requestId Request id.
+ * @return {Promise<object>} Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
+async function changePath(prevPath, data, dbName, userId, requestId) {
   try {
     fs.renameSync(prevPath, data.path);
   } catch (error) {
     const pathChange = await fetch(
-      `${process.env.API_DEST}/${dbName}/Requests/{userId}/modify/${userId}`,
+      `${process.env.API_DEST}/${dbName}/Requests/modify/${userId}`,
       {
         method: "POST",
         body: JSON.stringify({
@@ -167,14 +192,26 @@ async function changePath(prevPath, data, dbName, userId, requestId, fs) {
     }
   }
 }
-
-function shouldpathNameChange(data, prevPath, path) {
+/**
+ * Checks if request path should be changed.
+ * @param  {object} data Data from modify request.
+ * @param  {object} prevPath Previous path.
+ * @param  {string} path Modified path name.
+ * @return {boolean}
+ */
+function shouldPathNameChange(data, prevPath, path) {
   return data.objectType && prevPath !== path;
 }
-
-function validateData(recevierId, note, title) {
+/**
+ * Validate given form data.
+ * @param  {Number} receiverId Receiver id.
+ * @param  {string} note User note.
+ * @param  {string} title Request title.
+ * @return {string} Return error message. If no error occurred return only "Error:"
+ */
+function validateData(receiverId, note, title) {
   let message = "Error:";
-  if (!recevierId) message += "\nRecevier must not be empty.";
+  if (!receiverId) message += "\nReceiver must not be empty.";
   if (!note) message += "\nNote must not be empty.";
   if (!title) message += "\nTitle must not be empty.";
   return message;

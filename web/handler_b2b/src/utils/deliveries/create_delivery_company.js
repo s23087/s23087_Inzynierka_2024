@@ -4,13 +4,20 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 
+/**
+ * Sends request to create delivery company.
+ * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
+ * @param  {FormData} formData Contain form data.
+ * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default async function createDeliveryCompany(state, formData) {
   let companyName = formData.get("name");
   if (!companyName)
     return {
       error: true,
       completed: true,
-      message: "Company name must not be empty or excceed 40 chars.",
+      message: "Company name must not be empty or exceed 40 chars.",
     };
 
   const userId = await getUserId();

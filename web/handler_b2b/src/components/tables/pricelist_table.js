@@ -1,6 +1,14 @@
 import { Stack, Table } from "react-bootstrap";
 import PropTypes from "prop-types";
 
+/**
+ * Create a table that holds pricelist items. If there are not items empty element shall be returned.
+ * @component
+ * @param {object} props Component props
+ * @param {Array<{partnumber: string, itemName: string, qty: Number, price: Number}>} props.items Array with object that contain items.
+ * @param {string} props.currency Shortcut of currency name.
+ * @return {JSX.Element} Table element
+ */
 function PricelistTable({ items, currency }) {
   if (items.length === 0) {
     return <></>;

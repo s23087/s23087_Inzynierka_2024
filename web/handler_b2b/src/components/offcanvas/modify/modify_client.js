@@ -25,13 +25,23 @@ import switch_binding_view from "../../../../public/icons/switch_binding_view.pn
 import getUserClientBindings from "@/utils/clients/get_client_bindings";
 import getUsers from "@/utils/flexible/get_users";
 import setUserClientBindings from "@/utils/clients/set_user_clients_bindings";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 
+/**
+ * Create offcanvas that allow to modify chosen client.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {{clientId: Number, clientName: string, street: string, city: string, postal: string, nip: Number|undefined, country: string, countryId: Number}} props.client Chosen client to view.
+ * @param {boolean} props.isOrg True if org view is activated.
+ * @return {JSX.Element} Offcanvas element
+ */
 function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
   const router = useRouter();
-  // View change
+  // View change. If true binding modification is shown and client modify is hidden
   const [isBindingView, setIsBindingView] = useState(false);
-  // Object data
+  // Download holders
   const [restInfo, setRestInfo] = useState({
     creditLimit: null,
     availability: "",
@@ -41,7 +51,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
   const [statues, setStatuses] = useState([]);
   const [clientBindings, setClientBindings] = useState([]);
   const [users, setUsers] = useState([]);
-  // Get data & set prev state
+  // Previous data holder
   const [prevState, setPrevState] = useState({});
   // download error
   const [statusesDownloadError, setStatusesDownloadError] = useState(false);
@@ -49,6 +59,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
   const [restDownloadError, setRestDownloadError] = useState(false);
   const [countriesDownloadError, setCountriesDownloadError] = useState(false);
   const [userDownloadError, setUserDownloadError] = useState(false);
+  // download data
   useEffect(() => {
     if (showOffcanvas) {
       getRestClientInfo(client.clientId).then((data) => {
@@ -81,9 +92,9 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
         city: client.city,
         postalCode: client.postal,
         statusId:
-          Object.values(statues).findIndex(
+          statues[Object.values(statues).findIndex(
             (e) => e.name === restInfo.availability,
-          ) + 1,
+          )].id,
       });
     }
   }, [showOffcanvas]);
@@ -107,13 +118,16 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
       });
     }
   }, [isBindingView]);
-  // Errors
+  // Form errors
   const [nameError, setNameError] = useState(false);
   const [nipError, setNipError] = useState(false);
   const [streetError, setStreetError] = useState(false);
   const [cityError, setCityError] = useState(false);
   const [postalError, setPostalError] = useState(false);
   const [creditError, setCreditError] = useState(false);
+  /**
+   * Reset form errors
+  */
   const resetErrors = () => {
     setNameError(false);
     setNipError(false);
@@ -122,6 +136,9 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
     setPostalError(false);
     setCreditError(false);
   };
+  /**
+   * Check if form can be submitted
+  */
   const getIsErrorActive = () => {
     return (
       nameError ||
@@ -137,16 +154,19 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
       userDownloadError
     );
   };
-  const anyErrorActive = getIsErrorActive();
-  // Loading
+  // True if modify action is running
   const [isLoading, setIsLoading] = useState(false);
+  // True if binding modification is running
   const [isBindingLoading, setIsBindingLoading] = useState(false);
-  // Bindings states
+  // Bindings rerender key
   const [bindingChanged, setBindingChanged] = useState(false);
+  // True if modify binding operation is success
   const [bindingSuccess, setBindingSuccess] = useState(false);
+  // True if modify binding operation is failure
   const [bindingFailure, setBindingFailure] = useState(false);
+  // Message from modify binding result
   const [bindingMessage, setBindingMessage] = useState(false);
-  // Form
+  // Form action
   const [state, formAction] = useFormState(
     modifyClient.bind(null, client.clientId).bind(null, prevState),
     {
@@ -258,7 +278,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Name:</Form.Label>
                 <ErrorMessage
-                  message="Is empty or lenght is greater than 50."
+                  message="Is empty or length is greater than 50."
                   messageStatus={nameError}
                 />
                 <Form.Control
@@ -268,7 +288,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   defaultValue={client.clientName}
                   isInvalid={nameError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setNameError,
                       50,
@@ -280,7 +300,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Nip:</Form.Label>
                 <ErrorMessage
-                  message="Is empty, not a number or lenght is greater than 15."
+                  message="Is empty, not a number or length is greater than 15."
                   messageStatus={nipError}
                 />
                 <Form.Control
@@ -290,7 +310,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   defaultValue={client.nip}
                   isInvalid={nipError}
                   onInput={(e) => {
-                    InputValidtor.emptyNumberStringValidtor(
+                    InputValidator.emptyNumberStringValidator(
                       e.target.value,
                       setNipError,
                       15,
@@ -302,7 +322,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Street:</Form.Label>
                 <ErrorMessage
-                  message="Is empty or lenght is greater than 200."
+                  message="Is empty or length is greater than 200."
                   messageStatus={streetError}
                 />
                 <Form.Control
@@ -312,7 +332,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   defaultValue={client.street}
                   isInvalid={streetError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setStreetError,
                       200,
@@ -324,7 +344,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">City:</Form.Label>
                 <ErrorMessage
-                  message="Is empty or lenght is greater than 200."
+                  message="Is empty or length is greater than 200."
                   messageStatus={cityError}
                 />
                 <Form.Control
@@ -334,7 +354,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   defaultValue={client.city}
                   isInvalid={cityError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setCityError,
                       200,
@@ -346,7 +366,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Postal code:</Form.Label>
                 <ErrorMessage
-                  message="Is empty or lenght is greater than 25."
+                  message="Is empty or length is greater than 25."
                   messageStatus={postalError}
                 />
                 <Form.Control
@@ -356,7 +376,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   defaultValue={client.postal}
                   isInvalid={postalError}
                   onInput={(e) => {
-                    InputValidtor.onlyNumberStringValidtor(
+                    InputValidator.onlyNumberStringValidator(
                       e.target.value,
                       setPostalError,
                       25,
@@ -370,7 +390,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   Credit Limit:
                 </Form.Label>
                 <ErrorMessage
-                  message="Is empty or lenght is greater than 25."
+                  message="Is empty or length is greater than 25."
                   messageStatus={creditError}
                 />
                 <Form.Control
@@ -380,7 +400,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   defaultValue={restInfo.creditLimit}
                   isInvalid={creditError}
                   onInput={(e) => {
-                    InputValidtor.emptyNumberStringValidtor(
+                    InputValidator.emptyNumberStringValidator(
                       e.target.value,
                       setCreditError,
                       25,
@@ -428,23 +448,11 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                 <Form.Select
                   className="input-style shadow-sm maxInputWidth"
                   name="availability"
+                  defaultValue={statues[Object.values(statues).findIndex(
+                    (e) => e.name === restInfo.availability,
+                  )].id}
                 >
-                  <option
-                    key={
-                      Object.values(statues).findIndex(
-                        (e) => e.name === restInfo.availability,
-                      ) + 1
-                    }
-                    value={
-                      Object.values(statues).findIndex(
-                        (e) => e.name === restInfo.availability,
-                      ) + 1
-                    }
-                  >
-                    {restInfo.availability}
-                  </option>
                   {Object.values(statues)
-                    .filter((e) => e.name !== restInfo.availability)
                     .map((value) => {
                       return (
                         <option key={value.id} value={value.id}>
@@ -461,10 +469,10 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                       variant="mainBlue"
                       className="w-100"
                       type="click"
-                      disabled={anyErrorActive}
+                      disabled={ getIsErrorActive()}
                       onClick={(e) => {
                         e.preventDefault();
-                        if (anyErrorActive) return;
+                        if ( getIsErrorActive()) return;
                         setIsLoading(true);
                         let form = document.getElementById("clientModify");
                         form.requestSubmit();
@@ -641,6 +649,9 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
     </Offcanvas>
   );
 
+  /**
+   * Reset state of form
+  */
   function resetState() {
     state.error = false;
     state.completed = false;

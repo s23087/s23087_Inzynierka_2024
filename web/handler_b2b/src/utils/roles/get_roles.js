@@ -4,7 +4,7 @@ import getDbName from "../auth/get_db_name";
 
 /**
  * Sends request to get accessible roles.
- * @return {Promise<Array<Object>>}      Array of objects that contain role information. If connection was lost return null.
+ * @return {Promise<Array<string>>} Array of objects that contain role information. If connection was lost return null.
  */
 export default async function getRoles() {
   const dbName = await getDbName();

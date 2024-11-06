@@ -4,6 +4,17 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 
+/**
+ * Sends request to modify delivery. When data is unchanged the attribute in request will be null.
+ * @param  {Number} deliveryId Delivery id.
+ * @param  {Array<string>} waybills Array that contain waybills.
+ * @param  {boolean} isDeliveryToUser If delivery is of type "Deliveries to user" it value is true, otherwise false.
+ * @param  {{estimated: string, isWaybillModified: boolean}} prevState Object that contain information about previous state of chosen invoice.
+ * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
+ * @param  {FormData} formData Contain form data.
+ * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default async function updateDelivery(
   deliveryId,
   waybills,
@@ -16,8 +27,8 @@ export default async function updateDelivery(
   let company = formData.get("company");
 
   let message = "Error:";
-  if (!estimated) message += "\nName is empty or exceed required lenght";
-  if (!company) message += "\nDescription is empty or exceed required lenght";
+  if (!estimated) message += "\nName is empty or exceed required length";
+  if (!company) message += "\nDescription is empty or exceed required length";
 
   if (message.length > 6) {
     return {

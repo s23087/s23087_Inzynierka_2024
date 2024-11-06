@@ -2,7 +2,7 @@
 
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import SessionManagment from "./utils/auth/session_managment";
+import SessionManagement from "./utils/auth/session_management";
 import getRole from "./utils/auth/get_role";
 
 /**
@@ -14,29 +14,29 @@ const protectedRoutes = /^.*dashboard.*$/;
  */
 const restrictedPagesSolo =
   /^.*docType=Requests$|^.*\/roles.*$|^.*\/settings\/add_user.*$/;
-  /**
+/**
  * Regex that tells which sites "Merchant" role cannot access.
  */
 const restrictedPagesMerchant =
   /^.*\/roles.*$|^.*\/settings\/add_user.*$|^.*\/dashboard\/abstract_items.*$|^.*\/settings\/change_organization.*$/;
-  /**
+/**
  * Regex that tells which sites "Accountant" role cannot access.
  */
 const restrictedPagesAccountant =
   /^.*\/roles.*$|^.*\/pricelist.*$|^.*\/settings\/add_user.*$|^.*\/settings\/change_organization.*$/;
-  /**
+/**
  * Regex that tells which sites "Warehouse Manager" role cannot access. Part one.
  */
 const allowedPagesWarehouseManagerPartOne =
   /^.*\/deliveries.*$|^.*\/notifications.*$|^.*\/settings.*$/;
-  /**
+/**
  * Regex that tells which sites "Warehouse Manager" role cannot access. Part two.
  */
 const allowedPagesWarehouseManagerPartTwo =
   /^.*\/change_password.*$|^.*\/change_data.*$|^.*\/unauthorized.*$/;
 
 /**
- * Checks if role can access url. Return always false if role is not matched to one of those: Solo, Merchant, Accountant, Warehouse Manager. This function is case sensitive. 
+ * Checks if role can access url. Return always false if role is not matched to one of those: Solo, Merchant, Accountant, Warehouse Manager. This function is case sensitive.
  * @param  {string} role Role name.
  * @param  {string} url Accessed url.
  * @return {boolean}      True if role can access, otherwise false.
@@ -68,7 +68,7 @@ export default async function middleware(req) {
   const isProtectedRoute = protectedRoutes.test(path);
 
   const cookie = cookies().get("session")?.value;
-  const session = await SessionManagment.decrypt(cookie);
+  const session = await SessionManagement.decrypt(cookie);
 
   if (isProtectedRoute && !session?.userId) {
     return NextResponse.redirect(new URL("/", req.url));

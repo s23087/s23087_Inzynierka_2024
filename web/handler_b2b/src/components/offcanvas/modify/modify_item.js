@@ -22,41 +22,55 @@ import getBindings from "@/utils/warehouse/get_bindings";
 import CloseIcon from "../../../../public/icons/close_black.png";
 import switch_product_view from "../../../../public/icons/switch_product_view.png";
 import switch_binding_view from "../../../../public/icons/switch_binding_view.png";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 import ErrorMessage from "@/components/smaller_components/error_message";
-import ChangeBidningsWindow from "@/components/windows/change_bindings_window";
+import ChangeBindingsWindow from "@/components/windows/change_bindings_window";
 import changeBindings from "@/utils/warehouse/change_bindings";
 import validators from "@/utils/validators/validator";
 
+/**
+ * Create offcanvas that allow to modify chosen item.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {{itemId: Number, eans: Array<string>, partNumber: string, itemName: string}} props.item Chosen item to view.
+ * @param {string} props.currency Shortcut name of the currency that user choose.
+ * @param {boolean} props.isOrg True if org view is activated.
+ * @return {JSX.Element} Offcanvas element
+ */
 function ModifyItemOffcanvas({
   showOffcanvas,
   hideFunction,
   item,
-  curenncy,
+  currency,
   isOrg,
 }) {
   const router = useRouter();
+  // Previous state of item holder
   const [prevState] = useState({
     itemId: null,
     name: null,
     description: null,
     partNumber: null,
   });
-  // View change
+  // switch from product modify to binding modify
   const [isProductView, setIsProductView] = useState(true);
   // Eans
   const [eans, setEans] = useState([]);
-  // Binding to modify
+  // useState for change binding window 
   const [showBindingWindow, setShowBindingWindow] = useState(false);
+  // Holder for chosen binding to modify passed to window element
   const [bindingToModify, setBindingToModify] = useState({
     invoiceNumber: "",
     qty: 0,
   });
+  // New and changed bindings holder
   const [bindingsChanges] = useState([]);
-  // Errors
+  // Form errors
   const [partnumberError, setPartnumberError] = useState(false);
   const [nameError, setNameError] = useState(false);
-  // Get data
+  // Download data holders
   const [bindings, setBindings] = useState([
     {
       username: "user name",
@@ -67,9 +81,11 @@ function ModifyItemOffcanvas({
     },
   ]);
   const [description, setDescription] = useState(null);
+  // Download error
   const [descriptionDownloadError, setDescriptionDownloadError] =
     useState(false);
   const [bindingsDownloadError, setBindingsDownloadError] = useState(false);
+  // Download data
   useEffect(() => {
     if (showOffcanvas && isOrg) {
       let copyArray = [...item.eans];
@@ -82,7 +98,7 @@ function ModifyItemOffcanvas({
           setDescriptionDownloadError(true);
         }
       });
-      getBindings(item.itemId, curenncy).then((data) => {
+      getBindings(item.itemId, currency).then((data) => {
         if (data !== null) {
           setBindingsDownloadError(false);
           setBindings(data);
@@ -105,24 +121,33 @@ function ModifyItemOffcanvas({
   }, [showOffcanvas]);
   // Rerender Eans
   const [seedChange, setRerenderVar] = useState(1);
+  /**
+   * Check if ean exist in eans array
+   * @param {string} variable New ean
+  */
   const eanExist = (variable) => {
     return eans.findIndex((item) => item === variable) != -1;
   };
-  // Add ean window
+  // useState for add ean window
   const [isAddEanShow, setIsAddEanShow] = useState(false);
-  // Loading bool
+  // True if modify action is running
   const [isLoading, setIsLoading] = useState(false);
-  // Error func
+  /**
+   * Check if form can be submitted
+  */
   const isFormErrorActive = () =>
     partnumberError ||
     nameError ||
     descriptionDownloadError ||
     bindingsDownloadError;
+  /**
+   * Reset form error
+  */
   const resetErrors = () => {
     setPartnumberError(false);
     setNameError(false);
   };
-  // Form
+  // Forms action
   const [state, formAction] = useFormState(
     updateItem.bind(null, eans).bind(null, prevState),
     {
@@ -229,7 +254,7 @@ function ModifyItemOffcanvas({
               <Form.Group className="mb-3 maxInputWidth">
                 <Form.Label className="blue-main-text">P/N:</Form.Label>
                 <ErrorMessage
-                  message="Cannot be empty or excceed 150 chars."
+                  message="Cannot be empty or exceed 150 chars."
                   messageStatus={partnumberError}
                 />
                 <Form.Control
@@ -238,7 +263,7 @@ function ModifyItemOffcanvas({
                   name="partNumber"
                   isInvalid={partnumberError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setPartnumberError,
                       150,
@@ -251,7 +276,7 @@ function ModifyItemOffcanvas({
               <Form.Group className="mb-3 maxInputWidth">
                 <Form.Label className="blue-main-text">Name:</Form.Label>
                 <ErrorMessage
-                  message="Cannot be empty or excceed 250 chars."
+                  message="Cannot be empty or exceed 250 chars."
                   messageStatus={nameError}
                 />
                 <Form.Control
@@ -260,7 +285,7 @@ function ModifyItemOffcanvas({
                   name="name"
                   isInvalid={nameError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setNameError,
                       250,
@@ -359,7 +384,7 @@ function ModifyItemOffcanvas({
                       />
                     );
                   })}
-                <ChangeBidningsWindow
+                <ChangeBindingsWindow
                   modalShow={showBindingWindow}
                   onHideFunction={() => setShowBindingWindow(false)}
                   value={bindingToModify}
@@ -530,7 +555,7 @@ ModifyItemOffcanvas.propTypes = {
   showOffcanvas: PropTypes.bool.isRequired,
   hideFunction: PropTypes.func.isRequired,
   item: PropTypes.object.isRequired,
-  curenncy: PropTypes.string.isRequired,
+  currency: PropTypes.string.isRequired,
   isOrg: PropTypes.bool.isRequired,
 };
 

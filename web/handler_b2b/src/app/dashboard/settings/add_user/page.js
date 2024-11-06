@@ -8,12 +8,15 @@ import AddUser from "@/utils/settings/add_user";
 import Toastes from "@/components/smaller_components/toast";
 import getRoles from "@/utils/roles/get_roles";
 import ErrorMessage from "@/components/smaller_components/error_message";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 
 export default function AddUserPage() {
   const router = useRouter();
+  // download data holder
   const [roles, setRoles] = useState({});
+  // True if download error occurred
   const [roleDownloadError, setRoleDownloadError] = useState(false);
+  // download data
   useEffect(() => {
     getRoles().then((data) => {
       if (data !== null) {
@@ -24,18 +27,26 @@ export default function AddUserPage() {
       }
     });
   }, []);
+  // Form error
   const [emailError, setEmailError] = useState(false);
   const [nameError, setNameError] = useState(false);
   const [surnameError, setSurnameError] = useState(false);
   const [passError, setPassError] = useState(false);
+  /**
+   * Checks if form can be submitted
+   * @return {boolean}
+   */
   let isFormErrorActive = () =>
     emailError || nameError || surnameError || passError || roleDownloadError;
+  // True if add user action is running
   const [isLoading, setIsLoading] = useState(false);
+  // form action
   const [state, formAction] = useFormState(AddUser, {
     error: false,
     completed: false,
     message: "",
   });
+  // styles
   const buttonStyle = {
     width: "220px",
     height: "55px",
@@ -58,7 +69,7 @@ export default function AddUserPage() {
             name="email"
             maxLength={350}
             onInput={(e) => {
-              InputValidtor.emailValidator(e.target.value, setEmailError, 350);
+              InputValidator.emailValidator(e.target.value, setEmailError, 350);
             }}
             isInvalid={emailError}
             placeholder="email"
@@ -74,7 +85,7 @@ export default function AddUserPage() {
             isInvalid={nameError}
             maxLength={250}
             onInput={(e) => {
-              InputValidtor.normalStringValidtor(
+              InputValidator.normalStringValidator(
                 e.target.value,
                 setNameError,
                 250,
@@ -83,7 +94,7 @@ export default function AddUserPage() {
             placeholder="name"
           />
           <ErrorMessage
-            message="Incorrect username. Cannot be empty or excceed 250 chars."
+            message="Incorrect username. Cannot be empty or exceed 250 chars."
             messageStatus={nameError}
           />
         </Form.Group>
@@ -96,7 +107,7 @@ export default function AddUserPage() {
             isInvalid={surnameError}
             maxLength={250}
             onInput={(e) => {
-              InputValidtor.normalStringValidtor(
+              InputValidator.normalStringValidator(
                 e.target.value,
                 setSurnameError,
                 250,
@@ -105,7 +116,7 @@ export default function AddUserPage() {
             placeholder="surname"
           />
           <ErrorMessage
-            message="Incorrect surname. Cannot be empty or excceed 250 chars."
+            message="Incorrect surname. Cannot be empty or exceed 250 chars."
             messageStatus={surnameError}
           />
         </Form.Group>
@@ -118,7 +129,7 @@ export default function AddUserPage() {
             placeholder="password"
             isInvalid={passError}
             onInput={(e) => {
-              InputValidtor.isEmptyValidator(e.target.value, setPassError);
+              InputValidator.isEmptyValidator(e.target.value, setPassError);
             }}
           />
           <ErrorMessage message="Cannot be empty." messageStatus={passError} />

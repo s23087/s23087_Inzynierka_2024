@@ -3,6 +3,13 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
+
+/**
+ * Sends request to change client - user bindings.
+ * @param  {number} orgId Organization id.
+ * @param  {Array<Number>} userIds Array of user ids.
+ * @return {Promise<{ok: boolean, message: string}>} Return result of action in object. If ok is true, then operation is success, otherwise false.
+ */
 export default async function setUserClientBindings(orgId, userIds) {
   let data = {
     orgId: orgId,

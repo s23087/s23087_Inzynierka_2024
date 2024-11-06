@@ -7,7 +7,7 @@ import logout from "../auth/logout";
 /**
  * Sends request to delete chosen item. If user do not exist server will logout them.
  * @param  {Number} itemId Item id.
- * @return {Promise<object>}      Object with properties result {bool} and message {string}. If result is true, then item has been successfully deleted. Message is only return when there's error.
+ * @return {Promise<{result: boolean, message: string}>} If result is true, then item has been successfully deleted. Message is only returned when there's error.
  */
 export default async function deleteItem(itemId) {
   const dbName = await getDbName();

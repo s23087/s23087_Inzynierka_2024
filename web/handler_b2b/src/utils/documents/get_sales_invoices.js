@@ -5,9 +5,9 @@ import getUserId from "../auth/get_user_id";
 
 /**
  * Prepares params for joining to url.
- * @param  {[string]} sort Name of attribute that items will be sorted. Frist char indicates direction. D for descending and A for ascending.
- * @param  {[Object]} params Object that contains properties that items will be filtered by.
- * @return {[Object]}      Array of strings with prepared parameters.
+ * @param  {string} sort Name of attribute that items will be sorted. First char indicates direction. D for descending and A for ascending.
+ * @param  {{dateL: string, dateG: string, dueL: string, dueG: string, qtyL: string, qtyG: string, totalL: string, totalG: string, recipient: string, currency: string, paymentStatus: string, status: string}} params Object that contains properties that items will be filtered by.
+ * @return {Array<string>}      Array of strings with prepared parameters.
  */
 function getPrepParams(sort, params) {
   let prepParams = [];
@@ -28,6 +28,14 @@ function getPrepParams(sort, params) {
   return prepParams;
 }
 
+/**
+ * Sends request to get sales invoices. Can be filtered or sorted using sort and param arguments.
+ * @param  {boolean} isOrg True if org view is activated, otherwise false.
+ * @param  {string} search Searched phrase.
+ * @param  {string} sort Name of attribute that items will be sorted. First char indicates direction. D for descending and A for ascending. This param cannot be omitted.
+ * @param  {{dateL: string, dateG: string, dueL: string, dueG: string, qtyL: string, qtyG: string, totalL: string, totalG: string, recipient: string, currency: string, paymentStatus: string, status: string}} params Object that contains properties that items will be filtered by. This param cannot be omitted.
+ * @return {Promise<Array<{users: Array<string>|undefined, invoiceId: Number, invoiceNumber: string, clientName: string, invoiceDate: string, dueDate: string, paymentStatus: string, inSystem: boolean, qty: Number, price: Number}>>}      Array of objects that contain invoice information. If connection was lost return null. If error occurred return empty array.
+ */
 export default async function getSalesInvoices(isOrg, sort, params) {
   let url = "";
   let prepParams = getPrepParams(sort, params);
@@ -42,7 +50,7 @@ export default async function getSalesInvoices(isOrg, sort, params) {
     const items = await fetch(url, {
       method: "GET",
     });
-    
+
     if (items.ok) {
       return await items.json();
     }

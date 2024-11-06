@@ -4,7 +4,7 @@ import getDbName from "../auth/get_db_name";
 
 /**
  * Sends request to get offer statuses.
- * @return {Promise<Array<Object>>} Array of object that contains offer statuses information. If connection was lost return null.
+ * @return {Promise<Array<{statusId: string, statusName: string}>>} Array of object that contains offer statuses information. If connection was lost return null.
  */
 export default async function getOfferStatuses() {
   const dbName = await getDbName();

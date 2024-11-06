@@ -7,10 +7,10 @@ import validators from "../validators/validator";
 /**
  * Sends request to modify chosen item. When data is unchanged the attribute in request will be null.
  * @param  {Array} eans Any array of string containing ean values.
- * @param  {object} prevState Object that contain information about previous state of chosen item.
- * @param  {object} state Previous state of object bonded to this function.
+ * @param  {{itemId: number, name: string, description: string, partNumber: string}} prevState Object that contain information about previous state of chosen item.
+ * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
  * @param  {FormData} formData Contain form data.
- * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
  * Completed will always be true, to deliver information to component that action has been completed.
  */
 export default async function updateItem(eans, prevState, state, formData) {
@@ -98,17 +98,22 @@ export default async function updateItem(eans, prevState, state, formData) {
  */
 function validateData(formData) {
   let message = "Error:";
-  if (!validators.lengthSmallerThen(formData.get("name"), 250) ||
-    !validators.stringIsNotEmpty(formData.get("name")))
+  if (
+    !validators.lengthSmallerThen(formData.get("name"), 250) ||
+    !validators.stringIsNotEmpty(formData.get("name"))
+  )
     message += "\nName is empty or exceed required lenght";
 
-  if (!validators.lengthSmallerThen(formData.get("description"), 500) ||
-    !validators.stringIsNotEmpty(formData.get("description")))
+  if (
+    !validators.lengthSmallerThen(formData.get("description"), 500) ||
+    !validators.stringIsNotEmpty(formData.get("description"))
+  )
     message += "\nDescription is empty or exceed required lenght";
 
-  if (!validators.lengthSmallerThen(formData.get("partNumber"), 150) ||
-    !validators.stringIsNotEmpty(formData.get("partNumber")))
+  if (
+    !validators.lengthSmallerThen(formData.get("partNumber"), 150) ||
+    !validators.stringIsNotEmpty(formData.get("partNumber"))
+  )
     message += "\nPartnumber is empty or exceed required lenght";
   return message;
 }
-

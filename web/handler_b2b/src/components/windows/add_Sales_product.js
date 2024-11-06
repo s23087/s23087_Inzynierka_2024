@@ -13,9 +13,22 @@ import {
 import validators from "@/utils/validators/validator";
 import { useEffect, useState } from "react";
 import getItemsList from "@/utils/documents/get_products";
-import SuccesFadeAway from "../smaller_components/succes_fade_away";
+import SuccessFadeAway from "../smaller_components/success_fade_away";
 import ErrorMessage from "../smaller_components/error_message";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 
+/**
+ * Modal element that allow to add products owned by chosen user to document.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.modalShow Modal show parameter.
+ * @param {Function} props.onHideFunction Function that will close modal (set modalShow to false).
+ * @param {Function} props.addFunction Function that will activate after clicking add button.
+ * @param {Number} props.userId User id.
+ * @param {string} props.currency Shortcut of chosen by user currency name.
+ * @param {Number} props.addedProductsQty Length of array of already added products.
+ * @return {JSX.Element} Modal element
+ */
 function AddSaleProductWindow({
   modalShow,
   onHideFunction,
@@ -24,9 +37,11 @@ function AddSaleProductWindow({
   currency,
   addedProductsQty,
 }) {
-  // Products
+  // Product list
   const [products, setProducts] = useState([]);
+  // Chosen product index
   const [currentProduct, setCurrentProduct] = useState(0);
+  // True if download error occurred
   const [downloadError, setDownloadError] = useState(false);
   useEffect(() => {
     if (modalShow && addedProductsQty === 0) {
@@ -43,7 +58,7 @@ function AddSaleProductWindow({
   // Errors
   const [salesPriceError, setSalesPriceError] = useState(false);
   const [qtyError, setQtyError] = useState(false);
-  // Misc
+  // True if you want to show success information to user
   const [showSuccess, setShowSuccess] = useState(false);
   return (
     <Modal
@@ -58,7 +73,7 @@ function AddSaleProductWindow({
             <Col>
               <h5 className="mb-0 mt-3">Add Product</h5>
             </Col>
-            <SuccesFadeAway
+            <SuccessFadeAway
               showSuccess={showSuccess}
               setShowSuccess={setShowSuccess}
             />
@@ -79,7 +94,7 @@ function AddSaleProductWindow({
               {products.map((val, key) => {
                 if (val.qty > 0) {
                   return (
-                    <option key={value} value={key}>
+                    <option key={val} value={key}>
                       {val.partnumber +
                         " - " +
                         val.qty +
@@ -141,14 +156,7 @@ function AddSaleProductWindow({
               }
               isInvalid={salesPriceError}
               onInput={(e) => {
-                if (
-                  validators.isPriceFormat(e.target.value) &&
-                  validators.stringIsNotEmpty(e.target.value)
-                ) {
-                  setSalesPriceError(false);
-                } else {
-                  setSalesPriceError(true);
-                }
+                InputValidator.decimalValidator(e.target.value, setSalesPriceError)
               }}
             />
           </Form.Group>
@@ -157,19 +165,13 @@ function AddSaleProductWindow({
               variant="mainBlue"
               className="me-2 w-100"
               disabled={
-                salesPriceError ||
-                qtyError ||
-                downloadError ||
-                products.length === 0
+                getIsFormErrorActive()
               }
               onClick={() => {
                 setShowSuccess(false);
                 if (products.filter((e) => e.qty > 0).length <= 0) return;
                 if (
-                  salesPriceError ||
-                  qtyError ||
-                  downloadError ||
-                  products.length === 0
+                  getIsFormErrorActive()
                 ) {
                   return;
                 }
@@ -233,6 +235,16 @@ function AddSaleProductWindow({
       </Modal.Body>
     </Modal>
   );
+
+  /**
+   * True if any of conditions are fulfilled, otherwise false
+  */
+  function getIsFormErrorActive() {
+    return salesPriceError ||
+      qtyError ||
+      downloadError ||
+      products.length === 0;
+  }
 }
 
 AddSaleProductWindow.propTypes = {

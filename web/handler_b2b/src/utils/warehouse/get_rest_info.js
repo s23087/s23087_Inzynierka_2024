@@ -8,7 +8,7 @@ import getUserId from "../auth/get_user_id";
  * @param  {string} currency Name of currency.
  * @param  {Number} itemId Item id.
  * @param  {boolean} isOrg True if org view is activated, otherwise false.
- * @return {Object}      Object containing rest item information. If connection was lost return null.
+ * @return {{outsideItemInfos: Array<{users: Array<{key: Number, value: string}>, organizationName: string, qty: Number, price: Number, currency: string}>, ownedItemInfos: Array<{userId: Number, username: string, organizationName: string, invoiceNumber: string, qty: Number, price: Number, currency: string}>}}      Object containing rest item information. If connection was lost return null.
  */
 export default async function getRestInfo(currency, itemId, isOrg) {
   const dbName = await getDbName();

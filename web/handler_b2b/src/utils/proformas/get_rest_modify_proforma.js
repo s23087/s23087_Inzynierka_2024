@@ -5,7 +5,7 @@ import getDbName from "../auth/get_db_name";
 /**
  * Sends request to get rest information of chosen proforma needed for modification.
  * @param  {Number} proformaId Proforma id.
- * @return {Promise<object>}      Return object containing proforma object information (status, payment method, note). 
+ * @return {Promise<{status: boolean, paymentMethod: string, note: string}>} Return object containing proforma object information.
  * If connection is lost or proforma is not found return error message in attribute payment method and note.
  */
 export default async function getRestModifyProforma(proformaId) {

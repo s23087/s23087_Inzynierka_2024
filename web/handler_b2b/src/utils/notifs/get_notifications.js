@@ -5,7 +5,7 @@ import getUserId from "../auth/get_user_id";
 
 /**
  * Sends request to get notifications.
- * @return {Promise<Array<Object>>}      Array of objects that contain notifications information. If connection was lost return null.
+ * @return {Promise<Array<{notificationId: Number, info: string, objectType: string, reference: string, isRead: boolean}>>} Array of objects that contain notifications information. If connection was lost return null. If error occurred return empty array.
  */
 export default async function getNotifications() {
   const dbName = await getDbName();

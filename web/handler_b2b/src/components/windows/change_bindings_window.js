@@ -7,14 +7,27 @@ import ErrorMessage from "../smaller_components/error_message";
 import getUsers from "@/utils/flexible/get_users";
 import validators from "@/utils/validators/validator";
 
-function ChangeBidningsWindow({
+/**
+ * Modal element that allow to change item bindings from chosen invoice.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.modalShow Modal show parameter.
+ * @param {Function} props.onHideFunction Function that will close modal (set modalShow to false).
+ * @param {{invoiceNumber: string, userId: number, qty: number}} props.value Object representing bindings.
+ * @param {Function} props.addBinding Function that will activate after user decide to click "Add binding".
+ * @return {JSX.Element} Modal element
+ */
+function ChangeBindingsWindow({
   modalShow,
   onHideFunction,
   value,
   addBinding,
 }) {
+  // If input is incorrect the value should be set to true, otherwise false
   const [isInvalid, setIsInvalid] = useState(false);
+  // List of users
   const [users, setUsers] = useState([]);
+  // True if download error occurred, otherwise false
   const [userDownloadError, setUserDownloadError] = useState(false);
   useEffect(() => {
     if (modalShow) {
@@ -54,7 +67,7 @@ function ChangeBidningsWindow({
           </Form.Group>
           <Form.Group className="mb-3">
             <Form.Label className="blue-main-text">Users:</Form.Label>
-            <Form.Select className="input-style shadow-sm" id="choosenUser">
+            <Form.Select className="input-style shadow-sm" id="chosenUser">
               {users
                 .filter((e) => e.idUser !== value.userId)
                 .map((val) => {
@@ -79,6 +92,7 @@ function ChangeBidningsWindow({
               id="newQty"
               isInvalid={isInvalid}
               onInput={(e) => {
+                // check if input is number and checks if input does not exceed item qty
                 if (!validators.haveOnlyNumbers(e.target.value)) {
                   setIsInvalid(true);
                   return;
@@ -108,13 +122,13 @@ function ChangeBidningsWindow({
                     if (isInvalid) {
                       return;
                     }
-                    let choosenUser = document.getElementById("choosenUser");
+                    let chosenUser = document.getElementById("chosenUser");
                     let qty = document.getElementById("newQty").value;
                     addBinding(
                       value,
-                      parseInt(choosenUser.value),
+                      parseInt(chosenUser.value),
                       parseInt(qty),
-                      choosenUser.options[choosenUser.selectedIndex].text,
+                      chosenUser.options[chosenUser.selectedIndex].text,
                     );
                     onHideFunction();
                   }}
@@ -139,11 +153,11 @@ function ChangeBidningsWindow({
   );
 }
 
-ChangeBidningsWindow.propTypes = {
+ChangeBindingsWindow.propTypes = {
   modalShow: PropTypes.bool.isRequired,
   onHideFunction: PropTypes.func.isRequired,
   value: PropTypes.object.isRequired,
   addBinding: PropTypes.func.isRequired,
 };
 
-export default ChangeBidningsWindow;
+export default ChangeBindingsWindow;

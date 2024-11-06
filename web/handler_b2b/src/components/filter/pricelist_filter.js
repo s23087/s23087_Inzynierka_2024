@@ -15,6 +15,16 @@ import FilterHeader from "./filter_header";
 import SetQueryFunc from "./filters_query_functions";
 import SortOrderComponent from "./sort_component";
 
+/**
+ * Create offcanvas that allow to filter and sort pricelist objects.
+ * @component
+ * @param {object} props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {string} props.currentSort Current sort value
+ * @param {boolean} props.currentDirection True if ascending, false if descending.
+ * @return {JSX.Element} Offcanvas element
+ */
 function PricelistFilterOffcanvas({
   showOffcanvas,
   hideFunction,
@@ -25,7 +35,9 @@ function PricelistFilterOffcanvas({
   const pathName = usePathname();
   const params = useSearchParams();
   const newParams = new URLSearchParams(params);
+  // True is ascending order is enabled
   const [isAsc, setIsAsc] = useState(currentDirection);
+  // Order options
   const orderBy = ["Created", "Name", "Modified", "Products"];
   // Styles
   const vhStyle = {
@@ -42,15 +54,10 @@ function PricelistFilterOffcanvas({
       placement="bottom"
     >
       <Container className="h-100 w-100 p-0" fluid>
-        <FilterHeader 
-          hideFunction={hideFunction}
-        />
+        <FilterHeader hideFunction={hideFunction} />
         <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container className="p-0 mx-1 mx-xl-3" style={vhStyle} fluid>
-          <SortOrderComponent 
-              isAsc={isAsc}
-              setIsAsc={setIsAsc}
-            />
+            <SortOrderComponent isAsc={isAsc} setIsAsc={setIsAsc} />
             <Container className="px-1 ms-0 mb-3">
               <p className="blue-main-text">Sort:</p>
               <Form.Select
@@ -280,7 +287,6 @@ function PricelistFilterOffcanvas({
       </Container>
     </Offcanvas>
   );
-
 }
 
 PricelistFilterOffcanvas.propTypes = {

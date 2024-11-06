@@ -3,6 +3,9 @@ import Image from "next/image";
 import RegistrationForm from "@/components/registration/registration_form";
 import BigLogo from "../../../../public/big_logo.png";
 
+/**
+ * Registration form page
+ */
 export default function RegistrationFormHolder() {
   return (
     <main className="d-flex h-100 w-100 justify-content-center">

@@ -14,6 +14,17 @@ import FilterHeader from "./filter_header";
 import SetQueryFunc from "./filters_query_functions";
 import SortOrderComponent from "./sort_component";
 
+/**
+ * Create offcanvas that allow to filter and sort role objects.
+ * @component
+ * @param {object} props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {string} props.currentSort Current sort value
+ * @param {boolean} props.currentDirection True if ascending, false if descending.
+ * @param {Array<string>} props.rolesToChoose List of roles.
+ * @return {JSX.Element} Offcanvas element
+ */
 function RoleFilterOffcanvas({
   showOffcanvas,
   hideFunction,
@@ -25,7 +36,9 @@ function RoleFilterOffcanvas({
   const pathName = usePathname();
   const params = useSearchParams();
   const newParams = new URLSearchParams(params);
+  // True is ascending order is enabled
   const [isAsc, setIsAsc] = useState(currentDirection);
+  // Order options
   const orderBy = ["User"];
   // Styles
   const vhStyle = {
@@ -52,7 +65,7 @@ function RoleFilterOffcanvas({
                 className="input-style"
                 id="sortValue"
                 style={maxStyle}
-                defaultValue={currentSort.substring(1, currentSort.lenght)}
+                defaultValue={currentSort.substring(1, currentSort.length)}
               >
                 <option value="None">None</option>
                 {Object.values(orderBy).map((val) => {

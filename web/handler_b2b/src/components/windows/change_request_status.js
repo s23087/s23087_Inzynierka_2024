@@ -8,14 +8,25 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import setRequestStatus from "@/utils/documents/set_request_status";
 
+/**
+ * Modal element that allow to reject or complete selected requests.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.modalShow Modal show parameter.
+ * @param {Function} props.onHideFunction Function that will close modal (set modalShow to false).
+ * @param {Array<Number>} props.requestsIds Array of request ids.
+ * @return {JSX.Element} Modal element
+ */
 function ChangeSelectedStatusWindow({
   modalShow,
   onHideFunction,
   requestsIds,
 }) {
   const router = useRouter();
+  // If error happen is true, otherwise false
   const [isError, setIsError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  // If action is activated true, otherwise should be false.
   const [isActivated, setIsActivated] = useState(false);
   return (
     <Modal
@@ -62,6 +73,7 @@ function ChangeSelectedStatusWindow({
                   className="w-100"
                   disabled={isActivated || isError}
                   onClick={async () => {
+                    // Go through array and change all request status to fulfilled. If errors happens, count them, set error message and set isError to true.
                     setIsActivated(true);
                     let errorCount = 0;
                     for (let val in requestsIds) {
@@ -91,6 +103,7 @@ function ChangeSelectedStatusWindow({
                   className="w-100"
                   disabled={isActivated || isError}
                   onClick={async () => {
+                    // Go through array and change all request status to cancelled. If errors happens, count them, set error message and set isError to true.
                     setIsActivated(true);
                     let errorCount = 0;
                     for (let val in requestsIds) {

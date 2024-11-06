@@ -1,3 +1,4 @@
+# Script for windows task scheduler. Update invoice status.
 import os
 import requests
 from dotenv import load_dotenv

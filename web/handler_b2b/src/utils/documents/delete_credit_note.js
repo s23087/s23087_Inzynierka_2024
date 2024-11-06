@@ -4,6 +4,12 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import { getCreditPath } from "./get_document_path";
 
+/**
+ * Sends request to delete chosen credit note. If user do not exist server will logout them.
+ * @param  {Number} creditNoteId Credit note id.
+ * @param {boolean} isYourCredit Is invoice type "Your credit notes".
+ * @return {Promise<{error: boolean, message: string}>} Return action result with message. If error is true that action was unsuccessful.
+ */
 export default async function deleteCreditNote(creditNoteId, isYourCredit) {
   const dbName = await getDbName();
   let creditPath = await getCreditPath(creditNoteId);

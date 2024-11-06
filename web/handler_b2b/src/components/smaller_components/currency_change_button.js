@@ -1,6 +1,14 @@
 import PropTypes from "prop-types";
 import { Button, Container, Row, Col } from "react-bootstrap";
 
+/**
+ * Currency button that will open offcanvas to change currency.
+ * @component
+ * @param {object} props Component props
+ * @param {string} props.currency Current currency yin shortcut.
+ * @param {Function} props.openCurrencyOffcanvas Function that open currency change offcanvas.
+ * @return {JSX.Element} Button element
+ */
 function CurrencyChangeButton({ currency, openCurrencyOffcanvas }) {
   return (
     <Button

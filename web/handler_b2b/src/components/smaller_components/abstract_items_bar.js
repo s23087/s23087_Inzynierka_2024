@@ -2,7 +2,14 @@ import PropTypes from "prop-types";
 import Link from "next/link";
 import { Stack, Container, Button } from "react-bootstrap";
 
-function AbstractItemPostionBar({ site_name }) {
+/**
+ * Create container with page title and button that's allow to go back to settings.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.site_name Current page title.
+ * @return {JSX.Element} Stack element
+ */
+function AbstractItemPositionBar({ site_name }) {
   const barHeight = {
     height: "60px",
   };
@@ -30,8 +37,8 @@ function AbstractItemPostionBar({ site_name }) {
   );
 }
 
-AbstractItemPostionBar.propTypes = {
+AbstractItemPositionBar.propTypes = {
   site_name: PropTypes.string.isRequired,
 };
 
-export default AbstractItemPostionBar;
+export default AbstractItemPositionBar;

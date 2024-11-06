@@ -5,7 +5,17 @@ import SearchBar from "../smaller_components/search_bar";
 import FilterIcon from "../switches/filter_switch";
 import icon_more from "../../../public/icons/icon_more.png";
 
+/**
+ * Create Bar that holds filter button, search bar and more action icon.
+ * @component
+ * @param {object} props
+ * @param {boolean} props.filter_icon_bool True if any filter or sort is active
+ * @param {Function} props.moreButtonAction Action that will activate after clicking more action button
+ * @param {Function} props.filterAction Action that will activate after clicking filter button
+ * @return {JSX.Element} Stack element
+ */
 function SearchFilterBar({ filter_icon_bool, moreButtonAction, filterAction }) {
+  // Styles
   const barHeight = {
     height: "66px",
   };

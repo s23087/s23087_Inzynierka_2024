@@ -6,6 +6,18 @@ import pen_icon from "../../../public/icons/pen_icon.png";
 import close_white from "../../../public/icons/close_white.png";
 import ErrorMessage from "./error_message";
 
+/**
+ * Return input element that contain array value with buttons.
+ * @component
+ * @param {object} props Component props
+ * @param {string} props.value Value of input.
+ * @param {Function} props.deleteValue Function that will allow to delete value in array.
+ * @param {Function} props.modifyValue Function that will allow to modify value in array.
+ * @param {Function} props.existFun Function that will check if value already exist in array.
+ * @param {Function} props.validatorFunc Function that validates input when modifying.
+ * @param {string} props.errorMessage Error message when input does not pass validation.
+ * @return {JSX.Element} 
+ */
 function SpecialInput({
   value,
   deleteValue,
@@ -14,6 +26,7 @@ function SpecialInput({
   validatorFunc,
   errorMessage,
 }) {
+  // true if input should be unmodifiable
   const [isUnavail, setIsUnavail] = useState(true);
   const [ean, setEan] = useState(value);
   const [isInvalid, setIsInvalid] = useState(false);

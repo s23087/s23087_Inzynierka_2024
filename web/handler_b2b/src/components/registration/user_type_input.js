@@ -5,6 +5,14 @@ import PropTypes from "prop-types";
 import user_icon from "../../../public/icons/user_icon.png";
 import org_user_icon from "../../../public/icons/org_user_icon.png";
 
+/**
+ * Return button that will push user to given link. Used for choosing type of registration user wants to perform. 
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.is_org True if you want to get org version of button, false if you want get solo user version of button
+ * @param {string} props.link Link that will forward user to next page
+ * @return {JSX.Element} Link element
+ */
 function UserChooser({ is_org, link }) {
   const buttonStyle = {
     width: "259px",

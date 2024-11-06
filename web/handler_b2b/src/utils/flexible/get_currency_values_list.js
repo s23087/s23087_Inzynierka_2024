@@ -1,5 +1,12 @@
 "use server";
 
+/**
+ * Sends request to get chosen currency values from NPB site within specified date range. If start day is not week day then it will take as starting date the last friday from this date.
+ * @param  {string} currency Shortcut name of currency.
+ * @param  {string} startDate in format "yyyy-MM-dd"
+ * @param  {string} endDate in format "yyyy-MM-dd"
+ * @return {Promise<{error: boolean, message: string, rates: Array<{no: string, effectiveDate: string, mid: Number}>}>}      Object containing information about currency and result if operation was a success with message. If connection is lost returns null.
+ */
 export default async function getCurrencyValuesList(
   currency,
   startDate,
@@ -24,7 +31,11 @@ export default async function getCurrencyValuesList(
     });
 
     if (info.ok) {
-      return await info.json();
+      return {
+        error: false,
+        message: "Success",
+        rates: await info.json().rates,
+      };
     }
 
     return {

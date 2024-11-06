@@ -3,7 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import BigLogo from "../../../../public/big_logo.png";
 
+/**
+ * Page that shows up after unsuccessful registration
+ */
 export default function FailurePage() {
+  // Styles
   const buttonSize = {
     maxWidth: "214px",
   };

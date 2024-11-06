@@ -8,13 +8,13 @@ import validators from "../validators/validator";
 
 /**
  * Sends request to create proforma.
- * @param  {Array<object>} products Products added to proforma.
+ * @param  {Array<{id: Number, priceId: Number|undefined, qty: Number, price: Number}>} products Products added to proforma. PriceId is undefined only if isYourProforma is true.
  * @param  {FormData} file FormData object containing file binary data.
- * @param  {object} orgs Object containg user organization name.
+ * @param  {{orgName: string, restOrgs: Array<{orgName: string, orgId: Number}>}} orgs Object that contain user organization name.
  * @param  {boolean} isYourProforma Is proforma type "Yours proformas".
- * @param  {object} state Previous state of object bonded to this function.
+ * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
  * @param  {FormData} formData Contain form data.
- * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
  * Completed will always be true, to deliver information to component that action has been completed.
  */
 export default async function createProforma(
@@ -132,7 +132,7 @@ export default async function createProforma(
 
   /**
    * Organize information into object for fetch.
-   * @return {object} 
+   * @return {object}
    */
   function getData() {
     return {

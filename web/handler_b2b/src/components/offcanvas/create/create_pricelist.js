@@ -8,14 +8,26 @@ import { useRouter } from "next/navigation";
 import CloseIcon from "../../../../public/icons/close_black.png";
 import ProductHolder from "@/components/smaller_components/product_holder";
 import ErrorMessage from "@/components/smaller_components/error_message";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 import getOfferStatuses from "@/utils/pricelist/get_statuses";
 import AddItemToPricelistWindow from "@/components/windows/add_item_to_pricelist";
 import createPricelist from "@/utils/pricelist/create_pricelist";
 
+/**
+ * Create offcanvas that allow to create pricelist.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @return {JSX.Element} Offcanvas element
+ */
 function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
   const router = useRouter();
+  // download data holder
+  const [statuses, setStatuses] = useState([]);
+  // download error
   const [statusDownloadError, setStatusDownloadError] = useState(false);
+  // download data
   useEffect(() => {
     if (showOffcanvas) {
       getOfferStatuses().then((data) => {
@@ -28,25 +40,29 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
       });
     }
   }, [showOffcanvas]);
-  const [statuses, setStatuses] = useState([]);
-  // products
+  // useState for showing add sales window
   const [showSalesProductWindow, setShowSalesProductWindow] = useState(false);
+  // products holder
   const [products, setProducts] = useState([]);
+  // key to rerender product element that holds products
   const [resetSeed, setResetSeed] = useState(false);
-  // currency
+  // currency chosen by user
   const [chosenCurrency, setChosenCurrency] = useState("PLN");
-  // Errors
+  // Form errors
   const [nameError, setNameError] = useState(false);
   const [maxQtyError, setMaxQtyError] = useState(false);
+  /**
+   * Checks if form can be submitted
+  */
   const isFormErrorActive = () =>
     nameError ||
     maxQtyError ||
     statuses.length === 0 ||
     products.length === 0 ||
     statusDownloadError;
-  // Misc
+  // True if create action is running
   const [isLoading, setIsLoading] = useState(false);
-  // Form
+  // Form action
   const [state, formAction] = useFormState(
     createPricelist.bind(null, products).bind(null, chosenCurrency),
     {
@@ -113,7 +129,7 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Offer name:</Form.Label>
                 <ErrorMessage
-                  message="Is empty or lenght is greater than 100."
+                  message="Is empty or length is greater than 100."
                   messageStatus={nameError}
                 />
                 <Form.Control
@@ -123,7 +139,7 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="offer name"
                   isInvalid={nameError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setNameError,
                       100,
@@ -164,7 +180,7 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="qty"
                   isInvalid={maxQtyError}
                   onInput={(e) => {
-                    InputValidtor.decimalValidator(
+                    InputValidator.decimalValidator(
                       e.target.value,
                       setMaxQtyError,
                     );
@@ -300,6 +316,9 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
     </Offcanvas>
   );
 
+  /**
+   * Reset form state
+  */
   function resetState() {
     state.error = false;
     state.completed = false;

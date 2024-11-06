@@ -10,15 +10,26 @@ import { useRouter } from "next/navigation";
 import getCountries from "@/utils/flexible/get_countries";
 import getAvailabilityStatuses from "@/utils/clients/get_availability_statuses";
 import AddAvailabilityStatusWindow from "@/components/windows/addStatus";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 import ErrorMessage from "@/components/smaller_components/error_message";
 
+/**
+ * Create offcanvas that allow to create client.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @return {JSX.Element} Offcanvas element
+ */
 function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
   const router = useRouter();
+  // download data holder
+  const [countries, setCountries] = useState([]);
+  const [statues, setStatuses] = useState([]);
   // download error
   const [countriesDownloadError, setCountriesDownloadError] = useState(false);
   const [statusesDownloadError, setStatusesDownloadError] = useState(false);
-  // Get country and statuses
+  // download data
   useEffect(() => {
     if (showOffcanvas) {
       getCountries().then((data) => {
@@ -39,16 +50,17 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
       });
     }
   }, [showOffcanvas]);
-  const [countries, setCountries] = useState([]);
-  const [statues, setStatuses] = useState([]);
-  // Error
+  // Form error
   const [clientNameError, setClientNameError] = useState(false);
   const [nipClientError, setClientNipError] = useState(false);
   const [clientStreetError, setClientStreetError] = useState(false);
   const [cityClientError, setClientCityError] = useState(false);
   const [clientPostalError, setClientPostalError] = useState(false);
   const [creditError, setCreditError] = useState(false);
-  const setErrorsFalse = () => {
+  /**
+   * Set all errors to false
+  */
+  const clearFormErrors = () => {
     setClientNameError(false);
     setClientNipError(false);
     setClientStreetError(false);
@@ -56,6 +68,9 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
     setClientPostalError(false);
     setCreditError(false);
   };
+  /**
+   * Check if form can be submitted
+  */
   const isFormErrorActive = () => {
     return (
       clientNameError ||
@@ -68,9 +83,9 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
       statusesDownloadError
     );
   };
-  // Add status
+  // useState for add status window
   const [showAddStatus, setShowAddStatus] = useState(false);
-  // Loading element
+  // True if create action is running
   const [isLoading, setIsLoading] = useState(false);
   // Form action
   const [state, formAction] = useFormState(createClient, {
@@ -104,7 +119,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   variant="as-link"
                   onClick={() => {
                     hideFunction();
-                    setErrorsFalse();
+                    clearFormErrors();
                     if (!state.error && state.complete) {
                       router.refresh();
                     }
@@ -131,7 +146,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Name:</Form.Label>
                 <ErrorMessage
-                  message="Is empty or lenght is greater than 50."
+                  message="Is empty or length is greater than 50."
                   messageStatus={clientNameError}
                 />
                 <Form.Control
@@ -141,7 +156,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="name"
                   isInvalid={clientNameError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setClientNameError,
                       50,
@@ -153,7 +168,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Nip:</Form.Label>
                 <ErrorMessage
-                  message="Not a number or lenght is greater than 15."
+                  message="Not a number or length is greater than 15."
                   messageStatus={nipClientError}
                 />
                 <Form.Control
@@ -163,7 +178,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="nip"
                   isInvalid={nipClientError}
                   onInput={(e) => {
-                    InputValidtor.emptyNumberStringValidtor(
+                    InputValidator.emptyNumberStringValidator(
                       e.target.value,
                       setClientNipError,
                       15,
@@ -175,7 +190,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Street:</Form.Label>
                 <ErrorMessage
-                  message="Is empty or lenght is greater than 200."
+                  message="Is empty or length is greater than 200."
                   messageStatus={clientStreetError}
                 />
                 <Form.Control
@@ -185,7 +200,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="street"
                   isInvalid={clientStreetError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setClientStreetError,
                       200,
@@ -197,7 +212,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">City:</Form.Label>
                 <ErrorMessage
-                  message="Is empty or lenght is greater than 200."
+                  message="Is empty or length is greater than 200."
                   messageStatus={cityClientError}
                 />
                 <Form.Control
@@ -207,7 +222,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="city"
                   isInvalid={cityClientError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setClientCityError,
                       200,
@@ -219,7 +234,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Postal code:</Form.Label>
                 <ErrorMessage
-                  message="Is empty or lenght is greater than 25."
+                  message="Is empty or length is greater than 25."
                   messageStatus={clientPostalError}
                 />
                 <Form.Control
@@ -229,7 +244,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="postal code"
                   isInvalid={clientPostalError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setClientPostalError,
                       25,
@@ -243,7 +258,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   Credit Limit:
                 </Form.Label>
                 <ErrorMessage
-                  message="Must be a number or lenght is greater than 25."
+                  message="Must be a number or length is greater than 25."
                   messageStatus={creditError}
                 />
                 <Form.Control
@@ -253,7 +268,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   placeholder="credit limit"
                   isInvalid={creditError}
                   onInput={(e) => {
-                    InputValidtor.emptyNumberStringValidtor(
+                    InputValidator.emptyNumberStringValidator(
                       e.target.value,
                       setCreditError,
                       25,
@@ -324,7 +339,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                       className="w-100"
                       onClick={() => {
                         hideFunction();
-                        setErrorsFalse();
+                        clearFormErrors();
                         if (!state.error && state.completed) {
                           router.refresh();
                         }
@@ -371,6 +386,9 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
     </Offcanvas>
   );
 
+  /**
+   * Reset form state
+  */
   function resetState() {
     state.error = false;
     state.completed = false;

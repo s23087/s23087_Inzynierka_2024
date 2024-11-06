@@ -4,12 +4,23 @@ import PropTypes from "prop-types";
 import { useState } from "react";
 import { Modal, Container, Row, Col, Form, Button } from "react-bootstrap";
 
+/**
+ * Modal element that allow to change request status using option yes/no.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.modalShow Modal show parameter.
+ * @param {Function} props.onHideFunction Function that will close modal (set modalShow to false).
+ * @param {string} props.actionName Name of action what will modal do visible to user.
+ * @param {Function} props.actionFunc Function that will change request status upon clicking yes.
+ * @return {JSX.Element} Modal element
+ */
 function ChangeStatusWindow({
   modalShow,
   onHideFunction,
   actionName,
   actionFunc,
 }) {
+  // useState boolean. If true element is loading, otherwise nothing happening.
   const [isLoading, setIsLoading] = useState(false);
   return (
     <Modal
@@ -48,6 +59,7 @@ function ChangeStatusWindow({
                 className="w-100"
                 disabled={isLoading}
                 onClick={async () => {
+                  // Set loading when action is activated. After action is fulfilled, close modal, rest note element and set loading to false.
                   setIsLoading(true);
                   let note = document.getElementById("statusNote");
                   await actionFunc(note.value);
@@ -64,6 +76,7 @@ function ChangeStatusWindow({
                 variant="red"
                 className="w-100"
                 onClick={() => {
+                  // reset note element and close modal.
                   let note = document.getElementById("statusNote");
                   note.value = "";
                   onHideFunction();

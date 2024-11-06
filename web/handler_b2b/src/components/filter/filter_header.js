@@ -3,6 +3,13 @@ import { Offcanvas, Container, Row, Col, Button } from "react-bootstrap";
 import Image from "next/image";
 import CloseIcon from "../../../public/icons/close_black.png";
 
+/**
+ * Create filter offcanvas header.
+ * @component
+ * @param {object} props
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @return {JSX.Element} Offcanvas.Header element
+ */
 function FilterHeader({ hideFunction }) {
   return (
     <Offcanvas.Header className="border-bottom-grey px-xl-5">

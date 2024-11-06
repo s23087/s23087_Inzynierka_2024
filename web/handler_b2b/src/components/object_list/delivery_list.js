@@ -7,8 +7,8 @@ import SearchFilterBar from "../menu/search_filter_bar";
 import MoreActionWindow from "../windows/more_action";
 import { useSearchParams, useRouter } from "next/navigation";
 import DeleteObjectWindow from "../windows/delete_object";
-import SelectComponent from "../smaller_components/select_compontent";
-import getPagationInfo from "@/utils/flexible/get_page_info";
+import SelectComponent from "../smaller_components/select_component";
+import getPaginationInfo from "@/utils/flexible/get_page_info";
 import DeliveryContainer from "../object_container/delivery_container";
 import AddDeliveryOffcanvas from "../offcanvas/create/create_delivery";
 import deleteDelivery from "@/utils/deliveries/delete_delivery";
@@ -17,6 +17,19 @@ import ModifyDeliveryOffcanvas from "../offcanvas/modify/modify_delivery";
 import DeliveryFilterOffcanvas from "../filter/delivery_filter";
 import DeleteSelectedWindow from "../windows/delete_selected";
 
+/**
+ * Return component that showcase delivery objects, search bar, filter, more action element and selected element.
+ * @component
+ * @param {object} props Component props
+ * @param {Array<{user: string, deliveryId: Number, status: string, waybill: Array<string>, deliveryCompany: string, estimated: string, proforma: string, clientName: string, delivered: string}>} props.deliveries Array containing delivery objects.
+ * @param {string} props.type Name of chosen type of delivery.
+ * @param {boolean} props.orgView True if org view is enabled.
+ * @param {Number} props.deliveriesStart Starting index of deliveries subarray.
+ * @param {Number} props.deliveriesEnd Ending index of deliveries subarray.
+ * @param {boolean} props.filterActive If filter is activated then true, otherwise false.
+ * @param {string} props.currentSort Current value of "sort" query parameter
+ * @return {JSX.Element} Container element
+ */
 function DeliveryList({
   deliveries,
   type,
@@ -26,8 +39,11 @@ function DeliveryList({
   filterActive,
   currentSort,
 }) {
+  // Nav
+  const router = useRouter();
+  const params = useSearchParams();
   // View delivery
-  const [showViewDelivery, setShowViewDelivery] = useState(false);
+  const [showViewDelivery, setShowViewDelivery] = useState(false); // useState for showing view offcanvas
   const [deliveryToView, setDeliveryToView] = useState({
     deliveryId: 0,
     user: "",
@@ -37,9 +53,9 @@ function DeliveryList({
     delivered: "",
     status: "",
     waybill: [],
-  });
+  }); // holder of object chosen to view
   // Modify delivery
-  const [showModifyDelivery, setShowModifyDelivery] = useState(false);
+  const [showModifyDelivery, setShowModifyDelivery] = useState(false); // useState for showing modify offcanvas
   const [deliveryToModify, setProformaToDelivery] = useState({
     deliveryId: 0,
     user: "",
@@ -48,26 +64,24 @@ function DeliveryList({
     clientName: "",
     qty: 0,
     total: 0.0,
-  });
+  }); // holder of object chosen to modify
   // Delete delivery
-  const [showDeleteDelivery, setShowDeleteDelivery] = useState(false);
-  const [deliveryToDelete, setDeliveryToDelete] = useState(null);
-  const [isErrorDelete, setIsErrorDelete] = useState(false);
+  const [showDeleteDelivery, setShowDeleteDelivery] = useState(false); // useState for showing delete window
+  const [deliveryToDelete, setDeliveryToDelete] = useState(null); // holder of object chosen to delete
+  const [isErrorDelete, setIsErrorDelete] = useState(false); // true if delete action failed
   const [errorMessage, setErrorMessage] = useState("");
   // More action
-  const [showMoreAction, setShowMoreAction] = useState(false);
-  const [isShowAddDelivery, setShowAddDelivery] = useState(false);
-  // Seleted
-  const [selectedQty, setSelectedQty] = useState(0);
-  const [selectedDelivery] = useState([]);
+  const [showMoreAction, setShowMoreAction] = useState(false); // useState for showing more action window
+  const [isShowAddDelivery, setShowAddDelivery] = useState(false); // useState for showing create offcanvas
+  // Selected
+  const [selectedQty, setSelectedQty] = useState(0); // Number of selected objects
+  const [selectedDelivery] = useState([]); // Selected proforma keys
   // Filter
-  const [showFilter, setShowFilter] = useState(false);
+  const [showFilter, setShowFilter] = useState(false); // useState for showing filter offcanvas
   // mass action
-  const [showDeleteSelected, setShowDeleteSelected] = useState(false);
-  const [deleteSelectedErrorMess, setDeleteSelectedErrorMess] = useState("");
-  // Nav
-  const router = useRouter();
-  const params = useSearchParams();
+  const [showDeleteSelected, setShowDeleteSelected] = useState(false); // useState for showing mass action delete window
+  const [deleteSelectedErrorMess, setDeleteSelectedErrorMess] = useState(""); // error message of mass delete action
+  // styles
   const containerMargin = {
     height: "67px",
   };
@@ -152,9 +166,9 @@ function DeliveryList({
         selectAllOnPage={() => {
           selectedDelivery.splice(0, selectedDelivery.length);
           setSelectedQty(0);
-          let pagationInfo = getPagationInfo(params);
+          let paginationInfo = getPaginationInfo(params);
           Object.values(deliveries ?? [])
-            .slice(pagationInfo.start, pagationInfo.end)
+            .slice(paginationInfo.start, paginationInfo.end)
             .forEach((e) => selectedDelivery.push(e.deliveryId));
           setSelectedQty(selectedDelivery.length);
           setShowMoreAction(false);

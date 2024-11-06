@@ -12,11 +12,23 @@ import ViewClientOffcanvas from "../offcanvas/view/view_client";
 import deleteClient from "@/utils/clients/delete_client";
 import { useRouter, useSearchParams } from "next/navigation";
 import ModifyClientOffcanvas from "../offcanvas/modify/modify_client";
-import SelectComponent from "../smaller_components/select_compontent";
-import getPagationInfo from "@/utils/flexible/get_page_info";
+import SelectComponent from "../smaller_components/select_component";
+import getPaginationInfo from "@/utils/flexible/get_page_info";
 import ClientFilterOffcanvas from "../filter/client_filter";
 import DeleteSelectedWindow from "../windows/delete_selected";
 
+/**
+ * Return component that showcase client objects, search bar, filter, more action element and selected element.
+ * @component
+ * @param {object} props Component props
+ * @param {Array<{clientId: Number, clientName: string, street: string, city: string, postal: string, nip: Number|undefined, country: string}>} props.clients Array containing client objects.
+ * @param {boolean} props.orgView True if org view is enabled.
+ * @param {Number} props.clientsStart Starting index of clients subarray.
+ * @param {Number} props.clientsEnd Ending index of clients subarray.
+ * @param {boolean} props.filterActive If filter is activated then true, otherwise false.
+ * @param {string} props.currentSort Current value of "sort" query parameter
+ * @return {JSX.Element} Container element
+ */
 function ClientsList({
   clients,
   orgView,
@@ -25,35 +37,36 @@ function ClientsList({
   filterActive,
   currentSort,
 }) {
-  // View client
-  const [showViewClient, setShowViewClient] = useState(false);
-  const [clientToView, setClientToView] = useState({
-    users: [],
-  });
-  // Modify client
-  const [showModifyClient, setShowModifyClient] = useState(false);
-  const [clientToModify, setClientToModify] = useState({
-    users: [],
-  });
-  // Delete client
-  const [showDeleteClient, setShowDeleteclient] = useState(false);
-  const [clientToDelete, setItemToDelete] = useState(null);
-  const [isErrorDelete, setIsErrorDelete] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  // More action
-  const [showMoreAction, setShowMoreAction] = useState(false);
-  const [isShowAddClient, setShowAddClient] = useState(false);
-  // Seleted
-  const [selectedQty, setSelectedQty] = useState(0);
-  const [selectedClients] = useState([]);
-  // Filter
-  const [showFilter, setShowFilter] = useState(false);
-  // mass action
-  const [showDeleteSelected, setShowDeleteSelected] = useState(false);
-  const [deleteSelectedErrorMess, setDeleteSelectedErrorMess] = useState("");
   // Nav
   const router = useRouter();
   const params = useSearchParams();
+  // View client
+  const [showViewClient, setShowViewClient] = useState(false); // useState for showing view offcanvas
+  const [clientToView, setClientToView] = useState({
+    users: [],
+  }); // holder of object chosen to view
+  // Modify client
+  const [showModifyClient, setShowModifyClient] = useState(false); // useState for showing modify offcanvas
+  const [clientToModify, setClientToModify] = useState({
+    users: [],
+  }); // holder of object chosen to modify
+  // Delete client
+  const [showDeleteClient, setShowDeleteClient] = useState(false); // useState for showing delete window
+  const [clientToDelete, setItemToDelete] = useState(null); // holder of object chosen to delete
+  const [isErrorDelete, setIsErrorDelete] = useState(false); // true if delete action failed
+  const [errorMessage, setErrorMessage] = useState("");
+  // More action
+  const [showMoreAction, setShowMoreAction] = useState(false); // useState for showing more action window
+  const [isShowAddClient, setShowAddClient] = useState(false); // useState for showing create offcanvas
+  // Selected
+  const [selectedQty, setSelectedQty] = useState(0); // Number of selected objects
+  const [selectedClients] = useState([]); // Selected proforma keys
+  // Filter
+  const [showFilter, setShowFilter] = useState(false); // useState for showing filter offcanvas
+  // mass action
+  const [showDeleteSelected, setShowDeleteSelected] = useState(false); // useState for showing mass action delete window
+  const [deleteSelectedErrorMess, setDeleteSelectedErrorMess] = useState(""); // error message of mass delete action
+  // Styles
   const containerMargin = {
     height: "67px",
   };
@@ -110,7 +123,7 @@ function ClientsList({
                 }}
                 deleteAction={() => {
                   setItemToDelete(value.clientId);
-                  setShowDeleteclient(true);
+                  setShowDeleteClient(true);
                 }}
                 viewAction={() => {
                   setClientToView(value);
@@ -135,9 +148,9 @@ function ClientsList({
         selectAllOnPage={() => {
           selectedClients.splice(0, selectedClients.length);
           setSelectedQty(0);
-          let pagationInfo = getPagationInfo(params);
+          let paginationInfo = getPaginationInfo(params);
           Object.values(clients ?? [])
-            .slice(pagationInfo.start, pagationInfo.end)
+            .slice(paginationInfo.start, paginationInfo.end)
             .forEach((e) => selectedClients.push(e.clientId));
           setSelectedQty(selectedClients.length);
           setShowMoreAction(false);
@@ -164,7 +177,7 @@ function ClientsList({
       <DeleteObjectWindow
         modalShow={showDeleteClient}
         onHideFunction={() => {
-          setShowDeleteclient(false);
+          setShowDeleteClient(false);
           setIsErrorDelete(false);
         }}
         instanceName="client"
@@ -172,7 +185,7 @@ function ClientsList({
         deleteItemFunc={async () => {
           let result = await deleteClient(clientToDelete);
           if (!result.error) {
-            setShowDeleteclient(false);
+            setShowDeleteClient(false);
             router.refresh();
           } else {
             setErrorMessage(result.message);

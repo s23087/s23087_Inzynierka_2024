@@ -6,7 +6,7 @@ import getDbName from "../auth/get_db_name";
  * Sends request to get rest information of chosen proforma.
  * @param  {boolean} isYourProforma Is proforma type "Yours proformas".
  * @param  {Number} proformaId Proforma id.
- * @return {Promise<object>}      Return object containing proforma object information. If connection is lost return null.
+ * @return {Promise<{taxes: Number, currencyValue: Number, currencyDate: string, paymentMethod: string, inSystem: boolean, note: string, path: string, items: Array<{creditItemId: Number, partnumber: string, itemName: string, qty: Number, price: Number}>}>} Return object containing proforma object information. If connection is lost return null.
  */
 export default async function getRestProforma(isYourProforma, proformaId) {
   const dbName = await getDbName();

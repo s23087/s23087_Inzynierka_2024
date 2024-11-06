@@ -5,14 +5,25 @@ import { useState } from "react";
 import { Modal, Container, Row, Col, Form, Button } from "react-bootstrap";
 import ErrorMessage from "../smaller_components/error_message";
 
+/**
+ * Modal element that allow to add waybill to delivery.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.modalShow Modal show parameter.
+ * @param {Function} props.onHideFunction Function that will close modal (set modalShow to false).
+ * @param {Function} props.addAction Function that will activate after clicking add.
+ * @param {Function} props.waybillExist Function that will check if new waybill does not already exist in added waybills.
+ * @return {JSX.Element} Modal element
+ */
 function AddWaybillWindow({
   modalShow,
   onHideFunction,
   addAction,
   waybillExist,
 }) {
+  // True if waybill input is incorrect
   const [waybillIsInvalid, setWaybillIsInvalid] = useState(false);
-  const [newEan, setNewEan] = useState("");
+  const [newWaybill, setNewWaybill] = useState("");
   return (
     <Modal
       size="md"
@@ -51,7 +62,7 @@ function AddWaybillWindow({
                 } else {
                   setWaybillIsInvalid(true);
                 }
-                setNewEan(e.target.value);
+                setNewWaybill(e.target.value);
               }}
             />
           </Form.Group>
@@ -63,12 +74,12 @@ function AddWaybillWindow({
                   className="w-100"
                   disabled={waybillIsInvalid}
                   onClick={() => {
-                    if (newEan === "") {
+                    if (newWaybill === "") {
                       setWaybillIsInvalid(true);
                       return;
                     }
-                    addAction(newEan);
-                    setNewEan("");
+                    addAction(newWaybill);
+                    setNewWaybill("");
                     onHideFunction();
                   }}
                 >

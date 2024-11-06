@@ -17,28 +17,47 @@ import SpecialInput from "@/components/smaller_components/special_input";
 import AddEanWindow from "@/components/windows/addEan";
 import Toastes from "@/components/smaller_components/toast";
 import { useRouter } from "next/navigation";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 import ErrorMessage from "@/components/smaller_components/error_message";
 import validators from "@/utils/validators/validator";
 
+/**
+ * Create offcanvas that allow to create item.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @return {JSX.Element} Offcanvas element
+ */
 function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
   const router = useRouter();
-  // eans
+  // eans holder
   const [eans, setEans] = useState([]);
+  // key variable to rerender the component
   const [rerenderVar, setRerenderVar] = useState(1);
+  /**
+   * Checks if ean already exist in ean array
+   * @param {string} variable Ean value
+  */
   const eanExist = (variable) => {
     return eans.findIndex((item) => item === variable) != -1;
   };
+  // useState for showing add ean window
   const [isAddEanShow, setIsAddEanShow] = useState(false);
-  // Errors
+  // Form errors
   const [partnumberError, setPartnumberError] = useState(false);
   const [nameError, setNameError] = useState(false);
+  /**
+   * Check if form can be submitted
+  */
   const isErrorActive = () => partnumberError || nameError;
+  /**
+   * Reset form errors
+  */
   const resetErrors = () => {
     setPartnumberError(false);
     setNameError(false);
   };
-  const errorActive = isErrorActive();
   // Styles
   const maxStyle = {
     maxWidth: "393px",
@@ -50,7 +69,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
   const vhStyle = {
     height: "81vh",
   };
-  // Loading
+  // True if create action is running
   const [isLoading, setIsLoading] = useState(false);
   // Form action
   const [state, formAction] = useFormState(createItem.bind(null, eans), {
@@ -95,7 +114,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
               <Form.Group className="mb-3 maxInputWidth">
                 <Form.Label className="blue-main-text">P/N:</Form.Label>
                 <ErrorMessage
-                  message="Cannot be empty or excceed 150 chars."
+                  message="Cannot be empty or exceed 150 chars."
                   messageStatus={partnumberError}
                 />
                 <Form.Control
@@ -105,7 +124,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                   id="partnumber"
                   isInvalid={partnumberError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setPartnumberError,
                       150,
@@ -118,7 +137,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
               <Form.Group className="mb-3 maxInputWidth">
                 <Form.Label className="blue-main-text">Name:</Form.Label>
                 <ErrorMessage
-                  message="Cannot be empty or excceed 250 chars."
+                  message="Cannot be empty or exceed 250 chars."
                   messageStatus={nameError}
                 />
                 <Form.Control
@@ -128,7 +147,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                   id="name"
                   isInvalid={nameError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setNameError,
                       250,
@@ -138,7 +157,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                   maxLength={250}
                 />
               </Form.Group>
-              <Form.Group className="mb-3" controlId="formEans">
+              <Form.Group className="mb-3">
                 <Stack key={rerenderVar}>
                   <Form.Label className="blue-main-text">EANs:</Form.Label>
                   {eans.map((value, key) => {
@@ -199,24 +218,24 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                       variant="mainBlue"
                       className="w-100"
                       type="submit"
-                      disabled={errorActive}
+                      disabled={isErrorActive()}
                       onClick={(e) => {
                         e.preventDefault();
                         let partnumber =
                           document.getElementById("partnumber").value;
                         let name = document.getElementById("name").value;
-                        InputValidtor.normalStringValidtor(
+                        InputValidator.normalStringValidator(
                           partnumber,
                           setPartnumberError,
                           150,
                         );
-                        InputValidtor.normalStringValidtor(
+                        InputValidator.normalStringValidator(
                           name,
                           setNameError,
                           250,
                         );
                         if (partnumber === "" || name === "") return;
-                        if (errorActive) return;
+                        if (isErrorActive()) return;
                         setIsLoading(true);
                         let addForm = document.getElementById("addItemForm");
                         addForm.requestSubmit();
@@ -272,6 +291,9 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
     </Offcanvas>
   );
 
+  /**
+   * Reset form state
+  */
   function resetState() {
     state.error = false;
     state.completed = false;

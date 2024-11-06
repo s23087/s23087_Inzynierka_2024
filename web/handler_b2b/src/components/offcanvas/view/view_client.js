@@ -6,12 +6,25 @@ import { useEffect, useState } from "react";
 import { Offcanvas, Container, Row, Col, Button, Stack } from "react-bootstrap";
 import getRestClientInfo from "@/utils/clients/get_rest_info";
 import dropdown_big_down from "../../../../public/icons/dropdown_big_down.png";
+
+/**
+ * Create offcanvas that allow to view more information about client.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {{clientName: string, user: string, nip: Number|undefined, street: string, city: string, postal: string}} props.client Chosen client to view.
+ * @param {boolean} props.isOrg True if org view is activated.
+ * @return {JSX.Element} Offcanvas element
+ */
 function ViewClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
+  // download holder
   const [restInfo, setRestInfo] = useState({
     creditLimit: null,
     availability: "",
     daysForRealization: null,
   });
+  // download data
   useEffect(() => {
     if (showOffcanvas) {
       getRestClientInfo(client.clientId).then((data) => {
@@ -72,7 +85,7 @@ function ViewClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                 <Container className="px-1 ms-0">
                   <p className="mb-1 blue-main-text">Address:</p>
                   <p className="mb-1">
-                    {client.street + " " + client.city + " " + client.postal}
+                    {client.street + " " + client.city}
                   </p>
                 </Container>
                 <Container className="px-1 ms-0">

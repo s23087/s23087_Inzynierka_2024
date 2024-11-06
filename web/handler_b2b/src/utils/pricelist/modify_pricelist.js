@@ -10,13 +10,13 @@ const fs = require("node:fs");
 
 /**
  * Sends request to modify pricelist. When data is unchanged the attribute in request will be null. If user do not exist server will logout them.
- * @param  {Array<object>} products Array of products.
+ * @param  {Array<{id: Number, price: Number}>} products Array of products.
  * @param  {string} currency Currency shortcut name.
  * @param  {Number} offerId Offer id.
- * @param  {object} prevState Object that contain information about previous state of chosen item.
- * @param  {object} state Previous state of object bonded to this function.
+ * @param  {{offerName: string, maxQty: Number, currency: string, type: string, path: string,}} prevState Object that contain information about previous state of chosen item.
+ * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
  * @param  {FormData} formData Contain form data.
- * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
  * Completed will always be true, to deliver information to component that action has been completed.
  */
 export default async function modifyPricelist(
@@ -42,7 +42,7 @@ export default async function modifyPricelist(
 
   const userId = await getUserId();
   const dbName = await getDbName();
-  const deactivatedId = await getDeactivatedId();
+  const deactivatedId = await getDeactivatedId(dbName);
   if (!deactivatedId)
     return {
       error: true,
@@ -60,7 +60,7 @@ export default async function modifyPricelist(
   orgName = orgName.replace(/[^a-zA-Z0-9]/, "");
   orgName = orgName.replace(" ", "");
   let fileName = "";
-  let attributeChanged = getAtributeChanged(
+  let attributeChanged = getAttributeChanged(
     offerName,
     prevState,
     maxQtyForm,
@@ -144,7 +144,7 @@ export default async function modifyPricelist(
   }
   /**
    * Organize information into object for fetch.
-   * @return {object} 
+   * @return {object}
    */
   function getData() {
     return {
@@ -187,7 +187,7 @@ function renameFile(fileName, prevState) {
   }
 }
 /**
- * Check response for error. If no error occurred return null. If error 404 with text "User not found." is recivied, the user will be logout.
+ * Check response for error. If no error occurred return null. If error 404 with text "User not found." is received, the user will be logout.
  * @param {Response} info Fetch response.
  * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
  * Completed will always be true, to deliver information to component that action has been completed.
@@ -228,15 +228,16 @@ async function checkFetchForError(info) {
 
 /**
  * Fetch for "Deactivated" status id. If connection lost return null.
+ * @param {string} dbName Name of database.
  * @return {Promise<string>}      Return id of status "Deactivated".
  */
-async function getDeactivatedId() {
+async function getDeactivatedId(dbName) {
   try {
-    let getDeactivatedId = await fetch(
+    let getDeactivatedIdFetch = await fetch(
       `${process.env.API_DEST}/${dbName}/Offer/get/status/deactivated`,
       { method: "GET" },
     );
-    return getDeactivatedId.text();
+    return getDeactivatedIdFetch.text();
   } catch {
     console.error("Get status deactivated fetch failed.");
     return null;
@@ -247,7 +248,7 @@ async function getDeactivatedId() {
  * @param  {object} attributeChanged Boolean that tells if at least one attribute changed.
  * @param  {object} status Chosen status id.
  * @param  {string} deactivatedId Status id with name "Deactivated".
- * @return {boolean} True if attribute changes and status is stil active, otherwise false.
+ * @return {boolean} True if attribute changes and status is still active, otherwise false.
  */
 function requireNewPath(attributeChanged, status, deactivatedId) {
   return attributeChanged && status !== deactivatedId;
@@ -262,7 +263,7 @@ function requireNewPath(attributeChanged, status, deactivatedId) {
  * @param  {string} type Pricelist type.
  * @return {boolean} True if at least one changed, otherwise false.
  */
-function getAtributeChanged(offerName, prevState, maxQtyForm, currency, type) {
+function getAttributeChanged(offerName, prevState, maxQtyForm, currency, type) {
   return (
     offerName !== prevState.offerName ||
     maxQtyForm !== prevState.maxQty ||
@@ -276,8 +277,8 @@ function getAtributeChanged(offerName, prevState, maxQtyForm, currency, type) {
  * @param  {string} status Status id.
  * @param  {string} offerName Offer name.
  * @param  {string} maxQtyForm Max showed number of product in pricelist.
- * @param  {Array<object>} products Transport cost in form of string.
- * @return {string} Return error message. If no error occurred retrun only "Error:"
+ * @param  {Array<object>} products Array containing products.
+ * @return {string} Return error message. If no error occurred return only "Error:"
  */
 function validateData(status, offerName, maxQtyForm, products) {
   let errorMessage = "Error:";

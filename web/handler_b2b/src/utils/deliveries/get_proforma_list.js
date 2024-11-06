@@ -4,6 +4,11 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 
+/**
+ * Sends request to get proforma's without existing delivery. The object in array have properties id and proformaNumber.
+ * @param  {boolean} isDeliveryToUser If delivery is of type "Deliveries to user" it value is true, otherwise false.
+ * @return {Promise<Array<{id: Number, proformaNumber: string}>>} Array of objects that that contain proforma information. If connection was lost return null.
+ */
 export default async function getProformaListWithoutDelivery(isDeliveryToUser) {
   const dbName = await getDbName();
   const userId = await getUserId();

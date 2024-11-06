@@ -8,14 +8,30 @@ import { useRouter } from "next/navigation";
 import CloseIcon from "../../../../public/icons/close_black.png";
 import ProductHolder from "@/components/smaller_components/product_holder";
 import ErrorMessage from "@/components/smaller_components/error_message";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 import getOfferStatuses from "@/utils/pricelist/get_statuses";
 import AddItemToPricelistWindow from "@/components/windows/add_item_to_pricelist";
 import getRestModifyPricelist from "@/utils/pricelist/get_rest_modify_pricelist";
 import modifyPricelist from "@/utils/pricelist/modify_pricelist";
 
+/**
+ * Create offcanvas that allow to modify chosen pricelist.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {{pricelistId: Number, currency: string, name: string, path: string, status: string}} props.pricelist Chosen pricelist to view as object with properties.
+ * @return {JSX.Element} Offcanvas element
+ */
 function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
   const router = useRouter();
+  // download holders
+  const [statuses, setStatuses] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [maxQty, setMaxQty] = useState(0);
+  // Currency of pricelist
+  const [chosenCurrency, setChosenCurrency] = useState("PLN");
+  // download error
   const [statusDownloadError, setStatusDownloadError] = useState(false);
   const [restDownloadError, setRestDownloadError] = useState(false);
   useEffect(() => {
@@ -48,16 +64,11 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
       prevState.path = pricelist.path;
     }
   }, [showOffcanvas]);
-  const [statuses, setStatuses] = useState([]);
-  // products
-  const [showSalesProductWindow, setShowSalesProductWindow] = useState(false);
-  const [products, setProducts] = useState([]);
+  // key to rerender component with product
   const [resetSeed, setResetSeed] = useState(false);
-  // maxQty
-  const [maxQty, setMaxQty] = useState(0);
-  // currency
-  const [chosenCurrency, setChosenCurrency] = useState("PLN");
-  // previous state
+  // useState for showing add products window
+  const [showSalesProductWindow, setShowSalesProductWindow] = useState(false);
+  // Previous state holder
   const [prevState] = useState({
     offerName: "",
     maxQty: 0,
@@ -65,9 +76,12 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
     type: "",
     path: "",
   });
-  // Errors
+  // Form errors
   const [nameError, setNameError] = useState(false);
   const [maxQtyError, setMaxQtyError] = useState(false);
+  /**
+   * Check if form can be submitted
+  */
   const isFormErrorActive = () =>
     nameError ||
     maxQtyError ||
@@ -75,9 +89,9 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
     products.length === 0 ||
     statusDownloadError ||
     restDownloadError;
-  // Misc
+  // True if modify action is running
   const [isLoading, setIsLoading] = useState(false);
-  // Form
+  // Form action
   const [state, formAction] = useFormState(
     modifyPricelist
       .bind(null, products)
@@ -148,7 +162,7 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Offer name:</Form.Label>
                 <ErrorMessage
-                  message="Is empty or lenght is greater than 100."
+                  message="Is empty or length is greater than 100."
                   messageStatus={nameError}
                 />
                 <Form.Control
@@ -159,7 +173,7 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
                   placeholder="offer name"
                   isInvalid={nameError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setNameError,
                       100,
@@ -205,7 +219,7 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
                   placeholder="qty"
                   isInvalid={maxQtyError}
                   onInput={(e) => {
-                    InputValidtor.onlyNumberValidtor(
+                    InputValidator.onlyNumberValidator(
                       e.target.value,
                       setMaxQtyError,
                     );
@@ -244,7 +258,7 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
                   style={maxHeightScrollContainer}
                   key={resetSeed}
                 >
-                  {products.map((value) => {
+                  {products.map((value, key) => {
                     return (
                       <ProductHolder
                         key={value}
@@ -343,6 +357,9 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
     </Offcanvas>
   );
 
+  /**
+   * Reset form state
+  */
   function resetState() {
     state.error = false;
     state.completed = false;

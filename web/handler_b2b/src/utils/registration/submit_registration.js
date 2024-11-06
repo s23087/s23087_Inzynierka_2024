@@ -70,7 +70,7 @@ async function registerUser(is_org, formData) {
     try {
       let creationResult = await initDb(folderName);
       if (!creationResult) {
-        throw new Error("Db creation failed")
+        throw new Error("Db creation failed");
       }
       let registerResult = await createNewRegisteredUser(
         formData,
@@ -78,7 +78,7 @@ async function registerUser(is_org, formData) {
         is_org,
       );
       if (!registerResult) {
-        throw new Error("Registration failed")
+        throw new Error("Registration failed");
       }
     } catch (error) {
       deleteFolders(dbFilePath, dbLogPath, docPath, pricelistFile);

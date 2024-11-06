@@ -9,9 +9,20 @@ import { useRouter } from "next/navigation";
 import ErrorMessage from "../smaller_components/error_message";
 import createDeliveryCompany from "@/utils/deliveries/create_delivery_company";
 
+/**
+ * Modal element that allow to change request status using option yes/no.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.modalShow Modal show parameter.
+ * @param {Function} props.onHideFunction Function that will close modal (set modalShow to false).
+ * @param {Array<{name: string}>} props.companies List of already existing delivery companies.
+ * @return {JSX.Element} Modal element
+ */
 function AddDeliveryCompanyWindow({ modalShow, onHideFunction, companies }) {
   const router = useRouter();
+  // Input error
   const [nameError, setNameError] = useState(false);
+  // Form action
   const [state, formAction] = useFormState(createDeliveryCompany, {
     error: false,
     completed: false,

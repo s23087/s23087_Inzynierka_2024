@@ -1,5 +1,14 @@
 import PropTypes from "prop-types";
 
+/**
+ * Small circle with number or notification. When over 9 it will show as 9+.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.qty Unread notification quantity.
+ * @param {string} [props.top_value="-3px"] Distance from top.
+ * @param {string} [props.right_value="-7px"] Distance from right.
+ * @return {JSX.Element} span element
+ */
 function NotificationBadge({ qty, top_value = "-3px", right_value = "-7px" }) {
   const spanStyle = {
     height: "22px",

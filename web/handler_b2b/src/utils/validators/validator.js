@@ -1,6 +1,6 @@
 /**
  * Test string for email pattern.
- * @param  {string} str 
+ * @param  {string} str
  * @return {boolean}      Result of function regex function test.
  */
 function isEmail(str) {
@@ -12,7 +12,7 @@ function isEmail(str) {
 
 /**
  * Test string for decimal number with two decimal places pattern.
- * @param  {string} str 
+ * @param  {string} str
  * @return {boolean}      Result of function regex function test.
  */
 function isPriceFormat(str) {
@@ -22,7 +22,7 @@ function isPriceFormat(str) {
 
 /**
  * Test if string do not contain special characters.
- * @param  {string} str 
+ * @param  {string} str
  * @return {boolean}      Result of function regex function test.
  */
 function noPathCharacters(str) {
@@ -32,7 +32,7 @@ function noPathCharacters(str) {
 
 /**
  * Test if string contains only letters a-z and A-Z.
- * @param  {string} str 
+ * @param  {string} str
  * @return {boolean}      Result of function regex function test.
  */
 function haveNoNumbers(str) {
@@ -42,7 +42,7 @@ function haveNoNumbers(str) {
 
 /**
  * Test if string is a postivie integer.
- * @param  {string} str 
+ * @param  {string} str
  * @return {boolean}      Result of function regex function test.
  */
 function haveOnlyPositiveNumbers(str) {
@@ -52,7 +52,7 @@ function haveOnlyPositiveNumbers(str) {
 
 /**
  * Test if string is a integer.
- * @param  {string} str 
+ * @param  {string} str
  * @return {boolean}      Result of function regex function test.
  */
 function haveOnlyIntegers(str) {
@@ -62,7 +62,7 @@ function haveOnlyIntegers(str) {
 
 /**
  * Test if string do not exceed given length.
- * @param  {string} str 
+ * @param  {string} str
  * @return {boolean}
  */
 function lengthSmallerThen(str, length) {
@@ -71,8 +71,8 @@ function lengthSmallerThen(str, length) {
 
 /**
  * Test if strings are equal.
- * @param  {string} str1 
- * @param  {string} str2 
+ * @param  {string} str1
+ * @param  {string} str2
  * @return {boolean}
  */
 function stringAreEqual(str1, str2) {
@@ -81,7 +81,7 @@ function stringAreEqual(str1, str2) {
 
 /**
  * Test if string is not empty.
- * @param  {string} id Html element id 
+ * @param  {string} id Html element id
  * @return {boolean}
  */
 function isEmpty(id) {
@@ -90,7 +90,7 @@ function isEmpty(id) {
 
 /**
  * Test if string is not empty.
- * @param  {string} str 
+ * @param  {string} str
  * @return {boolean}
  */
 function stringIsNotEmpty(str) {

@@ -5,7 +5,14 @@ import PropTypes from "prop-types";
 import { Modal, Container, Row, Col, Button } from "react-bootstrap";
 import logout from "@/utils/auth/logout";
 
-function ForceLogutWindow({ modalShow }) {
+/**
+ * Modal element that show after changing password and logout the user.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.modalShow Modal show parameter.
+ * @return {JSX.Element} Modal element
+ */
+function ForceLogoutWindow({ modalShow }) {
   const router = useRouter();
   return (
     <Modal
@@ -46,8 +53,8 @@ function ForceLogutWindow({ modalShow }) {
   );
 }
 
-ForceLogutWindow.propTypes = {
+ForceLogoutWindow.propTypes = {
   modalShow: PropTypes.bool.isRequired,
 };
 
-export default ForceLogutWindow;
+export default ForceLogoutWindow;

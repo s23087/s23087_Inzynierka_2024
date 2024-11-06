@@ -3,6 +3,14 @@ import Image from "next/image";
 import PropTypes from "prop-types";
 import dropdown from "../../../public/icons/dropdown_big_down.png";
 
+/**
+ * Create offcanvas that shows service policy terms.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.show Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false
+ * @return {JSX.Element} Offcanvas element
+ */
 function PolicyOffcanvas({ show, hideFunction }) {
   return (
     <Offcanvas

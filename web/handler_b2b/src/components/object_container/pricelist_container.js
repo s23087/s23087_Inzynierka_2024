@@ -4,6 +4,19 @@ import ContainerButtons from "../smaller_components/container_buttons";
 import getFileFormServer from "@/utils/documents/download_file";
 import { useState } from "react";
 
+/**
+ * Create element that represent proforma object
+ * @component
+ * @param {Object} props
+ * @param {{pricelistId: Number, created: string, status: string, name: string, totalItems: Number, path: string, currency: string, modified: string}} props.pricelist Object value
+ * @param {boolean} props.selected True if container should show as selected
+ * @param {Function} props.selectAction Action that will activated after clicking select button
+ * @param {Function} props.unselectAction Action that will activated after clicking unselect button
+ * @param {Function} props.deleteAction Action that will activated after clicking delete button
+ * @param {Function} props.viewAction Action that will activated after clicking view button
+ * @param {Function} props.modifyAction Action that will activated after clicking modify button
+ * @return {JSX.Element} Container element
+ */
 function PricelistContainer({
   pricelist,
   selected,
@@ -18,7 +31,7 @@ function PricelistContainer({
     pricelist.path.lenght,
   );
   // Download bool
-  const [isDownloading, setIsDowlonding] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   // styles
   const containerBg = {
     backgroundColor: "var(--sec-blue)",
@@ -100,11 +113,11 @@ function PricelistContainer({
                 onClick={async () => {
                   if (!pricelist.path.endsWith("csv")) {
                     window.open(
-                      pricelist.path.substring(7, pricelist.path.lenght),
+                      pricelist.path.substring(7, pricelist.path.length),
                     );
                     return;
                   }
-                  setIsDowlonding(true);
+                  setIsDownloading(true);
                   let file = await getFileFormServer(pricelist.path);
                   if (file) {
                     let parsed = JSON.parse(file);
@@ -119,7 +132,7 @@ function PricelistContainer({
                     );
                     downloadObject.click();
                   }
-                  setIsDowlonding(false);
+                  setIsDownloading(false);
                 }}
               >
                 {type === "csv" ? "Download file" : "Open link to xml"}

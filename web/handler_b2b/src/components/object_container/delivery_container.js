@@ -5,6 +5,21 @@ import ContainerButtons from "../smaller_components/container_buttons";
 import user_small_icon from "../../../public/icons/user_small_icon.png";
 import getDeliveryStatusColor from "@/utils/deliveries/get_delivery_status_color";
 
+/**
+ * Create element that represent delivery object
+ * @component
+ * @param {Object} props
+ * @param {{user: string, deliveryId: Number, status: string, waybill: Array<string>, deliveryCompany: string, estimated: string, proforma: string, clientName: string, delivered: string}} props.delivery Object value
+ * @param {boolean} props.is_org True if org view is enabled
+ * @param {boolean} props.selected True if container should show as selected
+ * @param {boolean} props.isDeliveryToUser True if current type is "Deliveries to user"
+ * @param {Function} props.selectAction Action that will activated after clicking select button
+ * @param {Function} props.unselectAction Action that will activated after clicking unselect button
+ * @param {Function} props.deleteAction Action that will activated after clicking delete button
+ * @param {Function} props.viewAction Action that will activated after clicking view button
+ * @param {Function} props.modifyAction Action that will activated after clicking modify button
+ * @return {JSX.Element} Container element
+ */
 function DeliveryContainer({
   delivery,
   is_org,

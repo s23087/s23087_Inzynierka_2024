@@ -2,6 +2,11 @@
 
 import getDbName from "../auth/get_db_name";
 
+/**
+ * Sends request to get chosen organization user bindings.
+ * @param {Number} orgId Organization id
+ * @return {Promise<Array<{idUser: Number, username: string, surname: string}>>} Array of objects that that contain client-user binding information. If connection was lost return null.
+ */
 export default async function getUserClientBindings(orgId) {
   const dbName = await getDbName();
   try {

@@ -3,13 +3,25 @@ import Image from "next/image";
 import { Container, Row, Col, Stack, Button } from "react-bootstrap";
 import user_small_icon from "../../../public/icons/user_small_icon.png";
 
-function AbstractItemContainer({
+/**
+ * Create element that represent outside item object
+ * @component
+ * @param {Object} props
+ * @param {{users: Array<string>|undefined, partnumber: string, itemId: Number, orgId: Number, orgName: string, price: Number, qty: Number, currency: string}} props.abstract_item Object value
+ * @param {boolean} props.selected True if container should show as selected
+ * @param {Function} props.selectAction Action that will activated after clicking select button
+ * @param {Function} props.unselectAction Action that will activated after clicking unselect button
+ * @param {Function} props.deleteAction Action that will activated after clicking delete button
+ * @return {JSX.Element} Container element
+ */
+function OutsideItemContainer({
   abstract_item,
   selected,
   selectAction,
   unselectAction,
   deleteAction,
 }) {
+  // Styles
   const containerBg = {
     backgroundColor: "var(--sec-blue)",
   };
@@ -118,7 +130,7 @@ function AbstractItemContainer({
   );
 }
 
-AbstractItemContainer.propTypes = {
+OutsideItemContainer.propTypes = {
   abstract_item: PropTypes.object.isRequired,
   selected: PropTypes.bool.isRequired,
   selectAction: PropTypes.func.isRequired,
@@ -126,4 +138,4 @@ AbstractItemContainer.propTypes = {
   deleteAction: PropTypes.func.isRequired,
 };
 
-export default AbstractItemContainer;
+export default OutsideItemContainer;

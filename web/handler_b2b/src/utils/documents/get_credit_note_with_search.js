@@ -4,6 +4,15 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 
+/**
+ * Sends request to get credit notes where invoice number or organization contains search string. Can be filtered or sorted using sort and param arguments.
+ * @param  {boolean} isOrg True if org view is activated, otherwise false.
+ * @param  {boolean} isYourCredit Is type of credit note "Yours credit notes" boolean.
+ * @param  {string} search Searched phrase.
+ * @param  {string} sort Name of attribute that items will be sorted. First char indicates direction. D for descending and A for ascending. This param cannot be omitted.
+ * @param  {{dateL: string, dateG: string, qtyL: string, qtyG: string, totalL: string, totalG: string, recipient: string, currency: string, paymentStatus: string, status: string}} params Object that contains properties that items will be filtered by. This param cannot be omitted.
+ * @return {Promise<Array<{user: string|undefined, creditNoteId: Number, invoiceNumber: string, date: string, qty: Number, total: Number, clientName: string, inSystem: boolean, isPaid: boolean}>>} Array of objects that contain credit note information. If connection was lost return null. If error occurred return empty array.
+ */
 export default async function getSearchCreditNotes(
   isOrg,
   isYourCredit,
@@ -41,6 +50,12 @@ export default async function getSearchCreditNotes(
   }
 }
 
+/**
+ * Prepares params for joining to url.
+ * @param  {string} sort Name of attribute that items will be sorted. First char indicates direction. D for descending and A for ascending.
+ * @param  {{dateL: string, dateG: string, qtyL: string, qtyG: string, totalL: string, totalG: string, recipient: string, currency: string, paymentStatus: string, status: string}} params Object that contains properties that items will be filtered by.
+ * @return {Array<string>} Array of strings with prepared parameters.
+ */
 function getPrepParams(sort, params) {
   let result = [];
   if (sort !== ".None") result.push(`sort=${sort}`);

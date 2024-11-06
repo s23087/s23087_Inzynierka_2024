@@ -3,6 +3,12 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 
+/**
+ * Sends request to delete chosen delivery. If user do not exist server will logout them.
+ * @param {boolean} isDeliveryToUser Is delivery type "Deliveries to user".
+ * @param  {Number} deliveryId Delivery id.
+ * @return {Promise<{error: boolean, message: string}>} Return action result with message. If error is true that action was unsuccessful.
+ */
 export default async function deleteDelivery(isDeliveryToUser, deliveryId) {
   const dbName = await getDbName();
   const userId = await getUserId();

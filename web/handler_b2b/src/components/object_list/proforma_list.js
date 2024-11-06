@@ -7,8 +7,8 @@ import SearchFilterBar from "../menu/search_filter_bar";
 import MoreActionWindow from "../windows/more_action";
 import { useSearchParams, useRouter } from "next/navigation";
 import DeleteObjectWindow from "../windows/delete_object";
-import SelectComponent from "../smaller_components/select_compontent";
-import getPagationInfo from "@/utils/flexible/get_page_info";
+import SelectComponent from "../smaller_components/select_component";
+import getPaginationInfo from "@/utils/flexible/get_page_info";
 import ProformaContainer from "../object_container/proforma_container";
 import AddProformaOffcanvas from "../offcanvas/create/create_proforma";
 import ViewProformaOffcanvas from "../offcanvas/view/view_proforma";
@@ -17,6 +17,19 @@ import ModifyProformaOffcanvas from "../offcanvas/modify/modify_proforma";
 import ProformaFilterOffcanvas from "../filter/proforma_filter";
 import DeleteSelectedWindow from "../windows/delete_selected";
 
+/**
+ * Return component that showcase proforma objects, search bar, filter, more action element and selected element.
+ * @component
+ * @param {object} props Component props
+ * @param {Array<{user: string|undefined, proformaId: Number, date: string, transport: Number, qty: Number, total: Number, currencyName: string, clientName: string}>} props.proformas Array containing proforma objects.
+ * @param {string} props.type Name of chosen type of proforma.
+ * @param {boolean} props.orgView True if org view is enabled.
+ * @param {Number} props.proformasStart Starting index of proforma's subarray.
+ * @param {Number} props.proformasEnd Ending index of proforma's subarray.
+ * @param {boolean} props.filterActive If filter is activated then true, otherwise false.
+ * @param {string} props.currentSort Current value of "sort" query parameter
+ * @return {JSX.Element} Container element
+ */
 function ProformaList({
   proformas,
   type,
@@ -26,8 +39,11 @@ function ProformaList({
   filterActive,
   currentSort,
 }) {
+  // Nav
+  const router = useRouter();
+  const params = useSearchParams();
   // View proforma
-  const [showViewProforma, setShowViewProforma] = useState(false);
+  const [showViewProforma, setShowViewProforma] = useState(false); // useState for showing view offcanvas
   const [proformaToView, setProformaToView] = useState({
     proformaId: 0,
     user: "",
@@ -36,9 +52,9 @@ function ProformaList({
     clientName: "",
     qty: 0,
     total: 0.0,
-  });
+  }); // holder of object chosen to view
   // Modify proforma
-  const [showModifyProforma, setShowModifyProforma] = useState(false);
+  const [showModifyProforma, setShowModifyProforma] = useState(false); // useState for showing modify offcanvas
   const [proformaToModify, setProformaToModify] = useState({
     proformaId: 0,
     user: "",
@@ -47,26 +63,24 @@ function ProformaList({
     clientName: "",
     qty: 0,
     total: 0.0,
-  });
-  // Delete proforma
-  const [showDeleteProforma, setShowDeleteProforma] = useState(false);
-  const [proformaToDelete, setProformaToDelete] = useState(null);
-  const [isErrorDelete, setIsErrorDelete] = useState(false);
+  }); // holder of object chosen to modify
+  // Delete Proforma
+  const [showDeleteProforma, setShowDeleteProforma] = useState(false); // useState for showing delete window
+  const [proformaToDelete, setProformaToDelete] = useState(null); // holder of object chosen to delete
+  const [isErrorDelete, setIsErrorDelete] = useState(false); // true if delete action failed
   const [errorMessage, setErrorMessage] = useState("");
   // More action
-  const [showMoreAction, setShowMoreAction] = useState(false);
-  const [isShowAddProforma, setShowAddProforma] = useState(false);
-  // Seleted
-  const [selectedQty, setSelectedQty] = useState(0);
-  const [selectedProforma] = useState([]);
+  const [showMoreAction, setShowMoreAction] = useState(false); // useState for showing more action window
+  const [isShowAddProforma, setShowAddProforma] = useState(false); // useState for showing create offcanvas
+  // Selected
+  const [selectedQty, setSelectedQty] = useState(0); // Number of selected objects
+  const [selectedProforma] = useState([]); // Selected proforma keys
   // Filter
-  const [showFilter, setShowFilter] = useState(false);
-  // mass action
-  const [showDeleteSelected, setShowDeleteSelected] = useState(false);
-  const [deleteSelectedErrorMess, setDeleteSelectedErrorMess] = useState("");
-  // Nav
-  const router = useRouter();
-  const params = useSearchParams();
+  const [showFilter, setShowFilter] = useState(false); // useState for showing filter offcanvas
+  // Mass actions
+  const [showDeleteSelected, setShowDeleteSelected] = useState(false); // useState for showing mass action delete window
+  const [deleteSelectedErrorMess, setDeleteSelectedErrorMess] = useState(""); // error message of mass delete action
+  // Styles
   const containerMargin = {
     height: "67px",
   };
@@ -100,7 +114,7 @@ function ProformaList({
         <Container className="text-center" fluid>
           <p className="mt-5 pt-5 blue-main-text h2">
             {proformas
-              ? "Proformas not found :/"
+              ? "Proforma's not found :/"
               : "Could not connect to server."}
           </p>
         </Container>
@@ -151,9 +165,9 @@ function ProformaList({
         selectAllOnPage={() => {
           selectedProforma.splice(0, selectedProforma.length);
           setSelectedQty(0);
-          let pagationInfo = getPagationInfo(params);
+          let paginationInfo = getPaginationInfo(params);
           Object.values(proformas ?? [])
-            .slice(pagationInfo.start, pagationInfo.end)
+            .slice(paginationInfo.start, paginationInfo.end)
             .forEach((e) => selectedProforma.push(e.proformaId));
           setSelectedQty(selectedProforma.length);
           setShowMoreAction(false);

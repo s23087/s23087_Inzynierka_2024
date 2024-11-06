@@ -5,6 +5,13 @@ import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 import validators from "../validators/validator";
 
+/**
+ * Sends request to create client organization.
+ * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
+ * @param  {FormData} formData Contain form data.
+ * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default async function createClient(state, formData) {
   let nip = formData.get("nip");
   let credit = formData.get("credit");
@@ -59,7 +66,12 @@ export default async function createClient(state, formData) {
     }
 
     if (info.ok) {
-      return await setAvailabilityStatusesToClient(formData, dbName, userId);
+      return await setAvailabilityStatusesToClient(
+        info,
+        formData,
+        dbName,
+        userId,
+      );
     } else {
       return {
         error: true,
@@ -76,7 +88,16 @@ export default async function createClient(state, formData) {
     };
   }
 }
-async function setAvailabilityStatusesToClient(formData, dbName, userId) {
+/**
+ * Sends request to set created client availability status.
+ * @param  {Response} info Response of fetch that created client organization.
+ * @param  {FormData} formData Contain form data.
+ * @param  {string} dbName Database name.
+ * @param  {Number} userId Current user id.
+ * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
+async function setAvailabilityStatusesToClient(info, formData, dbName, userId) {
   let orgId = await info.text();
 
   let statusData = {
@@ -129,6 +150,13 @@ async function setAvailabilityStatusesToClient(formData, dbName, userId) {
   };
 }
 
+/**
+ * Validate form data.
+ * @param  {string} nip Organization nip.
+ * @param  {string} credit String containing credit limit.
+ * @param  {object} orgData Object containing organization data (orgName, street, city, postalCode).
+ * @return {string}      Error message. If no error occurred only "Error:" is returned.
+ */
 function validateData(nip, credit, orgData) {
   let errorMessage = "Error:";
   if (isNipIncorrect(nip)) errorMessage += "\nNip must have only numbers.";
@@ -150,6 +178,11 @@ function validateData(nip, credit, orgData) {
   return errorMessage;
 }
 
+/**
+ * Check if postal code is incorrect.
+ * @param  {string} postalCode Organization postal code.
+ * @return {boolean} If incorrect return true, otherwise false.
+ */
 function isPostalCodeIncorrect(postalCode) {
   return (
     !validators.lengthSmallerThen(postalCode, 200) ||
@@ -157,6 +190,11 @@ function isPostalCodeIncorrect(postalCode) {
   );
 }
 
+/**
+ * Check if city is incorrect.
+ * @param  {string} city Organization city.
+ * @return {boolean} If incorrect return true, otherwise false.
+ */
 function isCityIncorrect(city) {
   return (
     !validators.lengthSmallerThen(city, 200) ||
@@ -164,6 +202,11 @@ function isCityIncorrect(city) {
   );
 }
 
+/**
+ * Check if street is incorrect.
+ * @param  {string} street Organization street.
+ * @return {boolean} If incorrect return true, otherwise false.
+ */
 function isStreetIncorrect(street) {
   return (
     !validators.lengthSmallerThen(street, 200) ||
@@ -171,6 +214,11 @@ function isStreetIncorrect(street) {
   );
 }
 
+/**
+ * Check if organization name is incorrect.
+ * @param  {string} orgName Organization name.
+ * @return {boolean} If incorrect return true, otherwise false.
+ */
 function isOrgNameIncorrect(orgName) {
   return (
     !validators.lengthSmallerThen(orgName, 50) ||
@@ -178,12 +226,22 @@ function isOrgNameIncorrect(orgName) {
   );
 }
 
+/**
+ * Check if credit limit is incorrect.
+ * @param  {string} credit Organization credit limit.
+ * @return {boolean} If incorrect return true, otherwise false.
+ */
 function isCreditIncorrect(credit) {
   return (
     !validators.haveOnlyNumbers(credit) && validators.stringIsNotEmpty(credit)
   );
 }
 
+/**
+ * Check if nip is incorrect.
+ * @param  {string} nip Organization nip.
+ * @return {boolean} If incorrect return true, otherwise false.
+ */
 function isNipIncorrect(nip) {
   return !validators.haveOnlyNumbers(nip) && validators.stringIsNotEmpty(nip);
 }

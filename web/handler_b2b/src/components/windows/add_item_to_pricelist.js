@@ -11,12 +11,23 @@ import {
   Stack,
 } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import SuccesFadeAway from "../smaller_components/succes_fade_away";
+import SuccessFadeAway from "../smaller_components/success_fade_away";
 import ErrorMessage from "../smaller_components/error_message";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 import getItemsForPricelist from "@/utils/pricelist/get_items_for_pricelist";
 import validators from "@/utils/validators/validator";
 
+/**
+ * Modal element that allow to add products owned by chosen user to pricelist.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.modalShow Modal show parameter.
+ * @param {Function} props.onHideFunction Function that will close modal (set modalShow to false).
+ * @param {Function} props.addFunction Function that will activate after clicking add button.
+ * @param {string} props.currency Shortcut of chosen by user currency name.
+ * @param {Array<{ id: number, partnumber: string, qty: number, price: number, purchasePrice: number}>} props.addedProducts Array of already added object.
+ * @return {JSX.Element} Modal element
+ */
 function AddItemToPricelistWindow({
   modalShow,
   onHideFunction,
@@ -24,8 +35,9 @@ function AddItemToPricelistWindow({
   currency,
   addedProducts,
 }) {
-  // Products
+  // Product list
   const [products, setProducts] = useState([]);
+  // Chosen product index
   const [currentProduct, setCurrentProduct] = useState(0);
   useEffect(() => {
     if (modalShow) {
@@ -50,6 +62,10 @@ function AddItemToPricelistWindow({
   }, [modalShow, addedProducts, currency]);
   const [chosenPrice, setChosenPrice] = useState(0);
   const [chosenMargin, setChosenMargin] = useState(0);
+  /**
+   * Calculate product margin based on price input and product purchase price. Return string "Error" if product does not exist or is not a number.
+   * @return {Object} Margin of product with 2 decimal places or string error if occurred.
+  */
   let getMargin = () => {
     if (isNaN(parseFloat(chosenPrice)) || !products[currentProduct]) {
       return "Error";
@@ -65,7 +81,7 @@ function AddItemToPricelistWindow({
   const [downloadError, setDownloadError] = useState(false);
   const [salesPriceError, setSalesPriceError] = useState(false);
   const [marginError, setMarginError] = useState(false);
-  // Misc
+  // Set true if action was a success and set false to hide success information
   const [showSuccess, setShowSuccess] = useState(false);
   return (
     <Modal
@@ -80,7 +96,7 @@ function AddItemToPricelistWindow({
             <Col>
               <h5 className="mb-0 mt-3">Add Product</h5>
             </Col>
-            <SuccesFadeAway
+            <SuccessFadeAway
               showSuccess={showSuccess}
               setShowSuccess={setShowSuccess}
             />
@@ -135,7 +151,7 @@ function AddItemToPricelistWindow({
               defaultValue={chosenPrice}
               isInvalid={salesPriceError}
               onInput={(e) => {
-                InputValidtor.decimalValidator(
+                InputValidator.decimalValidator(
                   e.target.value,
                   setSalesPriceError,
                 );
@@ -165,7 +181,7 @@ function AddItemToPricelistWindow({
               defaultValue={chosenMargin}
               isInvalid={marginError}
               onInput={(e) => {
-                InputValidtor.decimalValidator(e.target.value, setMarginError);
+                InputValidator.decimalValidator(e.target.value, setMarginError);
                 if (!e.target.value) return;
                 if (!isNaN(parseFloat(e.target.value))) {
                   setChosenPrice(
@@ -237,6 +253,9 @@ function AddItemToPricelistWindow({
     </Modal>
   );
 
+  /**
+   * Drop product that are already added
+  */
   function getFilteredData(data) {
     return data.filter(
       (e) =>

@@ -5,6 +5,21 @@ import ContainerButtons from "@/components/smaller_components/container_buttons"
 import user_small_icon from "../../../../public/icons/user_small_icon.png";
 import getDocumentStatusStyle from "@/utils/documents/get_document_status_color";
 
+/**
+ * Create element that represent credit note object
+ * @component
+ * @param {Object} props
+ * @param {{user: string|undefined, creditNoteId: Number, invoiceNumber: string, date: string, qty: Number, total: Number, clientName: string, inSystem: boolean, isPaid: boolean}} props.credit_note Object value
+ * @param {boolean} props.is_org True if org view is enabled
+ * @param {boolean} props.selected True if container should show as selected
+ * @param {boolean} props.is_user_type True if current type is "Yours credit notes"
+ * @param {Function} props.selectAction Action that will activated after clicking select button
+ * @param {Function} props.unselectAction Action that will activated after clicking unselect button
+ * @param {Function} props.deleteAction Action that will activated after clicking delete button
+ * @param {Function} props.viewAction Action that will activated after clicking view button
+ * @param {Function} props.modifyAction Action that will activated after clicking modify button
+ * @return {JSX.Element} Container element
+ */
 function CreditNoteContainer({
   credit_note,
   is_org,
@@ -16,6 +31,7 @@ function CreditNoteContainer({
   viewAction,
   modifyAction,
 }) {
+  // Styles
   const containerBg = {
     backgroundColor: "var(--sec-blue)",
   };

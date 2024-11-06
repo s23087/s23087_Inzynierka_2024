@@ -7,6 +7,13 @@ import { useState } from "react";
 import getLogs from "@/utils/settings/get_logs";
 import ErrorMessage from "@/components/smaller_components/error_message";
 
+/**
+ * Return option list for setting depending on user role.
+ * @component
+ * @param {object} props Component props
+ * @param {string} props.role User role name.
+ * @return {JSX.Element}
+ */
 function SettingMenu({ role }) {
   const [isLoading, setIsLoading] = useState(false);
   const linkStyle = {

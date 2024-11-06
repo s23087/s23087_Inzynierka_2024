@@ -11,6 +11,10 @@ import sales_icon from "../../../public/icons/sales_icon.png";
 import yours_credit_note_icon from "../../../public/icons/yours_credit_note_icon.png";
 import yours_invoice_icon from "../../../public/icons/yours_invoice_icon.png";
 
+/**
+ * Return icon that is appropriate to chosen type. As default it will return invoice icon.
+ * @param {string} type Name of document type
+ */
 function getIcon(type) {
   switch (type) {
     case "Client credit notes":
@@ -27,10 +31,23 @@ function getIcon(type) {
   return <Image src={yours_invoice_icon} alt="Document switch button" />;
 }
 
+/**
+ * Create element that acts as switch. User can change the type of document that he wants to see. That element will use query parameter "docType" to return chosen type of document.
+ * It's also reset all filters and set page to 1. The user role "Solo" will not have access to "Request" option
+ * @component
+ * @param {object} props Component props
+ * @param {string} props.type Name of document type
+ * @param {boolean} props.is_role_solo True if user role equal "Solo"
+ * @return {JSX.Element} Dropdown element
+ */
 function InvoiceSwitch({ type, is_role_solo }) {
   const router = useRouter();
   const pathName = usePathname();
   const params = useSearchParams();
+  /**
+   * Reset filters and set query param to chosen type.
+   * @param {string} type Name of document type
+  */
   const changeDoc = (type) => {
     const newParams = new URLSearchParams(params);
     newParams.delete("orderBy");

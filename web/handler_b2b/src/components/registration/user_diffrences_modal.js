@@ -4,6 +4,14 @@ import Image from "next/image";
 import CloseIcon from "../../../public/icons/close_black.png";
 import MoreIcon from "../../../public/icons/more.png";
 
+/**
+ * Modal element that show information about types of user available.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} modalShow Modal show parameter.
+ * @param {Function} onHideFunction Function that will close modal (set modalShow to false).
+ * @return {JSX.Element} Modal element
+ */
 function UserDiffModal({ modalShow, onHideFunction }) {
   const modalContainerStyle = {
     height: "360px",
@@ -39,28 +47,22 @@ function UserDiffModal({ modalShow, onHideFunction }) {
         >
           <h6 className="mb-1">Individual user:</h6>
           <p>
-            Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
-            dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta
-            ac consectetur ac, vestibulum at eros.
+            Individual user type is for users that work solo. The services allow to control your warehouse the same as organization type, 
+            but it do not have features that allow to communicate between organization employees.
           </p>
 
           <p>
-            Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
-            dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta
-            ac consectetur ac, vestibulum at eros.
+            If you are not sure if individual type is for you, then do not worry. You can quickly switch to Organization type if individual type is not enough for you.
           </p>
 
           <h6 className="mb-1">Org user:</h6>
           <p>
-            Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
-            dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta
-            ac consectetur ac, vestibulum at eros.
+            Organization type is for users that lead business focused on selling products in bulk and need tool for supervising their warehouse and employees. This services
+            offer communication tools between employees and view on state of warehouse and deals of all employees.
           </p>
 
           <p>
-            Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
-            dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta
-            ac consectetur ac, vestibulum at eros.
+            This option allows you for easier management of your employees, improving workflow and documenting actions that happen in system.
           </p>
         </Container>
       </Modal.Body>

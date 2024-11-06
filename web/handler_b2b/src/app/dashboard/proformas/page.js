@@ -7,14 +7,33 @@ import ProformaList from "@/components/object_list/proforma_list";
 import getOrgView from "@/utils/auth/get_org_view";
 import getRole from "@/utils/auth/get_role";
 import getBasicInfo from "@/utils/menu/get_basic_user_info";
-import getNotificationCounter from "@/utils/menu/get_nofication_counter";
+import getNotificationCounter from "@/utils/menu/get_notification_counter";
 import getProformas from "@/utils/proformas/get_proformas";
 import getSearchProformas from "@/utils/proformas/get_search_proformas";
 
+/**
+ * Proforma page
+ * @param {Object} props
+ * @param {Object} props.searchParams Object that gives access to query parameters
+ * @param {string} props.searchParams.page Value that determines on which page user is in
+ * @param {string} props.searchParams.pagination Value that determines page pagination
+ * @param {string} props.searchParams.isOrg Value that determines if org view is enabled
+ * @param {string} props.searchParams.searchQuery Filled with value searched in objects
+ * @param {string} props.searchParams.orderBy Sort value
+ * @param {string} props.searchParams.qtyL Qty lower then filter
+ * @param {string} props.searchParams.qtyG Qty greater then filter
+ * @param {string} props.searchParams.totalL Total lower then filter
+ * @param {string} props.searchParams.totalG Total greater then filter
+ * @param {string} props.searchParams.dateL Date lower then filter
+ * @param {string} props.searchParams.dateG Date greater then filter
+ * @param {string} props.searchParams.recipient Recipient filter
+ * @param {string} props.searchParams.currency Currency filter
+ * @param {string} props.searchParams.proformaType Value that determines which type of proforma will be shown
+ */
 async function ProformasPage({ searchParams }) {
   const current_role = await getRole();
   const userInfo = await getBasicInfo();
-  const current_nofitication_qty = await getNotificationCounter();
+  const current_notification_qty = await getNotificationCounter();
   const is_org_switch_needed = current_role == "Admin";
   let currentSort = searchParams.orderBy ?? ".None";
   let params = {
@@ -42,8 +61,10 @@ async function ProformasPage({ searchParams }) {
     : "Yours proformas";
   let orgActivated =
     searchParams.isOrg !== undefined ? searchParams.isOrg : false;
+  // Check if current role can access the page with org view enabled
   let org_view = getOrgView(current_role, orgActivated === "true");
   let isSearchTrue = searchParams.searchQuery !== undefined;
+  // download
   let proformas = isSearchTrue
     ? await getSearchProformas(
         org_view,
@@ -58,8 +79,9 @@ async function ProformasPage({ searchParams }) {
         currentSort,
         params,
       );
+  // Pagination, default 10
   let proformasLength = proformas ? proformas.length : 0;
-  let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
+  let maxInstanceOnPage = searchParams.pagination ? searchParams.pagination : 10;
   let pageQty = Math.ceil(proformasLength / maxInstanceOnPage);
   pageQty = pageQty === 0 ? 1 : pageQty;
   let currentPage = parseInt(searchParams.page)
@@ -74,7 +96,7 @@ async function ProformasPage({ searchParams }) {
       <ProformaMenu
         type={type}
         current_role={current_role}
-        current_nofitication_qty={current_nofitication_qty}
+        current_notification_qty={current_notification_qty}
         is_org_switch_needed={is_org_switch_needed}
         org_view={org_view}
         user={userInfo}

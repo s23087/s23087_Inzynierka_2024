@@ -4,6 +4,11 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 
+/**
+ * Sends request to delete chosen client. If user do not exist server will logout them.
+ * @param  {Number} orgId Organization id.
+ * @return {Promise<{error: boolean, message: string}>} Return action result with message. If error is true that action was unsuccessful.
+ */
 export default async function deleteClient(orgId) {
   const dbName = await getDbName();
   const userId = await getUserId();

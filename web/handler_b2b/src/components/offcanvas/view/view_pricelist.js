@@ -7,15 +7,27 @@ import { Offcanvas, Container, Row, Col, Button, Stack } from "react-bootstrap";
 import dropdown_big_down from "../../../../public/icons/dropdown_big_down.png";
 import getPricelistItems from "@/utils/pricelist/get_pricelist_items";
 import PricelistTable from "@/components/tables/pricelist_table";
+
+/**
+ * Create offcanvas that allow to view more information about pricelist.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {{pricelistId: Number, status: string, name: string, created: string, modified: string, totalItems: Number, currency: string}} props.pricelist Chosen pricelist to view.
+ * @return {JSX.Element} Offcanvas element
+ */
 function ViewPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
-  const [pricelistItems, setRestInfo] = useState([]);
+  // Items holder 
+  const [pricelistItems, setPricelistItems] = useState([]);
+  // Download data
   useEffect(() => {
     if (showOffcanvas) {
       getPricelistItems(pricelist.pricelistId).then((data) => {
         if (data === null) {
           setErrorDownload(true);
         } else {
-          setRestInfo(data);
+          setPricelistItems(data);
           setErrorDownload(false);
         }
       });
@@ -23,7 +35,7 @@ function ViewPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
   }, [showOffcanvas]);
   // Download bool
   const [errorDownload, setErrorDownload] = useState(false);
-  // style
+  // Style
   const statusColor = {
     color:
       pricelist.status === "Active" ? "var(--main-green)" : "var(--sec-red)",

@@ -5,11 +5,23 @@ import { useState } from "react";
 import { useFormState } from "react-dom";
 import { Modal, Container, Row, Col, Form, Button } from "react-bootstrap";
 import ErrorMessage from "../smaller_components/error_message";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 import createNote from "@/utils/deliveries/create_note";
 
+/**
+ * Modal element that allow to add note to delivery.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.modalShow Modal show parameter.
+ * @param {Function} props.onHideFunction Function that will close modal (set modalShow to false).
+ * @param {Number} props.deliveryId Delivery id.
+ * @param {Function} props.successFun Function that will activate upon clicking success button.
+ * @return {JSX.Element} Modal element
+ */
 function AddNoteWindow({ modalShow, onHideFunction, deliveryId, successFun }) {
+  // Input error
   const [noteError, setNoteError] = useState(false);
+  // Form action
   const [state, formAction] = useFormState(createNote.bind(null, deliveryId), {
     error: false,
     completed: false,
@@ -47,7 +59,7 @@ function AddNoteWindow({ modalShow, onHideFunction, deliveryId, successFun }) {
                 maxLength={500}
                 isInvalid={noteError}
                 onInput={(e) => {
-                  InputValidtor.normalStringValidtor(
+                  InputValidator.normalStringValidator(
                     e.target.value,
                     setNoteError,
                     500,

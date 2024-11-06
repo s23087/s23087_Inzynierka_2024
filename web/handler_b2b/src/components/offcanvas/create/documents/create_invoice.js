@@ -18,15 +18,34 @@ import getCurrencyValuesList from "@/utils/flexible/get_currency_values_list";
 import AddSaleProductWindow from "@/components/windows/add_Sales_product";
 import CreateSalesInvoice from "@/utils/documents/create_sales_invoice";
 import ErrorMessage from "@/components/smaller_components/error_message";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 
+/**
+ * Create offcanvas that allow to create invoice.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {boolean} props.isYourInvoice If type equal to "Yours invoices" then true, otherwise false.
+ * @return {JSX.Element} Offcanvas element
+ */
 function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
   const router = useRouter();
+  // download data holders
+  const [users, setUsers] = useState([]);
+  const [orgs, setOrgs] = useState({
+    restOrgs: [],
+  });
+  const [taxes, setTaxes] = useState([]);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [paymentStatuses, setPaymentStatuses] = useState([]);
+  // download errors
   const [userDownloadError, setUserDownloadError] = useState(false);
   const [orgDownloadError, setOrgDownloadError] = useState(false);
   const [taxesDownloadError, setTaxesDownloadError] = useState(false);
   const [methodsDownloadError, setMethodsDownloadError] = useState(false);
   const [statusesDownloadError, setStatusesDownloadError] = useState(false);
+  // download data
   useEffect(() => {
     if (showOffcanvas) {
       getUsers().then((data) => {
@@ -35,7 +54,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
         } else {
           setUserDownloadError(false);
           setUsers(data);
-          setChoosenUser(data[0].idUser);
+          setChosenUser(data[0].idUser);
         }
       });
 
@@ -76,46 +95,45 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
       });
     }
   }, [showOffcanvas]);
-  // options
-  const [users, setUsers] = useState([]);
-  const [orgs, setOrgs] = useState({
-    restOrgs: [],
-  });
-  const [taxes, setTaxes] = useState([]);
-  const [paymentMethods, setPaymentMethods] = useState([]);
-  const [paymentStatuses, setPaymentStatuses] = useState([]);
-  // products
+  // useState for showing add product window
   const [showProductWindow, setShowProductWindow] = useState(false);
+  // useState for showing add sale product window
   const [showSalesProductWindow, setShowSalesProductWindow] = useState(false);
+  // product holder
   const [products, setProducts] = useState([]);
+  // key variable for rerender component holding product
   const [resetSeed, setResetSeed] = useState(false);
-  // File
+  // File holder
   const [file, setFile] = useState();
-  // Chossen user
-  const [choosenUser, setChoosenUser] = useState();
-  // Curenncy exchange value
+  // chosen user id holder
+  const [chosenUser, setChosenUser] = useState();
+  //useState for showing currency exchange input
   const [showCurrencyExchange, setShowCurrencyExchange] = useState(false);
-  const [choosenCurrency, setChoosenCurrency] = useState("PLN");
+  // currency chosen by user holder
+  const [chosenCurrency, setChosenCurrency] = useState("PLN");
+  // invoice date chosen by user holder
   const [invoiceDate, setInvoiceDate] = useState(
     new Date().toLocaleDateString("en-CA"),
   );
+  // currency download data holder
   const [currencyList, setCurrencyList] = useState({
     error: false,
     message: "",
     rates: [],
   });
+  // download currency data
   useEffect(() => {
     if (showCurrencyExchange) {
       if (Date.parse(invoiceDate) > Date.now()) {
         setCurrencyList({
           error: true,
-          message: "There is no exisitng value for this invoice date.",
+          message: "There is no existing value for this invoice date.",
           rates: [],
         });
         return;
       }
       getCurrencyValuesList(
-        choosenCurrency,
+        chosenCurrency,
         invoiceDate,
         new Date().toLocaleDateString("en-CA"),
       ).then((data) => {
@@ -125,12 +143,15 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
         });
       });
     }
-  }, [showCurrencyExchange, invoiceDate, choosenCurrency]);
-  // Errors
+  }, [showCurrencyExchange, invoiceDate, chosenCurrency]);
+  // Form errors
   const [invoiceError, setInvoiceError] = useState(false);
   const [transportError, setTransportError] = useState(false);
   const [documentError, setDocumentError] = useState(false);
   const [dateError, setDateError] = useState(false);
+  /**
+   * Check if form can be submitted
+  */
   const isFormErrorActive = () =>
     invoiceError ||
     transportError ||
@@ -144,9 +165,9 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
     taxesDownloadError ||
     methodsDownloadError ||
     statusesDownloadError;
-  // Misc
+  // True if create action is running
   const [isLoading, setIsLoading] = useState(false);
-  // Form
+  // Form action
   const [state, formPurchaseAction] = useFormState(
     isYourInvoice
       ? CreatePurchaseInvoice.bind(null, products)
@@ -241,7 +262,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                   name="user"
                   disabled={products.length > 0}
                   onChange={(e) => {
-                    setChoosenUser(e.target.value);
+                    setChosenUser(e.target.value);
                   }}
                 >
                   {Object.values(users).map((value) => {
@@ -258,7 +279,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                   Invoice Number:
                 </Form.Label>
                 <ErrorMessage
-                  message="Is empty, not a number or lenght is greater than 40."
+                  message="Is empty, not a number or length is greater than 40."
                   messageStatus={invoiceError}
                 />
                 <Form.Control
@@ -268,7 +289,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                   placeholder="invoice"
                   isInvalid={invoiceError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setInvoiceError,
                       40,
@@ -287,7 +308,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                   }
                 >
                   <p className="mb-0 text-start mb-1 warning-text small-text">
-                    Warning! The choosen day is not a week day, therfore
+                    Warning! The chosen day is not a week day, therefore
                     currency values will be taken from last friday.
                   </p>
                 </Row>
@@ -394,7 +415,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                         onChange={(e) => {
                           if (e.target.value != "PLN") {
                             setShowCurrencyExchange(true);
-                            setChoosenCurrency(e.target.value);
+                            setChosenCurrency(e.target.value);
                           } else {
                             setShowCurrencyExchange(false);
                           }
@@ -450,7 +471,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                   placeholder="transport cost"
                   isInvalid={transportError}
                   onInput={(e) => {
-                    InputValidtor.decimalValidator(
+                    InputValidator.decimalValidator(
                       e.target.value,
                       setTransportError,
                     );
@@ -653,8 +674,8 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
           addFunction={(val) => {
             products.push(val);
           }}
-          userId={choosenUser}
-          currency={choosenCurrency}
+          userId={chosenUser}
+          currency={chosenCurrency}
           addedProductsQty={products.length}
         />
         <Toastes.ErrorToast
@@ -679,6 +700,9 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
     </Offcanvas>
   );
 
+  /**
+   * Reset form state
+  */
   function resetState() {
     state.error = false;
     state.completed = false;

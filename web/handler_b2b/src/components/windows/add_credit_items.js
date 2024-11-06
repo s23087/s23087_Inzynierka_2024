@@ -12,11 +12,23 @@ import {
 } from "react-bootstrap";
 import validators from "@/utils/validators/validator";
 import { useEffect, useState } from "react";
-import SuccesFadeAway from "../smaller_components/succes_fade_away";
+import SuccessFadeAway from "../smaller_components/success_fade_away";
 import ErrorMessage from "../smaller_components/error_message";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 import getInvoiceItemForCredit from "@/utils/documents/get_invoice_item_for_credit";
 
+/**
+ * Modal element that allow to add products to credit note.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.modalShow Modal show parameter.
+ * @param {Function} props.onHideFunction Function that will close modal (set modalShow to false).
+ * @param {Function} props.addFunction Function that will activate after clicking add button.
+ * @param {Array<{id: number, partnumber: string, name: string, qty: number, price: number, priceId: number, invoiceId: number, purchasePrice: number}>} props.addedProducts Array of already added object.
+ * @param {Number} props.invoiceId Invoice id.
+ * @param {boolean} props.isYourCredit If credit note type is "yours credit notes" then true, otherwise false.
+ * @return {JSX.Element} Modal element
+ */
 function AddCreditProductWindow({
   modalShow,
   onHideFunction,
@@ -25,9 +37,11 @@ function AddCreditProductWindow({
   invoiceId,
   isYourCredit,
 }) {
-  // Products
+  // Product list
   const [products, setProducts] = useState([]);
+  // Chosen product index
   const [currentProduct, setCurrentProduct] = useState(0);
+  // True if download error occurred
   const [downloadError, setDownloadError] = useState([]);
   useEffect(() => {
     if (modalShow && addedProducts.length === 0) {
@@ -55,7 +69,7 @@ function AddCreditProductWindow({
   // Errors
   const [priceError, setPriceError] = useState(false);
   const [qtyError, setQtyError] = useState(false);
-  // Misc
+  // True if you want to show success information to user
   const [showSuccess, setShowSuccess] = useState(false);
   return (
     <Modal
@@ -70,7 +84,7 @@ function AddCreditProductWindow({
             <Col>
               <h5 className="mb-0 mt-3">Add Product</h5>
             </Col>
-            <SuccesFadeAway
+            <SuccessFadeAway
               showSuccess={showSuccess}
               setShowSuccess={setShowSuccess}
             />
@@ -104,7 +118,7 @@ function AddCreditProductWindow({
           <Form.Group className="mb-2">
             <Form.Label className="blue-main-text">Qty:</Form.Label>
             <ErrorMessage
-              message={`Must be bettwen -${products[currentProduct] ? products[currentProduct].qty : 0} and ${products[currentProduct] ? products[currentProduct].qty : 0}. Can not be 0.`}
+              message={`Must be between -${products[currentProduct] ? products[currentProduct].qty : 0} and ${products[currentProduct] ? products[currentProduct].qty : 0}. Can not be 0.`}
               messageStatus={qtyError}
             />
             <Form.Control
@@ -150,7 +164,7 @@ function AddCreditProductWindow({
               }
               isInvalid={priceError}
               onInput={(e) => {
-                InputValidtor.decimalValidator(e.target.value, setPriceError);
+                InputValidator.decimalValidator(e.target.value, setPriceError);
               }}
             />
           </Form.Group>
@@ -231,13 +245,16 @@ function AddCreditProductWindow({
     </Modal>
   );
 
+  /**
+   * Reduce qty of item that already exist in added items. For example if user added 3 of 5 product A, then in will reduce to 2 free items in array.
+  */
   function filterQtyOfAddedProducts(data) {
     data.forEach((element) => {
-      let qtyToSunstract = addedProducts
+      let qtyToSubtract = addedProducts
         .filter((e) => e.id === element.itemId)
         .reduce((sum, item) => sum + Math.abs(item.qty), 0);
-      if (qtyToSunstract !== 0) {
-        element.qty -= qtyToSunstract;
+      if (qtyToSubtract !== 0) {
+        element.qty -= qtyToSubtract;
       }
     });
   }

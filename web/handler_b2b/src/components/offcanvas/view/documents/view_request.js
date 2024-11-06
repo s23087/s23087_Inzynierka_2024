@@ -12,10 +12,23 @@ import getRestRequest from "@/utils/documents/get_rest_request";
 import setRequestStatus from "@/utils/documents/set_request_status";
 import { useRouter } from "next/navigation";
 import ErrorMessage from "@/components/smaller_components/error_message";
+
+/**
+ * Create offcanvas that allow to view more information about request.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {{id: Number, status: string, title: string, creationDate: string, username: string, objectType: string}} props.request Chosen request to view.
+ * @param {boolean} props.isOrg True if org view is activated.
+ * @return {JSX.Element} Offcanvas element
+ */
 function ViewRequestOffcanvas({ showOffcanvas, hideFunction, request, isOrg }) {
   const router = useRouter();
+  // Download holders
   const [note, setNote] = useState("");
   const [requestPath, setRequestPath] = useState("");
+  // Download data
   useEffect(() => {
     if (showOffcanvas) {
       getRestRequest(request.id).then((data) => {
@@ -28,11 +41,12 @@ function ViewRequestOffcanvas({ showOffcanvas, hideFunction, request, isOrg }) {
       });
     }
   }, [showOffcanvas]);
-  // Download bool
-  const [isDownloading, setIsDowlonding] = useState(false);
-  // Status change
+  // True if file (not data) is downloaded 
+  const [isDownloading, setIsDownloading] = useState(false);
+  // True if status change is running, otherwise false
   const [isLoadingCompleted, setIsLoadingCompleted] = useState(false);
   const [isLoadingRejected, setIsLoadingRejected] = useState(false);
+  // True if status change action throw error
   const [statusError, setStatusError] = useState(false);
   // Styles
   const statusColorMap = {
@@ -72,7 +86,7 @@ function ViewRequestOffcanvas({ showOffcanvas, hideFunction, request, isOrg }) {
                 className="p-0"
                 disabled={isDownloading || !requestPath}
                 onClick={async () => {
-                  setIsDowlonding(true);
+                  setIsDownloading(true);
                   let file = await getFileFormServer(requestPath);
                   if (file) {
                     let parsed = JSON.parse(file);
@@ -87,7 +101,7 @@ function ViewRequestOffcanvas({ showOffcanvas, hideFunction, request, isOrg }) {
                     );
                     downloadObject.click();
                   }
-                  setIsDowlonding(false);
+                  setIsDownloading(false);
                 }}
               >
                 <Image
@@ -118,7 +132,7 @@ function ViewRequestOffcanvas({ showOffcanvas, hideFunction, request, isOrg }) {
               <Stack className="pt-3" gap={3}>
                 <Container className="px-1 ms-0">
                   <ErrorMessage
-                    message="Note has excceed the max length."
+                    message="Note has exceed the max length."
                     messageStatus={statusError}
                   />
                   <Row>

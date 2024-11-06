@@ -9,14 +9,25 @@ import logout from "@/utils/auth/logout";
 import NotificationBadge from "../smaller_components/notification_icon";
 import user_settings_icon from "../../../public/icons/user_settings_icon.png";
 
+/**
+ * Create button with user icon that after clicking will open window with settings and notification link.
+ * @component
+ * @param {object} props
+ * @param {string} props.user_name Current user full username (name + surname)
+ * @param {Number} props.notification_qty Number of unread notification
+ * @param {string} [props.active_link="none"] Name of link if user is already in it. None if user is not on settings or notification page.
+ * @return {JSX.Element} Container element
+ */
 function UserSettingWindow({
   user_name,
   notification_qty,
   active_link = "none",
 }) {
+  // useState for showing window element
   const [showWindow, setShowWindow] = useState(false);
   const openWindow = () => setShowWindow(true);
   const closeWindow = () => setShowWindow(false);
+  // styles
   const windowStyle = {
     width: "260px",
     height: "220px",

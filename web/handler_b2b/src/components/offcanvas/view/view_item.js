@@ -21,6 +21,18 @@ import view_outside_icon from "../../../../public/icons/view_outside_icon.png";
 import view_warehouse_icon from "../../../../public/icons/view_warehouse_icon.png";
 import getItemOwners from "@/utils/warehouse/get_item_owners";
 import ErrorMessage from "@/components/smaller_components/error_message";
+
+/**
+ * Create offcanvas that allow to view more information about item.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {{itemId: Number, statusName: string, partNumber: string, itemName: string, eans: Array<string>, users: Array<string>}} props.item Chosen item to view.
+ * @param {string} props.currency Current currency chosen by user.
+ * @param {boolean} props.isOrg True if org view is activated.
+ * @return {JSX.Element} Offcanvas element
+ */
 function ViewItemOffcanvas({
   showOffcanvas,
   hideFunction,
@@ -28,16 +40,20 @@ function ViewItemOffcanvas({
   currency,
   isOrg,
 }) {
+  // Download data holders
   const [users, setUsers] = useState([]);
-  const [choosenUser, setChoosenUser] = useState();
-  const [isOurWarehouseView, setIsOurWarehouseView] = useState(true);
+  const [chosenUser, setChosenUser] = useState();
   const [restInfo, setRestInfo] = useState({
     outsideItemInfos: [],
     ownedItemInfos: [],
   });
   const [description, setDescription] = useState("Is loading");
+  // Download errors
   const [ownerDownloadError, setOwnerDownloadError] = useState(false);
   const [restDownloadError, setRestDownloadError] = useState(false);
+  // View switch
+  const [isOurWarehouseView, setIsOurWarehouseView] = useState(true);
+  // Data download
   useEffect(() => {
     if (showOffcanvas) {
       getRestInfo(currency, item.itemId, isOrg).then((data) => {
@@ -56,20 +72,21 @@ function ViewItemOffcanvas({
         }
       });
     }
-    if (isOrg) {
+    if (isOrg && item.users.length > 0) {
       getItemOwners(item.itemId).then((data) => {
         if (data !== null) {
           setOwnerDownloadError(false);
           setUsers(data);
           if (data[0]) {
-            setChoosenUser(data[0].idUser);
+            setChosenUser(data[0].idUser);
           }
         } else {
           setOwnerDownloadError(true);
         }
       });
     }
-  }, [showOffcanvas, currency, item.itemId, isOrg]);
+  }, [showOffcanvas, currency, item.itemId, item.users, isOrg]);
+  // Styles
   const statusColorStyle = {
     color:
       getStatusColor(item.statusName) === "var(--main-yellow)"
@@ -77,6 +94,9 @@ function ViewItemOffcanvas({
         : getStatusColor(item.statusName),
     marginBottom: ".25rem",
   };
+  /**
+   * Check if switch for view should be shown.
+  */
   const isRestInfoEmpty = () =>
     restInfo.outsideItemInfos.length === 0 &&
     restInfo.ownedItemInfos.length === 0;
@@ -142,7 +162,7 @@ function ViewItemOffcanvas({
                     <Form.Select
                       className="input-style shadow-sm"
                       onChange={(e) => {
-                        setChoosenUser(e.target.value);
+                        setChosenUser(e.target.value);
                       }}
                     >
                       {Object.values(users).map((value) => {
@@ -188,7 +208,7 @@ function ViewItemOffcanvas({
             <Col xs="12" md="6" lg="4" className="px-0 offset-lg-2">
               <Container
                 className="pt-5 pt-md-3 text-center overflow-x-scroll"
-                key={choosenUser}
+                key={chosenUser}
                 fluid
               >
                 <ErrorMessage
@@ -199,15 +219,15 @@ function ViewItemOffcanvas({
                   <ItemTable
                     restInfo={{
                       outsideItemInfos:
-                        isOrg && choosenUser
+                        isOrg && chosenUser
                           ? restInfo.outsideItemInfos.filter(
-                              (e) => e.userId == choosenUser,
+                              (e) => Object.values(e.users).findIndex(e.key === chosenUser) !== -1,
                             )
                           : restInfo.outsideItemInfos,
                       ownedItemInfos:
-                        isOrg && choosenUser
+                        isOrg && chosenUser
                           ? restInfo.ownedItemInfos.filter(
-                              (e) => e.userId == choosenUser,
+                              (e) => e.userId === chosenUser,
                             )
                           : restInfo.ownedItemInfos,
                     }}

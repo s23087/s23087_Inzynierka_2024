@@ -8,20 +8,34 @@ import small_logo from "../../../public/small_logo.png";
 import sidebar_button from "../../../public/icons/sidebar_icon.png";
 import { usePathname, useSearchParams } from "next/navigation";
 
+/**
+ * Create Temple for menu.
+ * @component
+ * @param {Object} props
+ * @param {Object} props.children Elements tha will be placed between logo and user icon
+ * @param {Function} props.sidebar_action Function that will be triggered after clicking open side bar menu button
+ * @param {string} props.user_name Full username (name + surname)
+ * @param {string} [props.user_window_active_link="none"] Name of current chosen link (ex. if user is in roles page then roles will be active link)
+ * @param {Number} props.current_notification_qty Number of unread notification
+ * @return {JSX.Element} Stack element
+ */
 function MenuTemplate({
   children,
   sidebar_action,
   user_name,
   user_window_active_link = "none",
-  current_nofitication_qty,
+  current_notification_qty,
 }) {
   const params = useSearchParams();
   const pathName = usePathname();
-  const accessaibleParams = new URLSearchParams(params);
-  const pagation = accessaibleParams.get("pagation")
-    ? accessaibleParams.get("pagation")
+  const accessibleParams = new URLSearchParams(params);
+  // Current pagination
+  const pagination = accessibleParams.get("pagination")
+    ? accessibleParams.get("pagination")
     : "";
-  const finalParam = pagation != "" ? `?pagation=${pagation}` : "";
+  // Pagination param for icon return to home link
+  const finalParam = pagination != "" ? `?pagination=${pagination}` : "";
+  // Styles
   const menuSize = {
     height: "81px",
   };
@@ -42,12 +56,12 @@ function MenuTemplate({
           onClick={sidebar_action}
         >
           <Image src={sidebar_button} alt="logo" />
-          <NotificationBadge qty={current_nofitication_qty} />
+          <NotificationBadge qty={current_notification_qty} />
         </Button>
         <Container className="pe-0 position-relative py-0 d-none d-xl-block">
           <UserSettingWindow
             user_name={user_name}
-            notification_qty={current_nofitication_qty}
+            notification_qty={current_notification_qty}
             active_link={user_window_active_link}
           />
         </Container>
@@ -61,7 +75,7 @@ MenuTemplate.propTypes = {
   sidebar_action: PropTypes.func.isRequired,
   user_name: PropTypes.string.isRequired,
   user_window_active_link: PropTypes.string,
-  current_nofitication_qty: PropTypes.number.isRequired,
+  current_notification_qty: PropTypes.number.isRequired,
 };
 
 export default MenuTemplate;

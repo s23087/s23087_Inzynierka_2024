@@ -8,22 +8,39 @@ import { useRouter } from "next/navigation";
 import CloseIcon from "../../../../../public/icons/close_black.png";
 import ProductHolder from "@/components/smaller_components/product_holder";
 import ErrorMessage from "@/components/smaller_components/error_message";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 import getListOfPurchaseInvoice from "@/utils/documents/get_list_purchase_invoice";
 import getListOfSalesInvoice from "@/utils/documents/get_list_sales_invoice";
 import AddCreditProductWindow from "@/components/windows/add_credit_items";
 import CreateCreditNote from "@/utils/documents/create_credit_note";
 import getUsers from "@/utils/flexible/get_users";
 
+/**
+ * Create offcanvas that allow to create credit note.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {boolean} props.isYourCreditNote If type equal to "Yours credit notes" then true, otherwise false.
+ * @return {JSX.Element} Offcanvas element
+ */
 function AddCreditNoteOffcanvas({
   showOffcanvas,
   hideFunction,
   isYourCreditNote,
 }) {
   const router = useRouter();
+  // download data holders
+  const [users, setUsers] = useState([]);
+  const [invoiceList, setInvoiceList] = useState([]);
+  const [chosenInvoice, setChosenInvoice] = useState();
+  const [chosenClient, setChosenClient] = useState();
+  const [userOrg, setUserOrg] = useState();
+  // download error
   const [userDownloadError, setUserDownloadError] = useState(false);
   const [invoiceListDownloadError, setInvoiceListDownloadError] =
     useState(false);
+  // download data
   useEffect(() => {
     if (showOffcanvas) {
       getUsers().then((data) => {
@@ -44,46 +61,45 @@ function AddCreditNoteOffcanvas({
         }
         setInvoiceListDownloadError(false);
         setInvoiceList(data);
-        setChoosenInvoice(data[0].invoiceId ? data[0].invoiceId : null);
-        setChoosenClient(data[0].clientName ?? "Is loading");
+        setChosenInvoice(data[0].invoiceId ? data[0].invoiceId : null);
+        setChosenClient(data[0].clientName ?? "Is loading");
         setUserOrg(data[0].orgName ?? "Is loading");
       });
     }
   }, [showOffcanvas, isYourCreditNote]);
-  // options
-  const [users, setUsers] = useState([]);
-  const [invoiceList, setInvoiceList] = useState([]);
-  const [choosenInvoice, setChoosenInvoice] = useState();
-  const [choosenClient, setChoosenClient] = useState();
-  const [userOrg, setUserOrg] = useState();
-  // products
+  // useState for showing ad product window
   const [showProductWindow, setShowProductWindow] = useState(false);
+  // product holder
   const [products, setProducts] = useState([]);
+  // key variable for rerendering component with products
   const [resetSeed, setResetSeed] = useState(false);
-  // File
+  // File holder
   const [file, setFile] = useState();
-  // Errors
+  // Form errors
   const [creditNumberError, setCreditNumberError] = useState(false);
   const [documentError, setDocumentError] = useState(false);
   const [dateError, setDateError] = useState(false);
+  /**
+   * Check if form can be submitted
+  */
   const isFormErrorActive = () =>
     creditNumberError ||
     documentError ||
     dateError ||
-    choosenClient === "Is loading" ||
+    chosenClient === "Is loading" ||
     userOrg === "Is loading" ||
     products.length === 0 ||
     userDownloadError ||
     invoiceListDownloadError;
-  // Misc
+  // True if create action is running
   const [isLoading, setIsLoading] = useState(false);
-  // Form
+  // Form action
   const [state, formPurchaseAction] = useFormState(
     CreateCreditNote.bind(null, {
       userOrg: userOrg,
-      choosenClient: choosenClient,
+      chosenClient: chosenClient,
       isYourCreditNote: isYourCreditNote,
-      invoiceId: choosenInvoice,
+      invoiceId: chosenInvoice,
     })
       .bind(null, products)
       .bind(null, file),
@@ -146,7 +162,7 @@ function AddCreditNoteOffcanvas({
           <Container className="p-0" style={vhStyle} fluid>
             <Form
               className="mx-1 mx-xl-3"
-              id="creditnoteForm"
+              id="creditNoteForm"
               action={formPurchaseAction}
             >
               <ErrorMessage
@@ -180,12 +196,12 @@ function AddCreditNoteOffcanvas({
                   disabled={products.length > 0}
                   onChange={(e) => {
                     let targetVal = parseInt(e.target.value);
-                    setChoosenInvoice(targetVal);
+                    setChosenInvoice(targetVal);
                     let invIndex = invoiceList.findIndex(
                       (e) => e.invoiceId === targetVal,
                     );
                     if (invIndex !== -1) {
-                      setChoosenClient(invoiceList[invIndex].clientName);
+                      setChosenClient(invoiceList[invIndex].clientName);
                     }
                   }}
                 >
@@ -203,7 +219,7 @@ function AddCreditNoteOffcanvas({
                   Credit note number:
                 </Form.Label>
                 <ErrorMessage
-                  message="Is empty, not a number or lenght is greater than 40."
+                  message="Is empty, not a number or length is greater than 40."
                   messageStatus={creditNumberError}
                 />
                 <Form.Control
@@ -213,7 +229,7 @@ function AddCreditNoteOffcanvas({
                   placeholder="credit note number"
                   isInvalid={creditNumberError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setCreditNumberError,
                       40,
@@ -225,7 +241,7 @@ function AddCreditNoteOffcanvas({
               <Form.Group className="mb-4">
                 <Form.Label className="blue-main-text">Date:</Form.Label>
                 <ErrorMessage
-                  message="Date excceed today's date."
+                  message="Date exceed today's date."
                   messageStatus={dateError}
                 />
                 <Form.Control
@@ -266,8 +282,8 @@ function AddCreditNoteOffcanvas({
                   className="input-style shadow-sm maxInputWidth"
                   type="text"
                   name="clientName"
-                  key={choosenClient}
-                  defaultValue={choosenClient ?? "Is loading"}
+                  key={chosenClient}
+                  defaultValue={chosenClient ?? "Is loading"}
                   readOnly
                   disabled
                 />
@@ -297,7 +313,7 @@ function AddCreditNoteOffcanvas({
                   style={maxHeightScrollContainer}
                   key={resetSeed}
                 >
-                  {products.map((value) => {
+                  {products.map((value, key) => {
                     return (
                       <ProductHolder
                         key={value}
@@ -314,7 +330,7 @@ function AddCreditNoteOffcanvas({
                   variant="mainBlue"
                   className="mb-3 mt-4 ms-3 py-3"
                   style={buttonStyle}
-                  disabled={!choosenInvoice}
+                  disabled={!chosenInvoice}
                   onClick={() => {
                     setShowProductWindow(true);
                   }}
@@ -379,7 +395,7 @@ function AddCreditNoteOffcanvas({
                         e.preventDefault();
                         setIsLoading(true);
 
-                        let form = document.getElementById("creditnoteForm");
+                        let form = document.getElementById("creditNoteForm");
                         form.requestSubmit();
                       }}
                     >
@@ -417,7 +433,7 @@ function AddCreditNoteOffcanvas({
             products.push(val);
           }}
           addedProducts={products}
-          invoiceId={choosenInvoice}
+          invoiceId={chosenInvoice}
           isYourCredit={isYourCreditNote}
         />
         <Toastes.ErrorToast
@@ -432,7 +448,7 @@ function AddCreditNoteOffcanvas({
           message={state.message}
           onHideFun={() => {
             resetState();
-            document.getElementById("creditnoteForm").reset();
+            document.getElementById("creditNoteForm").reset();
             setProducts([]);
             hideFunction();
             router.refresh();
@@ -442,6 +458,9 @@ function AddCreditNoteOffcanvas({
     </Offcanvas>
   );
 
+  /**
+   * Reset form state
+  */
   function resetState() {
     state.error = false;
     state.completed = false;

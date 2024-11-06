@@ -49,7 +49,7 @@ namespace database_communicator.Controllers
             var exist = await _userServices.UserExist(data.UserId);
             if (!exist) return NotFound("User not found.");
             var roleId = await _rolesServices.GetRoleId(data.RoleName);
-            var orgUserId = await _userServices.GetOrgUserId(data.ChoosenUserId);
+            var orgUserId = await _userServices.GetOrgUserId(data.ChosenUserId);
             if (orgUserId == null)
             {
                 return NotFound("Chosen user not found.");

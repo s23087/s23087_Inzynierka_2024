@@ -8,12 +8,12 @@ import MoreActionWindow from "../windows/more_action";
 import { useSearchParams, useRouter } from "next/navigation";
 import DeleteObjectWindow from "../windows/delete_object";
 import InvoiceContainer from "../object_container/documents/yours_invoice_container";
-import CreditNoteContainer from "../object_container/documents/credit_note_contianter";
+import CreditNoteContainer from "../object_container/documents/credit_note_container";
 import RequestContainer from "../object_container/documents/request_container";
 import AddInvoiceOffcanvas from "../offcanvas/create/documents/create_invoice";
 import deleteInvoice from "@/utils/documents/delete_invoice";
-import SelectComponent from "../smaller_components/select_compontent";
-import getPagationInfo from "@/utils/flexible/get_page_info";
+import SelectComponent from "../smaller_components/select_component";
+import getPaginationInfo from "@/utils/flexible/get_page_info";
 import ViewInvoiceOffcanvas from "../offcanvas/view/documents/view_invoice";
 import ModifyInvoiceOffcanvas from "../offcanvas/modify/documents/modify_invoice";
 import AddCreditNoteOffcanvas from "../offcanvas/create/documents/create_credit_note";
@@ -31,6 +31,13 @@ import InvoiceFilterOffcanvas from "../filter/document_filter";
 import DeleteSelectedWindow from "../windows/delete_selected";
 import ChangeSelectedStatusWindow from "../windows/change_request_status";
 
+/**
+ * Checks if value is selected
+ * @param {string} type Name of current chosen type
+ * @param {Object} document Document object 
+ * @param {Array<Object>} selected Array containing selected ids
+ * @returns {boolean} True if value exist in given selected array, otherwise false.
+ */
 function getIfSelected(type, document, selected) {
   if (type.includes("note")) {
     return selected.indexOf(document.creditNoteId) !== -1;
@@ -41,6 +48,20 @@ function getIfSelected(type, document, selected) {
   return selected.indexOf(document.invoiceId) !== -1;
 }
 
+/**
+ * Return component that showcase objects of chosen type, search bar, filter, more action element and selected element.
+ * @component
+ * @param {object} props Component props
+ * @param {Array<Object>} props.invoices Array containing objects of current type.
+ * @param {string} props.type Name of chosen type of document.
+ * @param {boolean} props.orgView True if org view is enabled.
+ * @param {Number} props.invoiceStart Starting index of documents subarray.
+ * @param {Number} props.invoiceEnd Ending index of documents subarray.
+ * @param {string} props.role Role of current user.
+ * @param {boolean} props.filterActive If filter is activated then true, otherwise false.
+ * @param {string} props.currentSort Current value of "sort" query parameter
+ * @return {JSX.Element} Container element
+ */
 function InvoiceList({
   invoices,
   type,
@@ -51,17 +72,20 @@ function InvoiceList({
   filterActive,
   currentSort,
 }) {
+  // Nav
+  const router = useRouter();
+  const params = useSearchParams();
   // View invoice
-  const [showViewInvoice, setShowViewInvoice] = useState(false);
+  const [showViewInvoice, setShowViewInvoice] = useState(false); // useState for showing view invoice offcanvas
   const [invoiceToView, setInvoiceToView] = useState({
     invoiceDate: "",
     dueDate: "",
     clientName: "",
     inSystem: false,
     paymentStatus: "",
-  });
+  }); // holder of invoice chosen to view
   // View credit note
-  const [showViewCredit, setShowViewCredit] = useState(false);
+  const [showViewCredit, setShowViewCredit] = useState(false); // useState for showing view credit note offcanvas
   const [creditToView, setCreditToView] = useState({
     user: "",
     creditNoteId: 0,
@@ -72,76 +96,74 @@ function InvoiceList({
     clientName: 0,
     inSystem: false,
     isPaid: false,
-  });
+  }); // holder of credit note chosen to view
   // View request
-  const [showViewRequest, setShowViewRequest] = useState(false);
+  const [showViewRequest, setShowViewRequest] = useState(false); // useState for showing view request offcanvas
   const [requestToView, setRequestToView] = useState({
     id: 0,
     username: "",
     status: "",
     objectType: "",
     creationDate: "",
-  });
+  }); // holder of request chosen to view
   // Modify invoice
-  const [showModifyInvoice, setShowModifyInvoice] = useState(false);
+  const [showModifyInvoice, setShowModifyInvoice] = useState(false); // useState for showing modify invoice offcanvas
   const [invoiceToModify, setInvoiceToModify] = useState({
     invoiceNumber: "",
-  });
+  }); // holder of invoice chosen to modify
   // Modify credit note
-  const [showModifyCreditNote, setShowModifyCreditNote] = useState(false);
+  const [showModifyCreditNote, setShowModifyCreditNote] = useState(false); // useState for showing modify credit note offcanvas
   const [creditNoteToModify, setCreditNoteToModify] = useState({
     invoiceNumber: "",
     date: "",
     clientName: "",
     inSystem: "",
     title: "",
-  });
+  }); // holder of credit note chosen to modify
   // Modify request
-  const [showModifyRequest, setShowModifyRequest] = useState(false);
+  const [showModifyRequest, setShowModifyRequest] = useState(false); // useState for showing modify request offcanvas
   const [requestToModify, setRequestToModify] = useState({
     id: 0,
     objectType: "",
-  });
+  }); // holder of request chosen to modify
   // Delete credit note
-  const [showDeleteCreditNote, setShowDeleteCreditNote] = useState(false);
-  const [creditNoteToDelete, setCreditNoteToDelete] = useState(null);
+  const [showDeleteCreditNote, setShowDeleteCreditNote] = useState(false); // useState for showing delete credit note window
+  const [creditNoteToDelete, setCreditNoteToDelete] = useState(null); // holder of credit note chosen to delete
   // Delete credit note
-  const [showDeleteRequest, setShowDeleteRequest] = useState(false);
-  const [requestToDelete, setRequestToDelete] = useState(null);
+  const [showDeleteRequest, setShowDeleteRequest] = useState(false); // useState for showing delete request window
+  const [requestToDelete, setRequestToDelete] = useState(null); // holder of request chosen to delete
   // Delete invoice
-  const [showDeleteInvoice, setShowDeleteInvoice] = useState(false);
-  const [invoiceToDelete, setInvoiceToDelete] = useState(null);
+  const [showDeleteInvoice, setShowDeleteInvoice] = useState(false); // useState for showing delete invoice window
+  const [invoiceToDelete, setInvoiceToDelete] = useState(null); // holder of invoice chosen to delete
   // Delete error
-  const [isErrorDelete, setIsErrorDelete] = useState(false);
+  const [isErrorDelete, setIsErrorDelete] = useState(false); // true if delete action failed
   const [errorMessage, setErrorMessage] = useState("");
   // More action
-  const [showMoreAction, setShowMoreAction] = useState(false);
-  const [isShowAddInvoice, setShowAddInvoice] = useState(false);
-  const [isShowAddCreditNote, setShowAddCreditNote] = useState(false);
-  const [isShowAddRequest, setShowAddRequest] = useState(false);
+  const [showMoreAction, setShowMoreAction] = useState(false); // useState for showing more action window
+  const [isShowAddInvoice, setShowAddInvoice] = useState(false); // useState for showing create invoice offcanvas
+  const [isShowAddCreditNote, setShowAddCreditNote] = useState(false); // useState for showing create credit note offcanvas
+  const [isShowAddRequest, setShowAddRequest] = useState(false); // useState for showing create request offcanvas
   // Change request status
-  const [showCompleteWindow, setShowCompleteWindow] = useState(false);
-  const [requestToComplete, setRequestToComplete] = useState();
-  const [showRejectWindow, setShowRejectWindow] = useState(false);
-  const [requestToReject, setRequestToReject] = useState();
-  const [showErrorToast, setShowErrorToast] = useState(false);
-  // Seleted
-  const [selectedQty, setSelectedQty] = useState(0);
-  const [selectedDocuments] = useState([]);
+  const [showCompleteWindow, setShowCompleteWindow] = useState(false); // useState for showing complete request window
+  const [requestToComplete, setRequestToComplete] = useState(); // holds request that user wants to complete
+  const [showRejectWindow, setShowRejectWindow] = useState(false); // useState for showing reject request window
+  const [requestToReject, setRequestToReject] = useState(); // holds request that user wants to reject
+  const [showErrorToast, setShowErrorToast] = useState(false); // useState for showing error toast if change action dropped error
+  // Selected
+  const [selectedQty, setSelectedQty] = useState(0); // Number of selected objects
+  const [selectedDocuments] = useState([]); // Selected documents keys
   // Filter
-  const [showFilter, setShowFilter] = useState(false);
+  const [showFilter, setShowFilter] = useState(false); // useState for showing filter offcanvas
   // mass action
-  const [showDeleteSelected, setShowDeleteSelected] = useState(false);
-  const [deleteSelectedErrorMess, setDeleteSelectedErrorMess] = useState("");
-  const [showChangeRequestStatus, setShowChangeRequestStatus] = useState(false);
-  // Nav
-  const router = useRouter();
-  const params = useSearchParams();
-  // Type change
+  const [showDeleteSelected, setShowDeleteSelected] = useState(false); // useState for showing mass action delete window
+  const [deleteSelectedErrorMess, setDeleteSelectedErrorMess] = useState(""); // error message of mass delete action
+  const [showChangeRequestStatus, setShowChangeRequestStatus] = useState(false); // useState for showing mass change request status
+  // Clear selected on type change
   useEffect(() => {
     setSelectedQty(0);
     selectedDocuments.shift(0, selectedDocuments.length);
   }, [type]);
+  // Styles
   const containerMargin = {
     height: "67px",
   };
@@ -182,166 +204,7 @@ function InvoiceList({
         Object.values(invoices ?? [])
           .slice(invoiceStart, invoiceEnd)
           .map((value) => {
-            return getDocument();
-
-            function getDocument() {
-              if (type.includes("note")) {
-                return (
-                  <CreditNoteContainer
-                    key={value.creditNoteId}
-                    credit_note={value}
-                    is_org={orgView}
-                    selected={getIfSelected(type, value, selectedDocuments)}
-                    is_user_type={type.includes("yours")}
-                    selectAction={selectAction}
-                    unselectAction={unselectAction}
-                    viewAction={viewAction}
-                    deleteAction={deleteAction}
-                    modifyAction={modifyAction}
-                  />
-                );
-              }
-              if (type.includes("Requests")) {
-                return (
-                  <RequestContainer
-                    key={value.id}
-                    request={value}
-                    is_org={orgView}
-                    selected={getIfSelected(type, value, selectedDocuments)}
-                    selectAction={selectAction}
-                    unselectAction={unselectAction}
-                    viewAction={viewAction}
-                    deleteAction={deleteAction}
-                    modifyAction={modifyAction}
-                    completeAction={completeAction}
-                    rejectAction={rejectAction}
-                  />
-                );
-              }
-
-              return (
-                <InvoiceContainer
-                  key={value.invoiceId}
-                  invoice={value}
-                  is_org={orgView}
-                  selected={getIfSelected(type, value, selectedDocuments)}
-                  is_user_type={type.includes("Yours")}
-                  selectAction={selectAction}
-                  unselectAction={unselectAction}
-                  deleteAction={deleteAction}
-                  viewAction={viewAction}
-                  modifyAction={modifyAction}
-                />
-              );
-            }
-
-            function rejectAction() {
-              return () => {
-                // Reject
-                if (type === "Requests") {
-                  setRequestToReject(value.id);
-                  setShowRejectWindow(true);
-                }
-              };
-            }
-
-            function completeAction() {
-              return () => {
-                // Complete
-                if (type === "Requests") {
-                  setRequestToComplete(value.id);
-                  setShowCompleteWindow(true);
-                }
-              };
-            }
-
-            function modifyAction() {
-              return () => {
-                // Modify
-                if (type.includes("notes")) {
-                  setCreditNoteToModify(value);
-                  setShowModifyCreditNote(true);
-                }
-                if (type.includes("invoice")) {
-                  setInvoiceToModify(value);
-                  setShowModifyInvoice(true);
-                }
-                if (type === "Requests") {
-                  setRequestToModify(value);
-                  setShowModifyRequest(true);
-                }
-              };
-            }
-
-            function viewAction() {
-              return () => {
-                // View
-                if (type.includes("notes")) {
-                  setCreditToView(value);
-                  setShowViewCredit(true);
-                }
-                if (type.includes("invoice")) {
-                  setInvoiceToView(value);
-                  setShowViewInvoice(true);
-                }
-                if (type === "Requests") {
-                  setRequestToView(value);
-                  setShowViewRequest(true);
-                }
-              };
-            }
-
-            function deleteAction() {
-              return () => {
-                // Delete
-                if (type.includes("notes")) {
-                  setCreditNoteToDelete(value.creditNoteId);
-                  setShowDeleteCreditNote(true);
-                }
-                if (type.includes("invoice")) {
-                  setInvoiceToDelete(value.invoiceId);
-                  setShowDeleteInvoice(true);
-                }
-                if (type === "Requests") {
-                  setRequestToDelete(value.id);
-                  setShowDeleteRequest(true);
-                }
-              };
-            }
-
-            function unselectAction() {
-              return () => {
-                // Unselect
-                let index;
-                if (type.includes("notes")) {
-                  index = selectedDocuments.indexOf(value.creditNoteId);
-                }
-                if (type.includes("invoice")) {
-                  index = selectedDocuments.indexOf(value.invoiceId);
-                }
-                if (type === "Requests") {
-                  index = selectedDocuments.indexOf(value.id);
-                }
-                selectedDocuments.splice(index, 1);
-                setSelectedQty(selectedQty - 1);
-              };
-            }
-
-            function selectAction() {
-              return () => {
-                // Select
-                setSelectedQty(selectedQty + 1);
-                if (type.includes("notes")) {
-                  selectedDocuments.push(value.creditNoteId);
-                }
-                if (type.includes("invoice")) {
-                  selectedDocuments.push(value.invoiceId);
-                }
-                if (type === "Requests") {
-                  selectedDocuments.push(value.id);
-                }
-              };
-            }
+            return getDocument(value);
           })
       )}
       <MoreActionWindow
@@ -378,9 +241,9 @@ function InvoiceList({
         selectAllOnPage={() => {
           selectedDocuments.splice(0, selectedDocuments.length);
           setSelectedQty(0);
-          let pagationInfo = getPagationInfo(params);
+          let paginationInfo = getPaginationInfo(params);
           Object.values(invoices ?? [])
-            .slice(pagationInfo.start, pagationInfo.end)
+            .slice(paginationInfo.start, paginationInfo.end)
             .forEach((e) => {
               if (type.includes("invoice")) selectedDocuments.push(e.invoiceId);
               if (type.includes("note")) selectedDocuments.push(e.creditNoteId);
@@ -611,20 +474,198 @@ function InvoiceList({
       />
       <Toastes.ErrorToast
         showToast={showErrorToast}
-        message="Note has excceed the max length."
+        message="Note has exceed the max length."
         onHideFun={() => setShowErrorToast(false)}
       />
     </Container>
   );
 
+  /**
+   * Return name of mass action depend on the chosen type
+  */
   function getActionOneName() {
     return type === "Requests" ? "Change status" : "Delete selected";
   }
 
+  /**
+   * Return function of mass action depend on the chosen type
+  */
   function getActionOne() {
     return type === "Requests"
       ? () => setShowChangeRequestStatus(true)
       : () => setShowDeleteSelected(true);
+  }
+
+  /**
+   * Return element that visually represent value using correct format determent by type
+   * @param {Object} value 
+   * @return {JSX.Element}
+   */
+  function getDocument(value) {
+    if (type.includes("note")) {
+      return (
+        <CreditNoteContainer
+          key={value.creditNoteId}
+          credit_note={value}
+          is_org={orgView}
+          selected={getIfSelected(type, value, selectedDocuments)}
+          is_user_type={type.includes("yours")}
+          selectAction={() => selectAction(value)}
+          unselectAction={() => unselectAction(value)}
+          viewAction={() => viewAction(value)}
+          deleteAction={() => deleteAction(value)}
+          modifyAction={() => modifyAction(value)}
+        />
+      );
+    }
+    if (type.includes("Requests")) {
+      return (
+        <RequestContainer
+          key={value.id}
+          request={value}
+          is_org={orgView}
+          selected={getIfSelected(type, value, selectedDocuments)}
+          selectAction={() => selectAction(value)}
+          unselectAction={() => unselectAction(value)}
+          viewAction={() => viewAction(value)}
+          deleteAction={() => deleteAction(value)}
+          modifyAction={() => modifyAction(value)}
+          completeAction={() => completeAction(value)}
+          rejectAction={() => rejectAction(value)}
+        />
+      );
+    }
+
+    return (
+      <InvoiceContainer
+        key={value.invoiceId}
+        invoice={value}
+        is_org={orgView}
+        selected={getIfSelected(type, value, selectedDocuments)}
+        is_user_type={type.includes("Yours")}
+        selectAction={() => selectAction(value)}
+        unselectAction={() => unselectAction(value)}
+        deleteAction={() => deleteAction(value)}
+        viewAction={() => viewAction(value)}
+        modifyAction={() => modifyAction(value)}
+      />
+    );
+  }
+
+  /**
+   * Set value of request to reject to chosen value id and then open the reject window
+   * @param {Object} value Document value
+   */
+  function rejectAction(value) {
+    if (type === "Requests") {
+      setRequestToReject(value.id);
+      setShowRejectWindow(true);
+    }
+  }
+
+  /**
+   * Set value of request to complete to chosen value id and then open the complete window
+   * @param {Object} value Document value
+   */
+  function completeAction(value) {
+    if (type === "Requests") {
+      setRequestToComplete(value.id);
+      setShowCompleteWindow(true);
+    }
+  }
+
+  /**
+   * Set modify value to chosen value and then open the modify offcanvas
+   * @param {Object} value Document value
+   */
+  function modifyAction(value) {
+    if (type.includes("notes")) {
+      setCreditNoteToModify(value);
+      setShowModifyCreditNote(true);
+    }
+    if (type.includes("invoice")) {
+      setInvoiceToModify(value);
+      setShowModifyInvoice(true);
+    }
+    if (type === "Requests") {
+      setRequestToModify(value);
+      setShowModifyRequest(true);
+    }
+  }
+
+  /**
+   * Set view value to chosen value and then open the view offcanvas
+   * @param {Object} value Document value
+   */
+  function viewAction(value) {
+    if (type.includes("notes")) {
+      setCreditToView(value);
+      setShowViewCredit(true);
+    }
+    if (type.includes("invoice")) {
+      setInvoiceToView(value);
+      setShowViewInvoice(true);
+    }
+    if (type === "Requests") {
+      setRequestToView(value);
+      setShowViewRequest(true);
+    }
+  }
+
+  /**
+   * Set delete value to id of chosen value and then open the delete window
+   * @param {Object} value Document value 
+   */
+  function deleteAction(value) {
+    // Delete
+    if (type.includes("notes")) {
+      setCreditNoteToDelete(value.creditNoteId);
+      setShowDeleteCreditNote(true);
+    }
+    if (type.includes("invoice")) {
+      setInvoiceToDelete(value.invoiceId);
+      setShowDeleteInvoice(true);
+    }
+    if (type === "Requests") {
+      setRequestToDelete(value.id);
+      setShowDeleteRequest(true);
+    }
+  }
+
+  /**
+   * Delete chosen value from select array using value id.
+   * @param {Object} value Document value
+   */
+  function unselectAction(value) {
+    let index;
+    if (type.includes("notes")) {
+      index = selectedDocuments.indexOf(value.creditNoteId);
+    }
+    if (type.includes("invoice")) {
+      index = selectedDocuments.indexOf(value.invoiceId);
+    }
+    if (type === "Requests") {
+      index = selectedDocuments.indexOf(value.id);
+    }
+    selectedDocuments.splice(index, 1);
+    setSelectedQty(selectedQty - 1);
+  }
+
+  /**
+   * Add chosen value id to select array
+   * @param {Object} value Document value
+   */
+  function selectAction(value) {
+    setSelectedQty(selectedQty + 1);
+    if (type.includes("notes")) {
+      selectedDocuments.push(value.creditNoteId);
+    }
+    if (type.includes("invoice")) {
+      selectedDocuments.push(value.invoiceId);
+    }
+    if (type === "Requests") {
+      selectedDocuments.push(value.id);
+    }
   }
 }
 

@@ -7,16 +7,28 @@ import Toastes from "@/components/smaller_components/toast";
 import { useRouter } from "next/navigation";
 import CloseIcon from "../../../../../public/icons/close_black.png";
 import ErrorMessage from "@/components/smaller_components/error_message";
-import getReceviers from "@/utils/documents/get_request_users";
+import getReceivers from "@/utils/documents/get_request_users";
 import createRequest from "@/utils/documents/create_request";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 
+/**
+ * Create offcanvas that allow to create request.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @return {JSX.Element} Offcanvas element
+ */
 function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
   const router = useRouter();
+  // download data holder
+  const [users, setUsers] = useState([]);
+  // download error
   const [userDownloadError, setUserDownloadError] = useState(false);
+  // download data
   useEffect(() => {
     if (showOffcanvas) {
-      getReceviers().then((data) => {
+      getReceivers().then((data) => {
         if (data !== null) {
           setUserDownloadError(false);
           setUsers(data);
@@ -26,23 +38,24 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
       });
     }
   }, [showOffcanvas]);
-  // options
-  const [users, setUsers] = useState([]);
-  // File
+  // File holder
   const [file, setFile] = useState();
-  // Errors
+  // Form errors
   const [documentError, setDocumentError] = useState(false);
   const [noteError, setNoteError] = useState(false);
   const [titleError, setTitleError] = useState(false);
+  /**
+   * Check if form can be submitted
+  */
   const isFromErrorActive = () =>
     documentError ||
     noteError ||
     users.length === 0 ||
     titleError ||
     userDownloadError;
-  // Misc
+  // True if create action is running
   const [isLoading, setIsLoading] = useState(false);
-  // Form
+  // Form action
   const [state, formAction] = useFormState(createRequest.bind(null, file), {
     error: false,
     completed: false,
@@ -79,6 +92,9 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
                     if (!state.error && state.complete) {
                       router.refresh();
                     }
+                    setNoteError(false);
+                    setDocumentError(false);
+                    setTitleError(false);
                   }}
                   className="pe-0"
                 >
@@ -98,7 +114,7 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
               <Form.Group className="mb-4">
                 <Form.Label className="blue-main-text">Title:</Form.Label>
                 <ErrorMessage
-                  message="Is empty or lenght is greater than 100."
+                  message="Is empty or length is greater than 100."
                   messageStatus={titleError}
                 />
                 <Form.Control
@@ -109,7 +125,7 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
                   id="title"
                   isInvalid={titleError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setTitleError,
                       100,
@@ -188,7 +204,7 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
                   id="noteId"
                   isInvalid={noteError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setNoteError,
                       500,
@@ -240,6 +256,9 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
                         } else {
                           resetState();
                         }
+                        setNoteError(false);
+                        setDocumentError(false);
+                        setTitleError(false);
                       }}
                     >
                       Cancel
@@ -262,6 +281,9 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
           message={state.message}
           onHideFun={() => {
             resetState();
+            setNoteError(false);
+            setDocumentError(false);
+            setTitleError(false);
             document.getElementById("requestForm").reset();
             hideFunction();
             router.refresh();
@@ -271,13 +293,13 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
     </Offcanvas>
   );
 
+  /**
+   * Reset form state
+  */
   function resetState() {
     state.error = false;
     state.completed = false;
     state.message = "";
-    setNoteError(false);
-    setDocumentError(false);
-    setTitleError(false);
     setIsLoading(false);
   }
 }

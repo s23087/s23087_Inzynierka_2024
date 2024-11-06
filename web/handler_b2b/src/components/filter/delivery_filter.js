@@ -19,6 +19,16 @@ import FilterHeader from "./filter_header";
 import SetQueryFunc from "./filters_query_functions";
 import SortOrderComponent from "./sort_component";
 
+/**
+ * Create offcanvas that allow to filter and sort delivery objects.
+ * @component
+ * @param {object} props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {string} props.currentSort Current sort value
+ * @param {boolean} props.currentDirection True if ascending, false if descending.
+ * @return {JSX.Element} Offcanvas element
+ */
 function DeliveryFilterOffcanvas({
   showOffcanvas,
   hideFunction,
@@ -29,14 +39,19 @@ function DeliveryFilterOffcanvas({
   const pathName = usePathname();
   const params = useSearchParams();
   const newParams = new URLSearchParams(params);
+  // True is ascending order is enabled
   const [isAsc, setIsAsc] = useState(currentDirection);
+  // Order options
   const orderBy = ["Id", "Estimated", "Recipient", "Proforma_Number"];
+  // download holder
   const [orgs, setOrgs] = useState([]);
   const [deliveries, setDeliveries] = useState([]);
   const [statuses, setStatuses] = useState([]);
+  // download error
   const [errorDownloadOrgs, setDownloadErrorOrgs] = useState(false);
   const [errorDownloadDeli, setDownloadErrorDeli] = useState(false);
   const [errorDownloadStatus, setDownloadErrorStatus] = useState(false);
+  // download data
   useEffect(() => {
     getOrgsList().then((data) => {
       if (data !== null) {
@@ -100,7 +115,7 @@ function DeliveryFilterOffcanvas({
                 className="input-style"
                 id="sortValue"
                 style={maxStyle}
-                defaultValue={currentSort.substring(1, currentSort.lenght)}
+                defaultValue={currentSort.substring(1, currentSort.length)}
               >
                 <option value="None">None</option>
                 {Object.values(orderBy).map((val) => {

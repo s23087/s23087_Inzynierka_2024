@@ -12,11 +12,24 @@ import DeleteObjectWindow from "../windows/delete_object";
 import ViewItemOffcanvas from "../offcanvas/view/view_item";
 import deleteItem from "@/utils/warehouse/delete_item";
 import ModifyItemOffcanvas from "../offcanvas/modify/modify_item";
-import SelectComponent from "../smaller_components/select_compontent";
-import getPagationInfo from "@/utils/flexible/get_page_info";
+import SelectComponent from "../smaller_components/select_component";
+import getPaginationInfo from "@/utils/flexible/get_page_info";
 import ProductFilterOffcanvas from "../filter/product_filter_offcanvas";
 import DeleteSelectedWindow from "../windows/delete_selected";
 
+/**
+ * Return component that showcase product objects, search bar, filter, more action element and selected element.
+ * @component
+ * @param {object} props Component props
+ * @param {Array<{users: Array<string>, itemId: Number, itemName: string, partNumber: string, statusName: string, eans: Array<string>, qty: Number, purchasePrice: Number, sources: Array<string>}>} props.products Array containing product objects.
+ * @param {boolean} props.orgView True if org view is enabled.
+ * @param {string} props.currency Shortcut name of chosen currency.
+ * @param {Number} props.productStart Starting index of products subarray.
+ * @param {Number} props.productEnd Ending index of products subarray.
+ * @param {boolean} props.filterActive If filter is activated then true, otherwise false.
+ * @param {string} props.currentSort Current value of "sort" query parameter
+ * @return {JSX.Element} Container element
+ */
 function ProductList({
   products,
   orgView,
@@ -26,37 +39,37 @@ function ProductList({
   filterActive,
   currentSort,
 }) {
-  // View Item
-  const [showViewItem, setShowViewItem] = useState(false);
-  const [itemToView, setItemToView] = useState({
-    users: [],
-    eans: [],
-  });
-  // Modify Item
-  const [showModifyItem, setShowModifyItem] = useState(false);
-  const [itemToModify, setItemToModify] = useState({
-    users: [],
-    eans: [],
-  });
-  // Delete item
-  const [showDeleteItem, setShowDeleteItem] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState(null);
-  const [isErrorDelete, setIsErrorDelete] = useState(false);
-  const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
-  // More action
-  const [showMoreAction, setShowMoreAction] = useState(false);
-  const [isShowAddItem, setShowAddItem] = useState(false);
-  // Seleted
-  const [selectedQty, setSelectedQty] = useState(0);
-  const [selectedProducts] = useState([]);
-  // Filter
-  const [showFilter, setShowFilter] = useState(false);
-  // mass action
-  const [showDeleteSelected, setShowDeleteSelected] = useState(false);
-  const [deleteSelectedErrorMess, setDeleteSelectedErrorMess] = useState("");
   // Nav
   const router = useRouter();
   const params = useSearchParams();
+  // View item
+  const [showViewItem, setShowViewItem] = useState(false); // useState for showing view offcanvas
+  const [itemToView, setItemToView] = useState({
+    users: [],
+    eans: [],
+  }); // holder of object chosen to view
+  // Modify item
+  const [showModifyItem, setShowModifyItem] = useState(false); // useState for showing modify offcanvas
+  const [itemToModify, setItemToModify] = useState({
+    users: [],
+    eans: [],
+  }); // holder of object chosen to modify
+  // Delete item
+  const [showDeleteItem, setShowDeleteItem] = useState(false); // useState for showing delete window
+  const [itemToDelete, setItemToDelete] = useState(null); // holder of object chosen to delete
+  const [isErrorDelete, setIsErrorDelete] = useState(false); // true if delete action failed
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
+  // More action
+  const [showMoreAction, setShowMoreAction] = useState(false); // useState for showing more action window
+  const [isShowAddItem, setShowAddItem] = useState(false); // useState for showing create offcanvas
+  // Selected
+  const [selectedQty, setSelectedQty] = useState(0); // Number of selected objects
+  const [selectedProducts] = useState([]); // Selected proforma keys
+  // Filter
+  const [showFilter, setShowFilter] = useState(false); // useState for showing filter offcanvas
+  // mass action
+  const [showDeleteSelected, setShowDeleteSelected] = useState(false); // useState for showing mass action delete window
+  const [deleteSelectedErrorMess, setDeleteSelectedErrorMess] = useState(""); // error message of mass delete action
   // Styles
   const containerMargin = {
     height: "67px",
@@ -140,9 +153,9 @@ function ProductList({
         selectAllOnPage={() => {
           selectedProducts.splice(0, selectedProducts.length);
           setSelectedQty(0);
-          let pagationInfo = getPagationInfo(params);
+          let paginationInfo = getPaginationInfo(params);
           Object.values(products ?? [])
-            .slice(pagationInfo.start, pagationInfo.end)
+            .slice(paginationInfo.start, paginationInfo.end)
             .forEach((e) => selectedProducts.push(e.itemId));
           setSelectedQty(selectedProducts.length);
           setShowMoreAction(false);
@@ -233,7 +246,7 @@ function ProductList({
         showOffcanvas={showModifyItem}
         hideFunction={() => setShowModifyItem(false)}
         item={itemToModify}
-        curenncy={currency}
+        currency={currency}
         isOrg={orgView}
       />
     </Container>

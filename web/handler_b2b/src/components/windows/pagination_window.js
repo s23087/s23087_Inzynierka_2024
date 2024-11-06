@@ -4,7 +4,15 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import PropTypes from "prop-types";
 import { Modal, Container, Row, Col, Form, Button } from "react-bootstrap";
 
-function PagationWindow({ windowShow, onHideFunction }) {
+/**
+ * Modal element that allow to change page pagination with option change/cancel. The list of pagination option is hard coded.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.modalShow Modal show parameter.
+ * @param {Function} props.onHideFunction Function that will close modal (set modalShow to false).
+ * @return {JSX.Element} Modal element
+ */
+function PaginationWindow({ windowShow, onHideFunction }) {
   const router = useRouter();
   const pathName = usePathname();
   const params = useSearchParams();
@@ -19,7 +27,7 @@ function PagationWindow({ windowShow, onHideFunction }) {
         <Container>
           <Row>
             <Col>
-              <h5 className="mb-0 mt-3">Pagation</h5>
+              <h5 className="mb-0 mt-3">Pagination</h5>
             </Col>
           </Row>
         </Container>
@@ -41,10 +49,11 @@ function PagationWindow({ windowShow, onHideFunction }) {
                     variant="mainBlue"
                     className="w-100"
                     onClick={(e) => {
+                      // set query params pagination and page with chosen one, then close modal
                       e.preventDefault();
                       let selectVal = document.getElementById("select").value;
                       const newParams = new URLSearchParams(params);
-                      newParams.set("pagation", selectVal);
+                      newParams.set("pagination", selectVal);
                       newParams.set("page", 1);
                       router.replace(`${pathName}?${newParams}`);
                       onHideFunction();
@@ -71,9 +80,9 @@ function PagationWindow({ windowShow, onHideFunction }) {
   );
 }
 
-PagationWindow.propTypes = {
+PaginationWindow.propTypes = {
   windowShow: PropTypes.bool.isRequired,
   onHideFunction: PropTypes.func.isRequired,
 };
 
-export default PagationWindow;
+export default PaginationWindow;

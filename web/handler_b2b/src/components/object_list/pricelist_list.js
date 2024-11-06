@@ -7,8 +7,8 @@ import SearchFilterBar from "../menu/search_filter_bar";
 import MoreActionWindow from "../windows/more_action";
 import DeleteObjectWindow from "../windows/delete_object";
 import { useRouter, useSearchParams } from "next/navigation";
-import SelectComponent from "../smaller_components/select_compontent";
-import getPagationInfo from "@/utils/flexible/get_page_info";
+import SelectComponent from "../smaller_components/select_component";
+import getPaginationInfo from "@/utils/flexible/get_page_info";
 import PricelistContainer from "../object_container/pricelist_container";
 import AddPricelistOffcanvas from "../offcanvas/create/create_pricelist";
 import deletePricelist from "@/utils/pricelist/delete_pricelist";
@@ -17,6 +17,17 @@ import ModifyPricelistOffcanvas from "../offcanvas/modify/modify_pricelist";
 import PricelistFilterOffcanvas from "../filter/pricelist_filter";
 import DeleteSelectedWindow from "../windows/delete_selected";
 
+/**
+ * Return component that showcase pricelist objects, search bar, filter, more action element and selected element.
+ * @component
+ * @param {object} props Component props
+ * @param {Array<{pricelistId: Number, created: string, status: string, name: string, totalItems: Number, path: string, currency: string, modified: string}>} props.pricelist Array containing pricelist objects.
+ * @param {Number} props.pricelistStart Starting index of pricelists subarray.
+ * @param {Number} props.pricelistEnd Ending index of pricelists subarray.
+ * @param {boolean} props.filterActive If filter is activated then true, otherwise false.
+ * @param {string} props.currentSort Current value of "sort" query parameter
+ * @return {JSX.Element} Container element
+ */
 function PricelistList({
   pricelist,
   pricelistStart,
@@ -24,8 +35,11 @@ function PricelistList({
   filterActive,
   currentSort,
 }) {
+  // Nav
+  const router = useRouter();
+  const params = useSearchParams();
   // View pricelist
-  const [showViewPricelist, setShowViewPricelist] = useState(false);
+  const [showViewPricelist, setShowViewPricelist] = useState(false); // useState for showing view offcanvas
   const [pricelistToView, setPricelistToView] = useState({
     created: "",
     modified: "",
@@ -33,9 +47,9 @@ function PricelistList({
     status: "",
     totalItems: 0,
     currency: "",
-  });
+  }); // holder of object chosen to view
   // Modify pricelist
-  const [showModifyPricelist, setShowModifyPricelist] = useState(false);
+  const [showModifyPricelist, setShowModifyPricelist] = useState(false); // useState for showing modify offcanvas
   const [pricelistToModify, setPricelistToModify] = useState({
     created: "",
     modified: "",
@@ -44,26 +58,24 @@ function PricelistList({
     totalItems: 0,
     currency: "",
     path: "",
-  });
+  }); // holder of object chosen to modify
   // Delete pricelist
-  const [showDeletePricelist, setShowDeletePricelist] = useState(false);
-  const [pricelistToDelete, setItemToDelete] = useState([0, ""]);
-  const [isErrorDelete, setIsErrorDelete] = useState(false);
+  const [showDeletePricelist, setShowDeletePricelist] = useState(false); // useState for showing delete window
+  const [pricelistToDelete, setItemToDelete] = useState([0, ""]); // holder of object chosen to delete
+  const [isErrorDelete, setIsErrorDelete] = useState(false); // true if delete action failed
   const [errorMessage, setErrorMessage] = useState("");
   // More action
-  const [showMoreAction, setShowMoreAction] = useState(false);
-  const [isShowAddPricelist, setShowAddPricelist] = useState(false);
-  // Seleted
-  const [selectedQty, setSelectedQty] = useState(0);
-  const [selectedPricelist] = useState([]);
+  const [showMoreAction, setShowMoreAction] = useState(false); // useState for showing more action window
+  const [isShowAddPricelist, setShowAddPricelist] = useState(false); // useState for showing create offcanvas
+  // Selected
+  const [selectedQty, setSelectedQty] = useState(0); // Number of selected objects
+  const [selectedPricelist] = useState([]); // Selected proforma keys
   // Filter
-  const [showFilter, setShowFilter] = useState(false);
+  const [showFilter, setShowFilter] = useState(false);  // useState for showing filter offcanvas
   // mass action
-  const [showDeleteAll, setDeleteAll] = useState(false);
-  const [deleteAllErrorMessage, setDeleteAllErrorMessage] = useState("");
-  // Nav
-  const router = useRouter();
-  const params = useSearchParams();
+  const [showDeleteAll, setDeleteAll] = useState(false); // useState for showing mass action delete window
+  const [deleteAllErrorMessage, setDeleteAllErrorMessage] = useState(""); // error message of mass delete action
+  // Styles
   const containerMargin = {
     height: "67px",
   };
@@ -152,9 +164,9 @@ function PricelistList({
         selectAllOnPage={() => {
           selectedPricelist.splice(0, selectedPricelist.length);
           setSelectedQty(0);
-          let pagationInfo = getPagationInfo(params);
+          let paginationInfo = getPaginationInfo(params);
           Object.values(pricelist ?? [])
-            .slice(pagationInfo.start, pagationInfo.end)
+            .slice(paginationInfo.start, paginationInfo.end)
             .forEach((e) => selectedPricelist.push([e.pricelistId, e.path]));
           setSelectedQty(selectedPricelist.length);
           setShowMoreAction(false);

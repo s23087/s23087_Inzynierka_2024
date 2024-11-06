@@ -2,6 +2,12 @@
 
 import getDbName from "../auth/get_db_name";
 
+/**
+ * Sends request to get chosen invoice item list.
+ * @param {Number} invoiceId Invoice id.
+ * @param {boolean} isYourInvoice Is invoice type "Yours invoices".
+ * @return {Promise<Array<{priceId: Number, invoiceId: Number, itemId: Number, itemName: string, partnumber: string, qty: Number, price: Number}>>} Array of objects that contain item information. If connection was lost return null.
+ */
 export default async function getInvoiceItemForCredit(
   invoiceId,
   isYourInvoice,

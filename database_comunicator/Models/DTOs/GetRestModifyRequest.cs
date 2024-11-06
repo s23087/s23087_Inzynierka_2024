@@ -2,7 +2,7 @@
 {
     public class GetRestModifyRequest
     {
-        public int RecevierId { get; set; }
+        public int ReceiverId { get; set; }
         public string Note { get; set; } = null!;
     }
 }

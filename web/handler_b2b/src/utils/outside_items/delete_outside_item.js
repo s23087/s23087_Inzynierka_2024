@@ -8,7 +8,7 @@ import logout from "../auth/logout";
  * Sends request to delete chosen outside item. If user do not exist server will logout them.
  * @param  {Number} itemId Item id.
  * @param  {Number} orgId Organization id item belong to.
- * @return {Promise<object>}      Object with properties result {bool} and message {string}. If result is true, then item has been successfully deleted. Message is only return when there's error.
+ * @return {Promise<{error: boolean, message: string}>} Return action result with message. If error is true that action was unsuccessful.
  */
 export default async function deleteOutsideItem(itemId, orgId) {
   const dbName = await getDbName();

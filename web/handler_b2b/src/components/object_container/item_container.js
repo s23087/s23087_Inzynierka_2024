@@ -7,6 +7,21 @@ import getStatusColor from "@/utils/warehouse/get_status_color";
 import ContainerButtons from "../smaller_components/container_buttons";
 import user_small_icon from "../../../public/icons/user_small_icon.png";
 
+/**
+ * Create element that represent item object
+ * @component
+ * @param {Object} props
+ * @param {{users: Array<string>, itemId: Number, itemName: string, partNumber: string, statusName: string, eans: Array<string>, qty: Number, purchasePrice: Number, sources: Array<string>}} props.item Object value
+ * @param {string} props.currency Current chosen currency name in shortcut
+ * @param {boolean} props.is_org True if org view is enabled
+ * @param {Function} props.selectQtyAction Action that will activated after clicking select button
+ * @param {Function} props.unselectQtyAction Action that will activated after clicking unselect button
+ * @param {Function} props.deleteAction Action that will activated after clicking delete button
+ * @param {Function} props.viewAction Action that will activated after clicking view button
+ * @param {Function} props.modifyAction Action that will activated after clicking modify button
+ * @param {boolean} props.selected True if container should show as selected
+ * @return {JSX.Element} Container element
+ */
 function ItemContainer({
   item,
   currency,
@@ -18,6 +33,7 @@ function ItemContainer({
   modifyAction,
   selected,
 }) {
+  // Styles
   let statusColor = getStatusColor(item.statusName);
   const containerBg = {
     backgroundColor: "var(--sec-blue)",
@@ -32,6 +48,10 @@ function ItemContainer({
     minHeight: "25px",
     alignItems: "center",
   };
+  /**
+   * Join array of eans and trim it to fit the container
+   * @return {string} Ean array that is cut to fit container
+   */
   const getShortEan = () => {
     let ean = item.eans.join(", ");
     ean = ean.substring(0, 15);
@@ -39,6 +59,10 @@ function ItemContainer({
     if (index === -1) return ean;
     return ean.substring(0, index) + " ...";
   };
+  /**
+   * Join array of sources and trim it to fit the container
+   * @return {string} Ean array that is cut to fit container
+   */
   const getShortSources = () => {
     let sources = item.sources.join(", ");
     sources = sources.substring(0, 15);

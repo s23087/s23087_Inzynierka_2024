@@ -7,15 +7,26 @@ import left_page from "../../../public/icons/left_page.png";
 import right_last_page from "../../../public/icons/right_last_page.png";
 import right_page from "../../../public/icons/right_page.png";
 
-function PagationFooter({
+/**
+ * Create element with pagination switch and page navigation.
+ * @component
+ * @param {object} props
+ * @param {Number} props.page_qty Number of pages
+ * @param {Number} props.max_instance_on_page Number of maximum number of object available on page
+ * @param {Number} props.current_page Number of current page
+ * @param {Function} props.paginationAction Action that will happen after clicking pagination container
+ * @return {JSX.Element} Stack element
+ */
+function PaginationFooter({
   page_qty,
   max_instance_on_page,
   current_page,
-  pagationAction,
+  paginationAction,
 }) {
   const router = useRouter();
   const pathName = usePathname();
   const params = useSearchParams();
+  // Styles
   const footerStyle = {
     height: "66px",
   };
@@ -25,7 +36,7 @@ function PagationFooter({
     height: "47px",
     borderRadius: "10px",
   };
-  const pagationStyle = {
+  const paginationStyle = {
     minWidth: "290px",
     height: "47px",
     borderRadius: "10px",
@@ -44,7 +55,7 @@ function PagationFooter({
           <Button
             variant="white-border"
             className="p-0 w-100"
-            onClick={pagationAction}
+            onClick={paginationAction}
           >
             <p className="mb-0 main-text">{max_instance_on_page}</p>
           </Button>
@@ -53,7 +64,7 @@ function PagationFooter({
       <Container className="d-flex justify-content-end">
         <span
           className="d-flex align-items-center justify-content-center main-text sec-blue-bg"
-          style={pagationStyle}
+          style={paginationStyle}
         >
           <Stack direction="horizontal">
             <Button
@@ -107,6 +118,10 @@ function PagationFooter({
     </Stack>
   );
 
+  /**
+   * Set query param "page" to chosen number.
+   * @param {Number} page_number 
+   */
   function setPage(page_number) {
     const newParams = new URLSearchParams(params);
     newParams.set("page", page_number);
@@ -114,11 +129,11 @@ function PagationFooter({
   }
 }
 
-PagationFooter.propTypes = {
+PaginationFooter.propTypes = {
   page_qty: PropTypes.number.isRequired,
   max_instance_on_page: PropTypes.number.isRequired,
   current_page: PropTypes.number.isRequired,
-  pagationAction: PropTypes.func.isRequired,
+  paginationAction: PropTypes.func.isRequired,
 };
 
-export default PagationFooter;
+export default PaginationFooter;

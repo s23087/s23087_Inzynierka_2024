@@ -6,8 +6,8 @@ import logout from "../auth/logout";
 
 /**
  * Sends request to modify item bindings in database.
- * @param  {Array<object>} bindings Any array of object containing all bindings values.
- * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * @param  {Array<{userId: Number, invoiceId: Number, itemId: Number, qty: Number}>} bindings Any array of object containing all bindings values.
+ * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
  * Completed will always be true, to deliver information to component that action has been completed.
  */
 export default async function changeBindings(bindings) {

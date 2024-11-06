@@ -8,12 +8,16 @@ import CountryOptions from "./country_options";
 import validators from "@/utils/validators/validator";
 import PolicyOffcanvas from "./policy_offcanvas";
 import ErrorMessage from "../smaller_components/error_message";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 
+/**
+ * Return form that allow user to sign up.
+ * @return {JSX.Element} Container element
+ */
 function RegistrationForm() {
   // Variable that tell if user choose Org option or Individual one
   const is_org = useSearchParams().get("is_org");
-  const registerUserBinded = registerUser.bind(null, is_org);
+  const registerUserBound = registerUser.bind(null, is_org);
 
   // Button loading
   const [isLoading, setIsLoading] = useState(false);
@@ -22,9 +26,15 @@ function RegistrationForm() {
   const [show, setShow] = useState(false);
   const showModal = () => setShow(true);
   const hideModal = () => setShow(false);
+  const [headerText, setHeaderText] = useState(
+    is_org === "true"
+      ? "Fill form for org user:"
+      : "Fill form for individual user:",
+  );
 
   // Form change variables
   const [step, setStep] = useState(1);
+  // Styles
   const spaceStyle = {
     whiteSpace: "pre",
   };
@@ -34,12 +44,6 @@ function RegistrationForm() {
   const unhidden = {
     display: "block",
   };
-
-  let headerText = useRef(
-    is_org === "true"
-      ? "Fill form for org user:"
-      : "Fill form for individual user:",
-  );
 
   // Form useState Variables
   const [emailError, setEmailError] = useState(false);
@@ -56,6 +60,7 @@ function RegistrationForm() {
   const [repPassError, setRepPassError] = useState(false);
   const [policyError, setPolicyError] = useState(false);
 
+  // Action that switch form parts from visible to hidden after passing a validation
   const nextStepActivator = () => {
     if (emailError || nameError || surnameError) {
       return;
@@ -86,10 +91,10 @@ function RegistrationForm() {
 
     switch (step) {
       case 1:
-        headerText.current = "Fill your company info:";
+        setHeaderText("Fill your company info:");
         break;
       case 2:
-        headerText.current = "Almost done!\nCreate strong password:";
+        setHeaderText("Almost done!\nCreate strong password:");
         window.scrollTo(0, 0);
         break;
     }
@@ -99,13 +104,13 @@ function RegistrationForm() {
     <Container className="text-center">
       <Container>
         <p className="black-text fw-semibold" style={spaceStyle}>
-          {headerText.current}
+          {headerText}
         </p>
       </Container>
       <Container className="maxFormWidth">
         <Row className="mb-4 justify-content-around">
           <Col className="mt-4 text-md-end">
-            <Form id="regForm" action={registerUserBinded}>
+            <Form id="regForm" action={registerUserBound}>
               {/* Step 1 */}
               <Container
                 className="px-0"
@@ -128,7 +133,7 @@ function RegistrationForm() {
                     isInvalid={emailError}
                     maxLength={350}
                     onInput={(e) => {
-                      InputValidtor.emailValidator(
+                      InputValidator.emailValidator(
                         e.target.value,
                         setEmailError,
                         350,
@@ -151,7 +156,7 @@ function RegistrationForm() {
                     isInvalid={nameError}
                     maxLength={250}
                     onInput={(e) => {
-                      InputValidtor.noNumberStringValidtor(
+                      InputValidator.noNumberStringValidator(
                         e.target.value,
                         setNameError,
                         250,
@@ -174,7 +179,7 @@ function RegistrationForm() {
                     isInvalid={surnameError}
                     maxLength={250}
                     onInput={(e) => {
-                      InputValidtor.noNumberStringValidtor(
+                      InputValidator.noNumberStringValidator(
                         e.target.value,
                         setSurnameError,
                         250,
@@ -203,7 +208,7 @@ function RegistrationForm() {
                     isInvalid={companyError}
                     maxLength={50}
                     onInput={(e) => {
-                      InputValidtor.normalStringValidtor(
+                      InputValidator.normalStringValidator(
                         e.target.value,
                         setCompanyError,
                         50,
@@ -250,7 +255,7 @@ function RegistrationForm() {
                     isInvalid={streetError}
                     maxLength={200}
                     onInput={(e) => {
-                      InputValidtor.normalStringValidtor(
+                      InputValidator.normalStringValidator(
                         e.target.value,
                         setStreetError,
                         200,
@@ -273,7 +278,7 @@ function RegistrationForm() {
                     isInvalid={cityError}
                     maxLength={250}
                     onInput={(e) => {
-                      InputValidtor.normalStringValidtor(
+                      InputValidator.normalStringValidator(
                         e.target.value,
                         setCityError,
                         250,
@@ -296,7 +301,7 @@ function RegistrationForm() {
                     isInvalid={postalError}
                     maxLength={25}
                     onInput={(e) => {
-                      InputValidtor.normalStringValidtor(
+                      InputValidator.normalStringValidator(
                         e.target.value,
                         setPostalError,
                         25,

@@ -10,14 +10,25 @@ import {
   Button,
   Stack,
 } from "react-bootstrap";
-import validators from "@/utils/validators/validator";
 import { useEffect, useState } from "react";
 import getItemsList from "@/utils/documents/get_products";
-import SuccesFadeAway from "../smaller_components/succes_fade_away";
+import SuccessFadeAway from "../smaller_components/success_fade_away";
 import ErrorMessage from "../smaller_components/error_message";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 
+/**
+ * Modal element that allow to add products to document.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.modalShow Modal show parameter.
+ * @param {Function} props.onHideFunction Function that will close modal (set modalShow to false).
+ * @param {Function} props.addFunction Function that will activate after clicking add button.
+ * @return {JSX.Element} Modal element
+ */
 function AddProductWindow({ modalShow, onHideFunction, addFunction }) {
+  // Products list
   const [products, setProducts] = useState([]);
+  // True if download error happen
   const [downloadError, setDownloadError] = useState(false);
   useEffect(() => {
     if (modalShow) {
@@ -34,7 +45,7 @@ function AddProductWindow({ modalShow, onHideFunction, addFunction }) {
   // Error
   const [priceError, setPriceError] = useState(false);
   const [qtyError, setQtyError] = useState(false);
-  // succes var
+  // True if success info should be shown
   const [showSuccess, setShowSuccess] = useState(false);
   return (
     <Modal
@@ -49,7 +60,7 @@ function AddProductWindow({ modalShow, onHideFunction, addFunction }) {
             <Col>
               <h5 className="mb-0 mt-3">Add Product</h5>
             </Col>
-            <SuccesFadeAway
+            <SuccessFadeAway
               showSuccess={showSuccess}
               setShowSuccess={setShowSuccess}
             />
@@ -85,14 +96,7 @@ function AddProductWindow({ modalShow, onHideFunction, addFunction }) {
               isInvalid={qtyError}
               placeholder="qty"
               onInput={(e) => {
-                if (
-                  validators.haveOnlyNumbers(e.target.value) &&
-                  validators.stringIsNotEmpty(e.target.value)
-                ) {
-                  setQtyError(false);
-                } else {
-                  setQtyError(true);
-                }
+                InputValidator.onlyNumberValidator(e.target.value, setQtyError)
               }}
             />
           </Form.Group>
@@ -109,14 +113,7 @@ function AddProductWindow({ modalShow, onHideFunction, addFunction }) {
               placeholder="price"
               isInvalid={priceError}
               onInput={(e) => {
-                if (
-                  validators.isPriceFormat(e.target.value) &&
-                  validators.stringIsNotEmpty(e.target.value)
-                ) {
-                  setPriceError(false);
-                } else {
-                  setPriceError(true);
-                }
+                InputValidator.decimalValidator(e.target.value, setPriceError)
               }}
             />
           </Form.Group>
@@ -125,15 +122,13 @@ function AddProductWindow({ modalShow, onHideFunction, addFunction }) {
               variant="mainBlue"
               className="me-2 w-100"
               disabled={
-                priceError || qtyError || downloadError || products.length === 0
+                getIsFormErrorActive()
               }
               onClick={() => {
+                // Check for errors, then use add function
                 setShowSuccess(false);
                 if (
-                  priceError ||
-                  qtyError ||
-                  downloadError ||
-                  products.length === 0
+                  getIsFormErrorActive()
                 ) {
                   return;
                 }
@@ -188,6 +183,13 @@ function AddProductWindow({ modalShow, onHideFunction, addFunction }) {
       </Modal.Body>
     </Modal>
   );
+
+  /**
+   * True if any of conditions are fulfilled, otherwise false
+  */
+  function getIsFormErrorActive() {
+    return priceError || qtyError || downloadError || products.length === 0;
+  }
 }
 
 AddProductWindow.propTypes = {

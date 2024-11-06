@@ -24,8 +24,8 @@ namespace database_communicator.Controllers
             _notificationServices = notificationServices;
         }
         [HttpGet]
-        [Route("get/receviers")]
-        public async Task<IActionResult> GetReceviers()
+        [Route("get/receivers")]
+        public async Task<IActionResult> GetReceivers()
         {
             var result = await _userServices.GetAccountantUser();
             return Ok(result);
@@ -127,9 +127,9 @@ namespace database_communicator.Controllers
         {
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound(userNotFoundMessage);
-            if (data.RecevierId != null)
+            if (data.ReceiverId != null)
             {
-                var recExist = await _userServices.UserExist((int)data.RecevierId);
+                var recExist = await _userServices.UserExist((int)data.ReceiverId);
                 if (!recExist) return NotFound("Receiver not found.");
             }
             var result = await _requestServices.ModifyRequest(data);
@@ -137,12 +137,12 @@ namespace database_communicator.Controllers
             var logId = await _logServices.getLogTypeId("Modify");
             var desc = $"User with id {userId} has modified the request.";
             await _logServices.CreateActionLog(desc, userId, logId);
-            if (userId != data.RecevierId && data.RecevierId != null)
+            if (userId != data.ReceiverId && data.ReceiverId != null)
             {
                 var userFull = await _userServices.GetUserFullName(userId);
                 await _notificationServices.CreateNotification(new CreateNotification
                 {
-                    UserId = (int)data.RecevierId,
+                    UserId = (int)data.ReceiverId,
                     Info = $"{userFull} has modified a request with id {data.RequestId}.",
                     ObjectType = "Requests",
                     Referance = $"{data.RequestId}"

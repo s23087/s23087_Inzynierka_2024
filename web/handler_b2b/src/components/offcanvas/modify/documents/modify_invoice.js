@@ -11,9 +11,19 @@ import getPaymentStatuses from "@/utils/documents/get_payment_statuses";
 import CloseIcon from "../../../../../public/icons/close_black.png";
 import ErrorMessage from "@/components/smaller_components/error_message";
 import updateInvoice from "@/utils/documents/modify_invoice";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
-import getRestModifyInvoice from "@/utils/documents/get_rest_modify_info";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
+import getRestModifyInvoice from "@/utils/documents/get_rest_modify_invoice";
 
+/**
+ * Create offcanvas that allow to modify chosen invoice.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {boolean} props.isYourInvoice If type equal to "Yours invoices" then true, otherwise false.
+ * @param {{proformaId: Number, proformaNumber: string, clientName: string, transport: Number}} props.invoice Chosen invoice to view.
+ * @return {JSX.Element} Offcanvas element
+ */
 function ModifyInvoiceOffcanvas({
   showOffcanvas,
   hideFunction,
@@ -21,10 +31,33 @@ function ModifyInvoiceOffcanvas({
   invoice,
 }) {
   const router = useRouter();
+  // download data holders
+  const [restInfo, setRestInfo] = useState({
+    transport: "is loading",
+    paymentMethod: "is loading",
+    note: "is loading",
+  });
+  const [orgs, setOrgs] = useState({
+    restOrgs: [],
+  });
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [paymentStatuses, setPaymentStatuses] = useState([]);
+  // Previous invoice data holder. If property is number then -1 means that data has been unchanged.
+  const [prevState] = useState({
+    invoiceNumber: "",
+    client: -1,
+    transport: 0.0,
+    paymentMethod: -1,
+    paymentStatus: -1,
+    status: null,
+    note: "",
+  });
+  // download errors
   const [orgDownloadError, setOrgDownloadError] = useState(false);
   const [methodsDownloadError, setMethodsDownloadError] = useState(false);
   const [statusesDownloadError, setStatusesDownloadError] = useState(false);
   const [restDownloadError, setRestDownloadError] = useState(false);
+  // download data
   useEffect(() => {
     if (showOffcanvas) {
       getOrgsList().then((data) => {
@@ -69,24 +102,15 @@ function ModifyInvoiceOffcanvas({
       });
     }
   }, [showOffcanvas]);
-  // rest info
-  const [restInfo, setRestInfo] = useState({
-    transport: "is loading",
-    paymentMethod: "is loading",
-    note: "is loading",
-  });
-  // options
-  const [orgs, setOrgs] = useState({
-    restOrgs: [],
-  });
-  const [paymentMethods, setPaymentMethods] = useState([]);
-  const [paymentStatuses, setPaymentStatuses] = useState([]);
-  // File
+  // File holder
   const [file, setFile] = useState();
-  // Errors
+  // Form errors
   const [invoiceNumberError, setInvoiceNumberError] = useState(false);
   const [transportError, setTransportError] = useState(false);
   const [documentError, setDocumentError] = useState(false);
+  /**
+   * Check if form can be submitted
+  */
   const isFormErrorActive = () =>
     invoiceNumberError ||
     transportError ||
@@ -95,18 +119,9 @@ function ModifyInvoiceOffcanvas({
     methodsDownloadError ||
     statusesDownloadError ||
     restDownloadError;
-  // Misc
+  // True if modify action is running
   const [isLoading, setIsLoading] = useState(false);
-  // Form
-  const [prevState] = useState({
-    invoiceNumber: "",
-    client: -1,
-    transport: 0.0,
-    paymentMethod: -1,
-    paymentStatus: -1,
-    status: null,
-    note: "",
-  });
+  // Form action
   const [state, formPurchaseAction] = useFormState(
     updateInvoice
       .bind(null, file)
@@ -180,7 +195,7 @@ function ModifyInvoiceOffcanvas({
                   Invoice Number:
                 </Form.Label>
                 <ErrorMessage
-                  message="Is empty, not a number or lenght is greater than 40."
+                  message="Is empty, not a number or length is greater than 40."
                   messageStatus={invoiceNumberError}
                 />
                 <Form.Control
@@ -189,7 +204,7 @@ function ModifyInvoiceOffcanvas({
                   name="invoice"
                   isInvalid={invoiceNumberError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setInvoiceNumberError,
                       40,
@@ -248,7 +263,7 @@ function ModifyInvoiceOffcanvas({
                   defaultValue={restInfo.transport}
                   isInvalid={transportError}
                   onInput={(e) => {
-                    InputValidtor.decimalValidator(
+                    InputValidator.decimalValidator(
                       e.target.value,
                       setTransportError,
                     );
@@ -432,6 +447,9 @@ function ModifyInvoiceOffcanvas({
     </Offcanvas>
   );
 
+  /**
+   * Reset state of form
+  */
   function resetState() {
     state.error = false;
     state.completed = false;

@@ -4,6 +4,20 @@ import { Container, Row, Col } from "react-bootstrap";
 import ContainerButtons from "../smaller_components/container_buttons";
 import user_small_icon from "../../../public/icons/user_small_icon.png";
 
+/**
+ * Create element that represent client object
+ * @component
+ * @param {Object} props
+ * @param {{clientId: Number, clientName: string, street: string, city: string, postal: string, nip: Number|undefined, country: string}} props.client Object value
+ * @param {boolean} props.is_org True if org view is enabled
+ * @param {boolean} props.selected True if container should show as selected
+ * @param {Function} props.selectAction Action that will activated after clicking select button
+ * @param {Function} props.unselectAction Action that will activated after clicking unselect button
+ * @param {Function} props.deleteAction Action that will activated after clicking delete button
+ * @param {Function} props.viewAction Action that will activated after clicking view button
+ * @param {Function} props.modifyAction Action that will activated after clicking modify button
+ * @return {JSX.Element} Container element
+ */
 function ClientContainer({
   client,
   is_org,
@@ -14,9 +28,14 @@ function ClientContainer({
   viewAction,
   modifyAction,
 }) {
+  // Styles
   const containerBg = {
     backgroundColor: "var(--sec-blue)",
   };
+  /**
+   * Build address string using client properties
+   * @return {string} Return string representing address
+   */
   const getAddress = () => {
     let tmp = client.street + " " + client.city + " " + client.postal;
     return tmp;

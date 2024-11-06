@@ -7,10 +7,20 @@ import Toastes from "@/components/smaller_components/toast";
 import { useRouter } from "next/navigation";
 import CloseIcon from "../../../../../public/icons/close_black.png";
 import ErrorMessage from "@/components/smaller_components/error_message";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 import getRestModifyCredit from "@/utils/documents/get_rest_modify_credit";
 import updateCreditNote from "@/utils/documents/modify_credit_note";
 
+/**
+ * Create offcanvas that allow to modify chosen credit note.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {boolean} props.isYourCredit If type equal to "Yours credit notes" then true, otherwise false.
+ * @param {{proformaId: Number, proformaNumber: string, clientName: string, transport: Number}} props.creditNote Chosen credit note to view.
+ * @return {JSX.Element} Offcanvas element
+ */
 function ModifyCreditNoteOffcanvas({
   showOffcanvas,
   hideFunction,
@@ -18,7 +28,23 @@ function ModifyCreditNoteOffcanvas({
   creditNote,
 }) {
   const router = useRouter();
+  // Download data holder
+  const [restInfo, setRestInfo] = useState({
+    creditNumber: "Is loading",
+    orgName: "Is loading",
+    note: "Is loading",
+  });
+  // Credit note previous data holder
+  const [prevState] = useState({
+    creditNoteNumber: "",
+    date: "",
+    inSystem: false,
+    isPaid: false,
+    note: "",
+  });
+  // Download error
   const [restDownloadError, setRestDownloadError] = useState(false);
+  // Download data
   useEffect(() => {
     if (showOffcanvas) {
       getRestModifyCredit(creditNote.creditNoteId, isYourCredit).then(
@@ -35,34 +61,24 @@ function ModifyCreditNoteOffcanvas({
       );
     }
   }, [showOffcanvas]);
-  // Rest info
-  const [restInfo, setRestInfo] = useState({
-    creditNumber: "Is loading",
-    orgName: "Is loading",
-    note: "Is loading",
-  });
-  // File
+  // File holder
   const [file, setFile] = useState();
-  // Errors
+  // From errors
   const [creditNumberError, setCreditNumberError] = useState(false);
   const [documentError, setDocumentError] = useState(false);
   const [dateError, setDateError] = useState(false);
+  /**
+   * Check if form can be submitted
+  */
   const isFormErrorActive = () =>
     creditNumberError ||
     documentError ||
     dateError ||
     restInfo.creditNumber === "Is loading" ||
     restDownloadError;
-  // Misc
+  // True if modify action is running
   const [isLoading, setIsLoading] = useState(false);
-  // Form
-  const [prevState] = useState({
-    creditNoteNumber: "",
-    date: "",
-    inSystem: false,
-    isPaid: false,
-    note: "",
-  });
+  // Form action
   const [state, formPurchaseAction] = useFormState(
     updateCreditNote
       .bind(null, file)
@@ -131,7 +147,7 @@ function ModifyCreditNoteOffcanvas({
                   Credit Note Number:
                 </Form.Label>
                 <ErrorMessage
-                  message="Is empty, not a number or lenght is greater than 40."
+                  message="Is empty, not a number or length is greater than 40."
                   messageStatus={creditNumberError}
                 />
                 <Form.Control
@@ -140,7 +156,7 @@ function ModifyCreditNoteOffcanvas({
                   name="creditNumber"
                   isInvalid={creditNumberError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setCreditNumberError,
                       40,
@@ -164,7 +180,7 @@ function ModifyCreditNoteOffcanvas({
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Date:</Form.Label>
                 <ErrorMessage
-                  message="Date excceed today's date."
+                  message="Date exceed today's date."
                   messageStatus={dateError}
                 />
                 <Form.Control
@@ -341,6 +357,9 @@ function ModifyCreditNoteOffcanvas({
     </Offcanvas>
   );
 
+  /**
+   * Reset state of form
+  */
   function resetState() {
     state.error = false;
     state.completed = false;

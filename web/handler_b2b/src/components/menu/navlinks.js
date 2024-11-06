@@ -3,6 +3,16 @@ import Link from "next/link";
 import { Container } from "react-bootstrap";
 import NotificationBadge from "../smaller_components/notification_icon";
 
+/**
+ * Create navigation links.
+ * @component
+ * @param {object} props
+ * @param {string} props.role Current user role
+ * @param {string} props.active_link Name of current chosen link (ex. if user is in roles page then roles will be active link)
+ * @param {Number} props.notification_qty Number of unread notification
+ * @param {boolean} props.is_sidebar True if navlinks are used for sidebar
+ * @return {JSX.Element}
+ */
 function Navlinks({ role, active_link, notification_qty, is_sidebar }) {
   const role_link_dic = {
     admin: {
@@ -95,7 +105,7 @@ function Navlinks({ role, active_link, notification_qty, is_sidebar }) {
 }
 
 Navlinks.propTypes = {
-  role: PropTypes.string.isRequired, // Admin, Merchant, Accountatn, Warehouse manager, Solo
+  role: PropTypes.string.isRequired, // Admin, Merchant, Accountant, Warehouse manager, Solo
   active_link: PropTypes.string.isRequired, // Name of active link from role_link_dic
   notification_qty: PropTypes.number.isRequired,
   is_sidebar: PropTypes.bool.isRequired,

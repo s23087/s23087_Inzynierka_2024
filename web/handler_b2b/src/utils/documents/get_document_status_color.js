@@ -1,3 +1,8 @@
+/**
+ * Depending on chosen status, will return appropriate style to element. If not found return white background.
+ * @param {string} statusName Name of document status (Paid, Unpaid, Due to, In system, Requested, Not in system).
+ * @return {{backgroundColor: string, color: string|undefined, justifyContent: string|undefined}} Returns object representing chosen status style.
+ */
 export default function getDocumentStatusStyle(statusName) {
   switch (statusName) {
     case "Paid":

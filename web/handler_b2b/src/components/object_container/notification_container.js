@@ -1,6 +1,14 @@
 import PropTypes from "prop-types";
 import { Container, Row, Col, Button } from "react-bootstrap";
 
+/**
+ * Create element that represent notification object
+ * @component
+ * @param {Object} props
+ * @param {{notificationId: Number, info: string, objectType: string, reference: string, isRead: boolean}} props.notification Object value
+ * @param {Function} props.switch_read_action Action that will activated after clicking "Mark as read/unread" button
+ * @return {JSX.Element} Container element
+ */
 function NotificationContainer({ notification, switch_read_action }) {
   const containerBg = {
     backgroundColor: "var(--sec-blue)",
@@ -35,8 +43,8 @@ function NotificationContainer({ notification, switch_read_action }) {
                 style={titleStyle}
               >
                 <p className="mb-0">
-                  {notification.objectType} with referance{" "}
-                  {notification.referance}
+                  {notification.objectType} with reference{" "}
+                  {notification.reference}
                 </p>
               </span>
             </Col>

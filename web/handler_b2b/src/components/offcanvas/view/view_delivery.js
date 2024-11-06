@@ -12,6 +12,18 @@ import AddNoteWindow from "@/components/windows/addNote";
 import ErrorMessage from "@/components/smaller_components/error_message";
 import setDeliveryStatus from "@/utils/deliveries/set_delivery_status";
 import { useRouter } from "next/navigation";
+
+/**
+ * Create offcanvas that allow to view more information about delivery.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {{deliveryId: Number, user: string, estimated: string, delivered: string, proforma: string, deliveryCompany: string, waybill: Array<string>, status: string}} props.delivery Chosen delivery to view.
+ * @param {boolean} props.isOrg True if org view is activated.
+ * @param {boolean} props.isDeliveryToUser If type equal to "Deliveries to user" then true, otherwise false.
+ * @return {JSX.Element} Offcanvas element
+ */
 function ViewDeliveryOffcanvas({
   showOffcanvas,
   hideFunction,
@@ -20,13 +32,17 @@ function ViewDeliveryOffcanvas({
   isDeliveryToUser,
 }) {
   const router = useRouter();
+  // download holder
   const [restInfo, setRestInfo] = useState({
     notes: [],
     items: [],
   });
+  // useState to show/hide add note modal
   const [showAddNote, setShowAddNote] = useState(false);
+  // download error
   const [downloadError, setDownloadError] = useState(false);
-  const [hasChanged, setHasChanged] = useState(false); // switch to other value when note has been added
+  // Active use effect to download notes with new one
+  const [hasChanged, setHasChanged] = useState(false);
   let statusColor = getDeliveryStatusColor(delivery.status).backgroundColor;
   useEffect(() => {
     if (showOffcanvas) {
@@ -40,10 +56,11 @@ function ViewDeliveryOffcanvas({
       });
     }
   }, [showOffcanvas, hasChanged]);
-  // change status
+  // True if status change action happen, otherwise false
   const [isLoading, setIsLoading] = useState(false);
+  // True if status change failed
   const [changeStatusError, setChangeStatusError] = useState(false);
-  // styles
+  // Styles
   const marginBottom = {
     marginBottom: "100px",
   };

@@ -1,6 +1,14 @@
 import { Stack, Table } from "react-bootstrap";
 import PropTypes from "prop-types";
 
+/**
+ * Create a table that show chosen item warehouse or outside warehouse information. If there are not information about item empty element shall be returned.
+ * @component
+ * @param {object} props Component props
+ * @param {{outsideItemInfos: Array<{organizationName: string, qty: Number, price: Number, currency: string}>, ownedItemInfos: Array<{organizationName: string, invoiceNumber: string, qty: Number, price: Number, currency: string}>}} props.restInfo Array with array that contain warehouse information about items.
+ * @param {boolean} props.isOurWarehouse True if table should show user warehouse information, otherwise shows outside warehouse information.
+ * @return {JSX.Element} Table element
+ */
 function ItemTable({ restInfo, isOurWarehouse }) {
   if (restInfo.outsideItemInfos.length === 0 && !isOurWarehouse) {
     return <></>;

@@ -3,6 +3,9 @@ import Image from "next/image";
 import LoginForm from "./../components/Login_form/login_form";
 import bigLogo from "../../public/big_logo.png";
 
+/**
+ * Main page for app with login form
+ */
 export default function App() {
   return (
     <main className="d-flex h-100 w-100 justify-content-center pb-5">

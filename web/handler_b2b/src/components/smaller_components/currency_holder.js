@@ -4,6 +4,17 @@ import Image from "next/image";
 import currency_arrow from "../../../public/icons/currency_arrow.png";
 import currency_button from "../../../public/icons/currency_button.png";
 
+/**
+ * Container for currency trade values.
+ * @component
+ * @param {object} props Component props
+ * @param {string} props.currency_name The currency name that exchange rate will be show.
+ * @param {string} props.current_currency Current chosen by user currency.
+ * @param {Number} props.exchange_rate Currency exchange rate.
+ * @param {Function} props.buttonAction Action that will happen after clicking round button.
+ * @param {boolean} props.isEven If true background will change from light blue to dark blue.
+ * @return {JSX.Element} Container element
+ */
 function CurrencyHolder({
   currency_name,
   current_currency,

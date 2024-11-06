@@ -2,6 +2,13 @@
 
 import getDbName from "../auth/get_db_name";
 
+/**
+ * Sends request to change request status.
+ * @param  {number} requestId request id.
+ * @param  {string} statusName Name of the status (Fulfilled, Request cancelled, In progress).
+ * @param  {string} note User note.
+ * @return {Promise<Boolean>}      Return true if operation succeed, otherwise false.
+ */
 export default async function setRequestStatus(requestId, statusName, note) {
   const dbName = await getDbName();
   let data = {

@@ -2,7 +2,17 @@ import PropTypes from "prop-types";
 import { Stack, Container } from "react-bootstrap";
 import OrgSwitcher from "../switches/org_switch";
 
-function PagePostionBar({ site_name, with_switch, switch_bool }) {
+/**
+ * Create Bar that holds page name and view switch if enabled.
+ * @component
+ * @param {object} props
+ * @param {string} props.site_name Name of current page
+ * @param {boolean} props.with_switch True if you want to view switch to be enabled
+ * @param {boolean} props.switch_bool True if org view is enabled, false if otherwise
+ * @return {JSX.Element} Stack element
+ */
+function PagePositionBar({ site_name, with_switch, switch_bool }) {
+  // Styles
   const barHeight = {
     height: "60px",
   };
@@ -22,10 +32,10 @@ function PagePostionBar({ site_name, with_switch, switch_bool }) {
   );
 }
 
-PagePostionBar.propTypes = {
+PagePositionBar.propTypes = {
   site_name: PropTypes.string.isRequired,
   with_switch: PropTypes.bool.isRequired,
   switch_bool: PropTypes.bool.isRequired,
 };
 
-export default PagePostionBar;
+export default PagePositionBar;

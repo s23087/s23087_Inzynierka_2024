@@ -1,3 +1,4 @@
+# Script for windows task scheduler. Update pricelist qty.
 import os
 import requests
 from dotenv import load_dotenv

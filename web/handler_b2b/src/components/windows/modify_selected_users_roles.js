@@ -7,6 +7,16 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import ErrorMessage from "../smaller_components/error_message";
 
+/**
+ * Modal element that allow to change selected users role.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.modalShow Modal show parameter.
+ * @param {Function} props.onHideFunction Function that will close modal (set modalShow to false).
+ * @param {Array<string>} props.roleList Role list.
+ * @param {Array<Number>} props.users Array that contain user ids.
+ * @return {JSX.Element} Modal element
+ */
 function ModifySelectedUserRole({
   modalShow,
   onHideFunction,

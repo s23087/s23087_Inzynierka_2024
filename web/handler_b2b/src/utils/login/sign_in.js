@@ -2,13 +2,13 @@
 
 import validators from "@/utils/validators/validator";
 import { redirect } from "next/navigation";
-import SessionManagment from "../auth/session_managment";
+import SessionManagement from "../auth/session_management";
 
 /**
  * Sends request to authorize user. If authorization is success it will redirect user to dashboard. If not it will return error object.
- * @param  {object} state Previous state of object bonded to this function.
+ * @param  {{error: boolean, message: string}} state Previous state of object bonded to this function.
  * @param  {FormData} formData Contain form data.
- * @return {Promise<object>}      Return object containing property: error {bool} and message {string}. If error is true that action was unsuccessful.
+ * @return {Promise<{error: boolean, message: string}>} Return action result with message. If error is true that action was unsuccessful.
  */
 export default async function signIn(state, formData) {
   let data = {
@@ -73,7 +73,7 @@ export default async function signIn(state, formData) {
     };
   }
   const body = await response.json();
-  await SessionManagment.createSession(body.id, body.role, dbName);
+  await SessionManagement.createSession(body.id, body.role, dbName);
   if (body.role === "Warehouse Manager") redirect("dashboard/deliveries");
   redirect("dashboard/warehouse");
 }

@@ -4,11 +4,11 @@ import validators from "../validator";
  * Checks if string is not empty and do not exceed given length. Then use given setter to return outcome.
  * @param  {string} string
  * @param  {Function} setter UseState function.
- * @param  {Number} maxLenght Max length allowed for given string
+ * @param  {Number} maxLength Max length allowed for given string
  */
-function normalStringValidtor(string, setter, maxLenght) {
+function normalStringValidator(string, setter, maxLength) {
   if (
-    validators.lengthSmallerThen(string, maxLenght) &&
+    validators.lengthSmallerThen(string, maxLength) &&
     validators.stringIsNotEmpty(string)
   ) {
     setter(false);
@@ -21,11 +21,11 @@ function normalStringValidtor(string, setter, maxLenght) {
  * Checks if string is not empty, do not exceed given length and do not contain numbers. Then use given setter to return outcome.
  * @param  {string} string
  * @param  {Function} setter UseState function.
- * @param  {Number} maxLenght Max length allowed for given string
+ * @param  {Number} maxLength Max length allowed for given string
  */
-function noNumberStringValidtor(string, setter, maxLenght) {
+function noNumberStringValidator(string, setter, maxLength) {
   if (
-    validators.lengthSmallerThen(string, maxLenght) &&
+    validators.lengthSmallerThen(string, maxLength) &&
     validators.stringIsNotEmpty(string) &&
     validators.haveNoNumbers(string)
   ) {
@@ -39,11 +39,11 @@ function noNumberStringValidtor(string, setter, maxLenght) {
  * Checks if string is not empty, do not exceed given length and contain only numbers. Then use given setter to return outcome.
  * @param  {string} string
  * @param  {Function} setter UseState function.
- * @param  {Number} maxLenght Max length allowed for given string
+ * @param  {Number} maxLength Max length allowed for given string
  */
-function onlyNumberStringValidtor(string, setter, maxLenght) {
+function onlyNumberStringValidator(string, setter, maxLength) {
   if (
-    validators.lengthSmallerThen(string, maxLenght) &&
+    validators.lengthSmallerThen(string, maxLength) &&
     validators.stringIsNotEmpty(string) &&
     validators.haveOnlyNumbers(string)
   ) {
@@ -54,11 +54,11 @@ function onlyNumberStringValidtor(string, setter, maxLenght) {
 }
 
 /**
- * Checks if string is a number. Then use given setter to return outcome.
+ * Checks if string is a number and is not empty. Then use given setter to return outcome.
  * @param  {string} string
  * @param  {Function} setter UseState function.
  */
-function onlyNumberValidtor(string, setter) {
+function onlyNumberValidator(string, setter) {
   if (
     validators.stringIsNotEmpty(string) &&
     validators.haveOnlyNumbers(string)
@@ -73,11 +73,11 @@ function onlyNumberValidtor(string, setter) {
  * Checks if string is a number and do not exceed given length. Then use given setter to return outcome.
  * @param  {string} string
  * @param  {Function} setter UseState function.
- * @param  {Number} maxLenght Max length allowed for given string
+ * @param  {Number} maxLength Max length allowed for given string
  */
-function emptyNumberStringValidtor(string, setter, maxLenght) {
+function emptyNumberStringValidator(string, setter, maxLength) {
   if (
-    validators.lengthSmallerThen(string, maxLenght) &&
+    validators.lengthSmallerThen(string, maxLength) &&
     validators.haveOnlyNumbers(string)
   ) {
     setter(false);
@@ -90,11 +90,11 @@ function emptyNumberStringValidtor(string, setter, maxLenght) {
  * Checks if string match email pattern and do not exceed given length. Then use given setter to return outcome.
  * @param  {string} string
  * @param  {Function} setter UseState function.
- * @param  {Number} maxLenght Max length allowed for given string
+ * @param  {Number} maxLength Max length allowed for given string
  */
-function emailValidator(string, setter, maxLenght) {
+function emailValidator(string, setter, maxLength) {
   if (
-    validators.lengthSmallerThen(string, maxLenght) &&
+    validators.lengthSmallerThen(string, maxLength) &&
     validators.isEmail(string) &&
     validators.stringIsNotEmpty(string)
   ) {
@@ -105,7 +105,7 @@ function emailValidator(string, setter, maxLenght) {
 }
 
 /**
- * Checks if string match decimal number pattern (with dot as separator and two decimal places). Then use given setter to return outcome.
+ * Checks if string match decimal number pattern (with dot as separator and two decimal places) and is not empty. Then use given setter to return outcome.
  * @param  {string} string
  * @param  {Function} setter UseState function.
  */
@@ -149,16 +149,16 @@ function isEmptyValidator(string, setter) {
 /**
  * Object that contains function to validate input strings with help of useState function.
  */
-const InputValidtor = {
-  normalStringValidtor,
-  onlyNumberStringValidtor,
-  emptyNumberStringValidtor,
+const InputValidator = {
+  normalStringValidator: normalStringValidator,
+  onlyNumberStringValidator: onlyNumberStringValidator,
+  emptyNumberStringValidator: emptyNumberStringValidator,
   emailValidator,
   decimalValidator,
-  onlyNumberValidtor,
+  onlyNumberValidator: onlyNumberValidator,
   noPathCharactersValidator,
-  noNumberStringValidtor,
+  noNumberStringValidator: noNumberStringValidator,
   isEmptyValidator,
 };
 
-export default InputValidtor;
+export default InputValidator;

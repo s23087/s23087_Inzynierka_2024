@@ -4,6 +4,16 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import validators from "../validators/validator";
 
+/**
+ * Sends request to create sales invoice.
+ * @param  {Array<{priceId: Number, id: Number, qty: Number, price: Number, invoiceId: Number}>} products Products added to invoice.
+ * @param  {FormData} file FormData object containing file binary data.
+ * @param  {{orgName: string, restOrgs: Array<{orgName: string, orgId: Number}>}} orgs Object that contain user organization name.
+ * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
+ * @param  {FormData} formData Contain form data.
+ * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default async function CreateSalesInvoice(
   products,
   file,
@@ -23,10 +33,10 @@ export default async function CreateSalesInvoice(
     };
 
   const dbName = await getDbName();
-  let choosenUser = formData.get("user");
+  let chosenUser = formData.get("user");
   let org = formData.get("org");
   let date = formData.get("date").replaceAll("-", "_");
-  let fileName = `../../database/${dbName}/documents/${invoice.replaceAll(/[\\./]/g, "").replaceAll(" ", "_")}_${choosenUser}${orgs.userOrgId}${org}_${date}${Date.now().toString()}.pdf`;
+  let fileName = `../../database/${dbName}/documents/${invoice.replaceAll(/[\\./]/g, "").replaceAll(" ", "_")}_${chosenUser}${orgs.userOrgId}${org}_${date}${Date.now().toString()}.pdf`;
   let transformProducts = [];
   products.forEach((element) => {
     transformProducts.push({
@@ -119,6 +129,10 @@ export default async function CreateSalesInvoice(
     };
   }
 
+  /**
+   * Organize information into object for fetch.
+   * @return {object}
+   */
   function getData() {
     return {
       userId: parseInt(formData.get("user")),
@@ -143,12 +157,25 @@ export default async function CreateSalesInvoice(
     };
   }
 }
+/**
+ * If different date from invoice date was chosen for currency value then return chosen date, otherwise return invoice date.
+ * @param  {FormData} formData Contain form data.
+ * @return {string}      Date in string (yyyy-MM-dd).
+ */
 function getExchangeDate(formData) {
   return formData.get("currencyExchange")
     ? formData.get("currencyExchange")
     : formData.get("date");
 }
 
+/**
+ * Validate form data.
+ * @param  {string} invoice Invoice number.
+ * @param  {string} transport String containing transport cost.
+ * @param  {Array<object>} products Products added to proforma.
+ * @param  {object} file File object.
+ * @return {string}      Error message. If no error occurred only "Error:" is returned.
+ */
 function validateData(invoice, transport, products, file) {
   let message = "Error:";
   if (

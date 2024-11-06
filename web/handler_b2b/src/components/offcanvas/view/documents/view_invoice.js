@@ -11,12 +11,24 @@ import download_on from "../../../../../public/icons/download_on.png";
 import getRestInvoice from "@/utils/documents/get_rest_invoice";
 import getFileFormServer from "@/utils/documents/download_file";
 import InvoiceTable from "@/components/tables/invoice_table";
+
+/**
+ * Create offcanvas that allow to view more information about invoice.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {{invoiceId: Number, paymentStatus: string, invoiceNumber: string, invoiceDate: string, dueDate: string, inSystem: boolean, clientName: string}} props.invoice Chosen invoice to view.
+ * @param {boolean} props.isYourInvoice If type equal to "Yours invoices" then true, otherwise false.
+ * @return {JSX.Element} Offcanvas element
+ */
 function ViewInvoiceOffcanvas({
   showOffcanvas,
   hideFunction,
   invoice,
   isYourInvoice,
 }) {
+  // download data holder
   const [restInfo, setRestInfo] = useState({
     tax: 0,
     currencyValue: 0,
@@ -29,6 +41,7 @@ function ViewInvoiceOffcanvas({
     items: [],
   });
   const [invoicePath, setInvoicePath] = useState("");
+  // download data
   useEffect(() => {
     if (showOffcanvas) {
       getRestInvoice(invoice.invoiceId, isYourInvoice).then((data) => {
@@ -63,8 +76,8 @@ function ViewInvoiceOffcanvas({
       });
     }
   }, [showOffcanvas, isYourInvoice]);
-  // Download bool
-  const [isDownloading, setIsDowlonding] = useState(false);
+  // True if invoice file is downloaded
+  const [isDownloading, setIsDownloading] = useState(false);
   // Styles
   let statusTextColor = getDocumentStatusStyle(
     invoice.paymentStatus,
@@ -99,7 +112,7 @@ function ViewInvoiceOffcanvas({
                 className="p-0"
                 disabled={isDownloading}
                 onClick={async () => {
-                  setIsDowlonding(true);
+                  setIsDownloading(true);
                   let file = await getFileFormServer(invoicePath);
                   if (file) {
                     let parsed = JSON.parse(file);
@@ -114,7 +127,7 @@ function ViewInvoiceOffcanvas({
                     );
                     downloadObject.click();
                   }
-                  setIsDowlonding(false);
+                  setIsDownloading(false);
                 }}
               >
                 <Image

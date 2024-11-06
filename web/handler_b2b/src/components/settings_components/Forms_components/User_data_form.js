@@ -7,21 +7,35 @@ import { Form, Container, Button, Stack } from "react-bootstrap";
 import { useState } from "react";
 import changeUserInfo from "@/utils/settings/change_user_info";
 import Toastes from "@/components/smaller_components/toast";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 import ErrorMessage from "@/components/smaller_components/error_message";
 
+/**
+ * Return form that allow user to change their data.
+ * @component
+ * @param {object} props Component props
+ * @param {string} props.email Current user email.
+ * @param {string} props.name Current user name.
+ * @param {string} props.surname Current user surname.
+ * @return {JSX.Element} Container element
+ */
 function ModifyUserForm({ email, name, surname }) {
   const router = useRouter();
+  // Error
   const [emailError, setEmailError] = useState(false);
   const [nameError, setNameError] = useState(false);
   const [surnameError, setSurnameError] = useState(false);
+  // Check if any error is active
   const isFormErrorActive = () => emailError || nameError || surnameError;
+  // Set true if component is loading
   const [isLoading, setIsLoading] = useState(false);
+  // Previous state of user data
   const [prevState] = useState({
     email: email,
     name: name,
     surname: surname,
   });
+  // Form action
   const [state, formAction] = useFormState(
     changeUserInfo.bind(null, prevState),
     {
@@ -30,6 +44,7 @@ function ModifyUserForm({ email, name, surname }) {
       message: "",
     },
   );
+  // Styles
   const buttonStyle = {
     width: "220px",
     height: "55px",
@@ -59,7 +74,7 @@ function ModifyUserForm({ email, name, surname }) {
             defaultValue={email}
             isInvalid={emailError}
             onInput={(e) => {
-              InputValidtor.emailValidator(e.target.value, setEmailError, 350);
+              InputValidator.emailValidator(e.target.value, setEmailError, 350);
             }}
             maxLength={350}
           />
@@ -67,7 +82,7 @@ function ModifyUserForm({ email, name, surname }) {
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">Name:</Form.Label>
           <ErrorMessage
-            message="Is empty or lenght is greater than 250."
+            message="Is empty or length is greater than 250."
             messageStatus={nameError}
           />
           <Form.Control
@@ -77,7 +92,7 @@ function ModifyUserForm({ email, name, surname }) {
             defaultValue={name}
             isInvalid={nameError}
             onInput={(e) => {
-              InputValidtor.normalStringValidtor(
+              InputValidator.normalStringValidator(
                 e.target.value,
                 setNameError,
                 250,
@@ -89,7 +104,7 @@ function ModifyUserForm({ email, name, surname }) {
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">Surname:</Form.Label>
           <ErrorMessage
-            message="Is empty or lenght is greater than 200."
+            message="Is empty or length is greater than 200."
             messageStatus={surnameError}
           />
           <Form.Control
@@ -99,7 +114,7 @@ function ModifyUserForm({ email, name, surname }) {
             defaultValue={surname}
             isInvalid={surnameError}
             onInput={(e) => {
-              InputValidtor.normalStringValidtor(
+              InputValidator.normalStringValidator(
                 e.target.value,
                 setSurnameError,
                 200,

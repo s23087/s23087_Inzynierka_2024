@@ -11,12 +11,24 @@ import download_on from "../../../../../public/icons/download_on.png";
 import getFileFormServer from "@/utils/documents/download_file";
 import getRestCreditNote from "@/utils/documents/get_rest_credit_note";
 import CreditNoteTable from "@/components/tables/credit_table";
+
+/**
+ * Create offcanvas that allow to view more information about credit note.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {{creditNoteId: Number, isPaid: boolean, user: string, invoiceNumber: string, date: string, clientName: string, inSystem: boolean}} props.creditNote Chosen credit note to view.
+ * @param {boolean} props.isYourCredit If type equal to "Yours credit notes" then true, otherwise false.
+ * @return {JSX.Element} Offcanvas element
+ */
 function ViewCreditNoteOffcanvas({
   showOffcanvas,
   hideFunction,
   creditNote,
   isYourCredit,
 }) {
+  // download data holder
   const [restInfo, setRestInfo] = useState({
     creditNoteNumber: "",
     currencyName: "",
@@ -25,6 +37,7 @@ function ViewCreditNoteOffcanvas({
     creditItems: [],
   });
   const [creditPath, setCreditPath] = useState("");
+  // download data
   useEffect(() => {
     if (showOffcanvas) {
       getRestCreditNote(creditNote.creditNoteId).then((data) => {
@@ -53,8 +66,8 @@ function ViewCreditNoteOffcanvas({
       });
     }
   }, [showOffcanvas]);
-  // Download bool
-  const [isDownloading, setIsDowlonding] = useState(false);
+  // True if credit note file is downloaded
+  const [isDownloading, setIsDownloading] = useState(false);
   // Styles
   let statusTextColor = getDocumentStatusStyle(
     creditNote.isPaid ? "Paid" : "Unpaid",
@@ -89,7 +102,7 @@ function ViewCreditNoteOffcanvas({
                 className="p-0"
                 disabled={isDownloading}
                 onClick={async () => {
-                  setIsDowlonding(true);
+                  setIsDownloading(true);
                   let file = await getFileFormServer(creditPath);
                   if (file) {
                     let parsed = JSON.parse(file);
@@ -104,7 +117,7 @@ function ViewCreditNoteOffcanvas({
                     );
                     downloadObject.click();
                   }
-                  setIsDowlonding(false);
+                  setIsDownloading(false);
                 }}
               >
                 <Image

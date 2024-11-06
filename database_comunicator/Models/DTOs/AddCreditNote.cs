@@ -2,7 +2,7 @@
 {
     public class AddCreditNote
     {
-        public required string CreditNotenumber { get; set; } = null!;
+        public required string CreditNoteNumber { get; set; } = null!;
         public required DateTime CreditNoteDate { get; set; }
         public required bool InSystem { get; set; }
         public required bool IsPaid { get; set; }

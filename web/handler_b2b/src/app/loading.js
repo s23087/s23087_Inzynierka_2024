@@ -1,5 +1,9 @@
 import { Container, Row, Col } from "react-bootstrap";
 
+/**
+ * Loading screen
+ * @return {JSX.Element} className element
+ */
 export default function Loading() {
   const spinnerStyle = {
     width: "3.5rem",

@@ -3,7 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import BigLogo from "../../../../public/big_logo.png";
 
-export default function SuccesPage() {
+/**
+ * Page that shows up after successful registration
+ */
+export default function SuccessPage() {
+  // Styles
   const buttonSize = {
     maxWidth: "214px",
   };

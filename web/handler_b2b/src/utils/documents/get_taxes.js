@@ -2,6 +2,10 @@
 
 import getDbName from "../auth/get_db_name";
 
+/**
+ * Sends request to get taxes lists.
+ * @return {Promise<Array<{taxesId: Number, taxesValue: Number}>>} Array of objects that contain tax information. If connection was lost return null.
+ */
 export default async function getTaxes() {
   const dbName = await getDbName();
   let url = `${process.env.API_DEST}/${dbName}/Invoices/get/taxes`;

@@ -1,6 +1,13 @@
 import { Table } from "react-bootstrap";
 import PropTypes from "prop-types";
 
+/**
+ * Create a table that holds delivery items. If there are not items empty element shall be returned.
+ * @component
+ * @param {object} props Component props
+ * @param {Array<{partnumber: string, itemName: string, qty: number}>} props.items Array with object that contain items.
+ * @return {JSX.Element} Table element
+ */
 function DeliveryTable({ items }) {
   if (items.length === 0) {
     return <></>;

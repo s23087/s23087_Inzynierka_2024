@@ -11,6 +11,18 @@ import download_on from "../../../../public/icons/download_on.png";
 import getFileFormServer from "@/utils/documents/download_file";
 import CreditNoteTable from "@/components/tables/credit_table";
 import getRestProforma from "@/utils/proformas/get_rest_proforma";
+
+/**
+ * Create offcanvas that allow to view more information about proforma.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {{proformaId: Number, proformaNumber: string, user: string, date: string, clientName: string, currencyName: string, transport: Number}} props.proforma Chosen proforma to view.
+ * @param {boolean} props.isYourProforma If type equal to "Yours proformas" then true, otherwise false.
+ * @param {boolean} props.isOrg True if org view is activated.
+ * @return {JSX.Element} Offcanvas element
+ */
 function ViewProformaOffcanvas({
   showOffcanvas,
   hideFunction,
@@ -18,6 +30,7 @@ function ViewProformaOffcanvas({
   isYourProforma,
   isOrg,
 }) {
+  // Download information holder
   const [restInfo, setRestInfo] = useState({
     taxes: 0,
     currencyValue: 0.0,
@@ -27,7 +40,9 @@ function ViewProformaOffcanvas({
     note: "Is loading",
     items: [],
   });
+  // Download path holder
   const [proformaPath, setProformaPath] = useState("");
+  // Download data
   useEffect(() => {
     if (showOffcanvas) {
       getRestProforma(isYourProforma, proforma.proformaId).then((data) => {
@@ -60,8 +75,8 @@ function ViewProformaOffcanvas({
       });
     }
   }, [showOffcanvas]);
-  // Download bool
-  const [isDownloading, setIsDowlonding] = useState(false);
+  // True if file is downloading
+  const [isDownloading, setIsDownloading] = useState(false);
   return (
     <Offcanvas
       className="h-100 minScalableWidth"
@@ -86,7 +101,7 @@ function ViewProformaOffcanvas({
                 className="p-0"
                 disabled={isDownloading}
                 onClick={async () => {
-                  setIsDowlonding(true);
+                  setIsDownloading(true);
                   let file = await getFileFormServer(proformaPath);
                   if (file) {
                     let parsed = JSON.parse(file);
@@ -101,7 +116,7 @@ function ViewProformaOffcanvas({
                     );
                     downloadObject.click();
                   }
-                  setIsDowlonding(false);
+                  setIsDownloading(false);
                 }}
               >
                 <Image

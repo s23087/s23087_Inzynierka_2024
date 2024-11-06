@@ -7,9 +7,9 @@ import getUserId from "../auth/get_user_id";
  * Sends request to get proformas. Can be filtered or sorted using sort and param arguments.
  * @param  {boolean} isOrg True if org view is activated, otherwise false.
  * @param  {boolean} isYourProforma Is proforma type "Yours proformas".
- * @param  {string} sort Name of attribute that items will be sorted. Frist char indicates direction. D for descending and A for ascending. This param cannot be omitted.
- * @param  {object} params Object that contains properties that items will be filtered by. This param cannot be omitted.
- * @return {Promise<Array<Object>>}      Array of objects that contain item information. If connection was lost return null.
+ * @param  {string} sort Name of attribute that items will be sorted. First char indicates direction. D for descending and A for ascending. This param cannot be omitted.
+ * @param  {{qtyL: string, qtyG: string, totalL: string, totalG: string, dateL: string, dateG: string, recipient: string, currency: string}} params Object that contains properties that items will be filtered by. This param cannot be omitted.
+ * @return {Promise<Array<{user: string|undefined, proformaId: Number, date: string, transport: Number, qty: Number, total: Number, currencyName: string, clientName: string}>>} Array of objects that contain item information. If connection was lost return null. If error occurred return empty array.
  */
 export default async function getProformas(
   isOrg,
@@ -44,8 +44,8 @@ export default async function getProformas(
 
 /**
  * Prepares params for joining to url.
- * @param  {string} sort Name of attribute that items will be sorted. Frist char indicates direction. D for descending and A for ascending.
- * @param  {object} params Object that contains properties that items will be filtered by.
+ * @param  {string} sort Name of attribute that items will be sorted. First char indicates direction. D for descending and A for ascending.
+ * @param  {{qtyL: string, qtyG: string, totalL: string, totalG: string, dateL: string, dateG: string, recipient: string, currency: string}} params Object that contains properties that items will be filtered by.
  * @return {Array<string>}      Array of strings with prepared parameters.
  */
 function getPrepParams(sort, params) {

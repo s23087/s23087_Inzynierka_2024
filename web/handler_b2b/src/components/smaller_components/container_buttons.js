@@ -1,6 +1,23 @@
 import PropTypes from "prop-types";
 import { Container, Row, Col, Button } from "react-bootstrap";
 
+/**
+ * Object container buttons.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.selected True if container is in selected mode.
+ * @param {Function} [props.selectAction=] Action that trigger object selection.
+ * @param {Function} [props.unselectAction=] Action that trigger object unselect.
+ * @param {Function} [props.deleteAction=] Action that open object delete modal.
+ * @param {Function} [props.viewAction=] Action that open object view offcanvas.
+ * @param {Function} [props.modifyAction=] Action that open object modify offcanvas.
+ * @param {Function} [props.completeAction=] Action that trigger request status change to fulfilled. Available only if is_request is true.
+ * @param {Function} [props.rejectAction=] Action that trigger request status change to reject. Available only if is_request is true.
+ * @param {boolean} [props.is_request=false] True if object is request.
+ * @param {boolean} [props.rejectUnaval=false] True if reject button should be disabled.
+ * @param {boolean} [props.completeUnaval=false] True if complete button should be disabled.
+ * @return {JSX.Element} Container element
+ */
 function ContainerButtons({
   selected,
   selectAction,
@@ -69,7 +86,7 @@ ContainerButtons.propTypes = {
   modifyAction: PropTypes.func,
   completeAction: PropTypes.func,
   rejectAction: PropTypes.func,
-  is_request: PropTypes.bool.isRequired,
+  is_request: PropTypes.bool,
   completeUnaval: PropTypes.bool,
   rejectUnaval: PropTypes.bool,
 };

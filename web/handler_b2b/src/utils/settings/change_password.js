@@ -7,9 +7,9 @@ import { redirect } from "next/navigation";
 
 /**
  * Sends request to modify user password.
- * @param  {object} state Previous state of object bonded to this function.
+ * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
  * @param  {FormData} formData Contain form data.
- * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
  * Completed will always be true, to deliver information to component that action has been completed.
  */
 export default async function ChangePassword(state, formData) {

@@ -3,7 +3,15 @@
 import PropTypes from "prop-types";
 import { Col } from "react-bootstrap";
 
-function SuccesFadeAway({ showSuccess, setShowSuccess }) {
+/**
+ * Return element showing success message that will fade away after a moment.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showSuccess useState boolean. True if message should be shown.
+ * @param {Function} props.setShowSuccess useState setter of showSuccess boolean.
+ * @return {JSX.Element} Col element
+ */
+function SuccessFadeAway({ showSuccess, setShowSuccess }) {
   const transition = {
     opacity: 0,
     transition: "all 250ms linear 1.5s",
@@ -25,9 +33,9 @@ function SuccesFadeAway({ showSuccess, setShowSuccess }) {
   );
 }
 
-SuccesFadeAway.propTypes = {
+SuccessFadeAway.propTypes = {
   showSuccess: PropTypes.bool.isRequired,
   setShowSuccess: PropTypes.func.isRequired,
 };
 
-export default SuccesFadeAway;
+export default SuccessFadeAway;

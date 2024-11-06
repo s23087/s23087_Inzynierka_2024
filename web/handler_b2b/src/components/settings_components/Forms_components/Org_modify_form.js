@@ -7,16 +7,26 @@ import { Form, Container, Button, Stack } from "react-bootstrap";
 import { useState } from "react";
 import modifyClient from "@/utils/flexible/modify_client";
 import Toastes from "@/components/smaller_components/toast";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 import ErrorMessage from "@/components/smaller_components/error_message";
 
+/**
+ * Return form that allow user to change their data.
+ * @component
+ * @param {object} props Component props
+ * @param {{id: Number, orgName: string, street: string, city: string, nip: Number|undefined, postal: string, countryId: Number, country: string}} props.orgInfo Object containing organization information.
+ * @param {Array<{id: Number, countryName: string}>} props.countries List of object describing countries.
+ * @return {JSX.Element} Container element
+ */
 function ModifyUserOrgForm({ orgInfo, countries }) {
   const router = useRouter();
+  // Form errors
   const [orgNameError, setOrgNameError] = useState(false);
   const [nipMyError, setMyNipError] = useState(false);
   const [streetError, setStreetError] = useState(false);
   const [cityError, setCityError] = useState(false);
   const [postalError, setPostalError] = useState(false);
+  // Check if form can be submitted
   const isFormErrorActive = () =>
     orgNameError ||
     nipMyError ||
@@ -25,19 +35,23 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
     postalError ||
     !countries ||
     orgInfo.street === "connection error";
+  // Previous state of organization data
   const [prevState] = useState({
     orgName: orgInfo.orgName,
     street: orgInfo.street,
     city: orgInfo.city,
     postalCode: orgInfo.postal,
   });
+  // Set true when form action is activated and false when no action happen
   const [isLoading, setIsLoading] = useState(false);
-  const bindedFunc = modifyClient.bind(null, orgInfo.id).bind(null, prevState);
-  const [state, formAction] = useFormState(bindedFunc, {
+  // Form function
+  const boundFunc = modifyClient.bind(null, orgInfo.id).bind(null, prevState);
+  const [state, formAction] = useFormState(boundFunc, {
     error: false,
     message: "",
     completed: false,
   });
+  // Styles
   const buttonStyle = {
     width: "220px",
     height: "55px",
@@ -53,7 +67,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">Name:</Form.Label>
           <ErrorMessage
-            message="Is empty or lenght is greater than 50."
+            message="Is empty or length is greater than 50."
             messageStatus={orgNameError}
           />
           <Form.Control
@@ -63,7 +77,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             defaultValue={orgInfo.orgName}
             isInvalid={orgNameError}
             onInput={(e) => {
-              InputValidtor.normalStringValidtor(
+              InputValidator.normalStringValidator(
                 e.target.value,
                 setOrgNameError,
                 50,
@@ -75,7 +89,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">Nip:</Form.Label>
           <ErrorMessage
-            message="Is empty, not a number or lenght is greater than 15."
+            message="Is empty, not a number or length is greater than 15."
             messageStatus={nipMyError}
           />
           <Form.Control
@@ -85,7 +99,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             defaultValue={orgInfo.nip}
             isInvalid={nipMyError}
             onInput={(e) => {
-              InputValidtor.emptyNumberStringValidtor(
+              InputValidator.emptyNumberStringValidator(
                 e.target.value,
                 setMyNipError,
                 15,
@@ -97,7 +111,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">Street:</Form.Label>
           <ErrorMessage
-            message="Is empty or lenght is greater than 200."
+            message="Is empty or length is greater than 200."
             messageStatus={streetError}
           />
           <Form.Control
@@ -107,7 +121,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             defaultValue={orgInfo.street}
             isInvalid={streetError}
             onInput={(e) => {
-              InputValidtor.normalStringValidtor(
+              InputValidator.normalStringValidator(
                 e.target.value,
                 setStreetError,
                 200,
@@ -119,7 +133,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">City:</Form.Label>
           <ErrorMessage
-            message="Is empty or lenght is greater than 200."
+            message="Is empty or length is greater than 200."
             messageStatus={cityError}
           />
           <Form.Control
@@ -129,7 +143,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             defaultValue={orgInfo.city}
             isInvalid={cityError}
             onInput={(e) => {
-              InputValidtor.normalStringValidtor(
+              InputValidator.normalStringValidator(
                 e.target.value,
                 setCityError,
                 200,
@@ -141,7 +155,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text">Postal code:</Form.Label>
           <ErrorMessage
-            message="Is empty or lenght is greater than 25."
+            message="Is empty or length is greater than 25."
             messageStatus={postalError}
           />
           <Form.Control
@@ -151,7 +165,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
             defaultValue={orgInfo.postalCode}
             isInvalid={postalError}
             onInput={(e) => {
-              InputValidtor.normalStringValidtor(
+              InputValidator.normalStringValidator(
                 e.target.value,
                 setPostalError,
                 25,
@@ -231,7 +245,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
       />
       <Toastes.SuccessToast
         showToast={state.completed && !state.error}
-        message="You have successfuly modified org info."
+        message="You have successfully modified org info."
         onHideFun={() => {
           state.error = false;
           state.completed = false;

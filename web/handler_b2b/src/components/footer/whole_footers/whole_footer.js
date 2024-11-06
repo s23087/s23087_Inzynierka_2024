@@ -2,20 +2,30 @@
 
 import PropTypes from "prop-types";
 import { useState } from "react";
-import PagationFooter from "../pagation_footer";
-import PagationWindow from "@/components/windows/pagation_window";
+import PaginationFooter from "../pagination_footer";
+import PaginationWindow from "@/components/windows/pagination_window";
 
+/**
+ * Create footer with pagination switch, page navigation and pagination window.
+ * @component
+ * @param {object} props
+ * @param {Number} props.page_qty Number of pages
+ * @param {Number} props.max_instance_on_page Number of maximum number of object available on page
+ * @param {Number} props.current_page Number of current page
+ * @return {JSX.Element} footer element
+ */
 function WholeFooter({ max_instance_on_page, page_qty, current_page }) {
+  // useState for showing pagination window
   const [windowShow, setWindowShow] = useState(false);
   return (
     <footer className="fixed-bottom w-100">
-      <PagationFooter
+      <PaginationFooter
         max_instance_on_page={max_instance_on_page}
         page_qty={page_qty}
         current_page={current_page}
-        pagationAction={() => setWindowShow(true)}
+        paginationAction={() => setWindowShow(true)}
       />
-      <PagationWindow
+      <PaginationWindow
         windowShow={windowShow}
         onHideFunction={() => setWindowShow(false)}
       />

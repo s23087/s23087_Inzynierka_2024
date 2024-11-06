@@ -2,6 +2,11 @@
 
 import getDbName from "../auth/get_db_name";
 
+/**
+ * Sends request to get rest information of chosen client. If not found return object without properties.
+ * @param {Number} orgId Organization id.
+ * @return {Promise<{creditLimit: Number|undefined, availability: string|undefined, daysForRealization: Number|undefined}>} Object that that contain client information. If connection was lost return null.
+ */
 export default async function getRestClientInfo(orgId) {
   const dbName = await getDbName();
   try {

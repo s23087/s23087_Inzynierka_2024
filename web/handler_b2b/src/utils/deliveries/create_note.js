@@ -5,6 +5,14 @@ import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 import validators from "../validators/validator";
 
+/**
+ * Sends request to create delivery note.
+ * @param  {Number} deliveryId Delivery id.
+ * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
+ * @param  {FormData} formData Contain form data.
+ * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default async function createNote(deliveryId, state, formData) {
   const dbName = await getDbName();
   const userId = await getUserId();
@@ -16,7 +24,7 @@ export default async function createNote(deliveryId, state, formData) {
     return {
       error: true,
       completed: true,
-      message: "Error: Note must not be empty or excceed 500 chars.",
+      message: "Error: Note must not be empty or exceed 500 chars.",
     };
   let data = {
     note: note,

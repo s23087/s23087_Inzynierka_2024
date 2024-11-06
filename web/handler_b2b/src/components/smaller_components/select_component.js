@@ -11,6 +11,15 @@ import {
   Button,
 } from "react-bootstrap";
 
+/**
+ * Create element showing hom much objects has been selected with button showing options for modifying them.
+ * @component
+ * @param {object} props Component props
+ * @param {Number} props.selectedQty Number of selected objects.
+ * @param {string} props.actionOneName Option one action name.
+ * @param {Function} props.actionOne Function that will activate after clicking first option.
+ * @return {JSX.Element} Container element
+ */
 function SelectComponent({ selectedQty, actionOneName, actionOne }) {
   const [isClicked, setIsClicked] = useState(false);
   const containerStyle = {

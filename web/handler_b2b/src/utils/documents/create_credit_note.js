@@ -5,6 +5,16 @@ import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 import validators from "../validators/validator";
 
+/**
+ * Sends request to create credit note.
+ * @param  {{userOrg: string, chosenClient: string, isYourCreditNote: boolean, invoiceId: Number}} additionalInvoiceInfo Object containing properties additional information about invoice.
+ * @param  {Array<{id: Number, invoiceId: Number, priceId: Number, qty: Number, price: Number, purchasePrice: Number}>} products Products added to credit note.
+ * @param  {FormData} file FormData object containing file binary data.
+ * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
+ * @param  {FormData} formData Contain form data.
+ * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
+ * Completed will always be true, to deliver information to component that action has been completed.
+ */
 export default async function CreateCreditNote(
   additionalInvoiceInfo,
   products,
@@ -31,14 +41,14 @@ export default async function CreateCreditNote(
 
   const dbName = await getDbName();
   const userId = await getUserId();
-  let choosenUser = parseInt(formData.get("user"));
+  let chosenUser = parseInt(formData.get("user"));
 
   let creditDate = formData.get("date").replaceAll("-", "_");
-  let fileName = `../../database/${dbName}/documents/cn_${creditNumber.replaceAll(/[\\./]/g, "").replaceAll(" ", "_")}_${userId}${additionalInvoiceInfo.userOrg}${additionalInvoiceInfo.choosenClient}_${creditDate}_${Date.now().toString()}.pdf`;
+  let fileName = `../../database/${dbName}/documents/cn_${creditNumber.replaceAll(/[\\./]/g, "").replaceAll(" ", "_")}_${userId}${additionalInvoiceInfo.userOrg}${additionalInvoiceInfo.chosenClient}_${creditDate}_${Date.now().toString()}.pdf`;
   let transformProducts = [];
   products.forEach((element) => {
     transformProducts.push({
-      userId: choosenUser,
+      userId: chosenUser,
       itemId: element.id,
       invoiceId: element.invoiceId,
       purchasePriceId: element.priceId,
@@ -49,7 +59,7 @@ export default async function CreateCreditNote(
     });
     if (element.qty > 0) {
       transformProducts.push({
-        userId: choosenUser,
+        userId: chosenUser,
         itemId: element.id,
         invoiceId: element.invoiceId,
         purchasePriceId: element.priceId,
@@ -151,9 +161,13 @@ export default async function CreateCreditNote(
     };
   }
 
+  /**
+   * Organize information into object for fetch.
+   * @return {object}
+   */
   function getData() {
     return {
-      creditNotenumber: creditNumber,
+      creditNoteNumber: creditNumber,
       creditNoteDate: formData.get("date"),
       inSystem: formData.get("status") === "true",
       isPaid: formData.get("isPaid") === "on",
@@ -166,23 +180,29 @@ export default async function CreateCreditNote(
   }
 }
 
+/**
+ * Validate form data.
+ * @param  {string} invoiceId Invoice id.
+ * @param  {string} creditNumber String containing credit note number.
+ * @param  {string} date Date in string.
+ * @param  {Array<object>} products Products added to proforma.
+ * @param  {object} file File object.
+ * @return {string}      Error message. If no error occurred only "Error:" is returned.
+ */
 function validateData(invoiceId, creditNumber, date, products, file) {
   let errorMessage = "Error:";
   if (!invoiceId) {
     errorMessage += "\nInvoice must not be empty.";
   }
-  if (isCreditNumberIncorrect(creditNumber))
+  if (
+    !validators.lengthSmallerThen(creditNumber, 40) ||
+    !validators.stringIsNotEmpty(creditNumber)
+  )
     errorMessage += "\nCredit note number must not be empty.";
   if (new Date(date) > Date.now())
-    errorMessage += "\nTransport cost must not be empty and must be decimal.";
+    errorMessage +=
+      "\nCannot create credit note with date exceeding todays's date.";
   if (products.length <= 0) errorMessage += "\nCredit note must have products.";
   if (!file) errorMessage += "\nDocument must not be empty.";
   return errorMessage;
-}
-
-function isCreditNumberIncorrect(creditNumber) {
-  return (
-    !validators.lengthSmallerThen(creditNumber, 40) ||
-    !validators.stringIsNotEmpty(creditNumber)
-  );
 }

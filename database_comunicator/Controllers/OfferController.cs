@@ -112,7 +112,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("get/items/pricelist/{pricelistId}/user/{userId}")]
+        [Route("get/items/{pricelistId}/user/{userId}")]
         public async Task<IActionResult> GetOfferItems(int pricelistId, int userId)
         {
             var userExist = await _userServices.UserExist(userId);
@@ -123,7 +123,7 @@ namespace database_communicator.Controllers
             return Ok(result);
         }
         [HttpGet]
-        [Route("get/rest/pricelist/{pricelistId}/user/{userId}")]
+        [Route("get/rest/{pricelistId}/user/{userId}")]
         public async Task<IActionResult> GetRestPricelist(int pricelistId, int userId)
         {
             var userExist = await _userServices.UserExist(userId);

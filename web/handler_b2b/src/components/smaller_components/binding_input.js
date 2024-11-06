@@ -3,6 +3,14 @@ import { Button, InputGroup, Form } from "react-bootstrap";
 import Image from "next/image";
 import pen_icon from "../../../public/icons/pen_icon.png";
 
+/**
+ * Return input element that contain binding information with button to modify.
+ * @component
+ * @param {object} props Component props
+ * @param {{username: string, qty: Number, price: Number, currency: string, invoiceNumber: string}} props.value Object representing binding.
+ * @param {Function} props.modifyAction Function that will allow to modify binding.
+ * @return {JSX.Element} InputGroup element
+ */
 function BindingInput({ value, modifyAction }) {
   let bindingValue =
     value.username +

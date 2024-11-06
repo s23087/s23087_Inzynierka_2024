@@ -8,11 +8,23 @@ import validators from "@/utils/validators/validator";
 import createStatus from "@/utils/clients/create_status";
 import { useRouter } from "next/navigation";
 import ErrorMessage from "../smaller_components/error_message";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 
+/**
+ * Modal element that allow to add availability status for organization to choose.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.modalShow Modal show parameter.
+ * @param {Function} props.onHideFunction Function that will close modal (set modalShow to false).
+ * @param {Array<{name: string}>} props.statuses List of current existing statuses.
+ * @return {JSX.Element} Modal element
+ */
 function AddAvailabilityStatusWindow({ modalShow, onHideFunction, statuses }) {
   const router = useRouter();
+  // Input errors
   const [nameError, setNameError] = useState(false);
   const [daysError, setDaysError] = useState(false);
+  // Form action with state
   const [state, formAction] = useFormState(createStatus, {
     error: false,
     completed: false,
@@ -73,11 +85,7 @@ function AddAvailabilityStatusWindow({ modalShow, onHideFunction, statuses }) {
                 isInvalid={daysError}
                 maxLength={150}
                 onInput={(e) => {
-                  if (validators.haveOnlyNumbers(e.target.value)) {
-                    setDaysError(false);
-                  } else {
-                    setDaysError(true);
-                  }
+                  InputValidator.onlyNumberValidator(e.target.value, setDaysError)
                 }}
               />
             </Form.Group>

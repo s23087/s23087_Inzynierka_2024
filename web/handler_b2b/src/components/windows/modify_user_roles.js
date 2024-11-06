@@ -7,6 +7,16 @@ import modifyUserRole from "@/utils/roles/modify_user_role";
 import { useRouter } from "next/navigation";
 import ErrorMessage from "../smaller_components/error_message";
 
+/**
+ * Modal element that allow to change user role.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.modalShow Modal show parameter.
+ * @param {Function} props.onHideFunction Function that will close modal (set modalShow to false).
+ * @param {Array<string>} props.roleList Role list.
+ * @param {{userId: Number, username: string, surname: string}} props.user Object that contain user info.
+ * @return {JSX.Element} Modal element
+ */
 function ModifyUserRole({ modalShow, onHideFunction, roleList, user }) {
   const router = useRouter();
   const [state, formAction] = useFormState(
@@ -17,6 +27,7 @@ function ModifyUserRole({ modalShow, onHideFunction, roleList, user }) {
       completed: false,
     },
   );
+  // Styles
   const hidden = {
     display: "none",
   };
@@ -75,6 +86,7 @@ function ModifyUserRole({ modalShow, onHideFunction, roleList, user }) {
                     variant="red"
                     className="w-100"
                     onClick={() => {
+                      // reset state and close modal
                       state.error = false;
                       state.message = "";
                       state.completed = false;

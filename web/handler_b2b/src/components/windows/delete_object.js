@@ -6,6 +6,19 @@ import { Modal, Container, Row, Col, Button } from "react-bootstrap";
 import CloseIcon from "../../../public/icons/close_black.png";
 import { useState } from "react";
 
+/**
+ * Modal element that serves as confirmation on delete object.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.modalShow Modal show parameter.
+ * @param {Function} props.onHideFunction Function that will close modal (set modalShow to false).
+ * @param {Function} props.deleteItemFunc Function to active, when confirming delete.
+ * @param {string} props.instanceName Name of object that will be deleted.
+ * @param {Number} props.instanceId Object id in database.
+ * @param {boolean} props.isError True if error occurred in delete action.
+ * @param {string} props.errorMessage
+ * @return {JSX.Element} Modal element
+ */
 function DeleteObjectWindow({
   modalShow,
   onHideFunction,
@@ -15,6 +28,7 @@ function DeleteObjectWindow({
   isError,
   errorMessage,
 }) {
+  // If action is activated true, otherwise should be false.
   const [isActivated, setIsActivated] = useState(false);
   return (
     <Modal

@@ -6,14 +6,32 @@ import PricelistMenu from "@/components/menu/wholeMenu/pricelist_menu";
 import PricelistList from "@/components/object_list/pricelist_list";
 import getRole from "@/utils/auth/get_role";
 import getBasicInfo from "@/utils/menu/get_basic_user_info";
-import getNotificationCounter from "@/utils/menu/get_nofication_counter";
+import getNotificationCounter from "@/utils/menu/get_notification_counter";
 import getPricelists from "@/utils/pricelist/get_pricelist";
 import getSearchPricelists from "@/utils/pricelist/get_search_pricelist";
 
+/**
+ * Pricelist page
+ * @param {Object} props
+ * @param {Object} props.searchParams Object that gives access to query parameters
+ * @param {string} props.searchParams.page Value that determines on which page user is in
+ * @param {string} props.searchParams.pagination Value that determines page pagination
+ * @param {string} props.searchParams.searchQuery Filled with value searched in objects
+ * @param {string} props.searchParams.orderBy Sort value
+ * @param {string} props.searchParams.createdL Created date lower then filter
+ * @param {string} props.searchParams.createdG Created date greater then filter
+ * @param {string} props.searchParams.modifiedL Modified date lower then filter
+ * @param {string} props.searchParams.modifiedG Modified date greater then filter
+ * @param {string} props.searchParams.totalL Total qty lower then filter
+ * @param {string} props.searchParams.totalG Total qty greater then filter
+ * @param {string} props.searchParams.status Status filter
+ * @param {string} props.searchParams.currency Currency filter
+ * @param {string} props.searchParams.type Type filter
+ */
 async function PricelistPage({ searchParams }) {
   const current_role = await getRole();
   const userInfo = await getBasicInfo();
-  const current_nofitication_qty = await getNotificationCounter();
+  const current_notification_qty = await getNotificationCounter();
   let params = {
     createdL: searchParams.createdL,
     createdG: searchParams.createdG,
@@ -38,10 +56,12 @@ async function PricelistPage({ searchParams }) {
     params.modifiedG;
   let currentSort = searchParams.orderBy ?? ".None";
   let isSearchTrue = searchParams.searchQuery !== undefined;
+  // download
   let pricelists = isSearchTrue
     ? await getSearchPricelists(searchParams.searchQuery, currentSort, params)
     : await getPricelists(currentSort, params);
-  let maxInstanceOnPage = searchParams.pagation ? searchParams.pagation : 10;
+  // Pagination, default 10
+  let maxInstanceOnPage = searchParams.pagination ? searchParams.pagination : 10;
   let itemsLength = pricelists === null ? 0 : pricelists.length;
   let pageQty = Math.ceil(itemsLength / maxInstanceOnPage);
   pageQty = pageQty === 0 ? 1 : pageQty;
@@ -56,7 +76,7 @@ async function PricelistPage({ searchParams }) {
     <main className="d-flex flex-column h-100">
       <PricelistMenu
         current_role={current_role}
-        current_nofitication_qty={current_nofitication_qty}
+        current_notification_qty={current_notification_qty}
         user={userInfo}
       />
 

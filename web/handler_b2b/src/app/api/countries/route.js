@@ -2,6 +2,9 @@
 
 import { NextResponse } from "next/server";
 
+/**
+ * Get list of countries from template database.
+ */
 export async function GET() {
   try {
     const countries = await fetch(

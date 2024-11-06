@@ -11,13 +11,13 @@ const fs = require("node:fs");
 /**
  * Sends request to modify proforma. When data is unchanged the attribute in request will be null.
  * @param  {FormData} file FormData object containing file binary data.
- * @param  {object} orgs Object containg user organization name.
- * @param  {object} prevState Object that contain information about previous state of chosen item.
+ * @param  {{orgName: string, restOrgs: Array<{orgName: string, orgId: Number}>}} orgs Object that contain user organization name.
+ * @param  {{proformaNumber: string, userId: Number, client: Number, transport: Number, paymentMethod: Number, status: boolean, note: string}} prevState Object that contain information about previous state of chosen item.
  * @param  {Number} proformaId Proforma id.
  * @param  {boolean} isYourProforma Is proforma type "Yours proformas".
- * @param  {object} state Previous state of object bonded to this function.
+ * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
  * @param  {FormData} formData Contain form data.
- * @return {Promise<object>}      Return object containing property: error {bool}, completed {bool} and message {string}. If error is true that action was unsuccessful.
+ * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
  * Completed will always be true, to deliver information to component that action has been completed.
  */
 export default async function updateProforma(
@@ -109,7 +109,7 @@ export default async function updateProforma(
           dbName,
           userId,
           isYourProforma,
-          proformaId
+          proformaId,
         );
       }
       return {
@@ -154,7 +154,7 @@ export default async function updateProforma(
 
   /**
    * Organize information into object for fetch.
-   * @return {object} 
+   * @return {object}
    */
   function getData() {
     return {
@@ -181,7 +181,7 @@ export default async function updateProforma(
  * @param  {object} data Data from modify request.
  * @param  {object} prevPath Previous path.
  * @param  {string} path Modified path name.
- * @return {boolean} 
+ * @return {boolean}
  */
 function needNewPath(data, prevPath, path) {
   return data.proformaNumber && prevPath !== path;
@@ -245,13 +245,13 @@ async function changePath(
  * @param  {string} user User id.
  * @param  {string} org Organization id.
  * @param  {string} transport Transport cost in form of string.
- * @return {string} Return error message. If no error occurred retrun only "Error:"
+ * @return {string} Return error message. If no error occurred return only "Error:"
  */
 function validateData(proformaNumber, user, org, transport) {
   let message = "Error:";
   if (!proformaNumber || proformaNumber.length > 40)
-    message += "\nProfroma must not be empty or excceed 40 chars.";
-  if (!user) message += "\nRecevier must not be empty.";
+    message += "\nProforma must not be empty or exceed 40 chars.";
+  if (!user) message += "\nReceiver must not be empty.";
   if (!org) message += "\nClient must not be empty.";
   if (!transport || !validators.isPriceFormat(transport))
     message += "\nTransport must be a number and not empty.";

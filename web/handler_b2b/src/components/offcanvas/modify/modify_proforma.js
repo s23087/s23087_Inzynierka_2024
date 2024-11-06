@@ -9,11 +9,21 @@ import getOrgsList from "@/utils/documents/get_orgs_list";
 import getPaymentMethods from "@/utils/documents/get_payment_methods";
 import CloseIcon from "../../../../public/icons/close_black.png";
 import ErrorMessage from "@/components/smaller_components/error_message";
-import InputValidtor from "@/utils/validators/form_validator/inputValidator";
+import InputValidator from "@/utils/validators/form_validator/inputValidator";
 import getRestModifyProforma from "@/utils/proformas/get_rest_modify_proforma";
 import getUsers from "@/utils/flexible/get_users";
 import updateProforma from "@/utils/proformas/modify_proforma";
 
+/**
+ * Create offcanvas that allow to modify chosen proforma.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {boolean} props.isYourProforma If type equal to "Yours proformas" then true, otherwise false.
+ * @param {{proformaId: Number, proformaNumber: string, clientName: string, transport: Number}} props.proforma Chosen proforma to view.
+ * @return {JSX.Element} Offcanvas element
+ */
 function ModifyProformaOffcanvas({
   showOffcanvas,
   hideFunction,
@@ -21,10 +31,25 @@ function ModifyProformaOffcanvas({
   proforma,
 }) {
   const router = useRouter();
+  // download data holders
+  const [restInfo, setRestInfo] = useState({
+    userId: -1,
+    inSystem: false,
+    paymentMethod: "Is loading",
+    note: "Is loading",
+  });
+  const [users, setUsers] = useState([]);
+  const [orgs, setOrgs] = useState({
+    orgName: "Is loading",
+    restOrgs: [],
+  });
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  // download error
   const [userDownloadError, setUserDownloadError] = useState(false);
   const [orgDownloadError, setOrgDownloadError] = useState(false);
   const [methodsDownloadError, setMethodsDownloadError] = useState(false);
   const [restDownloadError, setRestDownloadError] = useState(false);
+  // download data
   useEffect(() => {
     if (showOffcanvas) {
       getUsers().then((data) => {
@@ -69,26 +94,15 @@ function ModifyProformaOffcanvas({
       });
     }
   }, [showOffcanvas]);
-  // rest info
-  const [restInfo, setRestInfo] = useState({
-    userId: -1,
-    inSystem: false,
-    paymentMethod: "Is loading",
-    note: "Is loading",
-  });
-  // options
-  const [users, setUsers] = useState([]);
-  const [orgs, setOrgs] = useState({
-    orgName: "Is loading",
-    restOrgs: [],
-  });
-  const [paymentMethods, setPaymentMethods] = useState([]);
-  // File
+  // For file input
   const [file, setFile] = useState();
-  // Errors
+  // Form errors
   const [proformaNumberError, setInvoiceNumberError] = useState(false);
   const [transportError, setTransportError] = useState(false);
   const [documentError, setDocumentError] = useState(false);
+  /**
+   * Check if form can be submitted
+  */
   const isFormErrorActive = () =>
     proformaNumberError ||
     transportError ||
@@ -99,9 +113,9 @@ function ModifyProformaOffcanvas({
     restDownloadError ||
     methodsDownloadError ||
     orgDownloadError;
-  // Misc
+  // True if modify action is running
   const [isLoading, setIsLoading] = useState(false);
-  // Form
+  // Previous state of proforma. -1 if number property do not changed
   const [prevState] = useState({
     proformaNumber: "",
     userId: -1,
@@ -111,6 +125,7 @@ function ModifyProformaOffcanvas({
     status: null,
     note: "",
   });
+  // Form action with state
   const [state, formPurchaseAction] = useFormState(
     updateProforma
       .bind(null, file)
@@ -203,7 +218,7 @@ function ModifyProformaOffcanvas({
                   Proforma Number:
                 </Form.Label>
                 <ErrorMessage
-                  message="Is empty, not a number or lenght is greater than 40."
+                  message="Is empty, not a number or length is greater than 40."
                   messageStatus={proformaNumberError}
                 />
                 <Form.Control
@@ -212,7 +227,7 @@ function ModifyProformaOffcanvas({
                   name="proformaNumber"
                   isInvalid={proformaNumberError}
                   onInput={(e) => {
-                    InputValidtor.normalStringValidtor(
+                    InputValidator.normalStringValidator(
                       e.target.value,
                       setInvoiceNumberError,
                       40,
@@ -272,7 +287,7 @@ function ModifyProformaOffcanvas({
                   defaultValue={proforma.transport}
                   isInvalid={transportError}
                   onInput={(e) => {
-                    InputValidtor.decimalValidator(
+                    InputValidator.decimalValidator(
                       e.target.value,
                       setTransportError,
                     );

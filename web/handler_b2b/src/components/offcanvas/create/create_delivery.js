@@ -22,13 +22,28 @@ import AddWaybillWindow from "@/components/windows/addWaybill";
 import createDelivery from "@/utils/deliveries/create_delivery";
 import ErrorMessage from "@/components/smaller_components/error_message";
 
+/**
+ * Create offcanvas that allow to create delivery.
+ * @component
+ * @param {object} props Component props
+ * @param {boolean} props.showOffcanvas Offcanvas show parameter. If true is visible, if false hidden.
+ * @param {Function} props.hideFunction Function that set show parameter to false.
+ * @param {boolean} props.isDeliveryToUser If type equal to "Deliveries to user" then true, otherwise false.
+ * @return {JSX.Element} Offcanvas element
+ */
 function AddDeliveryOffcanvas({
   showOffcanvas,
   hideFunction,
   isDeliveryToUser,
 }) {
   const router = useRouter();
-  // Get country and statuses
+  // download data holders
+  const [proformas, setProformas] = useState([]);
+  const [deliveryCompanies, setDeliveryCompanies] = useState([]);
+  // download errors
+  const [companiesDownloadError, setCompaniesDownloadError] = useState(false);
+  const [proformasDownloadError, setProformasDownloadError] = useState(false);
+  // Download data
   useEffect(() => {
     if (showOffcanvas) {
       getDeliveryCompany().then((data) => {
@@ -49,20 +64,24 @@ function AddDeliveryOffcanvas({
       });
     }
   }, [showOffcanvas]);
-  const [proformas, setProformas] = useState([]);
-  const [deliveryCompanies, setDeliveryCompanies] = useState([]);
-  const [companiesDownloadError, setCompaniesDownloadError] = useState(false);
-  const [proformasDownloadError, setProformasDownloadError] = useState(false);
-  // Waybills
+  // Waybills holder
   const [waybills] = useState([]);
+  // useState for showing add waybill window
   const [isAddWaybillShow, setIsAddWaybillShow] = useState(false);
+  /**
+   * Checks if waybill already exist in waybill array.
+   * @param {string} variable Waybill value
+  */
   const waybillExist = (variable) => {
     return waybills.findIndex((item) => item === variable) != -1;
   };
+  // key variable to rerender component that holds waybills
   const [rerenderVar, setRerenderVar] = useState(1);
-  // Delivery company add
+  // useState for showing add delivery company window
   const [isAddCompanyShow, setIsAddCompanyShow] = useState(false);
-  // Error
+  /**
+   * Check if form can be submitted
+  */
   const isFormErrorActive = () => {
     return (
       proformas.length === 0 ||
@@ -71,7 +90,7 @@ function AddDeliveryOffcanvas({
       proformasDownloadError
     );
   };
-  // Loading element
+  // True if create action is running
   const [isLoading, setIsLoading] = useState(false);
   // Form action
   const [state, formAction] = useFormState(
@@ -213,7 +232,7 @@ function AddDeliveryOffcanvas({
                         validatorFunc={(val) =>
                           val.length > 0 && val.length <= 40
                         }
-                        errorMessage="Is empty or excced 40 chars."
+                        errorMessage="Is empty or exceed 40 chars."
                         modifyValue={(variable) => (waybills[key] = variable)}
                       />
                     );
@@ -311,6 +330,9 @@ function AddDeliveryOffcanvas({
     </Offcanvas>
   );
 
+  /**
+   * Reset form state
+  */
   function resetState() {
     state.error = false;
     state.completed = false;

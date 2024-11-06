@@ -8,11 +8,23 @@ import MoreActionWindow from "../windows/more_action";
 import { useSearchParams } from "next/navigation";
 import RoleContainer from "../object_container/role_container";
 import ModifyUserRole from "../windows/modify_user_roles";
-import SelectComponent from "../smaller_components/select_compontent";
-import getPagationInfo from "@/utils/flexible/get_page_info";
+import SelectComponent from "../smaller_components/select_component";
+import getPaginationInfo from "@/utils/flexible/get_page_info";
 import RoleFilterOffcanvas from "../filter/role_filter";
 import ModifySelectedUserRole from "../windows/modify_selected_users_roles";
 
+/**
+ * Return component that showcase role objects, search bar, filter, more action element and selected element.
+ * @component
+ * @param {object} props Component props
+ * @param {Array<{userId: Number, username: string, surname: string, roleName: string}>} props.roles Array containing role objects.
+ * @param {Number} props.rolesStart Starting index of roles subarray.
+ * @param {Number} props.rolesEnd Ending index of roles subarray.
+ * @param {Array<string>} props.rolesToChoose List of roles.
+ * @param {boolean} props.filterActive If filter is activated then true, otherwise false.
+ * @param {string} props.currentSort Current value of "sort" query parameter
+ * @return {JSX.Element} Container element
+ */
 function RolesList({
   roles,
   rolesStart,
@@ -21,20 +33,21 @@ function RolesList({
   filterActive,
   currentSort,
 }) {
-  // Modify role
-  const [showModifyRole, setShowModifyRole] = useState(false);
-  const [userToModify, setUserToModify] = useState({});
-  // More action
-  const [showMoreAction, setShowMoreAction] = useState(false);
-  // Seleted
-  const [selectedQty, setSelectedQty] = useState(0);
-  const [selectedRoles] = useState([]);
-  // Filter
-  const [showFilter, setShowFilter] = useState(false);
-  // more action
-  const [showModifySelectedRole, setShowModifySelectedRole] = useState(false);
-  // Nav
   const params = useSearchParams();
+  // useState for showing modify user role window
+  const [showModifyRole, setShowModifyRole] = useState(false);
+  // holder for user soon to be modified
+  const [userToModify, setUserToModify] = useState({});
+  // useState for showing more action window
+  const [showMoreAction, setShowMoreAction] = useState(false);
+  // Number of selected objects
+  const [selectedQty, setSelectedQty] = useState(0);
+  // Selected role keys
+  const [selectedRoles] = useState([]);
+  // useState for showing filter offcanvas
+  const [showFilter, setShowFilter] = useState(false);
+  // useState for showing modify selected user role window
+  const [showModifySelectedRole, setShowModifySelectedRole] = useState(false);
   // Styles
   const containerMargin = {
     height: "67px",
@@ -105,9 +118,9 @@ function RolesList({
         selectAllOnPage={() => {
           selectedRoles.splice(0, selectedRoles.length);
           setSelectedQty(0);
-          let pagationInfo = getPagationInfo(params);
+          let paginationInfo = getPaginationInfo(params);
           Object.values(roles ?? [])
-            .slice(pagationInfo.start, pagationInfo.end)
+            .slice(paginationInfo.start, paginationInfo.end)
             .forEach((e) => selectedRoles.push(e.userId));
           setSelectedQty(selectedRoles.length);
           setShowMoreAction(false);

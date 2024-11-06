@@ -2,6 +2,10 @@
 
 import getDbName from "../auth/get_db_name";
 
+/**
+ * Sends request to get organization availability statuses.
+ * @return {Promise<Array<{id: Number, name: string, days: Number}>>} Array of objects that that contain status information. If connection was lost return null.
+ */
 export default async function getAvailabilityStatuses() {
   const dbName = await getDbName();
   try {
