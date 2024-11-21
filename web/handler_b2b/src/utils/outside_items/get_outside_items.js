@@ -1,7 +1,6 @@
 "use server";
 
 import getDbName from "../auth/get_db_name";
-import logout from "../auth/logout";
 
 /**
  * Sends request to get outside items. Can be filtered or sorted using sort and param arguments.

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { useSearchParams } from "next/navigation";
 import registerUser from "@/utils/registration/submit_registration";
