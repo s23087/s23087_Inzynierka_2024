@@ -1,13 +1,16 @@
-﻿using database_communicator.Models;
-using database_communicator.Models.DTOs;
+﻿using database_communicator.FilterClass;
+using database_communicator.Models.DTOs.Create;
+using database_communicator.Models.DTOs.Get;
+using database_communicator.Models.DTOs.Modify;
 using database_communicator.Services;
-using database_comunicator.FilterClass;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace database_communicator.Controllers
 {
+    /// <summary>
+    /// This controller works on Invoice table and few other related tables. Used for receiving, modifying and creating data 
+    /// that holds invoices information. Use db_name parameter to pass the name of database that you want ot connect.
+    /// </summary>
     [Route("{db_name}/[controller]")]
     [ApiController]
     public class InvoicesController : ControllerBase
@@ -21,7 +24,7 @@ namespace database_communicator.Controllers
         private readonly ILogServices _logServices;
         private readonly INotificationServices _notificationServices;
         public InvoicesController(
-            IInvoiceServices invoiceServices, 
+            IInvoiceServices invoiceServices,
             IUserServices userServices,
             IOrganizationServices organizationServices,
             IItemServices itemServices,
@@ -36,12 +39,21 @@ namespace database_communicator.Controllers
             _logServices = logServices;
             _notificationServices = notificationServices;
         }
+        /// <summary>
+        /// Tries to receive taxes information from database.
+        /// </summary>
+        /// <returns>200 code with list of <see cref="Models.DTOs.Get.GetTaxes"/>.</returns>
         [HttpGet]
         [Route("get/taxes")]
-        public async Task<IActionResult> GetTaxes() { 
+        public async Task<IActionResult> GetTaxes()
+        {
             var result = await _invoicesService.GetTaxes();
             return Ok(result);
         }
+        /// <summary>
+        /// Tries to receive payment status information from database.
+        /// </summary>
+        /// <returns>200 code with list of <see cref="Models.DTOs.Get.GetPaymentStatuses"/>.</returns>
         [HttpGet]
         [Route("get/payment/statuses")]
         public async Task<IActionResult> GetPaymentStatuses()
@@ -49,6 +61,10 @@ namespace database_communicator.Controllers
             var result = await _invoicesService.GetPaymentStatuses();
             return Ok(result);
         }
+        /// <summary>
+        /// Tries to receive purchase invoice information from database.
+        /// </summary>
+        /// <returns>200 code with list of <see cref="GetInvoicesList"/>.</returns>
         [HttpGet]
         [Route("get/purchase/list")]
         public async Task<IActionResult> GetPurchaseList()
@@ -56,6 +72,10 @@ namespace database_communicator.Controllers
             var result = await _invoicesService.GetPurchaseInvoicesList();
             return Ok(result);
         }
+        /// <summary>
+        /// Tries to receive sales invoice information from database.
+        /// </summary>
+        /// <returns>200 code with list of <see cref="GetInvoicesList"/>.</returns>
         [HttpGet]
         [Route("get/sales/list")]
         public async Task<IActionResult> GetSalesList()
@@ -63,6 +83,10 @@ namespace database_communicator.Controllers
             var result = await _invoicesService.GetSalesInvoicesList();
             return Ok(result);
         }
+        /// <summary>
+        /// Tries to receive payment methods information from database.
+        /// </summary>
+        /// <returns>200 code with list of <see cref="Models.DTOs.Get.GetPaymentMethods"/>.</returns>
         [HttpGet]
         [Route("get/payment/methods")]
         public async Task<IActionResult> GetPaymentMethods()
@@ -70,6 +94,11 @@ namespace database_communicator.Controllers
             var result = await _invoicesService.GetPaymentMethods();
             return Ok(result);
         }
+        /// <summary>
+        /// Tries to receive chosen purchase invoice items available for adding to credit note from database.
+        /// </summary>
+        /// <param name="invoiceId">Chosen invoice id</param>
+        /// <returns>200 code wit list of <see cref="GetInvoiceItems"/> or 404 if invoice is not found.</returns>
         [HttpGet]
         [Route("get/purchase/items/{invoiceId}")]
         public async Task<IActionResult> GetPurchaseInvoiceItems(int invoiceId)
@@ -79,6 +108,11 @@ namespace database_communicator.Controllers
             var result = await _invoicesService.GetInvoiceItems(invoiceId, true);
             return Ok(result);
         }
+        /// <summary>
+        /// Tries to receive chosen sales invoice items available for adding to credit note from database.
+        /// </summary>
+        /// <param name="invoiceId"></param>
+        /// <returns>200 code wit list of <see cref="GetInvoiceItems"/> or 404 if invoice is not found.</returns>
         [HttpGet]
         [Route("get/sales/items/{invoiceId}")]
         public async Task<IActionResult> GetSalesInvoiceItems(int invoiceId)
@@ -88,6 +122,11 @@ namespace database_communicator.Controllers
             var result = await _invoicesService.GetInvoiceItems(invoiceId, false);
             return Ok(result);
         }
+        /// <summary>
+        /// Tries to receive organization information from database for purpose of creating or modifying invoice.
+        /// </summary>
+        /// <param name="userId">Id of user that the invoice is created for.</param>
+        /// <returns>200 code wit list of <see cref="GetOrgsForInvocie"/> or 404 if user is not found.</returns>
         [HttpGet]
         [Route("get/orgs/{userId}")]
         public async Task<IActionResult> GetOrgs(int userId)
@@ -97,11 +136,35 @@ namespace database_communicator.Controllers
             var result = await _invoicesService.GetOrgsForInvoice(userId);
             return Ok(result);
         }
+        /// <summary>
+        /// Tries to receive purchase invoices basic information from database for given user. Can be filtered using parameters. 
+        /// </summary>
+        /// <param name="userId">Id of user that returned invoices will belong to.</param>
+        /// <param name="search">Phrase that will be search across invoices numbers.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="dateL">Filter that search for date that is lower then given value</param>
+        /// <param name="dateG">Filter that search for date that is greater then given value</param>
+        /// <param name="dueL">Filter that search for due date that is lower then given value</param>
+        /// <param name="dueG">>Filter that search for due date that is greater then given value</param>
+        /// <param name="qtyL">Filter that search for qty that is lower then given value</param>
+        /// <param name="qtyG">Filter that search for qty that is greater then given value</param>
+        /// <param name="totalL">Filter that search for total that is lower then given value</param>
+        /// <param name="totalG">Filter that search for total that is greater then given value</param>
+        /// <param name="recipient">Filter that search for recipient with given value</param>
+        /// <param name="currency">Filter that search for currency with given value</param>
+        /// <param name="paymentStatus">Filter that search for payment status with given value</param>
+        /// <param name="status">Filter that search for status with given value</param>
+        /// <returns>200 code with list of <see cref="GetInvoices"/>, 400 when sort if given sort is incorrect or 404 when user is not found.</returns>
         [HttpGet]
         [Route("get/purchase/{userId}")]
         public async Task<IActionResult> GetPurchaseInvoices(int userId, string? search, string? sort, string? dateL, string? dateG,
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
+            if (sort != null)
+            {
+                bool isSortOk = sort.StartsWith("A") || sort.StartsWith("D");
+                if (!isSortOk) return BadRequest("Sort value is incorrect.");
+            }
             IEnumerable<GetInvoices> result;
             var filters = new InvoiceFiltersTemplate
             {
@@ -128,11 +191,34 @@ namespace database_communicator.Controllers
             result = await _invoicesService.GetPurchaseInvoices(userId, sort: sort, filters);
             return Ok(result);
         }
+        /// <summary>
+        /// Tries to receive purchase invoices basic information from database. Can be filtered using parameters. 
+        /// </summary>
+        /// <param name="search">Phrase that will be search across invoices numbers.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="dateL">Filter that search for date that is lower then given value</param>
+        /// <param name="dateG">Filter that search for date that is greater then given value</param>
+        /// <param name="dueL">Filter that search for due date that is lower then given value</param>
+        /// <param name="dueG">>Filter that search for due date that is greater then given value</param>
+        /// <param name="qtyL">Filter that search for qty that is lower then given value</param>
+        /// <param name="qtyG">Filter that search for qty that is greater then given value</param>
+        /// <param name="totalL">Filter that search for total that is lower then given value</param>
+        /// <param name="totalG">Filter that search for total that is greater then given value</param>
+        /// <param name="recipient">Filter that search for recipient with given value</param>
+        /// <param name="currency">Filter that search for currency with given value</param>
+        /// <param name="paymentStatus">Filter that search for payment status with given value</param>
+        /// <param name="status">Filter that search for status with given value</param>
+        /// <returns>200 code with list of <see cref="GetInvoices"/> or 400 when sort if given sort is incorrect.</returns>
         [HttpGet]
         [Route("get/purchase/org")]
         public async Task<IActionResult> GetPurchaseInvoicesOrg(string? search, string? sort, string? dateL, string? dateG,
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
+            if (sort != null)
+            {
+                bool isSortOk = sort.StartsWith("A") || sort.StartsWith("D");
+                if (!isSortOk) return BadRequest("Sort value is incorrect.");
+            }
             IEnumerable<GetInvoices> result;
             var filters = new InvoiceFiltersTemplate
             {
@@ -157,11 +243,35 @@ namespace database_communicator.Controllers
             result = await _invoicesService.GetPurchaseInvoices(sort: sort, filters);
             return Ok(result);
         }
+        /// <summary>
+        /// Tries to receive sales invoices basic information from database for given user. Can be filtered using parameters. 
+        /// </summary>
+        /// <param name="userId">Id of user that returned invoices will belong to.</param>
+        /// <param name="search">Phrase that will be search across invoices numbers.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="dateL">Filter that search for date that is lower then given value</param>
+        /// <param name="dateG">Filter that search for date that is greater then given value</param>
+        /// <param name="dueL">Filter that search for due date that is lower then given value</param>
+        /// <param name="dueG">>Filter that search for due date that is greater then given value</param>
+        /// <param name="qtyL">Filter that search for qty that is lower then given value</param>
+        /// <param name="qtyG">Filter that search for qty that is greater then given value</param>
+        /// <param name="totalL">Filter that search for total that is lower then given value</param>
+        /// <param name="totalG">Filter that search for total that is greater then given value</param>
+        /// <param name="recipient">Filter that search for recipient with given value</param>
+        /// <param name="currency">Filter that search for currency with given value</param>
+        /// <param name="paymentStatus">Filter that search for payment status with given value</param>
+        /// <param name="status">Filter that search for status with given value</param>
+        /// <returns>200 code with list of <see cref="GetInvoices"/>, 400 when sort if given sort is incorrect or 404 when user is not found.</returns>
         [HttpGet]
         [Route("get/sales/{userId}")]
         public async Task<IActionResult> GetSalesInvoices(int userId, string? search, string? sort, string? dateL, string? dateG,
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
+            if (sort != null)
+            {
+                bool isSortOk = sort.StartsWith("A") || sort.StartsWith("D");
+                if (!isSortOk) return BadRequest("Sort value is incorrect.");
+            }
             IEnumerable<GetInvoices> result;
             var filters = new InvoiceFiltersTemplate
             {
@@ -188,11 +298,34 @@ namespace database_communicator.Controllers
             result = await _invoicesService.GetSalesInvoices(userId, sort: sort, filters);
             return Ok(result);
         }
+        /// <summary>
+        /// Tries to receive sales invoices basic information from database. Can be filtered using parameters. 
+        /// </summary>
+        /// <param name="search">Phrase that will be search across invoices numbers.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="dateL">Filter that search for date that is lower then given value</param>
+        /// <param name="dateG">Filter that search for date that is greater then given value</param>
+        /// <param name="dueL">Filter that search for due date that is lower then given value</param>
+        /// <param name="dueG">>Filter that search for due date that is greater then given value</param>
+        /// <param name="qtyL">Filter that search for qty that is lower then given value</param>
+        /// <param name="qtyG">Filter that search for qty that is greater then given value</param>
+        /// <param name="totalL">Filter that search for total that is lower then given value</param>
+        /// <param name="totalG">Filter that search for total that is greater then given value</param>
+        /// <param name="recipient">Filter that search for recipient with given value</param>
+        /// <param name="currency">Filter that search for currency with given value</param>
+        /// <param name="paymentStatus">Filter that search for payment status with given value</param>
+        /// <param name="status">Filter that search for status with given value</param>
+        /// <returns>200 code with list of <see cref="GetInvoices"/> or 400 when sort if given sort is incorrect.</returns>
         [HttpGet]
         [Route("get/sales/org")]
         public async Task<IActionResult> GetSalesInvoicesOrg(string? search, string? sort, string? dateL, string? dateG,
             string? dueL, string? dueG, int? qtyL, int? qtyG, int? totalL, int? totalG, int? recipient, string? currency, int? paymentStatus, bool? status)
         {
+            if (sort != null)
+            {
+                bool isSortOk = sort.StartsWith("A") || sort.StartsWith("D");
+                if (!isSortOk) return BadRequest("Sort value is incorrect.");
+            }
             IEnumerable<GetInvoices> result;
             var filters = new InvoiceFiltersTemplate
             {
@@ -217,6 +350,12 @@ namespace database_communicator.Controllers
             result = await _invoicesService.GetSalesInvoices(sort: sort, filters);
             return Ok(result);
         }
+        /// <summary>
+        /// Create new purchase invoice in database using given information. This action will also create new log entry and notification.
+        /// </summary>
+        /// <param name="data">New purchase invoice data wrapped in <see cref="Models.DTOs.Create.AddPurchaseInvoice"/> object.</param>
+        /// <param name="userId">Id of user that's activating this action.</param>
+        /// <returns>200 code when success, 400 when failure or 404 when user, organization or item is not found.</returns>
         [HttpPost]
         [Route("add/purchase/{userId}")]
         public async Task<IActionResult> AddPurchaseInvoice(AddPurchaseInvoice data, int userId)
@@ -251,6 +390,12 @@ namespace database_communicator.Controllers
             }
             return Ok();
         }
+        /// <summary>
+        /// Create new sales invoice in database using given information. This action will also create new log entry and notification.
+        /// </summary>
+        /// <param name="data">New sales invoice data wrapped in <see cref="Models.DTOs.Create.AddSalesInvoice"/> object.</param>
+        /// <param name="userId">Id of user that's activating this action.</param>
+        /// <returns>200 code when success, 400 when failure or 404 when user, organization or item is not found.</returns>
         [HttpPost]
         [Route("add/sales/{userId}")]
         public async Task<IActionResult> AddSalesInvoice(AddSalesInvoice data, int userId)
@@ -285,6 +430,10 @@ namespace database_communicator.Controllers
             }
             return Ok();
         }
+        /// <summary>
+        /// Tries to receive information about available items for adding to purchase invoice.
+        /// </summary>
+        /// <returns>200 code with list of <see cref="GetItemList"/></returns>
         [HttpGet]
         [Route("get/items")]
         public async Task<IActionResult> GetAllItems()
@@ -292,6 +441,12 @@ namespace database_communicator.Controllers
             var result = await _itemServices.GetItemList();
             return Ok(result);
         }
+        /// <summary>
+        /// Tries to receive information about available items for adding to sales invoice.
+        /// </summary>
+        /// <param name="userId">Id of user that's items are needed for.</param>
+        /// <param name="currency">Shortcut name of currency that product price will be taken.</param>
+        /// <returns>200 code with list of <see cref="GetSalesItemList"/> or 404 when user is not found.</returns>
         [HttpGet]
         [Route("get/sales/items/{userId}/currency/{currency}")]
         public async Task<IActionResult> GetAllSalesItems(int userId, string currency)
@@ -301,6 +456,13 @@ namespace database_communicator.Controllers
             var result = await _itemServices.GetSalesItemList(userId, currency);
             return Ok(result);
         }
+        /// <summary>
+        /// Delete chosen invoice from database. This action will also create new log entry and notification.
+        /// </summary>
+        /// <param name="invoiceId">Chosen id of invoice to delete</param>
+        /// <param name="userId">Id of user that's activating this action.</param>
+        /// <param name="isYourInvoice">True if invoice recipient is user, false if client.</param>
+        /// <returns>200 code when success, 500 code when failure, 404 when user or invoice is not found or 400 when invoice have relations to other documents.</returns>
         [HttpDelete]
         [Route("delete/{invoiceId}/{isYourInvoice}/{userId}")]
         public async Task<IActionResult> DeleteInvoice(int invoiceId, int userId, bool isYourInvoice)
@@ -337,6 +499,11 @@ namespace database_communicator.Controllers
             }
             return result ? Ok() : new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
+        /// <summary>
+        /// Retrieves invoice file path from database.
+        /// </summary>
+        /// <param name="invoiceId">Invoice id.</param>
+        /// <returns>200 with string containing file path or 404 when invoice is not found.</returns>
         [HttpGet]
         [Route("get/path/{invoiceId}")]
         public async Task<IActionResult> GetInvoicePath(int invoiceId)
@@ -346,6 +513,12 @@ namespace database_communicator.Controllers
             var result = await _invoicesService.GetInvoicePath(invoiceId);
             return Ok(result);
         }
+        /// <summary>
+        /// Tries to receive information that was not passed as basic information in <see cref="GetPurchaseInvoices"/> or <see cref="GetPurchaseInvoicesOrg"/> 
+        /// function and are needed to showcase object for user.
+        /// </summary>
+        /// <param name="invoiceId">Invoice id.</param>
+        /// <returns>>200 with object of <see cref="GetRestInvoice"/> or 404 when invoice is not found.</returns>
         [HttpGet]
         [Route("rest/purchase/{invoiceId}")]
         public async Task<IActionResult> GetRestPurchaseInvoice(int invoiceId)
@@ -355,6 +528,12 @@ namespace database_communicator.Controllers
             var result = await _invoicesService.GetRestPurchaseInvoice(invoiceId);
             return Ok(result);
         }
+        /// <summary>
+        /// Tries to receive information that was not passed as basic information in <see cref="GetSalesInvoices"/> or <see cref="GetSalesInvoicesOrg"/> 
+        /// function and are needed to showcase object for user.
+        /// </summary>
+        /// <param name="invoiceId">Invoice id.</param>
+        /// <returns>>200 with object of <see cref="GetRestInvoice"/> or 404 when invoice is not found.</returns>
         [HttpGet]
         [Route("rest/sales/{invoiceId}")]
         public async Task<IActionResult> GetRestSalesInvoice(int invoiceId)
@@ -364,6 +543,12 @@ namespace database_communicator.Controllers
             var result = await _invoicesService.GetRestSalesInvoice(invoiceId);
             return Ok(result);
         }
+        /// <summary>
+        /// Tries to receive information that was not passed as basic information in <see cref="GetSalesInvoices"/> or <see cref="GetSalesInvoicesOrg"/> 
+        /// function and are needed to modify object.
+        /// </summary>
+        /// <param name="invoiceId">Invoice id.</param>
+        /// <returns>>200 with object of <see cref="Models.DTOs.Get.GetRestModifyInvoice"/> or 404 when invoice is not found.</returns>
         [HttpGet]
         [Route("get/rest/modify/{invoiceId}")]
         public async Task<IActionResult> GetRestModifyInvoice(int invoiceId)
@@ -373,6 +558,12 @@ namespace database_communicator.Controllers
             var result = await _invoicesService.GetRestModifyInvoice(invoiceId);
             return Ok(result);
         }
+        /// <summary>
+        /// Overwrite chosen invoice given properties. This action will also create new log entry and notification.
+        /// </summary>
+        /// <param name="data">New invoice data wrapped in <see cref="Models.DTOs.Modify.ModifyInvoice"/> object.</param>
+        /// <param name="userId">Id of user that's activating this action.</param>
+        /// <returns>200 code when success, 500 code when failure or 404 when user or invoice is not found,</returns>
         [HttpPost]
         [Route("modify/{userId}")]
         public async Task<IActionResult> ModifyInvoice(ModifyInvoice data, int userId)
@@ -407,11 +598,16 @@ namespace database_communicator.Controllers
             }
             return result ? Ok() : new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
+        /// <summary>
+        /// Modify all invoice status that due date has passed and payment status was unpaid to due to.
+        /// </summary>
+        /// <returns>200 code when success or 500 when failure</returns>
         [HttpPost]
         [Route("update/status")]
         public async Task<IActionResult> UpdateStatus()
         {
-            await _invoicesService.UpdateInvoiceStatus();
+            var result = await _invoicesService.UpdateInvoiceStatus();
+            if (!result) return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             return Ok();
         }
     }

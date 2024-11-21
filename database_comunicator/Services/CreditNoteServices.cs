@@ -1,39 +1,147 @@
 ﻿using database_communicator.Data;
+using database_communicator.FilterClass;
 using database_communicator.Models;
-using database_communicator.Models.DTOs;
+using database_communicator.Models.DTOs.Create;
+using database_communicator.Models.DTOs.Get;
+using database_communicator.Models.DTOs.Modify;
 using database_communicator.Utils;
-using database_comunicator.FilterClass;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace database_communicator.Services
 {
+    /// <summary>
+    /// Interface that interact with database and contains functions allowing to work on credit notes.
+    /// </summary>
     public interface ICreditNoteServices
     {
+        /// <summary>
+        /// Using transactions add credit note and it's items to database.
+        /// </summary>
+        /// <param name="data">Credit note data wrapped in <see cref="Models.DTOs.Create.AddCreditNote"/></param>
+        /// <returns>Id of new credit note or 0 if creation was not successful.</returns>
         public Task<int> AddCreditNote(AddCreditNote data);
+        /// <summary>
+        /// Do select query with given filter and sort to receive credit note information.
+        /// </summary>
+        /// <param name="yourCreditNotes">True if credit note was given by client to user, otherwise false.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="CreditNoteFiltersTemplate"/></param>
+        /// <returns>List of <see cref="GetCreditNote"/>.</returns>
         public Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string? sort, CreditNoteFiltersTemplate filters);
+        /// <summary>
+        /// Do select query with given search, filter and sort to receive credit note information.
+        /// </summary>
+        /// <param name="yourCreditNotes">True if credit note was given by client to user, otherwise false.</param>
+        /// <param name="search">The phrase searched in credit note information. It will check if phrase exist in organization name or invoice number.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="CreditNoteFiltersTemplate"/></param>
+        /// <returns>List of <see cref="GetCreditNote"/>.</returns>
         public Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string search, string? sort, CreditNoteFiltersTemplate filters);
+        /// <summary>
+        /// Do select query with given filter and sort to receive credit note information for given user.
+        /// </summary>
+        /// <param name="yourCreditNotes">True if credit note was given by client to user, otherwise false.</param>
+        /// <param name="userId">Id of user.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="CreditNoteFiltersTemplate"/></param>
+        /// <returns>List of <see cref="GetCreditNote"/>.</returns>
         public Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, int userId, string? sort, CreditNoteFiltersTemplate filters);
+        /// <summary>
+        /// Do select query with given search, filter and sort to receive credit note information for given user.
+        /// </summary>
+        /// <param name="yourCreditNotes">True if proforma is form client to user, false if it's from user to his client.</param>
+        /// <param name="search">The phrase searched in credit note information. It will check if phrase exist in organization name or invoice number.</param>
+        /// <param name="userId">Id of user.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="CreditNoteFiltersTemplate"/></param>
+        /// <returns>List of <see cref="GetCreditNote"/>.</returns>
         public Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string search, int userId, string? sort, CreditNoteFiltersTemplate filters);
+        /// <summary>
+        /// Check if deduction that comes with credit note can be applied to the user with given item.
+        /// </summary>
+        /// <param name="userId">Id of user that owns credit note.</param>
+        /// <param name="invoiceId">Id of invoice that credit note will be applied.</param>
+        /// <param name="itemId">Id of item that quantity will be deduced from.</param>
+        /// <param name="qty">Quantity that will be deduced.</param>
+        /// <returns>True if can be deduced or false if can't</returns>
         public Task<bool> CreditDeductionCanBeApplied(int userId, int invoiceId, int itemId, int qty);
+        /// <summary>
+        /// Checks if credit note with given invoice id and credit note number exist.
+        /// </summary>
+        /// <param name="creditNoteNumber">Credit note number</param>
+        /// <param name="invoiceId">Id of invoice bounded to credit note.</param>
+        /// <returns>True if exist, false if don't</returns>
         public Task<bool> CreditNoteExist(string creditNoteNumber, int invoiceId);
+        /// <summary>
+        /// Checks if credit note with given id exist.
+        /// </summary>
+        /// <param name="creditNoteId">Credit note id</param>
+        /// <returns>True if exist, false if not.</returns>
         public Task<bool> CreditNoteExist(int creditNoteId);
+        /// <summary>
+        /// Do select query using given id to receive credit note information that was not given in bulk query.
+        /// </summary>
+        /// <param name="creditNoteId">Credit note id.</param>
+        /// <returns>Credit note information wrapped in <see cref="Models.DTOs.Get.GetRestCreditNote"/>.</returns>
         public Task<GetRestCreditNote> GetRestCreditNote(int creditNoteId);
+        /// <summary>
+        /// Do delete query on credit note and credit note items table. Also deduces item qty from item-owner table.
+        /// </summary>
+        /// <param name="creditNoteId">Credit note id to delete.</param>
+        /// <returns>True if action was success, false if failure.</returns>
         public Task<bool> DeleteCreditNote(int creditNoteId);
+        /// <summary>
+        /// Do select query on credit note table to get user id bounded to credit note.
+        /// </summary>
+        /// <param name="creditNoteId">Credit note id.</param>
+        /// <returns>Return id of user.</returns>
         public Task<int> GetCreditNoteUser(int creditNoteId);
+        /// <summary>
+        /// Do select query on credit note table to get credit note number.
+        /// </summary>
+        /// <param name="creditNoteId">Credit note id.</param>
+        /// <returns>String containing credit note number.</returns>
         public Task<string> GetCreditNumber(int creditNoteId);
+        /// <summary>
+        /// Do select query on credit note table to get credit note file path.
+        /// </summary>
+        /// <param name="creditNoteId">Credit note id.</param>
+        /// <returns>String containing file path.</returns>
         public Task<string?> GetCreditFilePath(int creditNoteId);
+        /// <summary>
+        /// Do select query to receive credit note information needed to modify it, but not passed in bulk query.
+        /// </summary>
+        /// <param name="creditNoteId">Credit note id.</param>
+        /// <param name="isYourCredit">True if credit note was given by client to user, otherwise false.</param>
+        /// <returns>Chosen credit note information wrapped in  <see cref="Models.DTOs.Get.GetRestModifyCredit"/>.</returns>
         public Task<GetRestModifyCredit> GetRestModifyCredit(int creditNoteId, bool isYourCredit);
+        /// <summary>
+        /// Do select query to receive credit note invoice id.
+        /// </summary>
+        /// <param name="creditNoteId">Credit note id.</param>
+        /// <returns>Invoice id that's bound to credit note.</returns>
         public Task<int> GetCreditNoteInvoiceId(int creditNoteId);
+        /// <summary>
+        /// Overwrites chosen credit note properties given in data parameter.
+        /// </summary>
+        /// <param name="data">Object of <see cref="Models.DTOs.Modify.ModifyCreditNote"/>.</param>
+        /// <returns>True if success, false if failure.</returns>
         public Task<bool> ModifyCreditNote(ModifyCreditNote data);
     }
-    public class CreditNoteServices : ICreditNoteServices
+    /// <remarks>
+    /// Class for Credit note services.
+    /// </remarks>
+    /// <param name="handlerContext">Database context</param>
+    /// <param name="logger">Log interface</param>
+    public class CreditNoteServices(HandlerContext handlerContext, ILogger<CreditNoteServices> logger) : ICreditNoteServices
     {
-        private readonly HandlerContext _handlerContext;
-        public CreditNoteServices(HandlerContext handlerContext)
-        {
-            _handlerContext = handlerContext;
-        }
+        private readonly HandlerContext _handlerContext = handlerContext;
+        private readonly ILogger<CreditNoteServices> _logger = logger;
+        /// <summary>
+        /// Using transactions add credit note and it's items to database.
+        /// </summary>
+        /// <param name="data">Credit note data wrapped in <see cref="Models.DTOs.Create.AddCreditNote"/></param>
+        /// <returns>Id of new credit note or 0 if creation was not successful.</returns>
         public async Task<int> AddCreditNote(AddCreditNote data)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -54,7 +162,7 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
 
                 var currencyName = await _handlerContext.Invoices.Where(e => e.InvoiceId == data.InvoiceId).Select(e => e.CurrencyName).FirstAsync();
-                var invoiceCurrencydate = await _handlerContext.Invoices.Where(e => e.InvoiceId == data.InvoiceId).Select(e => e.CurrencyValueDate).FirstAsync();
+                var invoiceCurrencyDate = await _handlerContext.Invoices.Where(e => e.InvoiceId == data.InvoiceId).Select(e => e.CurrencyValueDate).FirstAsync();
                 if (currencyName != "PLN")
                 {
                     var currencyVal = await _handlerContext.Invoices
@@ -77,7 +185,7 @@ namespace database_communicator.Services
                     var calculatedItems = creditItems.Select(e => new CalculatedCreditNotePrice
                     {
                         CurrencyName = currencyName,
-                        UpdateDate = invoiceCurrencydate,
+                        UpdateDate = invoiceCurrencyDate,
                         CreditItemId = e.CreditItemId,
                         Price = e.NewPrice / currencyVal
                     }).ToList();
@@ -95,14 +203,15 @@ namespace database_communicator.Services
                         var secCalculatedItems = creditItems.Select(e => new CalculatedCreditNotePrice
                         {
                             CurrencyName = currencyName,
-                            UpdateDate = invoiceCurrencydate,
+                            UpdateDate = invoiceCurrencyDate,
                             CreditItemId = e.CreditItemId,
                             Price = e.NewPrice / secVal
                         }).ToList();
 
                         await _handlerContext.CalculatedCreditNotePrices.AddRangeAsync(secCalculatedItems);
                     }
-                } else
+                }
+                else
                 {
                     var creditItems = data.CreditNoteItems.Select(e => new CreditNoteItem
                     {
@@ -155,13 +264,21 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return creditNote.IdCreditNote;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Create credit note error.");
                 await trans.RollbackAsync();
                 return 0;
             }
         }
+        /// <summary>
+        /// Do select query with given filter and sort to receive credit note information.
+        /// </summary>
+        /// <param name="yourCreditNotes">True if credit note was given by client to user, otherwise false.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="CreditNoteFiltersTemplate"/></param>
+        /// <returns>List of <see cref="GetCreditNote"/>.</returns>
         public async Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string? sort, CreditNoteFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetCreditNoteSort(sort);
@@ -211,6 +328,14 @@ namespace database_communicator.Services
                     IsPaid = e.IsPaid
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query with given search, filter and sort to receive credit note information.
+        /// </summary>
+        /// <param name="yourCreditNotes">True if credit note was given by client to user, otherwise false.</param>
+        /// <param name="search">The phrase searched in credit note information. It will check if phrase exist in organization name or invoice number.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="CreditNoteFiltersTemplate"/></param>
+        /// <returns>List of <see cref="GetCreditNote"/>.</returns>
         public async Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string search, string? sort, CreditNoteFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetCreditNoteSort(sort);
@@ -236,9 +361,9 @@ namespace database_communicator.Services
 
             return await _handlerContext.CreditNotes
                 .Where(e => yourCreditNotes ? e.Invoice.OwnedItems.Any() : e.Invoice.SellingPrices.Any())
-                .Where(e => e.Invoice.InvoiceNumber.ToLower().Contains(search.ToLower()) 
-                    || 
-                    (yourCreditNotes ? 
+                .Where(e => e.Invoice.InvoiceNumber.ToLower().Contains(search.ToLower())
+                    ||
+                    (yourCreditNotes ?
                         e.Invoice.SellerNavigation.OrgName.ToLower().Contains(search.ToLower())
                         :
                         e.Invoice.BuyerNavigation.OrgName.ToLower().Contains(search.ToLower())
@@ -268,6 +393,14 @@ namespace database_communicator.Services
                     IsPaid = obj.IsPaid
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query with given filter and sort to receive credit note information for given user.
+        /// </summary>
+        /// <param name="yourCreditNotes">True if credit note was given by client to user, otherwise false.</param>
+        /// <param name="userId">Id of user.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="CreditNoteFiltersTemplate"/></param>
+        /// <returns>List of <see cref="GetCreditNote"/>.</returns>
         public async Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, int userId, string? sort, CreditNoteFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetCreditNoteSort(sort);
@@ -317,6 +450,15 @@ namespace database_communicator.Services
                     IsPaid = inst.IsPaid
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query with given search, filter and sort to receive credit note information for given user.
+        /// </summary>
+        /// <param name="yourCreditNotes">True if proforma is form client to user, false if it's from user to his client.</param>
+        /// <param name="search">The phrase searched in credit note information. It will check if phrase exist in organization name or invoice number.</param>
+        /// <param name="userId">Id of user.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="CreditNoteFiltersTemplate"/></param>
+        /// <returns>List of <see cref="GetCreditNote"/>.</returns>
         public async Task<IEnumerable<GetCreditNote>> GetCreditNotes(bool yourCreditNotes, string search, int userId, string? sort, CreditNoteFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetCreditNoteSort(sort);
@@ -375,6 +517,14 @@ namespace database_communicator.Services
                 }).ToListAsync();
 
         }
+        /// <summary>
+        /// Check if deduction that comes with credit note can be applied to the user with given item.
+        /// </summary>
+        /// <param name="userId">Id of user that owns credit note.</param>
+        /// <param name="invoiceId">Id of invoice that credit note will be applied.</param>
+        /// <param name="itemId">Id of item that quantity will be deduced from.</param>
+        /// <param name="qty">Quantity that will be deduced.</param>
+        /// <returns>True if can be deduced or false if can't</returns>
         public async Task<bool> CreditDeductionCanBeApplied(int userId, int invoiceId, int itemId, int qty)
         {
             var exist = await _handlerContext.ItemOwners
@@ -385,14 +535,30 @@ namespace database_communicator.Services
                 .Select(e => e.Qty).FirstAsync();
             return currentResult - qty >= 0;
         }
+        /// <summary>
+        /// Checks if credit note with given invoice id and credit note number exist.
+        /// </summary>
+        /// <param name="creditNoteNumber">Credit note number</param>
+        /// <param name="invoiceId">Id of invoice bounded to credit note.</param>
+        /// <returns>True if exist, false if don't</returns>
         public async Task<bool> CreditNoteExist(string creditNoteNumber, int invoiceId)
         {
             return await _handlerContext.CreditNotes.AnyAsync(x => x.CreditNoteNumber == creditNoteNumber && x.InvoiceId == invoiceId);
         }
+        /// <summary>
+        /// Checks if credit note with given id exist.
+        /// </summary>
+        /// <param name="creditNoteId">Credit note id</param>
+        /// <returns>True if exist, false if not.</returns>
         public async Task<bool> CreditNoteExist(int creditNoteId)
         {
             return await _handlerContext.CreditNotes.AnyAsync(x => x.IdCreditNote == creditNoteId);
         }
+        /// <summary>
+        /// Do select query using given id to receive credit note information that was not given in bulk query.
+        /// </summary>
+        /// <param name="creditNoteId">Credit note id.</param>
+        /// <returns>Credit note information wrapped in <see cref="Models.DTOs.Get.GetRestCreditNote"/>.</returns>
         public async Task<GetRestCreditNote> GetRestCreditNote(int creditNoteId)
         {
             var creditCurrency = await _handlerContext.CreditNotes.Where(e => e.IdCreditNote == creditNoteId).Select(e => e.Invoice.CurrencyName).FirstAsync();
@@ -414,6 +580,11 @@ namespace database_communicator.Services
                     }).ToList(),
                 }).FirstAsync();
         }
+        /// <summary>
+        /// Do delete query on credit note and credit note items table. Also deduces item qty from item-owner table.
+        /// </summary>
+        /// <param name="creditNoteId">Credit note id to delete.</param>
+        /// <returns>True if action was success, false if failure.</returns>
         public async Task<bool> DeleteCreditNote(int creditNoteId)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -423,7 +594,11 @@ namespace database_communicator.Services
                     .Where(e => e.CreditNoteId == creditNoteId)
                     .Select(e => new
                     {
-                        e.CreditItemId, e.PurchasePrice.InvoiceId, e.PurchasePrice.OwnedItemId, e.CreditNote.IdUser, e.Qty
+                        e.CreditItemId,
+                        e.PurchasePrice.InvoiceId,
+                        e.PurchasePrice.OwnedItemId,
+                        e.CreditNote.IdUser,
+                        e.Qty
                     }).ToListAsync();
                 foreach (var creditItem in creditItems)
                 {
@@ -439,25 +614,47 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex, "Delete credit note error.");
                 await trans.RollbackAsync();
                 return false;
             }
         }
+        /// <summary>
+        /// Do select query on credit note table to get user id bounded to credit note.
+        /// </summary>
+        /// <param name="creditNoteId">Credit note id.</param>
+        /// <returns>Return id of user.</returns>
         public async Task<int> GetCreditNoteUser(int creditNoteId)
         {
             return await _handlerContext.CreditNotes.Where(e => e.IdCreditNote == creditNoteId).Select(e => e.IdUser).FirstAsync();
         }
+        /// <summary>
+        /// Do select query on credit note table to get credit note number.
+        /// </summary>
+        /// <param name="creditNoteId">Credit note id.</param>
+        /// <returns>String containing credit note number.</returns>
         public async Task<string> GetCreditNumber(int creditNoteId)
         {
             return await _handlerContext.CreditNotes.Where(e => e.IdCreditNote == creditNoteId).Select(e => e.CreditNoteNumber).FirstAsync();
         }
+        /// <summary>
+        /// Do select query on credit note table to get credit note file path.
+        /// </summary>
+        /// <param name="creditNoteId">Credit note id.</param>
+        /// <returns>String containing file path.</returns>
         public async Task<string?> GetCreditFilePath(int creditNoteId)
         {
             return await _handlerContext.CreditNotes.Where(e => e.IdCreditNote == creditNoteId).Select(e => e.CreditFilePath).FirstAsync();
         }
+        /// <summary>
+        /// Do select query to receive credit note information needed to modify it, but not passed in bulk query.
+        /// </summary>
+        /// <param name="creditNoteId">Credit note id.</param>
+        /// <param name="isYourCredit">True if credit note was given by client to user, otherwise false.</param>
+        /// <returns>Chosen credit note information wrapped in  <see cref="Models.DTOs.Get.GetRestModifyCredit"/>.</returns>
         public async Task<GetRestModifyCredit> GetRestModifyCredit(int creditNoteId, bool isYourCredit)
         {
             return await _handlerContext.CreditNotes
@@ -465,10 +662,16 @@ namespace database_communicator.Services
                 .Select(e => new GetRestModifyCredit
                 {
                     CreditNumber = e.CreditNoteNumber,
+                    // OrgName should always be user organization name
                     OrgName = isYourCredit ? e.Invoice.BuyerNavigation.OrgName : e.Invoice.SellerNavigation.OrgName,
                     Note = e.Note
                 }).FirstAsync();
         }
+        /// <summary>
+        /// Do select query to receive credit note invoice id.
+        /// </summary>
+        /// <param name="creditNoteId">Credit note id.</param>
+        /// <returns>Invoice id that's bound to credit note.</returns>
         public async Task<int> GetCreditNoteInvoiceId(int creditNoteId)
         {
             return await _handlerContext.CreditNotes
@@ -476,6 +679,11 @@ namespace database_communicator.Services
                 .Select(e => e.InvoiceId)
                 .FirstAsync();
         }
+        /// <summary>
+        /// Overwrites chosen credit note properties given in data parameter.
+        /// </summary>
+        /// <param name="data">Object of <see cref="Models.DTOs.Modify.ModifyCreditNote"/>.</param>
+        /// <returns>True if success, false if failure.</returns>
         public async Task<bool> ModifyCreditNote(ModifyCreditNote data)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -532,9 +740,10 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Modify credit note error.");
                 await trans.RollbackAsync();
                 return false;
             }

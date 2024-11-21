@@ -1,28 +1,27 @@
-﻿using database_communicator.Models.DTOs;
+﻿using database_communicator.Models.DTOs.Create;
+using database_communicator.Models.DTOs.Modify;
 using database_communicator.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace database_communicator.Controllers
 {
+    /// <summary>
+    /// This controller allow to control user data, organization data and logs. Use db_name parameter to pass the name of database that you want ot connect.
+    /// </summary>
     [Route("{db_name}/[controller]")]
     [ApiController]
-    public class SettingsController : ControllerBase
+    public class SettingsController(ILogServices logServices, IOrganizationServices organizationServices, IUserServices userServices, IRolesServices rolesServices) : ControllerBase
     {
-        private readonly IUserServices _userServices;
-        private readonly IOrganizationServices _organizationServices;
-        private readonly ILogServices _logServices;
-        private readonly IRolesServices _rolesServices;
+        private readonly IUserServices _userServices = userServices;
+        private readonly IOrganizationServices _organizationServices = organizationServices;
+        private readonly ILogServices _logServices = logServices;
+        private readonly IRolesServices _rolesServices = rolesServices;
 
-        public SettingsController(ILogServices logServices, IOrganizationServices organizationServices, IUserServices userServices, IRolesServices rolesServices)
-        {
-            _logServices = logServices;
-            _organizationServices = organizationServices;
-            _userServices = userServices;
-            _rolesServices = rolesServices;
-        }
-
+        /// <summary>
+        /// Change user password.
+        /// </summary>
+        /// <param name="data">Object of <see cref="Models.DTOs.Modify.ChangePassword"/></param>
+        /// <returns>200 code when success, 500 when failure, 404 when user not found or 401 when old password does not match.</returns>
         [HttpPost]
         [Route("changePassword")]
         public async Task<IActionResult> ChangePassword(ChangePassword data)
@@ -31,11 +30,14 @@ namespace database_communicator.Controllers
             if (!exist) return NotFound();
             var verify = await _userServices.VerifyUserPassword(data.UserId, data.OldPassword);
             if (!verify) return Unauthorized();
-            var checkNewPass = await _userServices.VerifyUserPassword(data.UserId, data.NewPassword);
-            if (checkNewPass) return BadRequest();
-            await _userServices.ModifyPassword(data.UserId, data.NewPassword);
-            return Ok();
+            var result = await _userServices.ModifyPassword(data.UserId, data.NewPassword);
+            return result ? Ok() : new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
+        /// <summary>
+        /// Overwrite user old data with new one.
+        /// </summary>
+        /// <param name="data">New user data wrapped in <see cref="ChangeUserData"/> object.</param>
+        /// <returns>200 code when success, 404 when user not found or 400 when new email already exist.</returns>
         [HttpPost]
         [Route("modify/user")]
         public async Task<IActionResult> ModifyUser(ChangeUserData data)
@@ -47,11 +49,18 @@ namespace database_communicator.Controllers
                 var emailExist = await _userServices.EmailExist(data.Email);
                 if (emailExist) return BadRequest();
             }
-            await _userServices.ModifyUserData(data.UserId, data.Email, data.Username, data.Surname);
+            var result = await _userServices.ModifyUserData(data.UserId, data.Email, data.Username, data.Surname);
+            if (!result) return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             var logTypeId = await _logServices.getLogTypeId("Modify");
             await _logServices.CreateActionLog($"User with id {data.UserId} has changed their info.", data.UserId, logTypeId);
             return Ok();
         }
+        /// <summary>
+        /// Add new employee user to database. This action will also create new log entry.
+        /// </summary>
+        /// <param name="newUser">New user data.</param>
+        /// <param name="userId">Id of user that activates action.</param>
+        /// <returns>200 when success, 400 when failure or email already exist or 404 when user is not found.</returns>
         [HttpPost]
         [Route("add/user/{userId}")]
         public async Task<IActionResult> AddNewUser(AddUser newUser, int userId)
@@ -67,6 +76,11 @@ namespace database_communicator.Controllers
             await _logServices.CreateActionLog($"New user {newUser.Username} {newUser.Surname} has been added by user with id {userId}.", userId, logTypeId);
             return isCreated ? Ok() : BadRequest();
         }
+        /// <summary>
+        /// Switch user from solo user to org user.
+        /// </summary>
+        /// <param name="userId">Id of user.</param>
+        /// <returns>200 code when success, 400 when failure or 404 when not found.</returns>
         [HttpPost]
         [Route("switch")]
         public async Task<IActionResult> SwitchToOrg(int userId)
@@ -78,6 +92,11 @@ namespace database_communicator.Controllers
             var result = await _userServices.SwitchToOrg(userId, roleId, orgId);
             return result ? Ok() : BadRequest();
         }
+        /// <summary>
+        /// Tries to receive log data from the database.
+        /// </summary>
+        /// <param name="userId">Id of user that activate this action.</param>
+        /// <returns>200 code with list of <see cref="Models.DTOs.Get.GetLogs"/>, 404 when user not found or 401 when user is not an admin or solo role.</returns>
         [HttpGet]
         [Route("get/logs/{userId}")]
         public async Task<IActionResult> GetLogs(int userId)
@@ -90,7 +109,11 @@ namespace database_communicator.Controllers
             var result = await _logServices.GetLogs();
             return Ok(result);
         }
-
+        /// <summary>
+        /// Tries to receive user organization information.
+        /// </summary>
+        /// <param name="userId">Id of user activating this action.</param>
+        /// <returns>200 code with object of <see cref="Models.DTOs.Get.GetOrg"/> or 404 when user is not found.</returns>
         [HttpGet]
         [Route("get/modify/rest/{userId}")]
         public async Task<IActionResult> GetUserOrg(int userId)

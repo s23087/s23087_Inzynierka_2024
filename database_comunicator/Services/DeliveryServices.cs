@@ -1,8 +1,10 @@
 ﻿using database_communicator.Data;
 using database_communicator.Models;
-using database_communicator.Models.DTOs;
 using database_communicator.Utils;
-using database_comunicator.FilterClass;
+using database_communicator.FilterClass;
+using database_communicator.Models.DTOs.Create;
+using database_communicator.Models.DTOs.Get;
+using database_communicator.Models.DTOs.Modify;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.Metrics;
 using System.Linq.Expressions;
@@ -33,19 +35,41 @@ namespace database_communicator.Services
         public Task<bool> ModifyDelivery(ModifyDelivery data);
         public Task<IEnumerable<int>> GetWarehouseManagerIds();
     }
+    /// <summary>
+    /// Class that interact with database and contains functions allowing to work on deliveries.
+    /// </summary>
     public class DeliveryServices : IDeliveryServices
     {
         private readonly HandlerContext _handlerContext;
-        public DeliveryServices(HandlerContext handlerContext)
+        private readonly ILogger<CreditNoteServices> _logger;
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="handlerContext">Database context</param>
+        /// <param name="logger">Log interface</param>
+        public DeliveryServices(HandlerContext handlerContext, ILogger<CreditNoteServices> logger)
         {
             _handlerContext = handlerContext;
+            _logger = logger;
+
         }
+        /// <summary>
+        /// Check if company with given name exist in Delivery companies table.
+        /// </summary>
+        /// <param name="companyName">Name of searched company.</param>
+        /// <returns>True if exist, false if do not exist.</returns>
         public async Task<bool> DoesDeliveryCompanyExist(string companyName)
         {
             return await _handlerContext.DeliveryCompanies.AnyAsync(x => x.DeliveryCompanyName.ToLower() == companyName.ToLower());
         }
+        /// <summary>
+        /// Using transaction add new delivery company to database.
+        /// </summary>
+        /// <param name="companyName">Name of new delivery company.</param>
+        /// <returns>True if success or false if fails.</returns>
         public async Task<bool> AddDeliveryCompany(string companyName)
         {
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
             try
             {
                 await _handlerContext.DeliveryCompanies.AddAsync(new DeliveryCompany
@@ -53,13 +77,20 @@ namespace database_communicator.Services
                     DeliveryCompanyName = companyName,
                 });
                 await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
                 return true;
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Add delivery company error.");
+                await trans.RollbackAsync();
                 return false;
             }
         }
+        /// <summary>
+        /// Using transactions add new delivery to database.
+        /// </summary>
+        /// <param name="data">New delivery data wrapped in <see cref="Models.DTOs.Create.AddDelivery"/></param>
+        /// <returns>New delivery id or 0 when action was unsuccessful.</returns>
         public async Task<int> AddDelivery(AddDelivery data)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -101,19 +132,36 @@ namespace database_communicator.Services
                 return newDelivery.DeliveryId;
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Add delivery error.");
                 await trans.RollbackAsync();
                 return 0;
             }
         }
+        /// <summary>
+        /// Checks if delivery with given proforma exist.
+        /// </summary>
+        /// <param name="proformaId">Proforma id.</param>
+        /// <returns>True if exist, false if not.</returns>
         public async Task<bool> DeliveryProformaExist(int proformaId)
         {
             return await _handlerContext.Deliveries.AnyAsync(x => x.ProformaId == proformaId);
         }
+        /// <summary>
+        /// Checks if delivery with given id exist.
+        /// </summary>
+        /// <param name="deliveryId">Delivery id.</param>
+        /// <returns>True if exist, false if do not exist.</returns>
         public async Task<bool> DeliveryExist(int deliveryId)
         {
             return await _handlerContext.Deliveries.AnyAsync(x => x.DeliveryId == deliveryId);
         }
+        /// <summary>
+        /// Do select query with given filter and sort to receive all deliveries information.
+        /// </summary>
+        /// <param name="IsDeliveryToUser">True if delivery destination is user warehouse, otherwise false.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="DeliveryFiltersTemplate"/></param>
+        /// <returns>List of <see cref="GetDelivery"/>.</returns>
         public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, string? sort, DeliveryFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetDeliverySort(sort, IsDeliveryToUser);
@@ -159,6 +207,14 @@ namespace database_communicator.Services
                     Delivered = e.DeliveryDate
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query with given filter and sort to receive deliveries information for chosen user.
+        /// </summary>
+        /// <param name="IsDeliveryToUser">True if delivery destination is user warehouse, otherwise false.</param>
+        /// <param name="userId">Id of user</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="DeliveryFiltersTemplate"/></param>
+        /// <returns>List of <see cref="GetDelivery"/>.</returns>
         public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, int userId, string? sort, DeliveryFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetDeliverySort(sort, IsDeliveryToUser);
@@ -204,6 +260,14 @@ namespace database_communicator.Services
                     Delivered = obj.DeliveryDate
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query with given search, filter and sort to receive all deliveries information.
+        /// </summary>
+        /// <param name="IsDeliveryToUser">True if delivery destination is user warehouse, otherwise false.</param>
+        /// <param name="search">The phrase searched in deliveries information. It will check if phrase exist in proforma number or delivery id.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="DeliveryFiltersTemplate"/></param>
+        /// <returns>List of <see cref="GetDelivery"/>.</returns>
         public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, string search, string? sort, DeliveryFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetDeliverySort(sort, IsDeliveryToUser);
@@ -260,6 +324,15 @@ namespace database_communicator.Services
                     Delivered = ent.DeliveryDate
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query with given search, filter and sort to receive deliveries information for chosen user.
+        /// </summary>
+        /// <param name="IsDeliveryToUser">True if delivery destination is user warehouse, otherwise false.</param>
+        /// <param name="userId">Id of user</param>
+        /// <param name="search">The phrase searched in deliveries information. It will check if phrase exist in proforma number or delivery id.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="DeliveryFiltersTemplate"/></param>
+        /// <returns>List of <see cref="GetDelivery"/>.</returns>
         public async Task<IEnumerable<GetDelivery>> GetDeliveries(bool IsDeliveryToUser, int userId, string search, string? sort, DeliveryFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetDeliverySort(sort, IsDeliveryToUser);
@@ -317,6 +390,10 @@ namespace database_communicator.Services
                     Delivered = deliv.DeliveryDate
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query on Delivery Companies table.
+        /// </summary>
+        /// <returns>List of delivery companies with name and id.</returns>
         public async Task<IEnumerable<GetDeliveryCompany>> GetDeliveryCompanies()
         {
             return await _handlerContext.DeliveryCompanies.Select(e => new GetDeliveryCompany
@@ -325,6 +402,10 @@ namespace database_communicator.Services
                 Name = e.DeliveryCompanyName
             }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query on Delivery Statuses table.
+        /// </summary>
+        /// <returns>List of delivery statuses with id and name.</returns>
         public async Task<IEnumerable<GetDeliveryStatus>> GetDeliveryStatuses()
         {
             return await _handlerContext.DeliveryStatuses.Select(e => new GetDeliveryStatus
@@ -333,6 +414,12 @@ namespace database_communicator.Services
                 Name = e.StatusName
             }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query on Proforma table.
+        /// </summary>
+        /// <param name="IsDeliveryToUser">True if delivery destination is user warehouse, otherwise false.</param>
+        /// <param name="userId">Id of user.</param>
+        /// <returns>List of Proformas with id and proforma number that belongs to chosen user.</returns>
         public async Task<IEnumerable<GetProformaList>> GetProformaListWithoutDelivery(bool IsDeliveryToUser, int userId)
         {
             return await _handlerContext.Proformas
@@ -343,6 +430,11 @@ namespace database_communicator.Services
                     ProformaNumber = e.ProformaNumber,
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Using transaction delete delivery from database.
+        /// </summary>
+        /// <param name="deliveryId">Id of delivery to delete.</param>
+        /// <returns>True if success or false if failure.</returns>
         public async Task<bool> DeleteDelivery(int deliveryId)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -365,17 +457,27 @@ namespace database_communicator.Services
                 return true;
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Delete delivery error.");
                 await trans.RollbackAsync();
                 return false;
             }
         }
+        /// <summary>
+        /// Do select query on Delivery table for owner of delivery.
+        /// </summary>
+        /// <param name="deliveryId"></param>
+        /// <returns>User id that's a owner of delivery.</returns>
         public async Task<int> GetDeliveryOwnerId(int deliveryId)
         {
             return await _handlerContext.Deliveries
                 .Where(e => e.DeliveryId == deliveryId)
                 .Select(e => e.Proforma.UserId).FirstAsync();
         }
+        /// <summary>
+        /// Do select query using given id to receive delivery information that was not given in bulk query.
+        /// </summary>
+        /// <param name="deliveryId">Id of delivery</param>
+        /// <returns>Object containing delivery items, note, note date and name of user.</returns>
         public async Task<GetRestDelivery> GetRestDelivery(int deliveryId)
         {
             var isYourProforma = await _handlerContext.Deliveries
@@ -417,6 +519,11 @@ namespace database_communicator.Services
             }
             return restInfo;
         }
+        /// <summary>
+        /// Using transactions add delivery note.
+        /// </summary>
+        /// <param name="data">New note data wrapped in <see cref="Models.DTOs.Create.AddNote"/>.</param>
+        /// <returns>True if success, false if failure.</returns>
         public async Task<bool> AddNote(AddNote data)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -436,11 +543,16 @@ namespace database_communicator.Services
                 return true;
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Add delivery note error.");
                 await trans.RollbackAsync();
                 return false;
             }
         }
+        /// <summary>
+        /// Using transactions change delivery status. If status is equal to Fulfilled, Rejected or Delivered with issues then it's sets delivery date to Now.
+        /// </summary>
+        /// <param name="data">Object containing new delivery status</param>
+        /// <returns>True if success or false if failure.</returns>
         public async Task<bool> SetDeliveryStatus(SetDeliveryStatus data)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -476,11 +588,16 @@ namespace database_communicator.Services
                 return true;
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex, "Set delivery status error.");
                 await trans.RollbackAsync();
                 return false;
             }
         }
+        /// <summary>
+        /// Using transactions overwrites chosen delivery properties with new ones.
+        /// </summary>
+        /// <param name="data">New delivery properties values.</param>
+        /// <returns>True if success or false if failure.</returns>
         public async Task<bool> ModifyDelivery(ModifyDelivery data)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -522,11 +639,15 @@ namespace database_communicator.Services
                 return true;
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Modify delivery error.");
                 await trans.RollbackAsync();
                 return false;
             }
         }
+        /// <summary>
+        /// Do select query to receive ids of warehouse managers.
+        /// </summary>
+        /// <returns>List of warehouse managers ids.</returns>
         public async Task<IEnumerable<int>> GetWarehouseManagerIds()
         {
             return await _handlerContext.OrgUsers.Where(e => e.Role.RoleName == "Warehouse Manager").SelectMany(e => e.AppUsers).Select(e => e.IdUser).ToListAsync();

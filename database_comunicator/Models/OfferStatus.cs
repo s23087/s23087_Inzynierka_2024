@@ -5,7 +5,7 @@ namespace database_communicator.Models;
 
 public partial class OfferStatus
 {
-    public int OfferId { get; set; }
+    public int OfferStatusId { get; set; }
 
     public string StatusName { get; set; } = null!;
 

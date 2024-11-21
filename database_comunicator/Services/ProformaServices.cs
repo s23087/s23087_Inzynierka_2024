@@ -1,8 +1,10 @@
 ﻿using database_communicator.Data;
 using database_communicator.Models;
-using database_communicator.Models.DTOs;
 using database_communicator.Utils;
-using database_comunicator.FilterClass;
+using database_communicator.FilterClass;
+using database_communicator.Models.DTOs.Create;
+using database_communicator.Models.DTOs.Get;
+using database_communicator.Models.DTOs.Modify;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
@@ -22,18 +24,34 @@ namespace database_communicator.Services
         public Task<bool> DeleteProforma(bool isYourProforma, int proformaId);
         public Task<bool> DoesDeliveryExist(int proformaId);
         public Task<int> GetProformaUserId(int proformaId);
-        public Task<string> GetProformaNumber(int proformaId);
+        public Task<string?> GetProformaNumber(int proformaId);
         public Task<string?> GetProformaPath(int proformaId);
         public Task<GetRestModifyProforma> GetRestModifyProforma(int proformaId);
         public Task<bool> ModifyProforma(ModifyProforma data);
     }
+    /// <summary>
+    /// Class that interact with database and contains functions allowing to work on proformas.
+    /// </summary>
     public class ProformaServices : IProformaServices
     {
         private readonly HandlerContext _handlerContext;
-        public ProformaServices(HandlerContext handlerContext)
+        private readonly ILogger<CreditNoteServices> _logger;
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="handlerContext">Database context</param>
+        /// <param name="logger">Log interface</param>
+        public ProformaServices(HandlerContext handlerContext, ILogger<CreditNoteServices> logger)
         {
             _handlerContext = handlerContext;
+            _logger = logger;
+
         }
+        /// <summary>
+        /// Using transactions add new proforma to database.
+        /// </summary>
+        /// <param name="data">New proforma data</param>
+        /// <returns>True if success or false if failure.</returns>
         public async Task<int> AddProforma(AddProforma data)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -115,23 +133,42 @@ namespace database_communicator.Services
                 return newProforma.ProformaId;
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Create proforma error.");
                 await trans.RollbackAsync();
                 return 0;
             }
         }
+        /// <summary>
+        /// Checks if proforma with given parameters exists.
+        /// </summary>
+        /// <param name="number">Proforma number</param>
+        /// <param name="sellerId">Id of seller organization</param>
+        /// <param name="buyerId">Id of buyer organization</param>
+        /// <returns>True if exist or false if not.</returns>
         public async Task<bool> ProformaExist(string number, int sellerId, int buyerId)
         {
             return await _handlerContext.Proformas
                 .Where(e => e.ProformaNumber == number && e.Seller == sellerId && e.Buyer == buyerId)
                 .AnyAsync();
         }
+        /// <summary>
+        /// Checks if proforma with given id exists.
+        /// </summary>
+        /// <param name="proformaId">Proforma id</param>
+        /// <returns>True if exist or false if not.</returns>
         public async Task<bool> ProformaExist(int proformaId)
         {
             return await _handlerContext.Proformas
                 .Where(e => e.ProformaId == proformaId)
                 .AnyAsync();
         }
+        /// <summary>
+        /// Do select query to receive sorted and filtered proformas information.
+        /// </summary>
+        /// <param name="isYourProforma">True if proforma is for future purchase invoice, otherwise false.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="ProformaFiltersTemplate"/>.</param>
+        /// <returns>List of object containing proforma information.</returns>
         public async Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, string? sort, ProformaFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetProformaSort(sort, isYourProforma);
@@ -177,6 +214,14 @@ namespace database_communicator.Services
                     ClientName = isYourProforma ? e.SellerNavigation.OrgName : e.BuyerNavigation.OrgName
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query to receive searched, sorted and filtered proformas information.
+        /// </summary>
+        /// <param name="isYourProforma">True if proforma is for future purchase invoice, otherwise false.</param>
+        /// <param name="search">The phrase searched in proforma information. It will check if phrase exist in proforma number.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="ProformaFiltersTemplate"/>.</param>
+        /// <returns>List of object containing proforma information.</returns>
         public async Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, string search, string? sort, ProformaFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetProformaSort(sort, isYourProforma);
@@ -223,6 +268,14 @@ namespace database_communicator.Services
                     ClientName = isYourProforma ? obj.SellerNavigation.OrgName : obj.BuyerNavigation.OrgName
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query to receive searched, sorted and filtered user proformas information.
+        /// </summary>
+        /// <param name="isYourProforma">True if proforma is for future purchase invoice, otherwise false.</param>
+        /// <param name="userId">User id.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="ProformaFiltersTemplate"/>.</param>
+        /// <returns>List of object containing proforma information.</returns>
         public async Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, int userId, string? sort, ProformaFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetProformaSort(sort, isYourProforma);
@@ -268,6 +321,15 @@ namespace database_communicator.Services
                     ClientName = isYourProforma ? ent.SellerNavigation.OrgName : ent.BuyerNavigation.OrgName
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query to receive searched, sorted and filtered user proformas information.
+        /// </summary>
+        /// <param name="isYourProforma">True if proforma is for future purchase invoice, otherwise false.</param>
+        /// <param name="userId">User id.</param>
+        /// <param name="search">The phrase searched in proforma information. It will check if phrase exist in proforma number.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="ProformaFiltersTemplate"/>.</param>
+        /// <returns>List of object containing proforma information.</returns>
         public async Task<IEnumerable<GetProforma>> GetProformas(bool isYourProforma, int userId, string search, string? sort, ProformaFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetProformaSort(sort, isYourProforma);
@@ -314,6 +376,12 @@ namespace database_communicator.Services
                     ClientName = isYourProforma ? prof.SellerNavigation.OrgName : prof.BuyerNavigation.OrgName
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query using given id to receive proforma information that was not given in bulk query.
+        /// </summary>
+        /// <param name="isYourProforma">True if proforma is for future purchase invoice, otherwise false.</param>
+        /// <param name="proformaId">Proforma id</param>
+        /// <returns>Object containing proforma information.</returns>
         public async Task<GetRestProforma> GetRestProforma(bool isYourProforma, int proformaId)
         {
             return await _handlerContext.Proformas
@@ -348,6 +416,12 @@ namespace database_communicator.Services
                 })
                 .FirstAsync();
         }
+        /// <summary>
+        /// Using transactions delete proforma from database.
+        /// </summary>
+        /// <param name="isYourProforma">True if proforma is for future purchase invoice, otherwise false.</param>
+        /// <param name="proformaId">Proforma id.</param>
+        /// <returns>True fi success or false if not.</returns>
         public async Task<bool> DeleteProforma(bool isYourProforma, int proformaId)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -366,35 +440,60 @@ namespace database_communicator.Services
                 return true;
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Delete proforma error.");
                 await trans.RollbackAsync();
                 return false;
             }
         }
+        /// <summary>
+        /// Checks if delivery with given proforma id exist in database.
+        /// </summary>
+        /// <param name="proformaId">Proforma id</param>
+        /// <returns>True if exist or false if not.</returns>
         public async Task<bool> DoesDeliveryExist(int proformaId)
         {
             return await _handlerContext.Proformas.AnyAsync(e => e.ProformaId == proformaId && e.Deliveries.Any());
         }
+        /// <summary>
+        /// Do select query to receive id of user that owns that proforma.
+        /// </summary>
+        /// <param name="proformaId">Proforma id</param>
+        /// <returns>Id of user or 0 if do not exist.</returns>
         public async Task<int> GetProformaUserId(int proformaId)
         {
             return await _handlerContext.Proformas
                 .Where(e => e.ProformaId == proformaId)
-                .Select(e => e.UserId).FirstAsync();
+                .Select(e => e.UserId).FirstOrDefaultAsync();
         }
-        public async Task<string> GetProformaNumber(int proformaId)
+        /// <summary>
+        /// Do select query to receive given proforma number.
+        /// </summary>
+        /// <param name="proformaId">Proforma id</param>
+        /// <returns>Proforma number or null if do not exist.</returns>
+        public async Task<string?> GetProformaNumber(int proformaId)
         {
             return await _handlerContext.Proformas
                 .Where(e => e.ProformaId == proformaId)
                 .Select(e => e.ProformaNumber)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
         }
+        /// <summary>
+        /// Do select query to receive given proforma file path.
+        /// </summary>
+        /// <param name="proformaId">Proforma id</param>
+        /// <returns>Chosen proforma file path or null if do not exist.</returns>
         public async Task<string?> GetProformaPath(int proformaId)
         {
             return await _handlerContext.Proformas
                 .Where(e => e.ProformaId == proformaId)
                 .Select(e => e.ProformaFilePath)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
         }
+        /// <summary>
+        /// Do select query using given id to receive proforma information that was not given in bulk query.
+        /// </summary>
+        /// <param name="proformaId">Proforma id</param>
+        /// <returns>Object containing proforma information.</returns>
         public async Task<GetRestModifyProforma> GetRestModifyProforma(int proformaId)
         {
             return await _handlerContext.Proformas
@@ -407,6 +506,11 @@ namespace database_communicator.Services
                     Note = e.Note
                 }).FirstAsync();
         }
+        /// <summary>
+        /// Using transactions overwrite old proforma properties with given new values.
+        /// </summary>
+        /// <param name="data">New proforma properties values.</param>
+        /// <returns>True if success or false if failure.</returns>
         public async Task<bool> ModifyProforma(ModifyProforma data)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -481,7 +585,7 @@ namespace database_communicator.Services
                 return true;
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Modify proforma error.");
                 await trans.RollbackAsync();
                 return false;
             }

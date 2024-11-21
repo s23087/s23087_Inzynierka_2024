@@ -1,8 +1,9 @@
 ﻿using database_communicator.Data;
 using database_communicator.Models;
-using database_communicator.Models.DTOs;
 using database_communicator.Utils;
-using database_comunicator.FilterClass;
+using database_communicator.FilterClass;
+using database_communicator.Models.DTOs.Create;
+using database_communicator.Models.DTOs.Get;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -14,17 +15,34 @@ namespace database_communicator.Services
         public Task<IEnumerable<GetOutsideItem>> GetItems(string? sort, OutsideItemFiltersTemplate filters);
         public Task<IEnumerable<GetOutsideItem>> GetItems(string search, string? sort, OutsideItemFiltersTemplate filters);
         public Task<bool> ItemExist(int itemId, int orgId);
-        public Task DeleteItem(int itemId, int orgId);
+        public Task<bool> DeleteItem(int itemId, int orgId);
         public Task<IEnumerable<string>> AddItems(CreateOutsideItems data);
         public Task<IEnumerable<int>> GetItemOwners(int itemId, int orgId);
     }
+    /// <summary>
+    /// Class that interact with database and contains functions allowing to work on outside items. Outside item is item that user client sells or used to sell.
+    /// </summary>
     public class OutsideItemServices : IOutsideItemServices
     {
         private readonly HandlerContext _handlerContext;
-        public OutsideItemServices(HandlerContext handlerContext)
+        private readonly ILogger<CreditNoteServices> _logger;
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="handlerContext">Database context</param>
+        /// <param name="logger">Log interface</param>
+        public OutsideItemServices(HandlerContext handlerContext, ILogger<CreditNoteServices> logger)
         {
             _handlerContext = handlerContext;
+            _logger = logger;
+
         }
+        /// <summary>
+        /// Do select query to receive sorted and filtered items information.
+        /// </summary>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="OutsideItemFiltersTemplate"/></param>
+        /// <returns>List of object containing outside items information.</returns>
         public async Task<IEnumerable<GetOutsideItem>> GetItems(string? sort, OutsideItemFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetOutsideItemSort(sort);
@@ -64,6 +82,13 @@ namespace database_communicator.Services
                     Currency = e.CurrencyName
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query to receive search, sorted and filtered items information.
+        /// </summary>
+        /// <param name="search">The phrase searched in items information. It will check if phrase exist in item name or partnumber.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="OutsideItemFiltersTemplate"/></param>
+        /// <returns>List of object containing outside items information.</returns>
         public async Task<IEnumerable<GetOutsideItem>> GetItems(string search, string? sort, OutsideItemFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetOutsideItemSort(sort);
@@ -104,17 +129,46 @@ namespace database_communicator.Services
                     Currency = ent.CurrencyName
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Checks if outside item with given ids exists in database.
+        /// </summary>
+        /// <param name="itemId">Item id</param>
+        /// <param name="orgId">Organization id</param>
+        /// <returns></returns>
         public async Task<bool> ItemExist(int itemId, int orgId)
         {
             return await _handlerContext.OutsideItems.AnyAsync(x => x.ItemId == itemId && x.OrganizationId == orgId);
         }
-        public async Task DeleteItem(int itemId, int orgId)
+        /// <summary>
+        /// Using transactions delete outside item from database.
+        /// </summary>
+        /// <param name="itemId">Item id.</param>
+        /// <param name="orgId">Organization id.</param>
+        /// <returns>True if success or flase if failure.</returns>
+        public async Task<bool> DeleteItem(int itemId, int orgId)
         {
-            await _handlerContext.OutsideItems
-                .Where(e => e.ItemId == itemId && e.OrganizationId == orgId)
-                .ExecuteDeleteAsync();
-            await _handlerContext.SaveChangesAsync();
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
+            {
+                await _handlerContext.OutsideItems
+                                .Where(e => e.ItemId == itemId && e.OrganizationId == orgId)
+                                .ExecuteDeleteAsync();
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+                return true;
+            } catch (Exception ex)
+            {
+                _logger.LogError(ex, "Delete outside item error.");
+                await trans.RollbackAsync();
+                return false;
+            }
+
         }
+        /// <summary>
+        /// Using transactions add new outside item to database.
+        /// </summary>
+        /// <param name="data">New outside item data</param>
+        /// <returns>True if success or false if failure.</returns>
         public async Task<IEnumerable<string>> AddItems(CreateOutsideItems data)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -186,11 +240,17 @@ namespace database_communicator.Services
                 return errorItems;
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Create outside item error.");
                 await trans.RollbackAsync();
                 return new List<string>();
             }
         }
+        /// <summary>
+        /// Do select query to receive list of owner for given outside item.
+        /// </summary>
+        /// <param name="itemId">Item id</param>
+        /// <param name="orgId">Organization id</param>
+        /// <returns>List of outside item owners.</returns>
         public async Task<IEnumerable<int>> GetItemOwners(int itemId, int orgId)
         {
             return await _handlerContext.OutsideItems

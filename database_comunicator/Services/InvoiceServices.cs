@@ -1,8 +1,10 @@
 ﻿using database_communicator.Data;
 using database_communicator.Models;
-using database_communicator.Models.DTOs;
 using database_communicator.Utils;
-using database_comunicator.FilterClass;
+using database_communicator.FilterClass;
+using database_communicator.Models.DTOs.Create;
+using database_communicator.Models.DTOs.Get;
+using database_communicator.Models.DTOs.Modify;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq.Expressions;
@@ -39,15 +41,30 @@ namespace database_communicator.Services
         public Task<GetRestInvoice> GetRestSalesInvoice(int invoiceId);
         public Task<GetRestModifyInvoice> GetRestModifyInvoice(int invoiceId);
         public Task<bool> ModifyInvoice(ModifyInvoice data);
-        public Task UpdateInvoiceStatus();
+        public Task<bool> UpdateInvoiceStatus();
     }
+    /// <summary>
+    /// Class that interact with database and contains functions allowing to work on invoices.
+    /// </summary>
     public class InvoiceServices : IInvoiceServices
     {
         private readonly HandlerContext _handlerContext;
-        public InvoiceServices(HandlerContext handlerContext)
+        private readonly ILogger<CreditNoteServices> _logger;
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="handlerContext">Database context</param>
+        /// <param name="logger">Log interface</param>
+        public InvoiceServices(HandlerContext handlerContext, ILogger<CreditNoteServices> logger)
         {
             _handlerContext = handlerContext;
+            _logger = logger;
         }
+        /// <summary>
+        /// Do select query to receive user and user clients organizations information.
+        /// </summary>
+        /// <param name="userId">Id of user.</param>
+        /// <returns>Object containing user organization information and list of users clients organizations.</returns>
         public async Task<GetOrgsForInvocie> GetOrgsForInvoice(int userId)
         {
             var userOrg = await _handlerContext.AppUsers
@@ -71,6 +88,10 @@ namespace database_communicator.Services
                 RestOrgs = result
             };
         }
+        /// <summary>
+        /// Do select query to receive tax information.
+        /// </summary>
+        /// <returns>List of tax options containing tax id and value.</returns>
         public async Task<IEnumerable<GetTaxes>> GetTaxes()
         {
             return await _handlerContext.Taxes.Select(e => new GetTaxes
@@ -79,6 +100,10 @@ namespace database_communicator.Services
                 TaxesValue = e.TaxValue
             }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query to receive payment methods.
+        /// </summary>
+        /// <returns>List of payment methods options containing payment methods id and name.</returns>
         public async Task<IEnumerable<GetPaymentMethods>> GetPaymentMethods()
         {
             return await _handlerContext.PaymentMethods.Select(e => new GetPaymentMethods
@@ -87,6 +112,10 @@ namespace database_communicator.Services
                 MethodName = e.MethodName,
             }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query to receive payment statuses.
+        /// </summary>
+        /// <returns>List of payment statuses options containing payment status id and name.</returns>
         public async Task<IEnumerable<GetPaymentStatuses>> GetPaymentStatuses()
         {
             return await _handlerContext.PaymentStatuses.Select(e => new GetPaymentStatuses
@@ -95,6 +124,11 @@ namespace database_communicator.Services
                 StatusName = e.StatusName,
             }).ToListAsync();
         }
+        /// <summary>
+        /// Using transactions add purchase invoice to database. If PLN currency is chosen use entry with date 03/09/2024 as currency value.
+        /// </summary>
+        /// <param name="data">New purchase invoice data.</param>
+        /// <returns>Created invoice id or 0 when failure.</returns>
         public async Task<int> AddPurchaseInvoice(AddPurchaseInvoice data)
         {
             var plnData = new DateTime(2024,9,3,0,0,0,DateTimeKind.Utc);
@@ -198,17 +232,31 @@ namespace database_communicator.Services
                 await trans.CommitAsync();
                 return invoiceId;
             } catch (Exception ex) {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Create purchase invoice error.");
                 await trans.RollbackAsync();
                 return 0;
             }
         }
+        /// <summary>
+        /// Using transactions add sales invoice to database. If PLN currency is chosen use entry with date 03/09/2024 as currency value.
+        /// </summary>
+        /// <param name="data">New sales invoice data.</param>
+        /// <returns>Created invoice id or 0 when failure.</returns>
         public async Task<int> AddSalesInvoice(AddSalesInvoice data)
         {
             var plnData = new DateTime(2024, 9, 3, 0,0,0,DateTimeKind.Utc);
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
             try
             {
+                foreach (var item in data.InvoiceItems.Select(e => new { e.ItemId, e.BuyInvoiceId, e.Qty }))
+                {
+                    var canBeDeduced = await _handlerContext.ItemOwners.AnyAsync(x => x.OwnedItemId == item.ItemId && x.InvoiceId == item.BuyInvoiceId && x.IdUser == data.UserId && x.Qty >= item.Qty);
+                    if (!canBeDeduced)
+                    {
+                        _logger.LogError(message: "There's not enough items for sale invoice to be created.");
+                        return 0;
+                    }
+                }
                 var checkCurrency = await _handlerContext.CurrencyValues.Where(e => e.CurrencyName == data.CurrencyName && e.UpdateDate.Equals(data.CurrencyValueDate)).AnyAsync();
                 var currVal = new CurrencyValue
                 {
@@ -267,12 +315,17 @@ namespace database_communicator.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Create sales invoice error.");
                 await trans.RollbackAsync();
                 return 0;
             }
         }
-
+        /// <summary>
+        /// Do select query with given filter and sort to receive purchase invoice information.
+        /// </summary>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="InvoiceFiltersTemplate"/>.</param>
+        /// <returns>List of <see cref="GetInvoices"/>.</returns>
         public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string? sort, InvoiceFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetInvoiceSort(sort, true);
@@ -331,6 +384,13 @@ namespace database_communicator.Services
                     + (inv.CurrencyName == "PLN" ? inv.TransportCost : inv.TransportCost * inv.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query with given search, filter and sort to receive purchase invoice information.
+        /// </summary>
+        /// <param name="search">Phrase that will be search across invoices numbers.<</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="InvoiceFiltersTemplate"/>.</param>
+        /// <returns>List of <see cref="GetInvoices"/>.</returns>
         public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string search, string? sort, InvoiceFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetInvoiceSort(sort, true);
@@ -390,6 +450,13 @@ namespace database_communicator.Services
                     + (ent.CurrencyName == "PLN" ? ent.TransportCost : ent.TransportCost * ent.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query with given filter and sort to receive purchase invoice information for chosen user.
+        /// </summary>
+        /// <param name="userId">Id of user.<</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="InvoiceFiltersTemplate"/>.</param>
+        /// <returns>List of <see cref="GetInvoices"/> that belongs to chosen user.</returns>
         public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string? sort, InvoiceFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetInvoiceSort(sort, true);
@@ -444,6 +511,14 @@ namespace database_communicator.Services
                     + (instc.CurrencyName == "PLN" ? instc.TransportCost : instc.TransportCost * instc.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query with given search, filter and sort to receive purchase invoice information for chosen user.
+        /// </summary>
+        /// <param name="userId">Id of user.<</param>
+        /// <param name="search">Phrase that will be search across invoices numbers.<</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="InvoiceFiltersTemplate"/>.</param>
+        /// <returns>List of <see cref="GetInvoices"/> that belongs to chosen user.</returns>
         public async Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string search, string? sort, InvoiceFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetInvoiceSort(sort, true);
@@ -499,6 +574,12 @@ namespace database_communicator.Services
                     + (objs.CurrencyName == "PLN" ? objs.TransportCost : objs.TransportCost * objs.Currency.CurrencyValue1),
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query with given filter and sort to receive sales invoice information.
+        /// </summary>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="InvoiceFiltersTemplate"/>.</param>
+        /// <returns>List of <see cref="GetInvoices"/>.</returns>
         public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(string? sort, InvoiceFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
@@ -554,6 +635,13 @@ namespace database_communicator.Services
                 }).ToListAsync();
             return result;
         }
+        /// <summary>
+        /// Do select query with given search, filter and sort to receive sales invoice information.
+        /// </summary>
+        /// <param name="search">Phrase that will be search across invoices numbers.<</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="InvoiceFiltersTemplate"/>.</param>
+        /// <returns>List of <see cref="GetInvoices"/>.</returns>
         public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(string search, string? sort, InvoiceFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
@@ -609,6 +697,13 @@ namespace database_communicator.Services
                     Price = inst.SellingPrices.Select(d => d.Price * d.Qty).Sum() + inst.TransportCost,
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query with given filter and sort to receive sales invoice information for chosen user.
+        /// </summary>
+        /// <param name="userId">Id of user.<</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="InvoiceFiltersTemplate"/>.</param>
+        /// <returns>List of <see cref="GetInvoices"/> that belongs to chosen user.</returns>
         public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(int userId, string? sort, InvoiceFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
@@ -663,6 +758,14 @@ namespace database_communicator.Services
                     Price = entity.SellingPrices.Select(d => d.Price * d.Qty).Sum() + entity.TransportCost,
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query with given search, filter and sort to receive sales invoice information for chosen user.
+        /// </summary>
+        /// <param name="userId">Id of user.<</param>
+        /// <param name="search">Phrase that will be search across invoices numbers.<</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="InvoiceFiltersTemplate"/>.</param>
+        /// <returns>List of <see cref="GetInvoices"/> that belongs to chosen user.</returns>
         public async Task<IEnumerable<GetInvoices>> GetSalesInvoices(int userId, string search, string? sort, InvoiceFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetInvoiceSort(sort, false);
@@ -718,6 +821,10 @@ namespace database_communicator.Services
                     Price = en.SellingPrices.Select(d => d.Price * d.Qty).Sum() + en.TransportCost,
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query to get short list of purchase invoices.
+        /// </summary>
+        /// <returns>List of objects containing invoice id, invoice number, client name and user organization name.</returns>
         public async Task<IEnumerable<GetInvoicesList>> GetPurchaseInvoicesList()
         {
             return await _handlerContext.Invoices
@@ -731,6 +838,10 @@ namespace database_communicator.Services
                     OrgName = e.BuyerNavigation.OrgName
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query to get short list of sales invoices.
+        /// </summary>
+        /// <returns>List of objects containing invoice id, invoice number, client name and user organization name.</returns>
         public async Task<IEnumerable<GetInvoicesList>> GetSalesInvoicesList()
         {
             return await _handlerContext.Invoices
@@ -743,6 +854,12 @@ namespace database_communicator.Services
                     OrgName = e.SellerNavigation.OrgName
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query to receive chosen invoice items.
+        /// </summary>
+        /// <param name="invoiceId">Id of invoice that items you want to get.</param>
+        /// <param name="isPurchaseInvoice">True if purchase invoice, otherwise false</param>
+        /// <returns>List of invoice items wrapped in <see cref="Models.DTOs.Get.GetInvoiceItems"/>.</returns>
         public async Task<IEnumerable<GetInvoiceItems>> GetInvoiceItems(int invoiceId, bool isPurchaseInvoice)
         {
             var invoiceCurrency = await _handlerContext.Invoices.Where(e => e.InvoiceId == invoiceId).Select(e => e.CurrencyName).FirstAsync();
@@ -808,14 +925,29 @@ namespace database_communicator.Services
                     })
                 ).ToListAsync();
         }
+        /// <summary>
+        /// Checks if invoice has any of its items sold.
+        /// </summary>
+        /// <param name="invoiceId">Id of purchase invoice.</param>
+        /// <returns>True if some of items were sold, otherwise false.</returns>
         public async Task<bool> CheckIfSellingPriceExist(int invoiceId)
         {
-            return await _handlerContext.SellingPrices.Where(e => e.PurchasePrice.InvoiceId == invoiceId).AnyAsync();
+            return await _handlerContext.SellingPrices.AnyAsync(e => e.PurchasePrice.InvoiceId == invoiceId);
         }
+        /// <summary>
+        /// Check if invoice has credit notes.
+        /// </summary>
+        /// <param name="invoiceId">Invoice id</param>
+        /// <returns>True if has, false if not.</returns>
         public async Task<bool> CheckIfCreditNoteExist(int invoiceId)
         {
-            return await _handlerContext.CreditNotes.Where(e => e.InvoiceId == invoiceId).AnyAsync();
+            return await _handlerContext.CreditNotes.AnyAsync(e => e.InvoiceId == invoiceId);
         }
+        /// <summary>
+        /// Using transactions delete invoice from database.
+        /// </summary>
+        /// <param name="invoiceId">Id of invoice to delete</param>
+        /// <returns>True if success, false if failure.</returns>
         public async Task<bool> DeleteInvoice(int invoiceId)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -844,15 +976,25 @@ namespace database_communicator.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                _logger.LogError(ex, "Delete invoice error.");
                 await trans.RollbackAsync();
                 return false;
             }
         }
+        /// <summary>
+        /// Checks if invoice with given id exist.
+        /// </summary>
+        /// <param name="invoiceId">Invoice id.</param>
+        /// <returns>True if exist, false if not.</returns>
         public async Task<bool> InvoiceExist(int invoiceId)
         {
-            return await _handlerContext.Invoices.Where(e => e.InvoiceId == invoiceId).AnyAsync();
+            return await _handlerContext.Invoices.AnyAsync(e => e.InvoiceId == invoiceId);
         }
+        /// <summary>
+        /// Do select query to receive users ids that's items belongs to given invoice.
+        /// </summary>
+        /// <param name="invoiceId">Invoice id.</param>
+        /// <returns>List of users ids that items belong to invoice.</returns>
         public async Task<IEnumerable<int>> GetInvoiceUser(int invoiceId)
         {
             return await _handlerContext.ItemOwners.Where(e => e.InvoiceId == invoiceId)
@@ -865,14 +1007,29 @@ namespace database_communicator.Services
                     .Select(d => d.Key)
                 ).ToListAsync();
         }
+        /// <summary>
+        /// Do select query to receive chosen invoice number.
+        /// </summary>
+        /// <param name="invoiceId">Invoice id.</param>
+        /// <returns>String containing invoice number.</returns>
         public async Task<string> GetInvoiceNumber(int invoiceId)
         {
             return await _handlerContext.Invoices.Where(e => e.InvoiceId == invoiceId).Select(e => e.InvoiceNumber).FirstAsync();
         }
+        /// <summary>
+        /// Do select query to receive chosen invoice file path from database.
+        /// </summary>
+        /// <param name="invoiceId">Invoice id.</param>
+        /// <returns>String that contains file path.</returns>
         public async Task<string?> GetInvoicePath(int invoiceId)
         {
             return await _handlerContext.Invoices.Where(e => e.InvoiceId == invoiceId).Select(e => e.InvoiceFilePath).FirstAsync();
         }
+        /// <summary>
+        /// Do select query using given id to receive purchase invoice information that was not given in bulk query.
+        /// </summary>
+        /// <param name="invoiceId">Invoice id.</param>
+        /// <returns>Object containing purchase invoice information that was not passed in bulk query.</returns>
         public async Task<GetRestInvoice> GetRestPurchaseInvoice(int invoiceId)
         {
             var invoiceInfo = await _handlerContext.Invoices
@@ -922,6 +1079,11 @@ namespace database_communicator.Services
 
             return invoiceInfo;
         }
+        /// <summary>
+        /// Do select query using given id to receive sales invoice information that was not given in bulk query.
+        /// </summary>
+        /// <param name="invoiceId">Invoice id.</param>
+        /// <returns>Object containing sales invoice information that was not passed in bulk query.</returns>
         public async Task<GetRestInvoice> GetRestSalesInvoice(int invoiceId)
         {
             var invoiceInfo = await _handlerContext.Invoices
@@ -954,6 +1116,11 @@ namespace database_communicator.Services
 
             return invoiceInfo;
         }
+        /// <summary>
+        /// Do select query that returns invoice information needed to modify it.
+        /// </summary>
+        /// <param name="invoiceId">Invoice id.</param>
+        /// <returns>Object containing invoice transport, payment method and note values.</returns>
         public async Task<GetRestModifyInvoice> GetRestModifyInvoice(int invoiceId)
         {
             return await _handlerContext.Invoices
@@ -965,6 +1132,11 @@ namespace database_communicator.Services
                     Note = e.Note
                 }).FirstAsync();
         }
+        /// <summary>
+        /// Using transactions overwrites invoice properties values to given new ones.
+        /// </summary>
+        /// <param name="data">New invoice properties values wrapped in <see cref="Models.DTOs.Modify.ModifyInvoice"/></param>
+        /// <returns>True if success or false if failure.</returns>
         public async Task<bool> ModifyInvoice(ModifyInvoice data)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -1031,20 +1203,36 @@ namespace database_communicator.Services
                 return true;
             } catch (Exception ex)
             {
-                Console.Write(ex.ToString());
+                _logger.LogError(ex, "Modify invoice error.");
                 await trans.RollbackAsync();
                 return false;
             }
 
         }
-        public async Task UpdateInvoiceStatus()
+        /// <summary>
+        /// Using transactions change invoices status that was unpaid and it due date has passed to Due to value.
+        /// </summary>
+        /// <returns>True if success or false if failure.</returns>
+        public async Task<bool> UpdateInvoiceStatus()
         {
-            var dueToStatusId = await _handlerContext.PaymentStatuses.Where(e => e.StatusName == "Due to").Select(e => e.PaymentStatusId).FirstAsync();
-            await _handlerContext.Invoices
-                .Where(e => DateTime.Now > e.DueDate && e.PaymentsStatus.StatusName == "Unpaid")
-                .ExecuteUpdateAsync(setter =>
-                    setter.SetProperty(s => s.PaymentsStatusId, dueToStatusId)
-                );
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
+            {
+                var dueToStatusId = await _handlerContext.PaymentStatuses.Where(e => e.StatusName == "Due to").Select(e => e.PaymentStatusId).FirstAsync();
+                await _handlerContext.Invoices
+                    .Where(e => DateTime.Now > e.DueDate && e.PaymentsStatus.StatusName == "Unpaid")
+                    .ExecuteUpdateAsync(setter =>
+                        setter.SetProperty(s => s.PaymentsStatusId, dueToStatusId)
+                    );
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+                return true;
+            } catch (Exception ex)
+            {
+                _logger.LogError(ex, "Modify invoice status error.");
+                await trans.RollbackAsync();
+                return false;
+            }
         }
     }
 }

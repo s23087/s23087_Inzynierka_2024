@@ -1,8 +1,10 @@
 ﻿using database_communicator.Data;
 using database_communicator.Models;
-using database_communicator.Models.DTOs;
 using database_communicator.Utils;
-using database_comunicator.FilterClass;
+using database_communicator.FilterClass;
+using database_communicator.Models.DTOs.Create;
+using database_communicator.Models.DTOs.Get;
+using database_communicator.Models.DTOs.Modify;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -14,6 +16,12 @@ namespace database_communicator.Services
 {
     public interface IOrganizationServices
     {
+        /// <summary>
+        /// Using transactions add organization to database. If user id is passed will make this new organization as client to given user.
+        /// </summary>
+        /// <param name="org">New organization data</param>
+        /// <param name="userId">USer id.</param>
+        /// <returns>Id of new organization or 0 if failed</returns>
         public Task<int> AddOrganization(AddOrganization org, int? userId);
         public Task<int> GetCountryId(string countryName);
         public Task<bool> CountryExist(string countryName);
@@ -26,7 +34,7 @@ namespace database_communicator.Services
         public Task<GetClientRestInfo> GetClientsRestInfo(int orgId);
         public Task<bool> SetClientAvailabilityStatus(int orgId, int statusId);
         public Task<bool> SetClientUserBindings(SetUserClientBindings data);
-        public Task AddAvailabilityStatus(AddAvailabilityStatus data);
+        public Task<bool> AddAvailabilityStatus(AddAvailabilityStatus data);
         public Task<IEnumerable<GetAvailabilityStatuses>> GetAvailabilityStatuses();
         public Task<bool> OrgExist(int orgId);
         public Task<bool> ManyUserExist(IEnumerable<int> users);
@@ -35,14 +43,23 @@ namespace database_communicator.Services
         public Task<bool> OrgHaveRelations(int orgId, int userId);
         public Task<bool> DeleteOrg(int orgId);
     }
+    /// <summary>
+    /// Class that interact with database and contains functions allowing to work on organizations.
+    /// </summary>
     public class OrganizationServices : IOrganizationServices
     {
         private readonly HandlerContext _handlerContext;
-        public OrganizationServices(HandlerContext handlerContext)
+        private readonly ILogger<CreditNoteServices> _logger;
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="handlerContext">Database context</param>
+        /// <param name="logger">Log interface</param>
+        public OrganizationServices(HandlerContext handlerContext, ILogger<CreditNoteServices> logger)
         {
             _handlerContext = handlerContext;
+            _logger = logger;
         }
-
         public async Task<int> AddOrganization(AddOrganization org, int? userId)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -70,22 +87,34 @@ namespace database_communicator.Services
                 return newOrg.OrganizationId;
             } catch (Exception error)
             {
-                Console.WriteLine(error.ToString());
+                _logger.LogError(error, "Create organization error.");
                 await trans.RollbackAsync();
                 return 0;
             }
         }
-
+        /// <summary>
+        /// Checks if country with given name exists in database.
+        /// </summary>
+        /// <param name="countryName">Country name</param>
+        /// <returns>True if exist, false if not.</returns>
         public async Task<bool> CountryExist(string countryName)
         {
             return await _handlerContext.Countries.Where(e => e.CountryName == countryName).AnyAsync();
         }
-
+        /// <summary>
+        /// Do select query to receive id of country with given name.
+        /// </summary>
+        /// <param name="countryName">Country name</param>
+        /// <returns>Id of country or 0 if not found.</returns>
         public async Task<int> GetCountryId(string countryName)
         {
-            var result = await _handlerContext.Countries.Where(e => e.CountryName == countryName).Select(e => e.CountryId).ToListAsync();
-            return result[0];
+            return await _handlerContext.Countries.Where(e => e.CountryName == countryName).Select(e => e.CountryId).FirstOrDefaultAsync();
         }
+        /// <summary>
+        /// Do select query to receive organization information with given id.
+        /// </summary>
+        /// <param name="orgId">Organization id</param>
+        /// <returns>Object that contains chosen organization information.</returns>
         public async Task<GetOrg> GetOrg(int orgId)
         {
             return await _handlerContext.Organizations.Where(e => e.OrganizationId == orgId).Include(e => e.Country).Select(e => new GetOrg
@@ -100,6 +129,11 @@ namespace database_communicator.Services
                 Country=e.Country.CountryName
             }).FirstAsync();
         }
+        /// <summary>
+        /// Using transactions overwrites organizations properties with given new ones.
+        /// </summary>
+        /// <param name="data">New organization property values</param>
+        /// <returns>True if success or false if failure.</returns>
         public async Task<bool> ModifyOrg(ModifyOrg data)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -144,11 +178,19 @@ namespace database_communicator.Services
                 return true;
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Modify organization error.");
                 await trans.RollbackAsync();
                 return false;
             }
         }
+        /// <summary>
+        /// Do select query with given sort and filter to receive user clients information from database.
+        /// </summary>
+        /// <param name="userId">User id</param>
+        /// <param name="userOrgId">User organization id</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="country">Filter value. If passed return client that country is equal to given value.</param>
+        /// <returns>List of user clients.</returns>
         public async Task<IEnumerable<GetClient>> GetClients(int userId, int userOrgId, string? sort, int? country)
         {
             var sortFunc = SortFilterUtils.GetClientSort(sort);
@@ -179,6 +221,15 @@ namespace database_communicator.Services
 
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query with given sort and filter to receive user clients information from database.
+        /// </summary>
+        /// <param name="userId">User id</param>
+        /// <param name="userOrgId">User organization id</param>
+        /// <param name="search">The phrase searched in clients information. It will check if phrase exist in organization name, city or street.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="country">Filter value. If passed return client that country is equal to given value.</param>
+        /// <returns>List of user clients.</returns>
         public async Task<IEnumerable<GetClient>> GetClients(int userId, int userOrgId, string search, string? sort, int? country)
         {
             var sortFunc = SortFilterUtils.GetClientSort(sort);
@@ -210,6 +261,13 @@ namespace database_communicator.Services
 
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query with given sort and filter to receive organization clients information from database.
+        /// </summary>
+        /// <param name="userOrgId">User organization id</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="country">Filter value. If passed return client that country is equal to given value.</param>
+        /// <returns>List of user clients.</returns>
         public async Task<IEnumerable<GetOrgClient>> GetOrgClients(int userOrgId, string? sort, int? country)
         {
             var sortFunc = SortFilterUtils.GetClientSort(sort);
@@ -240,6 +298,14 @@ namespace database_communicator.Services
                     Country = e.Country.CountryName
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query with given search, sort and filter to receive organization clients information from database.
+        /// </summary>
+        /// <param name="userOrgId">User organization id</param>
+        /// <param name="search">The phrase searched in clients information. It will check if phrase exist in organization name, city or street.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="country">Filter value. If passed return client that country is equal to given value.</param>
+        /// <returns>List of user clients.</returns>
         public async Task<IEnumerable<GetOrgClient>> GetOrgClients(int userOrgId, string search, string? sort, int? country)
         {
             var sortFunc = SortFilterUtils.GetClientSort(sort);
@@ -271,6 +337,11 @@ namespace database_communicator.Services
                     Country = d.Country.CountryName
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query using given id to receive client information that was not given in bulk query.
+        /// </summary>
+        /// <param name="orgId">Client id</param>
+        /// <returns>Object containing client information.</returns>
         public async Task<GetClientRestInfo> GetClientsRestInfo(int orgId)
         {
             return await _handlerContext.Organizations.Where(e => e.OrganizationId == orgId)
@@ -282,33 +353,60 @@ namespace database_communicator.Services
                     DaysForRealization = e.AvailabilityStatus == null ? 0 : e.AvailabilityStatus.DaysForRealization
                 }).FirstAsync();
         }
-
+        /// <summary>
+        /// Using transactions set client availability status to the give one.
+        /// </summary>
+        /// <param name="orgId">Client id</param>
+        /// <param name="statusId">New status id</param>
+        /// <returns>True if success or false if failure.</returns>
         public async Task<bool> SetClientAvailabilityStatus(int orgId, int statusId)
         {
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
             try
             {
                 await _handlerContext.Organizations.ExecuteUpdateAsync(setters =>
                     setters.SetProperty(s => s.AvailabilityStatusId, statusId));
                 await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
                 return true;
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Change client availability status error.");
+                await trans.RollbackAsync();
                 return false;
             }
         }
-
-        public async Task AddAvailabilityStatus(AddAvailabilityStatus data)
+        /// <summary>
+        /// Using transactions add new client availability status.
+        /// </summary>
+        /// <param name="data">New status data</param>
+        /// <returns>True if success or false if failure.</returns>
+        public async Task<bool> AddAvailabilityStatus(AddAvailabilityStatus data)
         {
-            var newStatus = new AvailabilityStatus
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
             {
-                StatusName = data.StatusName,
-                DaysForRealization = data.DaysForRealization
-            };
+                var newStatus = new AvailabilityStatus
+                {
+                    StatusName = data.StatusName,
+                    DaysForRealization = data.DaysForRealization
+                };
 
-            _handlerContext.Add<AvailabilityStatus>(newStatus);
-            await _handlerContext.SaveChangesAsync();
+                _handlerContext.Add<AvailabilityStatus>(newStatus);
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+                return true;
+            } catch (Exception ex)
+            {
+                _logger.LogError(ex, "Add client availability status error.");
+                await trans.RollbackAsync();
+                return false;
+            }
         }
+        /// <summary>
+        /// Do select query to receive list of client availability statues from database.
+        /// </summary>
+        /// <returns>List of availability statuses.</returns>
         public async Task<IEnumerable<GetAvailabilityStatuses>> GetAvailabilityStatuses()
         {
             return await _handlerContext.AvailabilityStatuses.Select(e => new GetAvailabilityStatuses
@@ -318,6 +416,11 @@ namespace database_communicator.Services
                 Days = e.DaysForRealization
             }).ToListAsync();
         }
+        /// <summary>
+        /// Using transactions overwrites client-user bindings to given new ones.
+        /// </summary>
+        /// <param name="data">New client-user binding data.</param>
+        /// <returns>True if success or false if failure.</returns>
         public async Task<bool> SetClientUserBindings(SetUserClientBindings data)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -350,25 +453,50 @@ namespace database_communicator.Services
                 return true;
             } catch (Exception ex)
             {
-                Console.Write(ex.ToString());
+                _logger.LogError(ex, "Set client-user bindings error.");
                 await trans.RollbackAsync();
                 return false;
             }
 
         }
+        /// <summary>
+        /// Checks if organizations exists in database.
+        /// </summary>
+        /// <param name="orgId">Organization id.</param>
+        /// <returns>True if exist or false if not.</returns>
         public async Task<bool> OrgExist(int orgId)
         {
             return await _handlerContext.Organizations.Where(e => e.OrganizationId == orgId).AnyAsync();
         }
+        /// <summary>
+        /// Checks if All given user exist in database.
+        /// </summary>
+        /// <param name="users">List of users ids.</param>
+        /// <returns>True if all users exist, false otherwise.</returns>
         public async Task<bool> ManyUserExist(IEnumerable<int> users)
         {
             if (!users.Any()) return true;
-            return await _handlerContext.AppUsers.AnyAsync(e => users.Contains(e.IdUser));
+            foreach (var user in users)
+            {
+                var exists = await _handlerContext.AppUsers.AnyAsync(e => e.IdUser == user);
+                if (!exists) return false;
+            }
+            return true;
         }
+        /// <summary>
+        /// Checks if client availability status with given id exist in database.
+        /// </summary>
+        /// <param name="statusId">Status id</param>
+        /// <returns>True if exist, false if not.</returns>
         public async Task<bool> StatusExist(int statusId)
         {
             return await _handlerContext.AvailabilityStatuses.Where(e => e.AvailabilityStatusId == statusId).AnyAsync();
         }
+        /// <summary>
+        /// Do select query to receive organization client-user bindings information from database
+        /// </summary>
+        /// <param name="orgId">Organization id</param>
+        /// <returns>List containing users information bound to the organization.</returns>
         public async Task<IEnumerable<GetClientBindings>> GetClientBindings(int orgId)
         {
             return await _handlerContext.Organizations.Where(e => e.OrganizationId == orgId).SelectMany(e => e.AppUsers).Select(e => new GetClientBindings
@@ -378,6 +506,12 @@ namespace database_communicator.Services
                 Surname = e.Surname
             }).ToListAsync();
         }
+        /// <summary>
+        /// Checks if organization have any relation that might for example prevent from deleting given organization form database.
+        /// </summary>
+        /// <param name="orgId">Organization id.</param>
+        /// <param name="userId">Id of user.</param>
+        /// <returns>Return true if only existing relation is that of given user, otherwise false.</returns>
         public async Task<bool> OrgHaveRelations(int orgId, int userId)
         {
             var invoicesCheck = await _handlerContext.Invoices.AnyAsync(e => e.Buyer == orgId || e.Seller == orgId);
@@ -389,6 +523,11 @@ namespace database_communicator.Services
 
             return invoicesCheck || proformaCheck || soloUserCheck || orgUserCheck || outsideItemsCheck || userClientCheck;
         }
+        /// <summary>
+        /// Using transactions delete organization from database.
+        /// </summary>
+        /// <param name="orgId">Id of organization to delete.</param>
+        /// <returns>True if success or false if failure.</returns>
         public async Task<bool> DeleteOrg(int orgId)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -401,7 +540,7 @@ namespace database_communicator.Services
                 return true;
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Delete organization error.");
                 await trans.RollbackAsync();
                 return false;
             }

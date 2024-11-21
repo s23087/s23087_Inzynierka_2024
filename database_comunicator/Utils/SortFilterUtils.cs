@@ -1,12 +1,20 @@
 ﻿using database_communicator.Models;
-using database_communicator.Models.DTOs;
+using database_communicator.Models.DTOs.Get;
 using System;
 using System.Linq.Expressions;
 
 namespace database_communicator.Utils
 {
+    /// <summary>
+    /// Class that contains static methods that return function for order by.
+    /// </summary>
     public static class SortFilterUtils
     {
+        /// <summary>
+        /// Creates function that sort <see cref="GetManyItems"/> objects. Properties to choose: Id, Partnumber, Price, Name. Default: Qty.
+        /// </summary>
+        /// <param name="sort">String containing sorted property with direction. The first letter is direction and rest being property name.</param>
+        /// <returns>Function used in order by function.</returns>
         public static Func<GetManyItems, Object> GetItemSort(string? sort)
         {
             Func <GetManyItems, Object > orderBy;
@@ -28,6 +36,11 @@ namespace database_communicator.Utils
                 return orderBy;
             }
         }
+        /// <summary>
+        /// Creates function that sort <see cref="Request"/> objects. Properties to choose: Title, Date. Default: RequestId.
+        /// </summary>
+        /// <param name="sort">String containing sorted property with direction. The first letter is direction and rest being property name.</param>
+        /// <returns>Function used in order by function.</returns>
         public static Expression<Func<Request, Object>> GetRequestSort(string? sort)
         {
             Expression<Func<Request, Object>> orderBy;
@@ -48,6 +61,11 @@ namespace database_communicator.Utils
                 return orderBy;
             }
         }
+        /// <summary>
+        /// Creates function that sort <see cref="CreditNote"/> objects. Properties to choose: Number, Date, Qty, Total. Default: InvoiceId.
+        /// </summary>
+        /// <param name="sort">String containing sorted property with direction. The first letter is direction and rest being property name.</param>
+        /// <returns>Function used in order by function.</returns>
         public static Expression<Func<CreditNote, Object>> GetCreditNoteSort(string? sort)
         {
             Expression<Func<CreditNote, Object>> orderBy;
@@ -70,6 +88,11 @@ namespace database_communicator.Utils
                 return orderBy;
             }
         }
+        /// <summary>
+        /// Creates function that sort <see cref="Invoice"/> objects. Properties to choose: Number, Date, Qty, Total, Due. Default: InvoiceId.
+        /// </summary>
+        /// <param name="sort">String containing sorted property with direction. The first letter is direction and rest being property name.</param>
+        /// <returns>Function used in order by function.</returns>
         public static Expression<Func<Invoice, Object>> GetInvoiceSort(string? sort, bool isYourInvoice)
         {
             Expression<Func<Invoice, Object>> orderBy;
@@ -93,6 +116,11 @@ namespace database_communicator.Utils
                 return orderBy;
             }
         }
+        /// <summary>
+        /// Creates function that sort <see cref="OutsideItem"/> objects. Properties to choose: Id, Source, Qty, Price, Partnumber. Default: ItemId.
+        /// </summary>
+        /// <param name="sort">String containing sorted property with direction. The first letter is direction and rest being property name.</param>
+        /// <returns>Function used in order by function.</returns>
         public static Expression<Func<OutsideItem, Object>> GetOutsideItemSort(string? sort)
         {
             Expression<Func<OutsideItem, Object>> orderBy;
@@ -116,6 +144,11 @@ namespace database_communicator.Utils
                 return orderBy;
             }
         }
+        /// <summary>
+        /// Creates function that sort <see cref="OutsideItem"/> objects. Properties to choose: Id, Estimated, Recipient, Proforma_Number. Default: DeliveryId.
+        /// </summary>
+        /// <param name="sort">String containing sorted property with direction. The first letter is direction and rest being property name.</param>
+        /// <returns>Function used in order by function.</returns>
         public static Expression<Func<Delivery, Object>> GetDeliverySort(string? sort, bool isDeliveryToUser)
         {
             Expression<Func<Delivery, Object>> orderBy;
@@ -138,6 +171,11 @@ namespace database_communicator.Utils
                 return orderBy;
             }
         }
+        /// <summary>
+        /// Creates function that sort <see cref="Organization"/> objects. Properties to choose: Name, Country. Default: OrganizationId.
+        /// </summary>
+        /// <param name="sort">String containing sorted property with direction. The first letter is direction and rest being property name.</param>
+        /// <returns>Function used in order by function.</returns>
         public static Expression<Func<Organization, Object>> GetClientSort(string? sort)
         {
             Expression<Func<Organization, Object>> orderBy;
@@ -158,6 +196,11 @@ namespace database_communicator.Utils
                 return orderBy;
             }
         }
+        /// <summary>
+        /// Creates function that sort <see cref="Proforma"/> objects. Properties to choose: Number, Date, Recipient, Qty, Total. Default: ProformaId.
+        /// </summary>
+        /// <param name="sort">String containing sorted property with direction. The first letter is direction and rest being property name.</param>
+        /// <returns>Function used in order by function.</returns>
         public static Expression<Func<Proforma, Object>> GetProformaSort(string? sort, bool isYourProforma)
         {
             Expression<Func<Proforma, Object>> orderBy;
@@ -178,6 +221,11 @@ namespace database_communicator.Utils
             };
             return orderBy;
         }
+        /// <summary>
+        /// Creates function that sort <see cref="Offer"/> objects. Properties to choose: Created, Name, Modified, Products. Default: OfferId.
+        /// </summary>
+        /// <param name="sort">String containing sorted property with direction. The first letter is direction and rest being property name.</param>
+        /// <returns>Function used in order by function.</returns>
         public static Expression<Func<Offer, Object>> GetPricelistSort(string? sort)
         {
             Expression<Func<Offer, Object>> orderBy;

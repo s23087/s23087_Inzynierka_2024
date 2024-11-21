@@ -1,8 +1,10 @@
 ﻿using database_communicator.Data;
 using database_communicator.Models;
-using database_communicator.Models.DTOs;
 using database_communicator.Utils;
-using database_comunicator.FilterClass;
+using database_communicator.FilterClass;
+using database_communicator.Models.DTOs.Create;
+using database_communicator.Models.DTOs.Get;
+using database_communicator.Models.DTOs.Modify;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq;
@@ -13,7 +15,7 @@ namespace database_communicator.Services
     public interface IItemServices
     {
         public Task<int?> AddItem(AddItem newItem);
-        public Task UpdateItem(UpdateItem postItem);
+        public Task<bool> UpdateItem(UpdateItem postItem);
         public Task<bool> RemoveItem(int id);
         public Task<bool> ItemExist(int id);
         public Task<bool> ItemExist(string partNumber);
@@ -32,14 +34,23 @@ namespace database_communicator.Services
         public Task<bool> ChangeBindings(IEnumerable<ModifyBinding> data);
         public Task<bool> ItemHaveRelations(int itemId);
     }
+    /// <summary>
+    /// Class that interact with database and contains functions allowing to work on credit notes.
+    /// </summary>
     public class ItemServices : IItemServices
     {
         private readonly HandlerContext _handlerContext;
-        public ItemServices(HandlerContext handlerContext)
+        private readonly ILogger<CreditNoteServices> _logger;
+        public ItemServices(HandlerContext handlerContext, ILogger<CreditNoteServices> logger)
         {
             _handlerContext = handlerContext;
+            _logger = logger;
         }
-
+        /// <summary>
+        /// Using transactions add new item to database.
+        /// </summary>
+        /// <param name="newItem">New item values wrapped in <see cref="Models.DTOs.Create.AddItem"/>.</param>
+        /// <returns>True if success or false if failure.</returns>
         public async Task<int?> AddItem(AddItem newItem)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -63,18 +74,29 @@ namespace database_communicator.Services
 
                 await trans.CommitAsync();
                 return item.ItemId;
-            } catch (Exception)
+            } catch (Exception ex)
             {
+                _logger.LogError(ex, "Add item error.");
                 await trans.RollbackAsync();
                 return null;
             }
         }
-
+        /// <summary>
+        /// Checks if any of given eans exist in database.
+        /// </summary>
+        /// <param name="eans">Array of eans</param>
+        /// <returns>True if at least one ean exist in database, ohterwise false.</returns>
         public async Task<bool> EanExist(IEnumerable<string> eans)
         {
-            return await _handlerContext.Eans.Where(e => eans.Contains(e.EanValue)).AnyAsync();
+            return await _handlerContext.Eans.AnyAsync(e => eans.Contains(e.EanValue));
         }
-
+        /// <summary>
+        /// Do select query to receive item information for chosen user that was not passed in bulk query.
+        /// </summary>
+        /// <param name="id">Item id.</param>
+        /// <param name="userId">Id of item owner.</param>
+        /// <param name="currency">Shortcut name of currency.</param>
+        /// <returns>Object that contains information about invoice where that item is used and information about user clients stock of this item.</returns>
         public async Task<GetRestInfo> GetRestOfItem(int id, int userId, string currency)
         {
             List<GetRestInfoOwnedItems> result;
@@ -146,6 +168,12 @@ namespace database_communicator.Services
             };
 
         }
+        /// <summary>
+        /// Do select query to receive item information user that was not passed in bulk query.
+        /// </summary>
+        /// <param name="id">Item id.</param>
+        /// <param name="currency">Shortcut name of currency.</param>
+        /// <returns>Object that contains information about invoice where that item is used and information about user clients stock of this item.</returns>
         public async Task<GetRestInfo> GetRestOfItemOrg(int id, string currency)
         {
             List<GetRestInfoOwnedItems> result;
@@ -198,6 +226,13 @@ namespace database_communicator.Services
                 OwnedItemInfos = result
             };
         }
+        /// <summary>
+        /// Do select query to receive sorted and filtered items information with given currency from database.
+        /// </summary>
+        /// <param name="currency">Shortcut name of currency.</param>
+        /// <param name="orderBy">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="ItemFiltersTemplate"/></param>
+        /// <returns>List of <see cref="GetManyItems"/>.</returns>
         public async Task<IEnumerable<GetManyItems>> GetItems(string currency, string? orderBy, ItemFiltersTemplate filters)
         {
             List<GetManyItems> items;
@@ -330,6 +365,14 @@ namespace database_communicator.Services
                 return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
             }
         }
+        /// <summary>
+        /// Do select query to receive searched, sorted and filtered items information with given currency from database.
+        /// </summary>
+        /// <param name="currency">Shortcut name of currency.</param>
+        /// <param name="search">The phrase searched in items information. It will check if phrase exist in partnumber or item name.</param>
+        /// <param name="orderBy">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="ItemFiltersTemplate"/></param>
+        /// <returns>List of <see cref="GetManyItems"/>.</returns>
         public async Task<IEnumerable<GetManyItems>> GetItems(string currency, string search, string? orderBy, ItemFiltersTemplate filters)
         {
             List<GetManyItems> items;
@@ -529,6 +572,14 @@ namespace database_communicator.Services
                     return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
             }
         }
+        /// <summary>
+        /// Do select query to receive sorted and filtered items information with given currency from database for chosen user.
+        /// </summary>
+        /// <param name="currency">Shortcut name of currency.</param>
+        /// <param name="userId">User id.</param>
+        /// <param name="orderBy">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="ItemFiltersTemplate"/></param>
+        /// <returns>List of <see cref="GetManyItems"/>.</returns>
         public async Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId, string? orderBy, ItemFiltersTemplate filters)
         {
             List<GetManyItems> items;
@@ -644,6 +695,15 @@ namespace database_communicator.Services
                     return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
             }
         }
+        /// <summary>
+        /// Do select query to receive searched, sorted and filtered items information with given currency from database for chosen user.
+        /// </summary>
+        /// <param name="currency">Shortcut name of currency.</param>
+        /// <param name="userId">User id.</param>
+        /// <param name="search">The phrase searched in items information. It will check if phrase exist in partnumber or item name.</param>
+        /// <param name="orderBy">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="ItemFiltersTemplate"/></param>
+        /// <returns>List of <see cref="GetManyItems"/>.</returns>
         public async Task<IEnumerable<GetManyItems>> GetItems(string currency, int userId, string search, string? orderBy, ItemFiltersTemplate filters)
         {
             List<GetManyItems> items;
@@ -766,83 +826,112 @@ namespace database_communicator.Services
                     return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
             }
         }
-
+        /// <summary>
+        /// Checks if item with given id exists.
+        /// </summary>
+        /// <param name="id">Item id.</param>
+        /// <returns>True if exists or false if not.</returns>
         public async Task<bool> ItemExist(int id)
         {
             return await _handlerContext.Items.Where(e => e.ItemId == id).AnyAsync();
         }
-
+        /// <summary>
+        /// Checks if item with given part number exists.
+        /// </summary>
+        /// <param name="partNumber">Item part number.</param>
+        /// <returns>True if exists or false if not.</returns>
         public async Task<bool> ItemExist(string partNumber)
         {
             return await _handlerContext.Items.Where(e => e.PartNumber == partNumber).AnyAsync();
         }
-
+        /// <summary>
+        /// Using transactions delete item with given id from database.
+        /// </summary>
+        /// <param name="id">Item id.</param>
+        /// <returns>True if success or false if failure.</returns>
         public async Task<bool> RemoveItem(int id)
         {
-            var ownedExist = await _handlerContext.OwnedItems.Where(e => e.OwnedItemId == id).AnyAsync();
-
-            if (ownedExist) return false;
-
-            var eansToRemove = await _handlerContext.Eans.Where(e => e.ItemId == id).ToArrayAsync();
-
-            _handlerContext.Eans.RemoveRange(eansToRemove);
-
-            _handlerContext.Remove<Item>( new Item
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
             {
-                ItemId = id
-            });
+                var ownedExist = await _handlerContext.OwnedItems.Where(e => e.OwnedItemId == id).AnyAsync();
+                if (ownedExist) return false;
+                var eansToRemove = await _handlerContext.Eans.Where(e => e.ItemId == id).ToArrayAsync();
 
-            await _handlerContext.SaveChangesAsync();
-
-            return true;
-        }
-
-        public async Task UpdateItem(UpdateItem postItem)
-        {
-            if (!postItem.Eans.IsNullOrEmpty())
-            {
-                var toDeleteEans = await _handlerContext.Eans.Where(e => e.ItemId == postItem.Id && !postItem.Eans.Contains(e.EanValue)).ToArrayAsync();
-                _handlerContext.Eans.RemoveRange(toDeleteEans);
-                var restEans = await _handlerContext.Eans.Where(e => e.ItemId == postItem.Id && postItem.Eans.Contains(e.EanValue)).Select(e => e.EanValue).ToArrayAsync();
-                var eanToAdd = postItem.Eans.Where(e => !restEans.Contains(e)).ToArray();
-                if (!eanToAdd.IsNullOrEmpty())
+                _handlerContext.Eans.RemoveRange(eansToRemove);
+                _handlerContext.Remove<Item>(new Item
                 {
-                    _handlerContext.Eans.AddRange(eanToAdd.Select(e => new Ean
+                    ItemId = id
+                });
+
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+                return true;
+            } catch (Exception ex)
+            {
+                _logger.LogError(ex, "Delete item error.");
+                await trans.RollbackAsync();
+                return false;
+            }
+        }
+        /// <summary>
+        /// Using transactions overwrites old item properties to given new ones.
+        /// </summary>
+        /// <param name="postItem">New item properties values</param>
+        /// <returns>True if success or false if failure.</returns>
+        public async Task<bool> UpdateItem(UpdateItem postItem)
+        {
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
+            {
+                if (!postItem.Eans.IsNullOrEmpty())
+                {
+                    var toDeleteEans = await _handlerContext.Eans.Where(e => e.ItemId == postItem.Id && !postItem.Eans.Contains(e.EanValue)).ToArrayAsync();
+                    _handlerContext.Eans.RemoveRange(toDeleteEans);
+                    var restEans = await _handlerContext.Eans.Where(e => e.ItemId == postItem.Id && postItem.Eans.Contains(e.EanValue)).Select(e => e.EanValue).ToArrayAsync();
+                    var eanToAdd = postItem.Eans.Where(e => !restEans.Contains(e)).ToArray();
+                    if (!eanToAdd.IsNullOrEmpty())
                     {
-                        EanValue = e,
-                        ItemId = postItem.Id
-                    }));
+                        _handlerContext.Eans.AddRange(eanToAdd.Select(e => new Ean
+                        {
+                            EanValue = e,
+                            ItemId = postItem.Id
+                        }));
+                    }
                 }
-            }
 
-            var upadtedItem = new Item
+                if (postItem.ItemName != null)
+                {
+                    await _handlerContext.Items.ExecuteUpdateAsync(setter => setter.SetProperty(s => s.ItemName, postItem.ItemName));
+                }
+
+                if (postItem.ItemDescription == null)
+                {
+                    await _handlerContext.Items.ExecuteUpdateAsync(setter => setter.SetProperty(s => s.ItemDescription, postItem.ItemDescription));
+                }
+
+                if (postItem.PartNumber == null)
+                {
+                    await _handlerContext.Items.ExecuteUpdateAsync(setter => setter.SetProperty(s => s.PartNumber, postItem.PartNumber));
+                }
+
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+                return true;
+            } catch (Exception ex)
             {
-                ItemId = postItem.Id,
-                ItemName = postItem.ItemName,
-                ItemDescription = postItem.ItemDescription,
-                PartNumber = postItem.PartNumber
-            };
-
-            _handlerContext.Update<Item>( upadtedItem );
-
-            if (postItem.ItemName == null)
-            {
-                _handlerContext.Entry(upadtedItem).Property("ItemName").IsModified = false;
+                _logger.LogError(ex, "Modify item error.");
+                await trans.RollbackAsync();
+                return false;
             }
-
-            if (postItem.ItemDescription == null)
-            {
-                _handlerContext.Entry(upadtedItem).Property("ItemDescription").IsModified = false;
-            }
-
-            if (postItem.PartNumber == null)
-            {
-                _handlerContext.Entry(upadtedItem).Property("PartNumber").IsModified = false;
-            }
-
-            await _handlerContext.SaveChangesAsync();
 
         }
+        /// <summary>
+        /// Do select query to get necessary item information needed for item modification.
+        /// </summary>
+        /// <param name="id">Item id.</param>
+        /// <param name="currency">Shortcut name of currency that item will be displayed.</param>
+        /// <returns>List of item owners which information which invoice and how much they own.</returns>
         public async Task<IEnumerable<GetBinding>> GetModifyRestOfItem(int id, string currency)
         {
             List<GetBinding> binding;
@@ -859,7 +948,6 @@ namespace database_communicator.Services
                     Currency = currency,
                     InvoiceNumber = res.OwnedItem.Invoice.InvoiceNumber,
                     InvoiceId = res.OwnedItem.InvoiceId
-
                 }).ToListAsync();
 
             } else
@@ -880,11 +968,19 @@ namespace database_communicator.Services
             }
             return binding;
         }
+        /// <summary>
+        /// Do select query to receive item description from database.
+        /// </summary>
+        /// <param name="id">Item id.</param>
+        /// <returns>String that contains item description.</returns>
         public async Task<string> GetDescription(int id)
         {
-            var result = await _handlerContext.Items.Where(e => e.ItemId == id).Select(e => e.ItemDescription).ToListAsync();
-            return result[0];
+            return await _handlerContext.Items.Where(e => e.ItemId == id).Select(e => e.ItemDescription).FirstAsync();
         }
+        /// <summary>
+        /// Do select query to receive list of existing items.
+        /// </summary>
+        /// <returns>List of <see cref="Models.DTOs.Get.GetItemList"/>.</returns>
         public async Task<IEnumerable<GetItemList>> GetItemList()
         {
             return await _handlerContext.Items
@@ -895,6 +991,12 @@ namespace database_communicator.Services
                     Name = e.ItemName
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query to receive list of existing items available to sell for chosen user. 
+        /// </summary>
+        /// <param name="userId">User id.</param>
+        /// <param name="currency">Shortcut name of currency.</param>
+        /// <returns>List of items with purchase price in given currency</returns>
         public async Task<IEnumerable<GetSalesItemList>> GetSalesItemList(int userId, string currency)
         {
             if (currency == "PLN")
@@ -967,6 +1069,11 @@ namespace database_communicator.Services
                         )
                         .ToListAsync();
         }
+        /// <summary>
+        /// Do select query to receive users that holds at least 1 qty of chosen item.
+        /// </summary>
+        /// <param name="itemId">Item id.</param>
+        /// <returns>List of object containing user id, surname and name.</returns>
         public async Task<IEnumerable<GetUsers>> GetItemOwners(int itemId)
         {
             return await _handlerContext.AppUsers
@@ -983,6 +1090,11 @@ namespace database_communicator.Services
                 })
                 .ToListAsync();
         }
+        /// <summary>
+        /// Using transactions change item bindings (Qty of item possessed by user etc.).
+        /// </summary>
+        /// <param name="data">New bindings data.</param>
+        /// <returns>True if success or false if failure.</returns>
         public async Task<bool> ChangeBindings(IEnumerable<ModifyBinding> data)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -1026,12 +1138,17 @@ namespace database_communicator.Services
                 return true;
             } catch (Exception ex)
             {
-                Console.Write(ex.ToString());
+                _logger.LogError(ex, "Change item bindings error.");
                 await trans.RollbackAsync();
                 return false;
             }
 
         }
+        /// <summary>
+        /// Checks if item have existing relations that would for example withhold it deletion.
+        /// </summary>
+        /// <param name="itemId">Item id.</param>
+        /// <returns>True if have, false if not.</returns>
         public async Task<bool> ItemHaveRelations(int itemId)
         {
             return await _handlerContext.Items.AnyAsync(x => x.ItemId == itemId && (x.OwnedItems.Any() || x.OfferItems.Any() || x.ProformaFutureItems.Any() || x.OutsideItems.Any()));

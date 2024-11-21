@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("database_comunicator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c2bf1ab763c997ba5ce4e60122f9017af63f26bb")]
 [assembly: System.Reflection.AssemblyProductAttribute("database_comunicator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("database_comunicator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

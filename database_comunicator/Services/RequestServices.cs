@@ -1,8 +1,10 @@
 ﻿using database_communicator.Data;
 using database_communicator.Models;
-using database_communicator.Models.DTOs;
 using database_communicator.Utils;
-using database_comunicator.FilterClass;
+using database_communicator.FilterClass;
+using database_communicator.Models.DTOs.Create;
+using database_communicator.Models.DTOs.Get;
+using database_communicator.Models.DTOs.Modify;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -22,7 +24,7 @@ namespace database_communicator.Services
             string? type, int? status);
         public Task<GetRestRequest> GetRestRequest(int requestId);
         public Task<bool> RequestExist(int requestId);
-        public Task DeleteRequest(int requestId);
+        public Task<bool> DeleteRequest(int requestId);
         public Task<bool> ModifyRequest(ModifyRequest data);
         public Task<bool> SetRequestStatus(int requestId, int statusId, SetRequestStatus data);
         public Task<string?> GetRequestPath(int requestId);
@@ -31,20 +33,41 @@ namespace database_communicator.Services
 
         public Task<IEnumerable<GetRequestStatus>> GetRequestStatuses();
     }
+    /// <summary>
+    /// Class that interact with database and contains functions allowing to work on request.
+    /// </summary>
     public class RequestServices : IRequestServices
     {
         private readonly HandlerContext _handlerContext;
-        public RequestServices(HandlerContext handlerContext)
+        private readonly ILogger<CreditNoteServices> _logger;
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="handlerContext">Database context</param>
+        /// <param name="logger">Log interface</param>
+        public RequestServices(HandlerContext handlerContext, ILogger<CreditNoteServices> logger)
         {
             _handlerContext = handlerContext;
+            _logger = logger;
+
         }
+        /// <summary>
+        /// Do select query to receive status id with given name.
+        /// </summary>
+        /// <param name="status">Status name.</param>
+        /// <returns>Id of status or 0 if do not exist.</returns>
         public async Task<int> GetStatusId(string status)
         {
             return await _handlerContext.RequestStatuses
                 .Where(e => e.StatusName == status)
                 .Select(e => e.RequestStatusId)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
         }
+        /// <summary>
+        /// Using transactions add new request to database.
+        /// </summary>
+        /// <param name="data">New request data</param>
+        /// <returns>True if success, false if not.</returns>
         public async Task<int> AddRequest(AddRequest data)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -69,11 +92,21 @@ namespace database_communicator.Services
                 return toAdd.RequestId;
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Create request error.");
                 await trans.RollbackAsync();
                 return 0;
             }
         }
+        /// <summary>
+        /// Do select query to receive sorted and filtered requests information that was created by given user.
+        /// </summary>
+        /// <param name="userId">User id.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="dateL">Filter that search for date that is lower then given value.</param>
+        /// <param name="dateG">Filter that search for date that is greater then given value.</param>
+        /// <param name="type">Filter that search for type with given value</param>
+        /// <param name="status">Filter that search for status with given value</param>
+        /// <returns>List of request that was created by given user.</returns>
         public async Task<IEnumerable<GetRequest>> GetMyRequests(int userId, string? sort, string? dateL, string? dateG,
             string? type, int? status)
         {
@@ -109,6 +142,17 @@ namespace database_communicator.Services
                     Title = e.Title
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query to receive searched, sorted and filtered requests information that was created by given user.
+        /// </summary>
+        /// <param name="userId">User id.</param>
+        /// <param name="search">The phrase searched in request information. It will check if phrase exist in title.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="dateL">Filter that search for date that is lower then given value.</param>
+        /// <param name="dateG">Filter that search for date that is greater then given value.</param>
+        /// <param name="type">Filter that search for type with given value</param>
+        /// <param name="status">Filter that search for status with given value</param>
+        /// <returns>List of request that was created by given user.</returns>
         public async Task<IEnumerable<GetRequest>> GetMyRequests(int userId, string search, string? sort, string? dateL, string? dateG,
             string? type, int? status)
         {
@@ -144,6 +188,16 @@ namespace database_communicator.Services
                     Title = e.Title
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query to receive sorted and filtered requests information that was assigned to given user.
+        /// </summary>
+        /// <param name="userId">User id.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="dateL">Filter that search for date that is lower then given value.</param>
+        /// <param name="dateG">Filter that search for date that is greater then given value.</param>
+        /// <param name="type">Filter that search for type with given value</param>
+        /// <param name="status">Filter that search for status with given value</param>
+        /// <returns>List of request that was assigned to give user.</returns>
         public async Task<IEnumerable<GetRequest>> GetReceivedRequests(int userId, string? sort, string? dateL, string? dateG,
             string? type, int? status)
         {
@@ -179,6 +233,17 @@ namespace database_communicator.Services
                     Title = e.Title
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query to receive searched, sorted and filtered requests information that was assigned to given user.
+        /// </summary>
+        /// <param name="userId">User id.</param>
+        /// <param name="search">The phrase searched in request information. It will check if phrase exist in title.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="dateL">Filter that search for date that is lower then given value.</param>
+        /// <param name="dateG">Filter that search for date that is greater then given value.</param>
+        /// <param name="type">Filter that search for type with given value</param>
+        /// <param name="status">Filter that search for status with given value</param>
+        /// <returns>List of request that was assigned to given user.</returns>
         public async Task<IEnumerable<GetRequest>> GetReceivedRequests(int userId, string search, string? sort, string? dateL, string? dateG,
             string? type, int? status)
         {
@@ -214,6 +279,11 @@ namespace database_communicator.Services
                     Title = e.Title
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query using given id to receive request information that was not given in bulk query.
+        /// </summary>
+        /// <param name="requestId">Request id.</param>
+        /// <returns>Object containing request note and file path.</returns>
         public async Task<GetRestRequest> GetRestRequest(int requestId)
         {
             return await _handlerContext.Requests
@@ -224,14 +294,41 @@ namespace database_communicator.Services
                     Note = e.Note
                 }).FirstAsync();
         }
+        /// <summary>
+        /// Checks if request with given id exist.
+        /// </summary>
+        /// <param name="requestId">Request id.</param>
+        /// <returns>True if exist, false if not.</returns>
         public async Task<bool> RequestExist(int requestId)
         {
             return await _handlerContext.Requests.AnyAsync(x => x.RequestId == requestId);
         }
-        public async Task DeleteRequest(int requestId)
+        /// <summary>
+        /// Using transactions delete given request from database.
+        /// </summary>
+        /// <param name="requestId">Id of request to delete.</param>
+        /// <returns>True if success or false if not.</returns>
+        public async Task<bool> DeleteRequest(int requestId)
         {
-            await _handlerContext.Requests.Where(e => e.RequestId == requestId).ExecuteDeleteAsync();
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
+            {
+                await _handlerContext.Requests.Where(e => e.RequestId == requestId).ExecuteDeleteAsync();
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+                return true;
+            } catch (Exception ex)
+            {
+                _logger.LogError(ex, "Delete request error.");
+                await trans.RollbackAsync();
+                return false;
+            }
         }
+        /// <summary>
+        /// Using transactions overwrite old request values with new ones.
+        /// </summary>
+        /// <param name="data">New request values.</param>
+        /// <returns>True if succes, false if not.</returns>
         public async Task<bool> ModifyRequest(ModifyRequest data)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -286,48 +383,80 @@ namespace database_communicator.Services
                 return true;
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Modify request error.");
                 await trans.RollbackAsync();
                 return false;
             }
         }
+        /// <summary>
+        /// Using transactions change given request status to new one. Also add new text to note if was given in data.
+        /// </summary>
+        /// <param name="requestId">Request id.</param>
+        /// <param name="statusId">Id of new request status.</param>
+        /// <param name="data">Additional data for adding text to note.</param>
+        /// <returns>true if success or false if failure.</returns>
         public async Task<bool> SetRequestStatus(int requestId, int statusId, SetRequestStatus data)
         {
-            var toAdd = $"\n[{data.StatusName}] {DateTime.Now:dd/MM/yyyy H:mm}";
-            if (data.Note != null || data.Note != "")
+            using var trans = await _handlerContext.Database.BeginTransactionAsync();
+            try
             {
-                toAdd += "\n" + data.Note;
-            }
-            var note = await _handlerContext.Requests
-                .Where(e => e.RequestId == requestId)
-                .Select(e => e.Note).FirstAsync();
-            if (note.Length + toAdd.Length > 500)
+                var toAdd = $"\n[{data.StatusName}] {DateTime.Now:dd/MM/yyyy H:mm}";
+                if (data.Note != null || data.Note != "")
+                {
+                    toAdd += "\n" + data.Note;
+                }
+                var note = await _handlerContext.Requests
+                    .Where(e => e.RequestId == requestId)
+                    .Select(e => e.Note).FirstAsync();
+                if (note.Length + toAdd.Length > 500)
+                {
+                    return false;
+                }
+                await _handlerContext.Requests
+                    .Where(e => e.RequestId == requestId)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(s => s.RequestStatusId, statusId)
+                        .SetProperty(s => s.Note, s => s.Note + toAdd)
+                    );
+                await _handlerContext.SaveChangesAsync();
+                await trans.CommitAsync();
+                return true;
+            } catch (Exception ex)
             {
+                _logger.LogError(ex, "Set request status error.");
+                await trans.RollbackAsync();
                 return false;
             }
-            await _handlerContext.Requests
-                .Where(e => e.RequestId == requestId)
-                .ExecuteUpdateAsync(setters =>
-                    setters.SetProperty(s => s.RequestStatusId, statusId)
-                    .SetProperty(s => s.Note, s=> s.Note + toAdd)
-                );
-            await _handlerContext.SaveChangesAsync();
-            return true;
         }
+        /// <summary>
+        /// Do select query to receive request file path.
+        /// </summary>
+        /// <param name="requestId">Request id.</param>
+        /// <returns>String containing file path or null.</returns>
         public async Task<string?> GetRequestPath(int requestId)
         {
             return await _handlerContext.Requests
                 .Where (e => e.RequestId == requestId)
                 .Select(e => e.FilePath)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
         }
+        /// <summary>
+        /// Do select query to receive id of user request was assigned to.
+        /// </summary>
+        /// <param name="requestId">Request id.</param>
+        /// <returns>Id of user or 0 if request not found.</returns>
         public async Task<int> GetReceiverId(int requestId)
         {
             return await _handlerContext.Requests
                 .Where ((e) => e.RequestId == requestId)
                 .Select(e => e.IdUserReciver)
-                .FirstAsync();
+                .FirstOrDefaultAsync();
         }
+        /// <summary>
+        /// Do select query using given id to receive request information that was not given in bulk query and is needed for object modification.
+        /// </summary>
+        /// <param name="requestId">Request id.</param>
+        /// <returns>Object containing receiver id and request note.</returns>
         public async Task<GetRestModifyRequest> GetRestModifyRequest(int requestId)
         {
             return await _handlerContext.Requests
@@ -338,6 +467,10 @@ namespace database_communicator.Services
                     Note = e.Note,
                 }).FirstAsync();
         }
+        /// <summary>
+        /// Do select query to receive list of request statuses.
+        /// </summary>
+        /// <returns>List of object containing id and name of request statuses.</returns>
         public async Task<IEnumerable<GetRequestStatus>> GetRequestStatuses()
         {
             return await _handlerContext.RequestStatuses.Select(e => new GetRequestStatus

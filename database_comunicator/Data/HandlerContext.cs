@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using database_communicator.Models;
 using Microsoft.EntityFrameworkCore;
-using database_communicator.Models;
-using System.Security.Claims;
 
 namespace database_communicator.Data;
 
@@ -689,7 +686,7 @@ public partial class HandlerContext : DbContext
 
         modelBuilder.Entity<OfferItem>(entity =>
         {
-            entity.HasKey(e => new {e.OfferId, e.ItemId}).HasName("Offer_Item_pk");
+            entity.HasKey(e => new { e.OfferId, e.ItemId }).HasName("Offer_Item_pk");
 
             entity.ToTable("Offer_Item");
 
@@ -712,11 +709,11 @@ public partial class HandlerContext : DbContext
 
         modelBuilder.Entity<OfferStatus>(entity =>
         {
-            entity.HasKey(e => e.OfferId).HasName("Offer_status_pk");
+            entity.HasKey(e => e.OfferStatusId).HasName("Offer_status_pk");
 
             entity.ToTable("Offer_status");
 
-            entity.Property(e => e.OfferId).HasColumnName("offer_id");
+            entity.Property(e => e.OfferStatusId).HasColumnName("offer_id");
             entity.Property(e => e.StatusName)
                 .HasMaxLength(30)
                 .IsUnicode(false)

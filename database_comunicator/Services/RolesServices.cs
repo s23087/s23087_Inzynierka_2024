@@ -1,7 +1,7 @@
 ﻿using database_communicator.Data;
 using database_communicator.Models;
-using database_communicator.Models.DTOs;
 using database_communicator.Utils;
+using database_communicator.Models.DTOs.Get;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -14,23 +14,44 @@ namespace database_communicator.Services
         public Task<IEnumerable<GetOrgUsersWithRoles>> GetOrgUsersWithRoles(int userId, string? sort, string? role);
         public Task<IEnumerable<GetOrgUsersWithRoles>> GetOrgUsersWithRoles(int userId, string search, string? sort, string? role);
     }
+    /// <summary>
+    /// Class that interact with database and contains functions allowing to work on roles.
+    /// </summary>
     public class RolesServices : IRolesServices
     {
         private readonly HandlerContext _handlerContext;
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="handlerContext">Database context</param>
         public RolesServices(HandlerContext handlerContext)
         {
             _handlerContext = handlerContext;
         }
+        /// <summary>
+        /// Do select query to receive id of role with given name.
+        /// </summary>
+        /// <param name="roleName">Role name</param>
+        /// <returns>Id of role or 0 if do not exist.</returns>
         public async Task<int> GetRoleId(string roleName)
         {
-            var result = await _handlerContext.UserRoles.Where(e => e.RoleName.Equals(roleName)).Select(e => e.RoleId).ToListAsync();
-            return result[0];
+            return await _handlerContext.UserRoles.Where(e => e.RoleName.Equals(roleName)).Select(e => e.RoleId).FirstOrDefaultAsync();
         }
-
+        /// <summary>
+        /// Do select query to receive list containing role names.
+        /// </summary>
+        /// <returns>List of role names.</returns>
         public async Task<IEnumerable<string>> GetRoleNames()
         {
             return await _handlerContext.UserRoles.Select(e => e.RoleName).ToListAsync();
         }
+        /// <summary>
+        /// Do select query to receive sorted and filtered user list with roles from database.
+        /// </summary>
+        /// <param name="userId">Id of user activating this action.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="role">Filter value. If given the return value will only contain objects where role is equal to given value.</param>
+        /// <returns>List of users with their roles.</returns>
         public async Task<IEnumerable<GetOrgUsersWithRoles>> GetOrgUsersWithRoles(int userId, string? sort, string? role)
         {
             Expression<Func<AppUser, Object>> sortFunc = sort == null ? e => true : e => e.Username;
@@ -56,7 +77,14 @@ namespace database_communicator.Services
                     RoleName = e.OrgUser!.Role.RoleName
                 }).ToListAsync();
         }
-
+        /// <summary>
+        /// Do select query to receive searched, sorted and filtered user list with roles from database.
+        /// </summary>
+        /// <param name="userId">Id of user activating this action.</param>
+        /// <param name="search">The phrase searched in user information. It will check if phrase exist in username or surname.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="role">Filter value. If given the return value will only contain objects where role is equal to given value.</param>
+        /// <returns>List of users with their roles.</returns>
         public async Task<IEnumerable<GetOrgUsersWithRoles>> GetOrgUsersWithRoles(int userId, string search, string? sort, string? role)
         {
             Expression<Func<AppUser, Object>> sortFunc = sort == null ? e => true : e => e.Username;

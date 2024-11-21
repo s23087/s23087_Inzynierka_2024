@@ -1,8 +1,10 @@
 ﻿using database_communicator.Data;
 using database_communicator.Models;
-using database_communicator.Models.DTOs;
 using database_communicator.Utils;
-using database_comunicator.FilterClass;
+using database_communicator.FilterClass;
+using database_communicator.Models.DTOs.Create;
+using database_communicator.Models.DTOs.Get;
+using database_communicator.Models.DTOs.Modify;
 using LINQtoCSV;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -19,29 +21,47 @@ namespace database_communicator.Services
         public Task<bool> DoesPricelistExist(int offerId);
         public Task<bool> DoesPricelistExist(string offerName, int userId);
         public Task<bool> DeletePricelist(int offerId);
-        public Task<int> CreateOffer(AddOffer data);
-        public Task<IEnumerable<GetOfferStatus>> GetOfferStatuses();
-        public Task<IEnumerable<GetItemsForOffer>> GetItemsForOffers(int userId, string currency);
+        public Task<int> CreatePricelist(AddOffer data);
+        public Task<IEnumerable<GetOfferStatus>> GetPricelistStatuses();
+        public Task<IEnumerable<GetItemsForOffer>> GetItemsForPricelist(int userId, string currency);
         public Task<bool> CreateCsvFile(int offerId, int userId, string path, int maxQty);
-        public Task<bool> CreateCsvFile(int offerId);
+        public Task<bool> UpdateCsvFile(int offerId);
         public Task<bool> CreateXmlFile(int offerId, int userId, string path, int maxQty);
-        public Task<bool> CreateXmlFile(int offerId);
+        public Task<bool> UpdateXmlFile(int offerId);
         public Task<int> GetDeactivatedStatusId();
-        public Task<IEnumerable<GetCredtItemForTable>> GetOfferItems(int offerId, int userId);
-        public Task<GetRestModifyOffer> GetRestModifyOffer(int offerId, int userId);
-        public Task<bool> ModifyOffer(ModifyPricelist data);
-        public Task<string> GetOfferPath(int offerId);
+        public Task<IEnumerable<GetCredtItemForTable>> GetPricelistItems(int offerId, int userId);
+        public Task<GetRestModifyOffer> GetRestModifyPricelist(int offerId, int userId);
+        public Task<bool> ModifyPricelist(ModifyPricelist data);
+        public Task<string> GetPricelistPath(int offerId);
         public Task<int> GetOfferMaxQty(int offerId);
         public Task<IEnumerable<int>> GetAllActiveXmlOfferId();
         public Task<IEnumerable<int>> GetAllActiveCsvOfferId();
     }
+    /// <summary>
+    /// Class that interact with database and contains functions allowing to work on offers/pricelist.
+    /// </summary>
     public class OfferServices : IOfferServices
     {
         private readonly HandlerContext _handlerContext;
-        public OfferServices(HandlerContext handlerContext)
+        private readonly ILogger<CreditNoteServices> _logger;
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="handlerContext">Database context</param>
+        /// <param name="logger">Log interface</param>
+        public OfferServices(HandlerContext handlerContext, ILogger<CreditNoteServices> logger)
         {
             _handlerContext = handlerContext;
+            _logger = logger;
+
         }
+        /// <summary>
+        /// Do select query with given sort and filter to receive pricelists/offers information from database for chosen user.
+        /// </summary>
+        /// <param name="userId">User id.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="OfferFiltersTemplate"/></param>
+        /// <returns>List of pricelists/offers owned by chosen user.</returns>
         public async Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string? sort, OfferFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetPricelistSort(sort);
@@ -88,6 +108,14 @@ namespace database_communicator.Services
                     Currency = obj.CurrencyName
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query with given search, sort and filter to receive pricelists/offers information from database for chosen user.
+        /// </summary>
+        /// <param name="userId">User id.</param>
+        /// <param name="search">The phrase searched in pricelist information. It will check if phrase exist in pricelist name.</param>
+        /// <param name="sort">Contains parameter that object will be sorted by. Must start with D or A to determine ascending order. Then is follow by name of property.</param>
+        /// <param name="filters">Object with filter values wrapped in <see cref="OfferFiltersTemplate"/></param>
+        /// <returns>List of pricelists/offers owned by chosen user.</returns>
         public async Task<IEnumerable<GetPriceList>> GetPriceLists(int userId, string search, string? sort, OfferFiltersTemplate filters)
         {
             var sortFunc = SortFilterUtils.GetPricelistSort(sort);
@@ -136,14 +164,30 @@ namespace database_communicator.Services
                     Currency = ent.CurrencyName
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Checks if pricelist/offer id exists.
+        /// </summary>
+        /// <param name="offerId">Offer/Pricelist id</param>
+        /// <returns>True if exist, false if not.</returns>
         public async Task<bool> DoesPricelistExist(int offerId)
         {
             return await _handlerContext.Offers.AnyAsync(x => x.OfferId == offerId);
         }
+        /// <summary>
+        /// Checks if pricelist/offer with given name and user exists.
+        /// </summary>
+        /// <param name="offerName">Offer name</param>
+        /// <param name="userId">Id of user that owns offer/pricelist</param>
+        /// <returns>True if exist, false if not.</returns>
         public async Task<bool> DoesPricelistExist(string offerName, int userId)
         {
             return await _handlerContext.Offers.AnyAsync(x => x.OfferName == offerName && x.UserId == userId);
         }
+        /// <summary>
+        /// Using transactions delete pricelist/offer from database.
+        /// </summary>
+        /// <param name="offerId">Id of offer/pricelist to delete</param>
+        /// <returns>True if success or false if failure</returns>
         public async Task<bool> DeletePricelist(int offerId)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
@@ -160,12 +204,17 @@ namespace database_communicator.Services
                 return true;
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Delete pricelist error.");
                 await trans.RollbackAsync();
                 return false;
             }
         }
-        public async Task<int> CreateOffer(AddOffer data)
+        /// <summary>
+        /// Using transactions add new offer/pricelist to database.
+        /// </summary>
+        /// <param name="data">New pricelist/offer data</param>
+        /// <returns>True if success or false if failure</returns>
+        public async Task<int> CreatePricelist(AddOffer data)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
             try
@@ -196,21 +245,31 @@ namespace database_communicator.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Create pricelist error.");
                 await trans.RollbackAsync();
                 return 0;
             }
         }
-        public async Task<IEnumerable<GetOfferStatus>> GetOfferStatuses()
+        /// <summary>
+        /// Do select query to receive list of pricelist statuses from database.
+        /// </summary>
+        /// <returns>List of statuses containing id and status name.</returns>
+        public async Task<IEnumerable<GetOfferStatus>> GetPricelistStatuses()
         {
             return await _handlerContext.OfferStatuses
                 .Select(e => new GetOfferStatus
                 {
-                    StatusId = e.OfferId,
+                    StatusId = e.OfferStatusId,
                     StatusName = e.StatusName
                 }).ToListAsync();
         }
-        public async Task<IEnumerable<GetItemsForOffer>> GetItemsForOffers(int userId, string currency)
+        /// <summary>
+        /// Do select query to receive list of items available to add to pricelist/offer.
+        /// </summary>
+        /// <param name="userId">Id of user that is owner of pricelist/offer</param>
+        /// <param name="currency">Shortcut name of currency that price of item will be shown</param>
+        /// <returns>List of items in given currency that's available to add to pricelist/offer.</returns>
+        public async Task<IEnumerable<GetItemsForOffer>> GetItemsForPricelist(int userId, string currency)
         {
             if (currency == "PLN")
             {
@@ -249,6 +308,14 @@ namespace database_communicator.Services
                         .Average(x => x.Price)
                 }).ToListAsync();
         }
+        /// <summary>
+        /// Do select query on chosen pricelist/offer items and put them into csv file.
+        /// </summary>
+        /// <param name="offerId">Offer/pricelist id</param>
+        /// <param name="userId">Id of user that owns this offer/pricelist</param>
+        /// <param name="path">Path where csv file will be created</param>
+        /// <param name="maxQty">Max shown quantity in pricelist/offer</param>
+        /// <returns>True if file was created, false if not.</returns>
         public async Task<bool> CreateCsvFile(int offerId, int userId, string path, int maxQty)
         {
             var items = await _handlerContext.Items
@@ -285,15 +352,28 @@ namespace database_communicator.Services
                 return true;
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Create pricelist csv file error.");
                 return false;
             }
         }
-        public async Task<bool> CreateCsvFile(int offerId)
+        /// <summary>
+        /// Update csv file for given offer/pricelist id.
+        /// </summary>
+        /// <param name="offerId">Offer/pricelist id</param>
+        /// <returns>True if success or false if failure</returns>
+        public async Task<bool> UpdateCsvFile(int offerId)
         {
             var restOfferData = await _handlerContext.Offers.Where(e => e.OfferId == offerId).Select(e => new { e.UserId, e.PathToFile, e.MaxQty }).FirstAsync();
             return await CreateCsvFile(offerId, restOfferData.UserId, restOfferData.PathToFile, restOfferData.MaxQty);
         }
+        /// <summary>
+        /// Do select query on chosen pricelist/offer items and put them into xml file.
+        /// </summary>
+        /// <param name="offerId">Offer/pricelist id</param>
+        /// <param name="userId">Id of user that owns this offer/pricelist</param>
+        /// <param name="path">Path where csv file will be created</param>
+        /// <param name="maxQty">Max shown quantity in pricelist/offer</param>
+        /// <returns>True if file was created, false if not.</returns>
         public async Task<bool> CreateXmlFile(int offerId, int userId, string path, int maxQty)
         {
             var items = await _handlerContext.Items
@@ -325,20 +405,35 @@ namespace database_communicator.Services
                 return true;
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Create pricelist xml file error.");
                 return false;
             }
         }
-        public async Task<bool> CreateXmlFile(int offerId)
+        /// <summary>
+        /// Update csv file for given offer/pricelist id.
+        /// </summary>
+        /// <param name="offerId">Offer/pricelist id</param>
+        /// <returns>True if success or false if failure</returns>
+        public async Task<bool> UpdateXmlFile(int offerId)
         {
             var restOfferData = await _handlerContext.Offers.Where(d => d.OfferId == offerId).Select(d => new { d.UserId, d.PathToFile, d.MaxQty }).FirstAsync();
             return await CreateXmlFile(offerId, restOfferData.UserId, restOfferData.PathToFile, restOfferData.MaxQty);
         }
+        /// <summary>
+        /// Do select query to receive status id for Deactivated value.
+        /// </summary>
+        /// <returns>Id of deactivated status</returns>
         public async Task<int> GetDeactivatedStatusId()
         {
-            return await _handlerContext.OfferStatuses.Where(e => e.StatusName == "Deactivated").Select(e => e.OfferId).FirstAsync();
+            return await _handlerContext.OfferStatuses.Where(e => e.StatusName == "Deactivated").Select(e => e.OfferStatusId).FirstAsync();
         }
-        public async Task<IEnumerable<GetCredtItemForTable>> GetOfferItems(int offerId, int userId)
+        /// <summary>
+        /// Do select query to receive list of items that chosen pricelist contain.
+        /// </summary>
+        /// <param name="offerId">Offer/pricelist id</param>
+        /// <param name="userId">Id of user that owns pricelist</param>
+        /// <returns>List of items that belongs ot the chosen pricelist.</returns>
+        public async Task<IEnumerable<GetCredtItemForTable>> GetPricelistItems(int offerId, int userId)
         {
             return await _handlerContext.OfferItems
                 .Where(e => e.OfferId == offerId)
@@ -351,7 +446,13 @@ namespace database_communicator.Services
                     Price = e.SellingPrice
                 }).ToListAsync();
         }
-        public async Task<GetRestModifyOffer> GetRestModifyOffer(int offerId, int userId)
+        /// <summary>
+        /// Do select query using given ids to receive pricelist/offer information that was not given in bulk query and is needed to modify it.
+        /// </summary>
+        /// <param name="offerId">Offer/pricelist id</param>
+        /// <param name="userId">Id of user that owns pricelist/offer</param>
+        /// <returns>Object containing information about pricelist/offer</returns>
+        public async Task<GetRestModifyOffer> GetRestModifyPricelist(int offerId, int userId)
         {
             return await _handlerContext.Offers
                 .Where(e => e.OfferId == offerId)
@@ -387,7 +488,12 @@ namespace database_communicator.Services
                     }).ToList()
                 }).FirstAsync();
         }
-        public async Task<bool> ModifyOffer(ModifyPricelist data)
+        /// <summary>
+        /// Using transactions overwrites given properties with new values.
+        /// </summary>
+        /// <param name="data">New pricelist/offer properties values</param>
+        /// <returns>True if success or false if failure.</returns>
+        public async Task<bool> ModifyPricelist(ModifyPricelist data)
         {
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
             try
@@ -458,23 +564,41 @@ namespace database_communicator.Services
                 return true;
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                _logger.LogError(ex, "Modify pricelist error.");
                 await trans.RollbackAsync();
                 return false;
             }
         }
-        public async Task<string> GetOfferPath(int offerId)
+        /// <summary>
+        /// Do select query to receive pricelist file path from database.
+        /// </summary>
+        /// <param name="offerId">Offer/Pricelist id</param>
+        /// <returns>String containing file path.</returns>
+        public async Task<string> GetPricelistPath(int offerId)
         {
             return await _handlerContext.Offers.Where(e => e.OfferId == offerId).Select(e => e.PathToFile).FirstAsync();
         }
+        /// <summary>
+        /// Do select query to receive given offer/pricelist max showed quantity.
+        /// </summary>
+        /// <param name="offerId">Pricelist/offer id</param>
+        /// <returns>Number that indicates max quantity shown in pricelist/offer.</returns>
         public async Task<int> GetOfferMaxQty(int offerId)
         {
             return await _handlerContext.Offers.Where(e => e.OfferId == offerId).Select(e => e.MaxQty).FirstAsync();
         }
+        /// <summary>
+        /// Do select query to receive list of current active pricelist/offer with created xml file.
+        /// </summary>
+        /// <returns>List of pricelist/offer ids that have created xml filer</returns>
         public async Task<IEnumerable<int>> GetAllActiveXmlOfferId()
         {
             return await _handlerContext.Offers.Where(e => !e.PathToFile.EndsWith("csv") && e.OfferStatus.StatusName == "Active").Select(e => e.OfferId).ToListAsync();
         }
+        /// <summary>
+        /// Do select query to receive list of current active pricelist/offer with created csv file.
+        /// </summary>
+        /// <returns>List of pricelist/offer ids that have created csv filer</returns>
         public async Task<IEnumerable<int>> GetAllActiveCsvOfferId()
         {
             return await _handlerContext.Offers.Where(e => e.PathToFile.EndsWith("csv") && e.OfferStatus.StatusName == "Active").Select(e => e.OfferId).ToListAsync();

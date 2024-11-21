@@ -1,44 +1,43 @@
-﻿using database_communicator.Models.DTOs;
+﻿using database_communicator.Models.DTOs.Create;
 using database_communicator.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.RegularExpressions;
+using Microsoft.IdentityModel.Tokens;
 
 namespace database_communicator.Controllers
 {
+    /// <summary>
+    /// This controller allow to register new organization, first user for database, receive data needed for registration and set up new database. Use db_name parameter to pass the name of database that you want ot connect.
+    /// </summary>
     [Route("{db_name}/[controller]")]
     [ApiController]
-    public class RegistrationController : ControllerBase
+    public class RegistrationController(IRegistrationServices registrationServices, IOrganizationServices organizationServices, IUserServices userServices, IRolesServices rolesServices) : ControllerBase
     {
-        private readonly IRegistrationServices _registrationServices;
-        private readonly IOrganizationServices _organizationServices;
-        private readonly IUserServices _userServices;
-        private readonly IRolesServices _rolesServices;
-        public RegistrationController(IRegistrationServices registrationServices, IOrganizationServices organizationServices, IUserServices userServices, IRolesServices rolesServices)
-        {
-            _registrationServices = registrationServices;
-            _organizationServices = organizationServices;
-            _userServices = userServices;
-            _rolesServices = rolesServices;
-        }
+        private readonly IRegistrationServices _registrationServices = registrationServices;
+        private readonly IOrganizationServices _organizationServices = organizationServices;
+        private readonly IUserServices _userServices = userServices;
+        private readonly IRolesServices _rolesServices = rolesServices;
 
+        /// <summary>
+        /// Tries to receive list of countries from Template database.
+        /// </summary>
+        /// <returns>200 with the list of <see cref="Models.DTOs.Get.GetCountries"/></returns>
         [HttpGet]
         [Route("countries")]
         public async Task<IActionResult> GetCountries()
         {
-            var countries = await _registrationServices.getCountries();
-
-            return Ok(countries.Select(e => new GetCountries
-            {
-                Id = e.CountryId,
-                CountryName = e.CountryName
-            }));
+            var countries = await _registrationServices.GetCountries();
+            return Ok(countries);
         }
-
+        /// <summary>
+        /// Create new database using Template database and createDB.sql file.
+        /// </summary>
+        /// <param name="orgName">New organization name</param>
+        /// <returns>200 code when success or 400 when failure</returns>
         [HttpPost]
         [Route("/template/[controller]/createDb/{orgName}")]
         public async Task<IActionResult> CreateDb(string orgName)
         {
+            if (orgName.IsNullOrEmpty()) return BadRequest();
             bool result = await _registrationServices.CreateNewDatabase(orgName);
 
             if (result)
@@ -48,7 +47,10 @@ namespace database_communicator.Controllers
 
             return BadRequest();
         }
-
+        /// <summary>
+        /// Set up newly created database, by creating tables, indexes and etc.
+        /// </summary>
+        /// <returns>200 code when success, 400 when failure.</returns>
         [HttpPost]
         [Route("setupDb")]
         public async Task<IActionResult> SetupDb()
@@ -63,14 +65,19 @@ namespace database_communicator.Controllers
 
             return BadRequest();
         }
+        /// <summary>
+        /// Create user and user organization in new database that has been set up.
+        /// </summary>
+        /// <param name="newUser">New user and organization data wrapped in <see cref="Models.DTOs.Create.RegisterUser"/> object.</param>
+        /// <returns>200 code when success, 400 when failure or 404 when country is not found.</returns>
         [HttpPost]
         [Route("registerUser")]
         public async Task<IActionResult> RegisterUser(RegisterUser newUser)
         {
             bool countryExist = await _organizationServices.CountryExist(newUser.Country);
-            if (!countryExist) { return BadRequest(); }
+            if (!countryExist) return NotFound();
             int countryId = await _organizationServices.GetCountryId(newUser.Country);
-            int orgId = await _organizationServices.AddOrganization(new AddOrganization
+            var org = new AddOrganization
             {
                 OrgName = newUser.OrgName,
                 Nip = newUser.Nip,
@@ -79,7 +86,10 @@ namespace database_communicator.Controllers
                 PostalCode = newUser.PostalCode,
                 CreditLimit = null,
                 CountryId = countryId
-            }, null);
+            };
+            int orgId = await _organizationServices.AddOrganization(org, null);
+
+            if (orgId == 0) return BadRequest();
 
             int roleId = -1;
 
@@ -88,7 +98,7 @@ namespace database_communicator.Controllers
                 roleId = await _rolesServices.GetRoleId("Admin");
             }
 
-            var result = await _userServices.AddUser(new AddUser
+            bool result = await _userServices.AddUser(new AddUser
             {
                 Email = newUser.Email,
                 Username = newUser.Username,
