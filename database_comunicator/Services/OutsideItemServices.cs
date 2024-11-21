@@ -25,13 +25,13 @@ namespace database_communicator.Services
     public class OutsideItemServices : IOutsideItemServices
     {
         private readonly HandlerContext _handlerContext;
-        private readonly ILogger<CreditNoteServices> _logger;
+        private readonly ILogger<OutsideItemServices> _logger;
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="handlerContext">Database context</param>
         /// <param name="logger">Log interface</param>
-        public OutsideItemServices(HandlerContext handlerContext, ILogger<CreditNoteServices> logger)
+        public OutsideItemServices(HandlerContext handlerContext, ILogger<OutsideItemServices> logger)
         {
             _handlerContext = handlerContext;
             _logger = logger;

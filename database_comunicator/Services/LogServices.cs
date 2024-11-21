@@ -17,13 +17,13 @@ namespace database_communicator.Services
     public class LogServices : ILogServices
     {
         private readonly HandlerContext _handlerContext;
-        private readonly ILogger<CreditNoteServices> _logger;
+        private readonly ILogger<LogServices> _logger;
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="handlerContext">Database context</param>
         /// <param name="logger">Log interface</param>
-        public LogServices(HandlerContext handlerContext, ILogger<CreditNoteServices> logger)
+        public LogServices(HandlerContext handlerContext, ILogger<LogServices> logger)
         {
             _handlerContext = handlerContext;
             _logger = logger;

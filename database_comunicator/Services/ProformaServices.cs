@@ -1,13 +1,11 @@
 ﻿using database_communicator.Data;
-using database_communicator.Models;
-using database_communicator.Utils;
 using database_communicator.FilterClass;
+using database_communicator.Models;
 using database_communicator.Models.DTOs.Create;
 using database_communicator.Models.DTOs.Get;
 using database_communicator.Models.DTOs.Modify;
+using database_communicator.Utils;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Linq.Expressions;
 
 namespace database_communicator.Services
 {
@@ -35,13 +33,13 @@ namespace database_communicator.Services
     public class ProformaServices : IProformaServices
     {
         private readonly HandlerContext _handlerContext;
-        private readonly ILogger<CreditNoteServices> _logger;
+        private readonly ILogger<ProformaServices> _logger;
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="handlerContext">Database context</param>
         /// <param name="logger">Log interface</param>
-        public ProformaServices(HandlerContext handlerContext, ILogger<CreditNoteServices> logger)
+        public ProformaServices(HandlerContext handlerContext, ILogger<ProformaServices> logger)
         {
             _handlerContext = handlerContext;
             _logger = logger;
@@ -67,7 +65,8 @@ namespace database_communicator.Services
                         UpdateDate = plnData,
                         CurrencyValue1 = 1
                     };
-                } else
+                }
+                else
                 {
                     var checkCurrency = await _handlerContext.CurrencyValues.Where(e => e.CurrencyName == data.CurrencyName && e.UpdateDate.Equals(data.CurrencyDate)).AnyAsync();
                     currVal = new CurrencyValue
@@ -116,7 +115,8 @@ namespace database_communicator.Services
                             PurchasePrice = e.Price
                         }).ToList();
                     await _handlerContext.ProformaFutureItems.AddRangeAsync(futureItems);
-                } else
+                }
+                else
                 {
                     var ownedItems = data.ProformaItems
                         .Select(e => new ProformaOwnedItem
@@ -131,7 +131,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return newProforma.ProformaId;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Create proforma error.");
                 await trans.RollbackAsync();
@@ -430,7 +431,8 @@ namespace database_communicator.Services
                 if (isYourProforma)
                 {
                     await _handlerContext.ProformaFutureItems.Where(e => e.ProformaId == proformaId).ExecuteDeleteAsync();
-                } else
+                }
+                else
                 {
                     await _handlerContext.ProformaOwnedItems.Where(e => e.ProformaId == proformaId).ExecuteDeleteAsync();
                 }
@@ -438,7 +440,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Delete proforma error.");
                 await trans.RollbackAsync();
@@ -583,7 +586,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Modify proforma error.");
                 await trans.RollbackAsync();

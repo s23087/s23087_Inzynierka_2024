@@ -56,7 +56,7 @@ namespace database_communicator_Test.Controllers
             //Arrange
             int notificationId = 1;
             bool isRead = true;
-            A.CallTo(() => _notificationServices.NotifExists(notificationId)).Returns(true);
+            A.CallTo(() => _notificationServices.NotificationExists(notificationId)).Returns(true);
             A.CallTo(() => _notificationServices.SetIsRead(notificationId, isRead)).Returns(true);
             var controller = new NotificationsController(_userServices, _notificationServices);
 
@@ -73,7 +73,7 @@ namespace database_communicator_Test.Controllers
             //Arrange
             int notificationId = 1;
             bool isRead = true;
-            A.CallTo(() => _notificationServices.NotifExists(notificationId)).Returns(false);
+            A.CallTo(() => _notificationServices.NotificationExists(notificationId)).Returns(false);
             A.CallTo(() => _notificationServices.SetIsRead(notificationId, isRead)).Returns(true);
             var controller = new NotificationsController(_userServices, _notificationServices);
 
@@ -90,7 +90,7 @@ namespace database_communicator_Test.Controllers
             //Arrange
             int notificationId = 1;
             bool isRead = true;
-            A.CallTo(() => _notificationServices.NotifExists(notificationId)).Returns(true);
+            A.CallTo(() => _notificationServices.NotificationExists(notificationId)).Returns(true);
             A.CallTo(() => _notificationServices.SetIsRead(notificationId, isRead)).Returns(false);
             var controller = new NotificationsController(_userServices, _notificationServices);
 

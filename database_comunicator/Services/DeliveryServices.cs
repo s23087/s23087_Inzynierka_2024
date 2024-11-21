@@ -1,15 +1,11 @@
 ﻿using database_communicator.Data;
-using database_communicator.Models;
-using database_communicator.Utils;
 using database_communicator.FilterClass;
+using database_communicator.Models;
 using database_communicator.Models.DTOs.Create;
 using database_communicator.Models.DTOs.Get;
 using database_communicator.Models.DTOs.Modify;
+using database_communicator.Utils;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics.Metrics;
-using System.Linq.Expressions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace database_communicator.Services
 {
@@ -41,13 +37,13 @@ namespace database_communicator.Services
     public class DeliveryServices : IDeliveryServices
     {
         private readonly HandlerContext _handlerContext;
-        private readonly ILogger<CreditNoteServices> _logger;
+        private readonly ILogger<DeliveryServices> _logger;
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="handlerContext">Database context</param>
         /// <param name="logger">Log interface</param>
-        public DeliveryServices(HandlerContext handlerContext, ILogger<CreditNoteServices> logger)
+        public DeliveryServices(HandlerContext handlerContext, ILogger<DeliveryServices> logger)
         {
             _handlerContext = handlerContext;
             _logger = logger;
@@ -79,7 +75,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Add delivery company error.");
                 await trans.RollbackAsync();
@@ -130,7 +127,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return newDelivery.DeliveryId;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Add delivery error.");
                 await trans.RollbackAsync();
@@ -294,7 +292,8 @@ namespace database_communicator.Services
             try
             {
                 searchById = Int32.Parse(search);
-            } catch
+            }
+            catch
             {
                 searchById = -1;
             }
@@ -455,7 +454,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Delete delivery error.");
                 await trans.RollbackAsync();
@@ -505,7 +505,8 @@ namespace database_communicator.Services
                          Partnumber = e.Item.PartNumber,
                          Qty = e.Qty
                      }).ToListAsync();
-            } else
+            }
+            else
             {
                 restInfo.Items = await _handlerContext.Deliveries
                      .Where(e => e.DeliveryId == deliveryId)
@@ -541,7 +542,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Add delivery note error.");
                 await trans.RollbackAsync();
@@ -586,7 +588,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Set delivery status error.");
                 await trans.RollbackAsync();
@@ -625,7 +628,7 @@ namespace database_communicator.Services
                         .Where(e => e.DeliveriesId == data.DeliveryId && !data.Waybills.Contains(e.WaybillValue))
                         .ExecuteDeleteAsync();
                     var restWaybills = await _handlerContext.Waybills.Where(e => e.DeliveriesId == data.DeliveryId).Select(e => e.WaybillValue).ToListAsync();
-                    foreach ( var waybill in data.Waybills.Where(e => !restWaybills.Contains(e)) )
+                    foreach (var waybill in data.Waybills.Where(e => !restWaybills.Contains(e)))
                     {
                         await _handlerContext.Waybills.AddAsync(new Waybill
                         {
@@ -637,7 +640,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Modify delivery error.");
                 await trans.RollbackAsync();

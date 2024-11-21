@@ -12,18 +12,12 @@ namespace database_communicator.Controllers
     /// </summary>
     [Route("{db_name}/[controller]")]
     [ApiController]
-    public class ClientController : ControllerBase
+    public class ClientController(IOrganizationServices organizationServices, IUserServices userServices, ILogServices logServices) : ControllerBase
     {
-        private readonly IOrganizationServices _organizationServices;
-        private readonly IUserServices _userServices;
-        private readonly ILogServices _logServices;
-        public ClientController(IOrganizationServices organizationServices, IUserServices userServices, ILogServices logServices)
-        {
-            _organizationServices = organizationServices;
-            _userServices = userServices;
-            _logServices = logServices;
+        private readonly IOrganizationServices _organizationServices = organizationServices;
+        private readonly IUserServices _userServices = userServices;
+        private readonly ILogServices _logServices = logServices;
 
-        }
         /// <summary>
         /// Tries to receive basic information about chosen user clients.
         /// </summary>
@@ -38,7 +32,7 @@ namespace database_communicator.Controllers
         {
             if (sort != null)
             {
-                bool isSortOk = sort.StartsWith("A") || sort.StartsWith("D");
+                bool isSortOk = sort.StartsWith('A') || sort.StartsWith('D');
                 if (!isSortOk) return BadRequest();
             }
             var exist = await _userServices.UserExist(userId);
@@ -68,7 +62,7 @@ namespace database_communicator.Controllers
         {
             if (sort != null)
             {
-                bool isSortOk = sort.StartsWith("A") || sort.StartsWith("D");
+                bool isSortOk = sort.StartsWith('A') || sort.StartsWith('D');
                 if (!isSortOk) return BadRequest();
             }
             var exist = await _userServices.UserExist(userId);

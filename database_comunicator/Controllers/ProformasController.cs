@@ -16,6 +16,7 @@ namespace database_communicator.Controllers
     {
         private const string userNotFoundMessage = "User not found.";
         private const string proformaNotFoundMessage = "Proforma not found.";
+        private const string sortErrorMessage = "Sort value is incorrect.";
         private readonly IProformaServices _proformaServices = proformaServices;
         private readonly IUserServices _userServices = userServices;
         private readonly ILogServices _logServices = logServices;
@@ -78,7 +79,7 @@ namespace database_communicator.Controllers
             if (sort != null)
             {
                 bool isSortOk = sort.StartsWith('A') || sort.StartsWith('D');
-                if (!isSortOk) return BadRequest("Sort value is incorrect.");
+                if (!isSortOk) return BadRequest(sortErrorMessage);
             }
             var exist = await _userServices.UserExist(userId);
             if (!exist) return NotFound(userNotFoundMessage);
@@ -123,7 +124,7 @@ namespace database_communicator.Controllers
             if (sort != null)
             {
                 bool isSortOk = sort.StartsWith('A') || sort.StartsWith('D');
-                if (!isSortOk) return BadRequest("Sort value is incorrect.");
+                if (!isSortOk) return BadRequest(sortErrorMessage);
             }
             var filters = new ProformaFiltersTemplate
             {
@@ -167,7 +168,7 @@ namespace database_communicator.Controllers
             if (sort != null)
             {
                 bool isSortOk = sort.StartsWith('A') || sort.StartsWith('D');
-                if (!isSortOk) return BadRequest("Sort value is incorrect.");
+                if (!isSortOk) return BadRequest(sortErrorMessage);
             }
             var filters = new ProformaFiltersTemplate
             {
@@ -212,7 +213,7 @@ namespace database_communicator.Controllers
             if (sort != null)
             {
                 bool isSortOk = sort.StartsWith('A') || sort.StartsWith('D');
-                if (!isSortOk) return BadRequest("Sort value is incorrect.");
+                if (!isSortOk) return BadRequest(sortErrorMessage);
             }
             var filters = new ProformaFiltersTemplate
             {

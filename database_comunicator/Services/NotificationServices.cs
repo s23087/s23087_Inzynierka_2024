@@ -11,7 +11,7 @@ namespace database_communicator.Services
         public Task<int> CreateNotification(CreateNotification data);
         public Task<bool> SetIsRead(int notifId,bool isRead);
         public Task<IEnumerable<GetNotifications>> GetNotifications(int userId);
-        public Task<bool> NotifExists(int notifId);
+        public Task<bool> NotificationExists(int notifId);
     }
     /// <summary>
     /// Class that interact with database and contains functions allowing to work on notifications.
@@ -19,13 +19,13 @@ namespace database_communicator.Services
     public class NotificationServices : INotificationServices
     {
         private readonly HandlerContext _handlerContext;
-        private readonly ILogger<CreditNoteServices> _logger;
+        private readonly ILogger<NotificationServices> _logger;
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="handlerContext">Database context</param>
         /// <param name="logger">Log interface</param>
-        public NotificationServices(HandlerContext handlerContext, ILogger<CreditNoteServices> logger)
+        public NotificationServices(HandlerContext handlerContext, ILogger<NotificationServices> logger)
         {
             _handlerContext = handlerContext;
             _logger = logger;
@@ -111,7 +111,7 @@ namespace database_communicator.Services
         /// </summary>
         /// <param name="notifId">Notification id</param>
         /// <returns>True if exist, otherwise false.</returns>
-        public async Task<bool> NotifExists(int notifId)
+        public async Task<bool> NotificationExists(int notifId)
         {
             return await _handlerContext.UserNotifications.Where(e => e.NotificationId == notifId).AnyAsync();
         }

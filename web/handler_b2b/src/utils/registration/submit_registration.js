@@ -51,7 +51,7 @@ function deleteFolders(dbfile, logFile, docFile, pricelistFile) {
 
 /**
  * Sends request to create new database and first user. Depend on result will redirect user to appropriate site.
- * @param  {boolean} is_org Any array of string containing ean values.
+ * @param  {string} is_org String representation of boolean value.
  * @param  {FormData} formData Contain form data.
  */
 async function registerUser(is_org, formData) {

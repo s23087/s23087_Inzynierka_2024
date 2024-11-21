@@ -49,13 +49,13 @@ namespace database_communicator.Services
     public class InvoiceServices : IInvoiceServices
     {
         private readonly HandlerContext _handlerContext;
-        private readonly ILogger<CreditNoteServices> _logger;
+        private readonly ILogger<InvoiceServices> _logger;
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="handlerContext">Database context</param>
         /// <param name="logger">Log interface</param>
-        public InvoiceServices(HandlerContext handlerContext, ILogger<CreditNoteServices> logger)
+        public InvoiceServices(HandlerContext handlerContext, ILogger<InvoiceServices> logger)
         {
             _handlerContext = handlerContext;
             _logger = logger;

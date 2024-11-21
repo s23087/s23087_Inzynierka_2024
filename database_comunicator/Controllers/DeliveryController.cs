@@ -12,20 +12,15 @@ namespace database_communicator.Controllers
     /// </summary>
     [Route("{db_name}/[controller]")]
     [ApiController]
-    public class DeliveryController : ControllerBase
+    public class DeliveryController(IDeliveryServices deliveryServices, IUserServices userServices, ILogServices logServices, INotificationServices notificationServices) : ControllerBase
     {
         private const string userNotFoundMessage = "User not found.";
-        private readonly IDeliveryServices _deliveryService;
-        private readonly IUserServices _userServices;
-        private readonly ILogServices _logServices;
-        private readonly INotificationServices _notificationServices;
-        public DeliveryController(IDeliveryServices deliveryServices, IUserServices userServices, ILogServices logServices, INotificationServices notificationServices)
-        {
-            _deliveryService = deliveryServices;
-            _userServices = userServices;
-            _logServices = logServices;
-            _notificationServices = notificationServices;
-        }
+        private const string sortErrorMessage = "Sort value is incorrect.";
+        private readonly IDeliveryServices _deliveryService = deliveryServices;
+        private readonly IUserServices _userServices = userServices;
+        private readonly ILogServices _logServices = logServices;
+        private readonly INotificationServices _notificationServices = notificationServices;
+
         /// <summary>
         /// Tries to receive information about deliveries that coming to user form his client.
         /// </summary>
@@ -48,8 +43,8 @@ namespace database_communicator.Controllers
         {
             if (sort != null)
             {
-                bool isSortOk = sort.StartsWith("A") || sort.StartsWith("D");
-                if (!isSortOk) return BadRequest("Sort value is incorrect.");
+                bool isSortOk = sort.StartsWith('A') || sort.StartsWith('D');
+                if (!isSortOk) return BadRequest(sortErrorMessage);
             }
             var filters = new DeliveryFiltersTemplate
             {
@@ -93,8 +88,8 @@ namespace database_communicator.Controllers
         {
             if (sort != null)
             {
-                bool isSortOk = sort.StartsWith("A") || sort.StartsWith("D");
-                if (!isSortOk) return BadRequest("Sort value is incorrect.");
+                bool isSortOk = sort.StartsWith('A') || sort.StartsWith('D');
+                if (!isSortOk) return BadRequest(sortErrorMessage);
             }
             var filters = new DeliveryFiltersTemplate
             {
@@ -137,8 +132,8 @@ namespace database_communicator.Controllers
         {
             if (sort != null)
             {
-                bool isSortOk = sort.StartsWith("A") || sort.StartsWith("D");
-                if (!isSortOk) return BadRequest("Sort value is incorrect.");
+                bool isSortOk = sort.StartsWith('A') || sort.StartsWith('D');
+                if (!isSortOk) return BadRequest(sortErrorMessage);
             }
             var filters = new DeliveryFiltersTemplate
             {
@@ -182,8 +177,8 @@ namespace database_communicator.Controllers
         {
             if (sort != null)
             {
-                bool isSortOk = sort.StartsWith("A") || sort.StartsWith("D");
-                if (!isSortOk) return BadRequest("Sort value is incorrect.");
+                bool isSortOk = sort.StartsWith('A') || sort.StartsWith('D');
+                if (!isSortOk) return BadRequest(sortErrorMessage);
             }
             var filters = new DeliveryFiltersTemplate
             {

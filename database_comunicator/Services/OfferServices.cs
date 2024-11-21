@@ -1,15 +1,12 @@
 ﻿using database_communicator.Data;
-using database_communicator.Models;
-using database_communicator.Utils;
 using database_communicator.FilterClass;
+using database_communicator.Models;
 using database_communicator.Models.DTOs.Create;
 using database_communicator.Models.DTOs.Get;
 using database_communicator.Models.DTOs.Modify;
+using database_communicator.Utils;
 using LINQtoCSV;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Xml.Linq;
 
 namespace database_communicator.Services
@@ -43,13 +40,13 @@ namespace database_communicator.Services
     public class OfferServices : IOfferServices
     {
         private readonly HandlerContext _handlerContext;
-        private readonly ILogger<CreditNoteServices> _logger;
+        private readonly ILogger<OfferServices> _logger;
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="handlerContext">Database context</param>
         /// <param name="logger">Log interface</param>
-        public OfferServices(HandlerContext handlerContext, ILogger<CreditNoteServices> logger)
+        public OfferServices(HandlerContext handlerContext, ILogger<OfferServices> logger)
         {
             _handlerContext = handlerContext;
             _logger = logger;
@@ -202,7 +199,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Delete pricelist error.");
                 await trans.RollbackAsync();
@@ -350,7 +348,8 @@ namespace database_communicator.Services
             {
                 cc.Write(csvItems, newPath, csvFileDescription);
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Create pricelist csv file error.");
                 return false;
@@ -387,7 +386,7 @@ namespace database_communicator.Services
                     Qty = e.OwnedItems.SelectMany(d => d.ItemOwners).Where(d => d.IdUser == userId).Sum(x => x.Qty),
                     Price = e.OfferItems.Where(d => d.OfferId == offerId && d.ItemId == e.ItemId).Select(d => d.SellingPrice).First()
                 }).ToListAsync();
-            var xmlItems = items.Select(e => 
+            var xmlItems = items.Select(e =>
                     new XElement("Product",
                         new XElement("Partnumber", e.PartNumber),
                         new XElement("ItemName", e.ItemName),
@@ -401,9 +400,10 @@ namespace database_communicator.Services
             string newPath = $"../web/handler_b2b/{path}";
             try
             {
-                xmlFile.Save( newPath );
+                xmlFile.Save(newPath);
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Create pricelist xml file error.");
                 return false;
@@ -510,7 +510,8 @@ namespace database_communicator.Services
                             .ExecuteUpdateAsync(setter =>
                                 setter.SetProperty(s => s.SellingPrice, item.Price)
                             );
-                    } else
+                    }
+                    else
                     {
                         await _handlerContext.OfferItems.AddAsync(new OfferItem
                         {
@@ -523,7 +524,7 @@ namespace database_communicator.Services
                 if (data.OfferName != null)
                 {
                     await _handlerContext.Offers.Where(e => e.OfferId == data.OfferId)
-                        .ExecuteUpdateAsync(setter => 
+                        .ExecuteUpdateAsync(setter =>
                             setter.SetProperty(s => s.OfferName, data.OfferName)
                         );
                 }
@@ -562,7 +563,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Modify pricelist error.");
                 await trans.RollbackAsync();

@@ -1,16 +1,11 @@
 ﻿using database_communicator.Data;
-using database_communicator.Models;
-using database_communicator.Utils;
 using database_communicator.FilterClass;
+using database_communicator.Models;
 using database_communicator.Models.DTOs.Create;
 using database_communicator.Models.DTOs.Get;
 using database_communicator.Models.DTOs.Modify;
-using Microsoft.Data.SqlClient;
+using database_communicator.Utils;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Security.Cryptography;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace database_communicator.Services
 {
@@ -49,13 +44,13 @@ namespace database_communicator.Services
     public class OrganizationServices : IOrganizationServices
     {
         private readonly HandlerContext _handlerContext;
-        private readonly ILogger<CreditNoteServices> _logger;
+        private readonly ILogger<OrganizationServices> _logger;
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="handlerContext">Database context</param>
         /// <param name="logger">Log interface</param>
-        public OrganizationServices(HandlerContext handlerContext, ILogger<CreditNoteServices> logger)
+        public OrganizationServices(HandlerContext handlerContext, ILogger<OrganizationServices> logger)
         {
             _handlerContext = handlerContext;
             _logger = logger;
@@ -85,7 +80,8 @@ namespace database_communicator.Services
                 }
                 await trans.CommitAsync();
                 return newOrg.OrganizationId;
-            } catch (Exception error)
+            }
+            catch (Exception error)
             {
                 _logger.LogError(error, "Create organization error.");
                 await trans.RollbackAsync();
@@ -120,13 +116,13 @@ namespace database_communicator.Services
             return await _handlerContext.Organizations.Where(e => e.OrganizationId == orgId).Include(e => e.Country).Select(e => new GetOrg
             {
                 Id = e.OrganizationId,
-                OrgName=e.OrgName,
-                Nip=e.Nip,
-                Street=e.Street,
-                City=e.City,
-                PostalCode=e.PostalCode,
-                CountryId=e.CountryId,
-                Country=e.Country.CountryName
+                OrgName = e.OrgName,
+                Nip = e.Nip,
+                Street = e.Street,
+                City = e.City,
+                PostalCode = e.PostalCode,
+                CountryId = e.CountryId,
+                Country = e.Country.CountryName
             }).FirstAsync();
         }
         /// <summary>
@@ -176,7 +172,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Modify organization error.");
                 await trans.RollbackAsync();
@@ -369,7 +366,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Change client availability status error.");
                 await trans.RollbackAsync();
@@ -396,7 +394,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Add client availability status error.");
                 await trans.RollbackAsync();
@@ -451,7 +450,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Set client-user bindings error.");
                 await trans.RollbackAsync();
@@ -538,7 +538,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Delete organization error.");
                 await trans.RollbackAsync();

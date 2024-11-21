@@ -86,7 +86,7 @@ namespace database_communicator.Controllers
         {
             if (sort != null)
             {
-                bool isSortOk = sort.StartsWith("A") || sort.StartsWith("D");
+                bool isSortOk = sort.StartsWith('A') || sort.StartsWith('D');
                 if (!isSortOk) return BadRequest("Sort value is incorrect.");
             }
             var filters = new OfferFiltersTemplate

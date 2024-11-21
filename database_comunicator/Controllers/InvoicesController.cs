@@ -13,32 +13,25 @@ namespace database_communicator.Controllers
     /// </summary>
     [Route("{db_name}/[controller]")]
     [ApiController]
-    public class InvoicesController : ControllerBase
+    public class InvoicesController(
+        IInvoiceServices invoiceServices,
+        IUserServices userServices,
+        IOrganizationServices organizationServices,
+        IItemServices itemServices,
+        ILogServices logServices,
+        INotificationServices notificationServices
+            ) : ControllerBase
     {
         private const string invoiceNotFoundMessage = "Invoice not found.";
         private const string userNotFoundMessage = "User not found.";
-        private readonly IInvoiceServices _invoicesService;
-        private readonly IUserServices _userServices;
-        private readonly IOrganizationServices _organizationServices;
-        private readonly IItemServices _itemServices;
-        private readonly ILogServices _logServices;
-        private readonly INotificationServices _notificationServices;
-        public InvoicesController(
-            IInvoiceServices invoiceServices,
-            IUserServices userServices,
-            IOrganizationServices organizationServices,
-            IItemServices itemServices,
-            ILogServices logServices,
-            INotificationServices notificationServices
-            )
-        {
-            _invoicesService = invoiceServices;
-            _userServices = userServices;
-            _organizationServices = organizationServices;
-            _itemServices = itemServices;
-            _logServices = logServices;
-            _notificationServices = notificationServices;
-        }
+        private const string sortErrorMessage = "Sort value is incorrect.";
+        private readonly IInvoiceServices _invoicesService = invoiceServices;
+        private readonly IUserServices _userServices = userServices;
+        private readonly IOrganizationServices _organizationServices = organizationServices;
+        private readonly IItemServices _itemServices = itemServices;
+        private readonly ILogServices _logServices = logServices;
+        private readonly INotificationServices _notificationServices = notificationServices;
+
         /// <summary>
         /// Tries to receive taxes information from database.
         /// </summary>
@@ -162,8 +155,8 @@ namespace database_communicator.Controllers
         {
             if (sort != null)
             {
-                bool isSortOk = sort.StartsWith("A") || sort.StartsWith("D");
-                if (!isSortOk) return BadRequest("Sort value is incorrect.");
+                bool isSortOk = sort.StartsWith('A') || sort.StartsWith('D');
+                if (!isSortOk) return BadRequest(sortErrorMessage);
             }
             IEnumerable<GetInvoices> result;
             var filters = new InvoiceFiltersTemplate
@@ -216,8 +209,8 @@ namespace database_communicator.Controllers
         {
             if (sort != null)
             {
-                bool isSortOk = sort.StartsWith("A") || sort.StartsWith("D");
-                if (!isSortOk) return BadRequest("Sort value is incorrect.");
+                bool isSortOk = sort.StartsWith('A') || sort.StartsWith('D');
+                if (!isSortOk) return BadRequest(sortErrorMessage);
             }
             IEnumerable<GetInvoices> result;
             var filters = new InvoiceFiltersTemplate
@@ -269,8 +262,8 @@ namespace database_communicator.Controllers
         {
             if (sort != null)
             {
-                bool isSortOk = sort.StartsWith("A") || sort.StartsWith("D");
-                if (!isSortOk) return BadRequest("Sort value is incorrect.");
+                bool isSortOk = sort.StartsWith('A') || sort.StartsWith('D');
+                if (!isSortOk) return BadRequest(sortErrorMessage);
             }
             IEnumerable<GetInvoices> result;
             var filters = new InvoiceFiltersTemplate
@@ -323,8 +316,8 @@ namespace database_communicator.Controllers
         {
             if (sort != null)
             {
-                bool isSortOk = sort.StartsWith("A") || sort.StartsWith("D");
-                if (!isSortOk) return BadRequest("Sort value is incorrect.");
+                bool isSortOk = sort.StartsWith('A') || sort.StartsWith('D');
+                if (!isSortOk) return BadRequest(sortErrorMessage);
             }
             IEnumerable<GetInvoices> result;
             var filters = new InvoiceFiltersTemplate
@@ -375,8 +368,8 @@ namespace database_communicator.Controllers
             var invoiceId = await _invoicesService.AddPurchaseInvoice(data);
             if (invoiceId == 0) return BadRequest("Could not create the document.");
             var logId = await _logServices.getLogTypeId("Create");
-            var desc = $"User with id {userId} has created the invoice {data.InvoiceNumber} for user with id {data.UserId}.";
-            await _logServices.CreateActionLog(desc, userId, logId);
+            var logDescription = $"User with id {userId} has created the invoice {data.InvoiceNumber} for user with id {data.UserId}.";
+            await _logServices.CreateActionLog(logDescription, userId, logId);
             if (data.UserId != userId)
             {
                 var userFull = await _userServices.GetUserFullName(userId);
@@ -415,8 +408,8 @@ namespace database_communicator.Controllers
             var invoiceId = await _invoicesService.AddSalesInvoice(data);
             if (invoiceId == 0) return BadRequest("Could not create the document.");
             var logId = await _logServices.getLogTypeId("Create");
-            var desc = $"User with id {userId} has created the invoice {data.InvoiceNumber} for user with id {data.UserId}.";
-            await _logServices.CreateActionLog(desc, userId, logId);
+            var logDescription = $"User with id {userId} has created the invoice {data.InvoiceNumber} for user with id {data.UserId}.";
+            await _logServices.CreateActionLog(logDescription, userId, logId);
             if (data.UserId != userId)
             {
                 var userFull = await _userServices.GetUserFullName(userId);
@@ -479,8 +472,8 @@ namespace database_communicator.Controllers
             if (result)
             {
                 var logId = await _logServices.getLogTypeId("Delete");
-                var desc = $"User with id {userId} has deleted the invoice {invoiceNumber}.";
-                await _logServices.CreateActionLog(desc, userId, logId);
+                var logDescription = $"User with id {userId} has deleted the invoice {invoiceNumber}.";
+                await _logServices.CreateActionLog(logDescription, userId, logId);
                 var userFull = await _userServices.GetUserFullName(userId);
                 foreach (var user in invoiceUsers)
                 {
@@ -578,8 +571,8 @@ namespace database_communicator.Controllers
                 var invoiceUsers = await _invoicesService.GetInvoiceUser(data.InvoiceId);
                 var invoiceNumber = await _invoicesService.GetInvoiceNumber(data.InvoiceId);
                 var logId = await _logServices.getLogTypeId("Modify");
-                var desc = $"User with id {userId} has modify the invoice {invoiceNumber}.";
-                await _logServices.CreateActionLog(desc, userId, logId);
+                var logDescription = $"User with id {userId} has modify the invoice {invoiceNumber}.";
+                await _logServices.CreateActionLog(logDescription, userId, logId);
                 var userFull = await _userServices.GetUserFullName(userId);
                 foreach (var user in invoiceUsers)
                 {

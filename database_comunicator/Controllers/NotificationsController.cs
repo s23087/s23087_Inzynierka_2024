@@ -42,7 +42,7 @@ namespace database_communicator.Controllers
         [Route("modify/{notifId}/is_read/{isRead}")]
         public async Task<IActionResult> SetNotification(int notifId, bool isRead)
         {
-            var exist = await _notificationServices.NotifExists(notifId);
+            var exist = await _notificationServices.NotificationExists(notifId);
             if (!exist) return NotFound();
             var result = await _notificationServices.SetIsRead(notifId, isRead);
             if (!result) return new StatusCodeResult(StatusCodes.Status500InternalServerError);

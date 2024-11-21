@@ -1,12 +1,11 @@
 ﻿using database_communicator.Data;
-using database_communicator.Models;
-using database_communicator.Utils;
 using database_communicator.FilterClass;
+using database_communicator.Models;
 using database_communicator.Models.DTOs.Create;
 using database_communicator.Models.DTOs.Get;
 using database_communicator.Models.DTOs.Modify;
+using database_communicator.Utils;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace database_communicator.Services
 {
@@ -39,13 +38,13 @@ namespace database_communicator.Services
     public class RequestServices : IRequestServices
     {
         private readonly HandlerContext _handlerContext;
-        private readonly ILogger<CreditNoteServices> _logger;
+        private readonly ILogger<RequestServices> _logger;
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="handlerContext">Database context</param>
         /// <param name="logger">Log interface</param>
-        public RequestServices(HandlerContext handlerContext, ILogger<CreditNoteServices> logger)
+        public RequestServices(HandlerContext handlerContext, ILogger<RequestServices> logger)
         {
             _handlerContext = handlerContext;
             _logger = logger;
@@ -90,7 +89,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return toAdd.RequestId;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Create request error.");
                 await trans.RollbackAsync();
@@ -317,7 +317,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Delete request error.");
                 await trans.RollbackAsync();
@@ -381,7 +382,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Modify request error.");
                 await trans.RollbackAsync();
@@ -421,7 +423,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Set request status error.");
                 await trans.RollbackAsync();
@@ -436,7 +439,7 @@ namespace database_communicator.Services
         public async Task<string?> GetRequestPath(int requestId)
         {
             return await _handlerContext.Requests
-                .Where (e => e.RequestId == requestId)
+                .Where(e => e.RequestId == requestId)
                 .Select(e => e.FilePath)
                 .FirstOrDefaultAsync();
         }
@@ -448,7 +451,7 @@ namespace database_communicator.Services
         public async Task<int> GetReceiverId(int requestId)
         {
             return await _handlerContext.Requests
-                .Where ((e) => e.RequestId == requestId)
+                .Where((e) => e.RequestId == requestId)
                 .Select(e => e.IdUserReciver)
                 .FirstOrDefaultAsync();
         }

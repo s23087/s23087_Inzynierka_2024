@@ -1,12 +1,10 @@
 ﻿using database_communicator.Data;
 using database_communicator.Models;
 using database_communicator.Models.DTOs;
-using database_communicator.Utils;
 using database_communicator.Models.DTOs.Create;
 using database_communicator.Models.DTOs.Get;
-using Microsoft.Data.SqlClient;
+using database_communicator.Utils;
 using Microsoft.EntityFrameworkCore;
-using System.Runtime.CompilerServices;
 
 namespace database_communicator.Services
 {
@@ -42,13 +40,13 @@ namespace database_communicator.Services
     public class UserServices : IUserServices
     {
         private readonly HandlerContext _handlerContext;
-        private readonly ILogger<CreditNoteServices> _logger;
+        private readonly ILogger<UserServices> _logger;
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="handlerContext">Database context</param>
         /// <param name="logger">Log interface</param>
-        public UserServices(HandlerContext handlerContext, ILogger<CreditNoteServices> logger)
+        public UserServices(HandlerContext handlerContext, ILogger<UserServices> logger)
         {
             _handlerContext = handlerContext;
             _logger = logger;
@@ -95,13 +93,14 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Create user error.");
                 await trans.RollbackAsync();
                 return false;
             }
-            
+
         }
         /// <summary>
         /// Do select query to receive basic information about user.
@@ -236,7 +235,9 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 _logger.LogError(ex, "Modify user password error.");
                 await trans.RollbackAsync();
                 return false;
@@ -280,7 +281,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Modify user data error.");
                 await trans.RollbackAsync();
@@ -317,7 +319,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Switch application type error.");
                 await trans.RollbackAsync();
@@ -386,7 +389,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Modify user role error.");
                 await trans.RollbackAsync();
@@ -433,11 +437,11 @@ namespace database_communicator.Services
             return await _handlerContext.AppUsers
                 .Where(e => e.OrgUser!.Role.RoleName == "Accountant" || e.OrgUser!.Role.RoleName == "Admin")
                 .Select(e => new GetUsers
-            {
-                IdUser = e.IdUser,
-                Username = e.Username,
-                Surname = e.Surname
-            }).ToListAsync();
+                {
+                    IdUser = e.IdUser,
+                    Username = e.Username,
+                    Surname = e.Surname
+                }).ToListAsync();
         }
         /// <summary>
         /// Do select query to receive user name and surname as one string from database.
@@ -461,7 +465,8 @@ namespace database_communicator.Services
             if (isSolo)
             {
                 return await _handlerContext.AppUsers.Where(e => e.IdUser == userId).Select(e => e.SoloUser!.Organizations.OrgName).FirstOrDefaultAsync();
-            } else
+            }
+            else
             {
                 return await _handlerContext.AppUsers.Where(e => e.IdUser == userId).Select(e => e.OrgUser!.Organizations.OrgName).FirstOrDefaultAsync();
             }

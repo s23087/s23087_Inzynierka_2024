@@ -40,8 +40,8 @@ namespace database_communicator.Services
     public class ItemServices : IItemServices
     {
         private readonly HandlerContext _handlerContext;
-        private readonly ILogger<CreditNoteServices> _logger;
-        public ItemServices(HandlerContext handlerContext, ILogger<CreditNoteServices> logger)
+        private readonly ILogger<ItemServices> _logger;
+        public ItemServices(HandlerContext handlerContext, ILogger<ItemServices> logger)
         {
             _handlerContext = handlerContext;
             _logger = logger;

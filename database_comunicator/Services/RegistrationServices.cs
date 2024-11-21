@@ -1,8 +1,5 @@
 ﻿using database_communicator.Data;
-using database_communicator.Models;
-using database_communicator.Models.DTOs;
 using database_communicator.Models.DTOs.Get;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 
@@ -21,14 +18,14 @@ namespace database_communicator.Services
     {
         private readonly HandlerContext _handlerContext;
         private readonly IConfiguration _configuration;
-        private readonly ILogger<CreditNoteServices> _logger;
+        private readonly ILogger<RegistrationServices> _logger;
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="handlerContext">Database context</param>
         /// <param name="configuration">Configuration interface to recover some data from secrets</param>
         /// <param name="logger">Log interface</param>
-        public RegistrationServices(HandlerContext handlerContext, IConfiguration configuration, ILogger<CreditNoteServices> logger)
+        public RegistrationServices(HandlerContext handlerContext, IConfiguration configuration, ILogger<RegistrationServices> logger)
         {
             _handlerContext = handlerContext;
             _configuration = configuration;
@@ -66,7 +63,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Create database error.");
                 await trans.RollbackAsync();
@@ -92,7 +90,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Setup error.");
                 await trans.RollbackAsync();
