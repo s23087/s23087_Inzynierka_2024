@@ -53,7 +53,15 @@ export default async function updateItem(eans, prevState, state, formData) {
       },
     );
 
-    if (info.status == 400) {
+    if (info.status === 500) {
+      return {
+        error: true,
+        completed: true,
+        message: "Server error.",
+      };
+    }
+
+    if (info.status === 400) {
       return {
         error: true,
         completed: true,
@@ -61,7 +69,7 @@ export default async function updateItem(eans, prevState, state, formData) {
       };
     }
 
-    if (info.status == 404) {
+    if (info.status === 404) {
       return {
         error: true,
         completed: true,

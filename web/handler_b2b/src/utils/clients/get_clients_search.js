@@ -34,6 +34,10 @@ export default async function getSearchClients(isOrg, search, sort, country) {
       return [];
     }
 
+    if (items.status === 400) {
+      return [];
+    }
+
     if (items.ok) {
       return await items.json();
     }

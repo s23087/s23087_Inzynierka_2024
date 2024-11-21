@@ -31,6 +31,10 @@ export default async function getSearchSalesInvoices(
       method: "GET",
     });
 
+    if (items.status === 404) {
+      logout();
+    }
+
     if (items.ok) {
       return await items.json();
     }

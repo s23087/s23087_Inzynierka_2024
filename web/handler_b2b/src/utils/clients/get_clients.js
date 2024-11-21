@@ -33,6 +33,10 @@ export default async function getClients(isOrg, sort, country) {
       return [];
     }
 
+    if (items.status === 400) {
+      return [];
+    }
+
     if (items.ok) {
       return await items.json();
     }

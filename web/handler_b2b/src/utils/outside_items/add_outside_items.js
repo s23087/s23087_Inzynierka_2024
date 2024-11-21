@@ -128,6 +128,6 @@ export default async function addOutsideItems(file, state, formData) {
   return {
     error: false,
     completed: true,
-    message: "The file has been uploaded, wait for futher notifications.",
+    message: "The file has been uploaded, wait for further notifications.",
   };
 }

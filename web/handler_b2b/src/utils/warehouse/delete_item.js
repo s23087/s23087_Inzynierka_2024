@@ -18,7 +18,7 @@ export default async function deleteItem(itemId) {
       method: "Delete",
     });
 
-    if (info.status == 404) {
+    if (info.status === 404) {
       let text = await info.text();
       if (text === "User not found.") logout();
       return {
@@ -27,11 +27,18 @@ export default async function deleteItem(itemId) {
       };
     }
 
-    if (info.status == 400) {
+    if (info.status === 400) {
       let text = await info.text();
       return {
         result: false,
         message: text,
+      };
+    }
+
+    if (info.status === 500) {
+      return {
+        result: false,
+        message: "Server error",
       };
     }
 

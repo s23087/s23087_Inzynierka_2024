@@ -1,7 +1,9 @@
 # Directory
+database_comunicator/Logs
 
 # Files
 scripts/scripts_logs.txt
+database_comunicator/nlog.config
 
 ## Database dir
 database/

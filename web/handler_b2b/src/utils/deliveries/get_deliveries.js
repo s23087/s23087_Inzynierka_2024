@@ -37,6 +37,10 @@ export default async function getDeliveries(
       return [];
     }
 
+    if (items.status === 400) {
+      return [];
+    }
+
     if (info.ok) {
       return await info.json();
     }

@@ -53,6 +53,14 @@ export default async function changeUserInfo(prevState, state, formData) {
       };
     }
 
+    if (info.status === 500) {
+      return {
+        error: true,
+        message: "Server error.",
+        completed: true,
+      };
+    }
+
     if (info.ok) {
       return {
         error: false,

@@ -18,10 +18,6 @@ export default async function getOutsideItems(sort, params) {
     const info = await fetch(url, {
       method: "GET",
     });
-    if (info.status === 404) {
-      logout();
-      return [];
-    }
 
     if (info.ok) {
       return await info.json();

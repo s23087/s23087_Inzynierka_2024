@@ -39,6 +39,10 @@ export default async function getSearchCreditNotes(
       return [];
     }
 
+    if (items.status === 400) {
+      return [];
+    }
+
     if (items.ok) {
       return await items.json();
     }

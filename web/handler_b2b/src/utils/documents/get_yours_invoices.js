@@ -25,6 +25,10 @@ export default async function getYoursInvoices(isOrg, sort, params) {
       method: "GET",
     });
 
+    if (items.status === 404) {
+      logout();
+    }
+    
     if (items.ok) {
       return await items.json();
     }

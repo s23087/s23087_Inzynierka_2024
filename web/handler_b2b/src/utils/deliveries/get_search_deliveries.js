@@ -38,6 +38,9 @@ export default async function getSearchDeliveries(
       logout();
       return [];
     }
+    if (items.status === 400) {
+      return [];
+    }
 
     if (info.ok) {
       return await info.json();

@@ -48,6 +48,13 @@ export default async function deleteRequest(requestId) {
         };
       }
     }
+    if (info.status === 500){
+      return {
+        error: true,
+        message: "Server error.",
+      };
+    }
+
     return {
       error: true,
       message: await info.text(),

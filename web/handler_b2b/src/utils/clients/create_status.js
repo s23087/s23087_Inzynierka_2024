@@ -58,6 +58,14 @@ export default async function createStatus(state, formData) {
       };
     }
 
+    if (info.status === 500) {
+      return {
+        error: true,
+        completed: true,
+        message: "Server error.",
+      };
+    }
+
     if (info.ok) {
       return {
         error: false,
