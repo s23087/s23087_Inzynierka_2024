@@ -891,7 +891,7 @@ namespace database_communicator.Services
 
                 if (postItem.ItemName != null)
                 {
-                    var nameQtyChanged = await _handlerContext.Items.Where(e => e.ItemId == postItem.Id).ExecuteUpdateAsync(setter => setter.SetProperty(s => s.ItemName, postItem.ItemName));
+                    await _handlerContext.Items.Where(e => e.ItemId == postItem.Id).ExecuteUpdateAsync(setter => setter.SetProperty(s => s.ItemName, postItem.ItemName));
                 }
 
                 if (postItem.ItemDescription != null)
