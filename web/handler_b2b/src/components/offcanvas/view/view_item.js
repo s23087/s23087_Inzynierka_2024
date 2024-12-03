@@ -96,7 +96,7 @@ function ViewItemOffcanvas({
   };
   /**
    * Check if switch for view should be shown.
-  */
+   */
   const isRestInfoEmpty = () =>
     restInfo.outsideItemInfos.length === 0 &&
     restInfo.ownedItemInfos.length === 0;
@@ -162,7 +162,7 @@ function ViewItemOffcanvas({
                     <Form.Select
                       className="input-style shadow-sm"
                       onChange={(e) => {
-                        setChosenUser(e.target.value);
+                        setChosenUser(parseInt(e.target.value));
                       }}
                     >
                       {Object.values(users).map((value) => {
@@ -221,7 +221,10 @@ function ViewItemOffcanvas({
                       outsideItemInfos:
                         isOrg && chosenUser
                           ? restInfo.outsideItemInfos.filter(
-                              (e) => Object.values(e.users).findIndex(e.key === chosenUser) !== -1,
+                              (e) =>
+                                Object.values(e.users).findIndex(
+                                  (x) => x.key === chosenUser,
+                                ) !== -1,
                             )
                           : restInfo.outsideItemInfos,
                       ownedItemInfos:

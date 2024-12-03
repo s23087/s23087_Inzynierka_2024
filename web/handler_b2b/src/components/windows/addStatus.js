@@ -85,7 +85,10 @@ function AddAvailabilityStatusWindow({ modalShow, onHideFunction, statuses }) {
                 isInvalid={daysError}
                 maxLength={150}
                 onInput={(e) => {
-                  InputValidator.onlyNumberValidator(e.target.value, setDaysError)
+                  InputValidator.onlyNumberValidator(
+                    e.target.value,
+                    setDaysError,
+                  );
                 }}
               />
             </Form.Group>

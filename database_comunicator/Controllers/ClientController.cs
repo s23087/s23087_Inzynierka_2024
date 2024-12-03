@@ -169,7 +169,7 @@ namespace database_communicator.Controllers
         /// </summary>
         /// <param name="data">Object of <see cref="Models.DTOs.Modify.ModifyOrg"/> containing changed organization properties.</param>
         /// <param name="userId">Id of user that's activating this action.</param>
-        /// <returns>200 code if modification was successful or 404 if user or organization was not found.</returns>
+        /// <returns>200 code if modification was successful, 500 if not or 404 if user or organization was not found.</returns>
         [HttpPost]
         [Route("modify/{userId}")]
         public async Task<IActionResult> ModifyOrg(ModifyOrg data, int userId)

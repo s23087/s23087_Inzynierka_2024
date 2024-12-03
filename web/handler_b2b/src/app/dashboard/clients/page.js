@@ -48,7 +48,9 @@ async function ClientsPage({ searchParams }) {
     : await getClients(org_view, currentSort, country);
   // Pagination, default 10
   let clientsLength = clients ? clients.length : 0;
-  let maxInstanceOnPage = searchParams.pagination ? searchParams.pagination : 10;
+  let maxInstanceOnPage = searchParams.pagination
+    ? searchParams.pagination
+    : 10;
   let pageQty = Math.ceil(clientsLength / maxInstanceOnPage);
   pageQty = pageQty === 0 ? 1 : pageQty;
   let currentPage = parseInt(searchParams.page)

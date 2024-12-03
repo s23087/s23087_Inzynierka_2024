@@ -151,7 +151,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
   const [dateError, setDateError] = useState(false);
   /**
    * Check if form can be submitted
-  */
+   */
   const isFormErrorActive = () =>
     invoiceError ||
     transportError ||
@@ -173,9 +173,11 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
       ? CreatePurchaseInvoice.bind(null, products)
           .bind(null, file)
           .bind(null, orgs)
+          .bind(null, chosenCurrency)
       : CreateSalesInvoice.bind(null, products)
           .bind(null, file)
-          .bind(null, orgs),
+          .bind(null, orgs)
+          .bind(null, chosenCurrency),
     {
       error: false,
       completed: false,
@@ -260,7 +262,6 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                   id="userSelect"
                   className="input-style shadow-sm maxInputWidth"
                   name="user"
-                  disabled={products.length > 0}
                   onChange={(e) => {
                     setChosenUser(e.target.value);
                   }}
@@ -321,6 +322,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                         type="date"
                         name="date"
                         isInvalid={dateError}
+                        readOnly={products.length > 0}
                         defaultValue={new Date().toLocaleDateString("en-CA")}
                         onChange={(e) => {
                           let date = new Date(e.target.value);
@@ -411,8 +413,10 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                       <Form.Select
                         id="currencySelect"
                         className="input-style shadow-sm"
+                        disabled={products.length > 0}
                         name="currency"
                         onChange={(e) => {
+                          if (products.length > 0) return;
                           if (e.target.value != "PLN") {
                             setShowCurrencyExchange(true);
                             setChosenCurrency(e.target.value);
@@ -432,7 +436,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
               {showCurrencyExchange ? (
                 <Form.Group className="mb-3">
                   <Form.Label className="blue-main-text">
-                    Currency Exchange
+                    Currency Exchange:
                   </Form.Label>
                   <ErrorMessage
                     message={currencyList.message}
@@ -448,7 +452,10 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                       ? null
                       : currencyList.rates.map((val) => {
                           return (
-                            <option key={val} value={val.effectiveDate}>
+                            <option
+                              key={val.effectiveDate}
+                              value={[val.effectiveDate, val.mid]}
+                            >
                               {val.mid} Date: {val.effectiveDate}
                             </option>
                           );
@@ -548,7 +555,13 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                   {products.map((value, key) => {
                     return (
                       <ProductHolder
-                        key={value}
+                        key={[
+                          value.id,
+                          value.itemId,
+                          value.priceId,
+                          value.invoiceId,
+                          key,
+                        ]}
                         value={value}
                         deleteValue={() => {
                           products.splice(key, 1);
@@ -702,7 +715,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
 
   /**
    * Reset form state
-  */
+   */
   function resetState() {
     state.error = false;
     state.completed = false;

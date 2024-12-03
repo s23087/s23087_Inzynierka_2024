@@ -59,7 +59,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
   const [creditError, setCreditError] = useState(false);
   /**
    * Set all errors to false
-  */
+   */
   const clearFormErrors = () => {
     setClientNameError(false);
     setClientNipError(false);
@@ -70,7 +70,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
   };
   /**
    * Check if form can be submitted
-  */
+   */
   const isFormErrorActive = () => {
     return (
       clientNameError ||
@@ -388,7 +388,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
 
   /**
    * Reset form state
-  */
+   */
   function resetState() {
     state.error = false;
     state.completed = false;

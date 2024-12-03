@@ -20,7 +20,8 @@ export default async function getCurrencyValueByDate(currency, date) {
     }
 
     return 0;
-  } catch {
+  } catch (error) {
+    console.error(error);
     console.error("getCurrencyValueByDate fetch failed");
     return null;
   }

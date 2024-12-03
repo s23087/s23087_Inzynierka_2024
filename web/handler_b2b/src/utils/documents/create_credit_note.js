@@ -44,7 +44,7 @@ export default async function CreateCreditNote(
   let chosenUser = parseInt(formData.get("user"));
 
   let creditDate = formData.get("date").replaceAll("-", "_");
-  let fileName = `../../database/${dbName}/documents/cn_${creditNumber.replaceAll(/[\\./]/g, "").replaceAll(" ", "_")}_${userId}${additionalInvoiceInfo.userOrg}${additionalInvoiceInfo.chosenClient}_${creditDate}_${Date.now().toString()}.pdf`;
+  let fileName = `../../database/${dbName}/documents/cn_${creditNumber.replaceAll(/[\\./]/g, "").replaceAll(" ", "_")}_${userId}${additionalInvoiceInfo.userOrg.replaceAll(" ", "_")}${additionalInvoiceInfo.chosenClient.replaceAll(" ", "_")}_${creditDate}_${Date.now().toString()}.pdf`;
   let transformProducts = [];
   products.forEach((element) => {
     transformProducts.push({

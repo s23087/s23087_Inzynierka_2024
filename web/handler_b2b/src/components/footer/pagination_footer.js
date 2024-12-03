@@ -120,7 +120,7 @@ function PaginationFooter({
 
   /**
    * Set query param "page" to chosen number.
-   * @param {Number} page_number 
+   * @param {Number} page_number
    */
   function setPage(page_number) {
     const newParams = new URLSearchParams(params);

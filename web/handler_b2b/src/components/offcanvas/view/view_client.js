@@ -84,9 +84,7 @@ function ViewClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                 </Container>
                 <Container className="px-1 ms-0">
                   <p className="mb-1 blue-main-text">Address:</p>
-                  <p className="mb-1">
-                    {client.street + " " + client.city}
-                  </p>
+                  <p className="mb-1">{client.street + " " + client.city}</p>
                 </Container>
                 <Container className="px-1 ms-0">
                   <p className="mb-1 blue-main-text">Postal code:</p>

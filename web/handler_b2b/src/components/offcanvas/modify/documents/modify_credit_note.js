@@ -69,7 +69,7 @@ function ModifyCreditNoteOffcanvas({
   const [dateError, setDateError] = useState(false);
   /**
    * Check if form can be submitted
-  */
+   */
   const isFormErrorActive = () =>
     creditNumberError ||
     documentError ||
@@ -359,7 +359,7 @@ function ModifyCreditNoteOffcanvas({
 
   /**
    * Reset state of form
-  */
+   */
   function resetState() {
     state.error = false;
     state.completed = false;

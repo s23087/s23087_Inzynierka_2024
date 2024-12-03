@@ -56,7 +56,7 @@ function haveOnlyPositiveNumbers(str) {
  * @return {boolean}      Result of function regex function test.
  */
 function haveOnlyIntegers(str) {
-  const reg = /^-?d*$/;
+  const reg = /^-?\d*$/;
   return reg.test(str);
 }
 

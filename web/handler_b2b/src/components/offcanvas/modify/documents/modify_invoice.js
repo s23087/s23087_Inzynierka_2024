@@ -110,7 +110,7 @@ function ModifyInvoiceOffcanvas({
   const [documentError, setDocumentError] = useState(false);
   /**
    * Check if form can be submitted
-  */
+   */
   const isFormErrorActive = () =>
     invoiceNumberError ||
     transportError ||
@@ -449,7 +449,7 @@ function ModifyInvoiceOffcanvas({
 
   /**
    * Reset state of form
-  */
+   */
   function resetState() {
     state.error = false;
     state.completed = false;

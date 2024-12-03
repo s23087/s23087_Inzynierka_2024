@@ -34,7 +34,7 @@ import ChangeSelectedStatusWindow from "../windows/change_request_status";
 /**
  * Checks if value is selected
  * @param {string} type Name of current chosen type
- * @param {Object} document Document object 
+ * @param {Object} document Document object
  * @param {Array<Object>} selected Array containing selected ids
  * @returns {boolean} True if value exist in given selected array, otherwise false.
  */
@@ -482,14 +482,14 @@ function InvoiceList({
 
   /**
    * Return name of mass action depend on the chosen type
-  */
+   */
   function getActionOneName() {
     return type === "Requests" ? "Change status" : "Delete selected";
   }
 
   /**
    * Return function of mass action depend on the chosen type
-  */
+   */
   function getActionOne() {
     return type === "Requests"
       ? () => setShowChangeRequestStatus(true)
@@ -498,7 +498,7 @@ function InvoiceList({
 
   /**
    * Return element that visually represent value using correct format determent by type
-   * @param {Object} value 
+   * @param {Object} value
    * @return {JSX.Element}
    */
   function getDocument(value) {
@@ -614,7 +614,7 @@ function InvoiceList({
 
   /**
    * Set delete value to id of chosen value and then open the delete window
-   * @param {Object} value Document value 
+   * @param {Object} value Document value
    */
   function deleteAction(value) {
     // Delete

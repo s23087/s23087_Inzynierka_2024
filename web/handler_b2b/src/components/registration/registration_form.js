@@ -219,7 +219,7 @@ function RegistrationForm() {
 
                 <Form.Group className="mb-4" controlId="formNip">
                   <ErrorMessage
-                    message="Must contain only numbers."
+                    message="Must contain only numbers. Max 9 letters."
                     messageStatus={nipError}
                   />
                   <Form.Control
@@ -229,14 +229,11 @@ function RegistrationForm() {
                     placeholder="nip"
                     isInvalid={nipError}
                     onInput={(e) => {
-                      if (validators.haveOnlyNumbers(e.target.value)) {
-                        setNipError(false);
-                      } else {
-                        setNipError(true);
-                      }
-                      if (!validators.stringIsNotEmpty(e.target.value)) {
-                        setNipError(false);
-                      }
+                      InputValidator.emptyNumberStringValidator(
+                        e.target.value,
+                        setNipError,
+                        9,
+                      );
                     }}
                   />
                 </Form.Group>

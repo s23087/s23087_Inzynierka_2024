@@ -74,8 +74,30 @@ namespace database_communicator.Services
                     OrgId = e.SoloUserId != null ? e.SoloUser!.Organizations.OrganizationId : e.OrgUser!.Organizations.OrganizationId,
                     OrgName = e.SoloUserId != null ? e.SoloUser!.Organizations.OrgName : e.OrgUser!.Organizations.OrgName,
                 }).FirstAsync();
-            var result = await _handlerContext.Organizations
-                .Where(e => e.AppUsers.Any( x => x.IdUser == userId))
+            IEnumerable<RestOrgs> result;
+            var isOrgUser = await _handlerContext.AppUsers.AnyAsync(x => x.IdUser == userId && x.OrgUserId != null);
+            if (isOrgUser)
+            {
+                var isRoleMerchant = await _handlerContext.AppUsers.AnyAsync(x => x.IdUser == userId && x.OrgUser!.Role.RoleName == "Merchant");
+                if (isRoleMerchant)
+                {
+                    result = await _handlerContext.Organizations
+                        .Where(e => e.OrganizationId != userOrg.OrgId && e.AppUsers.Any(x => x.IdUser == userId))
+                        .Select(e => new RestOrgs
+                        {
+                            OrgId = e.OrganizationId,
+                            OrgName = e.OrgName
+                        }).ToListAsync();
+                    return new GetOrgsForInvocie
+                    {
+                        UserOrgId = userOrg.OrgId,
+                        OrgName = userOrg.OrgName,
+                        RestOrgs = result
+                    };
+                }
+            }
+            result = await _handlerContext.Organizations
+                .Where(e => e.OrganizationId != userOrg.OrgId)
                 .Select(e => new RestOrgs
                 {
                     OrgId = e.OrganizationId,
@@ -137,14 +159,12 @@ namespace database_communicator.Services
             {
                 var currVal = new List<CurrencyValue>()
                 { 
-                    new CurrencyValue
-                    {
+                    new() {
                         CurrencyName = "USD",
                         UpdateDate = data.CurrencyValueDate,
                         CurrencyValue1 = data.UsdValue
                     },
-                    new CurrencyValue
-                    {
+                    new() {
                         CurrencyName = "EUR",
                         UpdateDate = data.CurrencyValueDate,
                         CurrencyValue1 = data.EuroValue
@@ -879,7 +899,7 @@ namespace database_communicator.Services
                             Partnumber = e.OwnedItem.OriginalItem.PartNumber,
                             Qty = e.Qty,
                             Price = e.Price
-                        }).ToListAsync();
+                        }).Where(e => e.Qty > 0).ToListAsync();
                 } else
                 {
                     return await _handlerContext.OwnedItems
@@ -895,7 +915,7 @@ namespace database_communicator.Services
                             Partnumber = e.OwnedItem.OriginalItem.PartNumber,
                             Qty = e.Qty,
                             Price = e.CalculatedPrices.Where(d => d.CurrencyName == invoiceCurrency).Select(d => d.Price).First()
-                        }).ToListAsync();
+                        }).Where(e => e.Qty > 0).ToListAsync();
                 }
             }
 
@@ -923,7 +943,7 @@ namespace database_communicator.Services
                         Qty = e.Qty,
                         Price = invoiceCurrency == "PLN" ? e.NewPrice : e.CalculatedCreditNotePrices.Where(d => d.CurrencyName == invoiceCurrency).Select(d => d.Price).First()
                     })
-                ).ToListAsync();
+                ).Where(e => e.Qty > 0).ToListAsync();
         }
         /// <summary>
         /// Checks if invoice has any of its items sold.

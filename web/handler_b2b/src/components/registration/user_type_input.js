@@ -6,7 +6,7 @@ import user_icon from "../../../public/icons/user_icon.png";
 import org_user_icon from "../../../public/icons/org_user_icon.png";
 
 /**
- * Return button that will push user to given link. Used for choosing type of registration user wants to perform. 
+ * Return button that will push user to given link. Used for choosing type of registration user wants to perform.
  * @component
  * @param {object} props Component props
  * @param {boolean} props.is_org True if you want to get org version of button, false if you want get solo user version of button

@@ -2,6 +2,7 @@
 
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
+import logout from "../auth/logout";
 
 /**
  * Sends request to get sales invoices where invoice number contains search string. Can be filtered or sorted using sort and param arguments.

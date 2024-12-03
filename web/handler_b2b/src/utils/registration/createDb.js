@@ -21,7 +21,8 @@ export default async function initDb(dbName) {
       return isSetup.ok;
     }
     return false;
-  } catch {
+  } catch (error) {
+    console.error(error);
     console.error("initDb fetch failed.");
     return false;
   }

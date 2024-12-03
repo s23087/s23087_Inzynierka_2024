@@ -82,7 +82,9 @@ async function DeliveriesPage({ searchParams }) {
       );
   // Pagination, default 10
   let deliveriesLength = deliveries ? deliveries.length : 0;
-  let maxInstanceOnPage = searchParams.pagination ? searchParams.pagination : 10;
+  let maxInstanceOnPage = searchParams.pagination
+    ? searchParams.pagination
+    : 10;
   let pageQty = Math.ceil(deliveriesLength / maxInstanceOnPage);
   pageQty = pageQty === 0 ? 1 : pageQty;
   let currentPage = parseInt(searchParams.page)

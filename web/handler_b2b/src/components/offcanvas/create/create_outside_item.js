@@ -242,7 +242,7 @@ function AddOutsideItemsOffcanvas({ showOffcanvas, hideFunction }) {
 
   /**
    * Reset form state
-  */
+   */
   function resetState() {
     state.error = false;
     state.completed = false;

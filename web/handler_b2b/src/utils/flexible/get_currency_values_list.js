@@ -31,10 +31,11 @@ export default async function getCurrencyValuesList(
     });
 
     if (info.ok) {
+      let rates = await info.json();
       return {
         error: false,
         message: "Success",
-        rates: await info.json().rates,
+        rates: rates.rates,
       };
     }
 
@@ -43,7 +44,8 @@ export default async function getCurrencyValuesList(
       message: "Could not connect to nbp services.",
       rates: [],
     };
-  } catch {
+  } catch (error) {
+    console.error(error);
     console.error("getCurrencyValuesList fetch failed.");
     return {
       error: true,

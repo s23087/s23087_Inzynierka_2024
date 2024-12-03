@@ -71,7 +71,7 @@ function AddDeliveryOffcanvas({
   /**
    * Checks if waybill already exist in waybill array.
    * @param {string} variable Waybill value
-  */
+   */
   const waybillExist = (variable) => {
     return waybills.findIndex((item) => item === variable) != -1;
   };
@@ -81,7 +81,7 @@ function AddDeliveryOffcanvas({
   const [isAddCompanyShow, setIsAddCompanyShow] = useState(false);
   /**
    * Check if form can be submitted
-  */
+   */
   const isFormErrorActive = () => {
     return (
       proformas.length === 0 ||
@@ -332,7 +332,7 @@ function AddDeliveryOffcanvas({
 
   /**
    * Reset form state
-  */
+   */
   function resetState() {
     state.error = false;
     state.completed = false;

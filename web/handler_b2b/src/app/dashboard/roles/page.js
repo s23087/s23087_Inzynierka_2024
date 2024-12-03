@@ -38,7 +38,9 @@ async function RolesPage({ searchParams }) {
     : await getUserRoles(null, currentSort, role);
   // Pagination, default 10
   let rolesLength = roles ? roles.length : 0;
-  let maxInstanceOnPage = searchParams.pagination ? searchParams.pagination : 10;
+  let maxInstanceOnPage = searchParams.pagination
+    ? searchParams.pagination
+    : 10;
   let pageQty = Math.ceil(rolesLength / maxInstanceOnPage);
   pageQty = pageQty === 0 ? 1 : pageQty;
   let currentPage = parseInt(searchParams.page)

@@ -41,9 +41,9 @@ function ItemTable({ restInfo, isOurWarehouse }) {
       </thead>
       <tbody key={restInfo}>
         {isOurWarehouse
-          ? Object.values(restInfo.ownedItemInfos).map((value) => {
+          ? Object.values(restInfo.ownedItemInfos).map((value, key) => {
               return (
-                <tr key={value}>
+                <tr key={key}>
                   <td>
                     <p className="mb-0">
                       {value.organizationName + "\n" + value.invoiceNumber}

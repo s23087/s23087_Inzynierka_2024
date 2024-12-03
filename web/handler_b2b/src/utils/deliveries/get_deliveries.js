@@ -37,7 +37,7 @@ export default async function getDeliveries(
       return [];
     }
 
-    if (items.status === 400) {
+    if (info.status === 400) {
       return [];
     }
 
@@ -46,7 +46,8 @@ export default async function getDeliveries(
     }
 
     return [];
-  } catch {
+  } catch (error) {
+    console.error(error);
     console.error("getDeliveries fetch failed.");
     return null;
   }

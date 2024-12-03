@@ -363,7 +363,6 @@ namespace database_communicator_Test.Controllers
             int itemId = 1;
             int userId = 1;
             string currency = "PLN";
-            int logTypeId = 1;
             A.CallTo(() => _userServices.UserExist(userId)).Returns(true);
             A.CallTo(() => _itemServices.ItemExist(itemId)).Returns(true);
             A.CallTo(() => _itemServices.GetRestOfItem(itemId, userId, currency)).Returns(data);
@@ -384,7 +383,6 @@ namespace database_communicator_Test.Controllers
             int itemId = 1;
             int userId = 1;
             string currency = "PLN";
-            int logTypeId = 1;
             A.CallTo(() => _userServices.UserExist(userId)).Returns(false);
             A.CallTo(() => _itemServices.ItemExist(itemId)).Returns(true);
             A.CallTo(() => _itemServices.GetRestOfItem(itemId, userId, currency)).Returns(data);
@@ -405,7 +403,6 @@ namespace database_communicator_Test.Controllers
             int itemId = 1;
             int userId = 1;
             string currency = "PLN";
-            int logTypeId = 1;
             A.CallTo(() => _userServices.UserExist(userId)).Returns(true);
             A.CallTo(() => _itemServices.ItemExist(itemId)).Returns(false);
             A.CallTo(() => _itemServices.GetRestOfItem(itemId, userId, currency)).Returns(data);

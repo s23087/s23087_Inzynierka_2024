@@ -25,9 +25,9 @@ function PricelistTable({ items, currency }) {
         </tr>
       </thead>
       <tbody key={items}>
-        {Object.values(items).map((value) => {
+        {Object.values(items).map((value, key) => {
           return (
-            <tr key={value}>
+            <tr key={key}>
               <td>
                 <p className="mb-0 break-spaces">
                   {value.partnumber + "\n" + value.itemName}

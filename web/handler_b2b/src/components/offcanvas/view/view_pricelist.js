@@ -18,7 +18,7 @@ import PricelistTable from "@/components/tables/pricelist_table";
  * @return {JSX.Element} Offcanvas element
  */
 function ViewPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
-  // Items holder 
+  // Items holder
   const [pricelistItems, setPricelistItems] = useState([]);
   // Download data
   useEffect(() => {

@@ -58,7 +58,7 @@ function ModifyItemOffcanvas({
   const [isProductView, setIsProductView] = useState(true);
   // Eans
   const [eans, setEans] = useState([]);
-  // useState for change binding window 
+  // useState for change binding window
   const [showBindingWindow, setShowBindingWindow] = useState(false);
   // Holder for chosen binding to modify passed to window element
   const [bindingToModify, setBindingToModify] = useState({
@@ -124,7 +124,7 @@ function ModifyItemOffcanvas({
   /**
    * Check if ean exist in eans array
    * @param {string} variable New ean
-  */
+   */
   const eanExist = (variable) => {
     return eans.findIndex((item) => item === variable) != -1;
   };
@@ -134,7 +134,7 @@ function ModifyItemOffcanvas({
   const [isLoading, setIsLoading] = useState(false);
   /**
    * Check if form can be submitted
-  */
+   */
   const isFormErrorActive = () =>
     partnumberError ||
     nameError ||
@@ -142,7 +142,7 @@ function ModifyItemOffcanvas({
     bindingsDownloadError;
   /**
    * Reset form error
-  */
+   */
   const resetErrors = () => {
     setPartnumberError(false);
     setNameError(false);
@@ -366,7 +366,7 @@ function ModifyItemOffcanvas({
                   .map((value, key) => {
                     return (
                       <BindingInput
-                        value={value}
+                        value={key}
                         key={[
                           key,
                           value.username,
@@ -506,7 +506,7 @@ function ModifyItemOffcanvas({
               (state.completed && state.error) ||
               (bindingState.completed && bindingState.error)
             }
-            message={state.complete ? state.message : bindingState.message}
+            message={state.completed ? state.message : bindingState.message}
             key={[
               state.completed,
               state.error,
@@ -522,7 +522,7 @@ function ModifyItemOffcanvas({
               (state.completed && !state.error) ||
               (bindingState.completed && !bindingState.error)
             }
-            message={state.complete ? state.message : bindingState.message}
+            message={state.completed ? state.message : bindingState.message}
             key={[
               state.completed,
               !state.error,

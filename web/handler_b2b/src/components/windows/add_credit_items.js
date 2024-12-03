@@ -107,7 +107,17 @@ function AddCreditProductWindow({
               {products.map((val, key) => {
                 if (val.qty > 0) {
                   return (
-                    <option key={val} value={key}>
+                    <option
+                      key={[
+                        val.itemId,
+                        val.invoiceId,
+                        val.priceId,
+                        val.qty,
+                        val.price,
+                        key,
+                      ]}
+                      value={key}
+                    >
                       {val.partnumber + " - " + val.qty + " pcs " + val.price}
                     </option>
                   );
@@ -128,20 +138,26 @@ function AddCreditProductWindow({
               isInvalid={qtyError}
               key={[currentProduct, products]}
               defaultValue={
-                products[currentProduct] ? products[currentProduct].qty : 1
+                products[currentProduct] ? products[currentProduct].qty : 0
               }
               onInput={(e) => {
-                if (
-                  validators.haveOnlyIntegers(e.target.value) &&
-                  validators.stringIsNotEmpty(e.target.value) &&
-                  parseInt(e.target.value) >=
-                    products[currentProduct].qty * -1 &&
-                  parseInt(e.target.value) <= products[currentProduct].qty &&
-                  e.target.value !== "0"
-                ) {
-                  setQtyError(false);
-                } else {
+                if (!e.target.value) {
                   setQtyError(true);
+                  return;
+                }
+                if (!validators.haveOnlyIntegers(e.target.value)) {
+                  setQtyError(true);
+                  return;
+                }
+                let parsedValue = parseInt(e.target.value);
+                if (
+                  parsedValue > products[currentProduct].qty ||
+                  parsedValue < products[currentProduct].qty * -1 ||
+                  parsedValue === 0
+                ) {
+                  setQtyError(true);
+                } else {
+                  setQtyError(false);
                 }
               }}
             />
@@ -247,7 +263,7 @@ function AddCreditProductWindow({
 
   /**
    * Reduce qty of item that already exist in added items. For example if user added 3 of 5 product A, then in will reduce to 2 free items in array.
-  */
+   */
   function filterQtyOfAddedProducts(data) {
     data.forEach((element) => {
       let qtyToSubtract = addedProducts

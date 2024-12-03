@@ -65,7 +65,8 @@ export default async function signIn(state, formData) {
         message: "The company id is incorrect.",
       };
     }
-  } catch {
+  } catch (error) {
+    console.error(error);
     console.error("signIn fetch failed");
     return {
       error: true,

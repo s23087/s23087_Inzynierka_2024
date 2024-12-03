@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Products>
+  <Product>
+    <Partnumber>itemA</Partnumber>
+    <ItemName>Item A</ItemName>
+    <ItemDescription>Laptop.</ItemDescription>
+    <Eans>1256156153132</Eans>
+    <Qty>&gt; 25</Qty>
+    <Price>385.52</Price>
+  </Product>
+  <Product>
+    <Partnumber>itemB</Partnumber>
+    <ItemName>Item B</ItemName>
+    <ItemDescription>Laptop.</ItemDescription>
+    <Eans>515616123132</Eans>
+    <Qty>&gt; 25</Qty>
+    <Price>73.93</Price>
+  </Product>
+  <Product>
+    <Partnumber>itemC</Partnumber>
+    <ItemName>Item C</ItemName>
+    <ItemDescription>Laptop.</ItemDescription>
+    <Eans></Eans>
+    <Qty>&gt; 25</Qty>
+    <Price>640.27</Price>
+  </Product>
+  <Product>
+    <Partnumber>itemD</Partnumber>
+    <ItemName>Item D</ItemName>
+    <ItemDescription>Laptop.</ItemDescription>
+    <Eans>125324532545, 214235325235</Eans>
+    <Qty>1</Qty>
+    <Price>3956.20</Price>
+  </Product>
+</Products>

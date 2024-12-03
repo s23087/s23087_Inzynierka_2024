@@ -6,24 +6,25 @@ import createNewRegisteredUser from "./registerUser";
 
 /**
  * Create database, log, document and pricelist folder with given names.
- * @param  {string} dbfile Database file name.
+ * @param  {string} dbFile Database file name.
  * @param  {string} logFile Database log file name.
  * @param  {string} docFile Document file name.
  * @param  {string} pricelistFile Pricelist file name.
- * @return {boolean}      Return true if no error occurred. Otherwise false
+ * @return {boolean} Return true if no error occurred. Otherwise false
  */
-function createFolders(dbfile, logFile, docFile, pricelistFile) {
+function createFolders(dbFile, logFile, docFile, pricelistFile) {
   const fs = require("node:fs");
   try {
-    if (!fs.existsSync(dbfile)) {
-      fs.mkdirSync(dbfile);
+    if (!fs.existsSync(dbFile)) {
+      fs.mkdirSync(dbFile);
       fs.mkdirSync(logFile);
       fs.mkdirSync(docFile);
       fs.mkdirSync(pricelistFile);
       return true;
     }
     return false;
-  } catch {
+  } catch (error) {
+    console.error(error);
     console.error("createFolders fetch failed.");
     return false;
   }
@@ -41,10 +42,11 @@ function deleteFolders(dbfile, logFile, docFile, pricelistFile) {
   const fs = require("node:fs");
   try {
     fs.rmdirSync(logFile);
-    fs.rmdirSync(dbfile);
     fs.rmdirSync(docFile);
+    fs.rmdirSync(dbfile);
     fs.rmdirSync(pricelistFile);
-  } catch {
+  } catch (error) {
+    console.error(error);
     console.error("deleteFolders fetch failed.");
   }
 }
@@ -62,9 +64,12 @@ async function registerUser(is_org, formData) {
   let dbLogPath = dbFilePath.concat("/log");
   let docPath = dbFilePath.concat("/documents");
   let pricelistFile = `src/app/api/pricelist/${folderName}`;
-  let fileCreation = false;
-
-  fileCreation = createFolders(dbFilePath, dbLogPath, docPath, pricelistFile);
+  let fileCreation = createFolders(
+    dbFilePath,
+    dbLogPath,
+    docPath,
+    pricelistFile,
+  );
 
   if (fileCreation) {
     try {
@@ -81,12 +86,13 @@ async function registerUser(is_org, formData) {
         throw new Error("Registration failed");
       }
     } catch (error) {
+      console.error(error);
       deleteFolders(dbFilePath, dbLogPath, docPath, pricelistFile);
       redirect("failure");
     }
     redirect("success");
   } else {
-    console.log("file failure");
+    console.error("file failure");
     redirect("failure");
   }
 }

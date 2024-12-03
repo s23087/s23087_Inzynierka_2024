@@ -81,7 +81,7 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
   const [maxQtyError, setMaxQtyError] = useState(false);
   /**
    * Check if form can be submitted
-  */
+   */
   const isFormErrorActive = () =>
     nameError ||
     maxQtyError ||
@@ -261,7 +261,7 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
                   {products.map((value, key) => {
                     return (
                       <ProductHolder
-                        key={value}
+                        key={key}
                         value={value}
                         deleteValue={() => {
                           products.splice(key, 1);
@@ -359,7 +359,7 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
 
   /**
    * Reset form state
-  */
+   */
   function resetState() {
     state.error = false;
     state.completed = false;

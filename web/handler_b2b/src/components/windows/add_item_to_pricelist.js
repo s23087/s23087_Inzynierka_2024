@@ -65,7 +65,7 @@ function AddItemToPricelistWindow({
   /**
    * Calculate product margin based on price input and product purchase price. Return string "Error" if product does not exist or is not a number.
    * @return {Object} Margin of product with 2 decimal places or string error if occurred.
-  */
+   */
   let getMargin = () => {
     if (isNaN(parseFloat(chosenPrice)) || !products[currentProduct]) {
       return "Error";
@@ -123,7 +123,7 @@ function AddItemToPricelistWindow({
               {products.map((val, key) => {
                 if (val.qty > 0) {
                   return (
-                    <option key={val} value={key}>
+                    <option key={key} value={key}>
                       {val.partnumber +
                         " - " +
                         val.qty +
@@ -226,6 +226,7 @@ function AddItemToPricelistWindow({
                   setChosenPrice((0.0).toFixed(2));
                 }
                 setChosenMargin((0.0).toFixed(2));
+                document.getElementById("margin").value = 0.0;
                 addFunction({
                   id: wholeProduct.itemId,
                   partnumber: wholeProduct.partnumber,
@@ -255,7 +256,7 @@ function AddItemToPricelistWindow({
 
   /**
    * Drop product that are already added
-  */
+   */
   function getFilteredData(data) {
     return data.filter(
       (e) =>

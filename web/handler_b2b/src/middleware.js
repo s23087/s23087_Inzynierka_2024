@@ -50,10 +50,9 @@ function checkRestriction(role, url) {
     case "Accountant":
       return restrictedPagesAccountant.test(url);
     case "Warehouse Manager":
-      return (
-        !allowedPagesWarehouseManagerPartOne.test(url) ||
-        !allowedPagesWarehouseManagerPartTwo.test(url)
-      );
+      if (allowedPagesWarehouseManagerPartOne.test(url)) return false;
+      if (allowedPagesWarehouseManagerPartTwo.test(url)) return false;
+      return true;
     default:
       return false;
   }

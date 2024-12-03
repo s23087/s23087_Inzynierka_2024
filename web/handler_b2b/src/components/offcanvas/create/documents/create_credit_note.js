@@ -81,7 +81,7 @@ function AddCreditNoteOffcanvas({
   const [dateError, setDateError] = useState(false);
   /**
    * Check if form can be submitted
-  */
+   */
   const isFormErrorActive = () =>
     creditNumberError ||
     documentError ||
@@ -316,7 +316,7 @@ function AddCreditNoteOffcanvas({
                   {products.map((value, key) => {
                     return (
                       <ProductHolder
-                        key={value}
+                        key={key}
                         value={value}
                         deleteValue={() => {
                           products.splice(key, 1);
@@ -460,7 +460,7 @@ function AddCreditNoteOffcanvas({
 
   /**
    * Reset form state
-  */
+   */
   function resetState() {
     state.error = false;
     state.completed = false;

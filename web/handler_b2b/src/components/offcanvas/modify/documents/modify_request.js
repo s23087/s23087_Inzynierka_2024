@@ -73,7 +73,7 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
   const [titleError, setTitleError] = useState(false);
   /**
    * Check is form can be submitted
-  */
+   */
   const isFormErrorActive = () =>
     documentError ||
     noteError ||

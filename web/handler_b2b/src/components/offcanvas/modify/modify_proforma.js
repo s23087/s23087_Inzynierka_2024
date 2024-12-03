@@ -102,7 +102,7 @@ function ModifyProformaOffcanvas({
   const [documentError, setDocumentError] = useState(false);
   /**
    * Check if form can be submitted
-  */
+   */
   const isFormErrorActive = () =>
     proformaNumberError ||
     transportError ||

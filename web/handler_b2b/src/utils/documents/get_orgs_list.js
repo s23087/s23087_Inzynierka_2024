@@ -23,7 +23,8 @@ export default async function getOrgsList() {
     return {
       restOrgs: [],
     };
-  } catch {
+  } catch (error) {
+    console.error(error);
     console.error("getOrgsList fetch failed.");
     return null;
   }

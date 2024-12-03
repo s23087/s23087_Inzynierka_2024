@@ -10,6 +10,7 @@ import validators from "../validators/validator";
  * @param  {Array<{id: Number, qty: Number, price: Number}>} products Products added to invoice.
  * @param  {FormData} file FormData object containing file binary data.
  * @param  {{orgName: string, restOrgs: Array<{orgName: string, orgId: Number}>}} orgs Object that contain user organization name.
+ * @param  {string} chosenCurrency String containing shortcut name of currency
  * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
  * @param  {FormData} formData Contain form data.
  * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
@@ -19,6 +20,7 @@ export default async function CreatePurchaseInvoice(
   products,
   file,
   orgs,
+  chosenCurrency,
   state,
   formData,
 ) {
@@ -47,7 +49,6 @@ export default async function CreatePurchaseInvoice(
     });
   });
 
-  let chosenCurrency = formData.get("currency");
   let currencyExchangeDate = getExchangeDate(formData);
   let { euroVal, usdVal } = await getCurrencyValues(currencyExchangeDate);
 
@@ -206,9 +207,10 @@ async function getCurrencyValues(currencyExchangeDate) {
  * @return {string}      Date in string (yyyy-MM-dd).
  */
 function getExchangeDate(formData) {
-  return formData.get("currencyExchange")
-    ? formData.get("currencyExchange")
-    : formData.get("date");
+  if (formData.get("currencyExchange")) {
+    return formData.get("currencyExchange").split(",")[0];
+  }
+  return formData.get("date");
 }
 
 /**

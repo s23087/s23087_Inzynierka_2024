@@ -361,7 +361,7 @@ namespace database_communicator.Services
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
             try
             {
-                await _handlerContext.Organizations.ExecuteUpdateAsync(setters =>
+                await _handlerContext.Organizations.Where(e => e.OrganizationId == orgId).ExecuteUpdateAsync(setters =>
                     setters.SetProperty(s => s.AvailabilityStatusId, statusId));
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();

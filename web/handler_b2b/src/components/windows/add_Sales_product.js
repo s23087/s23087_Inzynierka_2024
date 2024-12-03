@@ -53,7 +53,11 @@ function AddSaleProductWindow({
           setDownloadError(true);
         }
       });
+    } else {
+      let currentProductIndex = products.findIndex((e) => e.qty > 0);
+      setCurrentProduct(currentProductIndex);
     }
+    setShowSuccess(false);
   }, [modalShow, addedProductsQty, userId, currency]);
   // Errors
   const [salesPriceError, setSalesPriceError] = useState(false);
@@ -89,12 +93,16 @@ function AddSaleProductWindow({
             <Form.Select
               className="input-style shadow-sm"
               id="product"
+              defaultValue={currentProduct}
               onChange={(e) => setCurrentProduct(e.target.value)}
             >
               {products.map((val, key) => {
                 if (val.qty > 0) {
                   return (
-                    <option key={val} value={key}>
+                    <option
+                      key={[val.itemId, val.priceId, val.invoiceId]}
+                      value={key}
+                    >
                       {val.partnumber +
                         " - " +
                         val.qty +
@@ -156,7 +164,10 @@ function AddSaleProductWindow({
               }
               isInvalid={salesPriceError}
               onInput={(e) => {
-                InputValidator.decimalValidator(e.target.value, setSalesPriceError)
+                InputValidator.decimalValidator(
+                  e.target.value,
+                  setSalesPriceError,
+                );
               }}
             />
           </Form.Group>
@@ -164,19 +175,15 @@ function AddSaleProductWindow({
             <Button
               variant="mainBlue"
               className="me-2 w-100"
-              disabled={
-                getIsFormErrorActive()
-              }
+              disabled={getIsFormErrorActive()}
               onClick={() => {
                 setShowSuccess(false);
                 if (products.filter((e) => e.qty > 0).length <= 0) return;
-                if (
-                  getIsFormErrorActive()
-                ) {
+                let qty = document.getElementById("qty").value;
+                if (getIsFormErrorActiveWithQty(qty)) {
                   return;
                 }
                 let productKey = document.getElementById("product").value;
-                let qty = document.getElementById("qty").value;
                 let price = document.getElementById("price").value;
                 if (!price && !qty) {
                   setSalesPriceError(true);
@@ -238,12 +245,23 @@ function AddSaleProductWindow({
 
   /**
    * True if any of conditions are fulfilled, otherwise false
-  */
+   */
   function getIsFormErrorActive() {
-    return salesPriceError ||
+    return (
+      salesPriceError || qtyError || downloadError || products.length === 0
+    );
+  }
+  /**
+   * True if any of conditions are fulfilled, otherwise false
+   */
+  function getIsFormErrorActiveWithQty(qty) {
+    return (
+      salesPriceError ||
       qtyError ||
       downloadError ||
-      products.length === 0;
+      products.length === 0 ||
+      qty <= 0
+    );
   }
 }
 

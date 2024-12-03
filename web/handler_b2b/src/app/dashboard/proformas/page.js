@@ -81,7 +81,9 @@ async function ProformasPage({ searchParams }) {
       );
   // Pagination, default 10
   let proformasLength = proformas ? proformas.length : 0;
-  let maxInstanceOnPage = searchParams.pagination ? searchParams.pagination : 10;
+  let maxInstanceOnPage = searchParams.pagination
+    ? searchParams.pagination
+    : 10;
   let pageQty = Math.ceil(proformasLength / maxInstanceOnPage);
   pageQty = pageQty === 0 ? 1 : pageQty;
   let currentPage = parseInt(searchParams.page)

@@ -1,6 +1,5 @@
 using database_communicator.Data;
 using database_communicator.Services;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NLog;
 using NLog.Web;
@@ -58,7 +57,8 @@ catch (Exception ex)
 {
     logger.Error(ex, "NLog setup error.");
     throw;
-} finally
+}
+finally
 {
     NLog.LogManager.Shutdown();
 }

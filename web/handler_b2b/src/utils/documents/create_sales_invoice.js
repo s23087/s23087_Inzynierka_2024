@@ -9,6 +9,7 @@ import validators from "../validators/validator";
  * @param  {Array<{priceId: Number, id: Number, qty: Number, price: Number, invoiceId: Number}>} products Products added to invoice.
  * @param  {FormData} file FormData object containing file binary data.
  * @param  {{orgName: string, restOrgs: Array<{orgName: string, orgId: Number}>}} orgs Object that contain user organization name.
+ * @param  {string} chosenCurrency String containing shortcut name of currency
  * @param  {{error: boolean, completed: boolean, message: string}} state Previous state of object bonded to this function.
  * @param  {FormData} formData Contain form data.
  * @return {Promise<{error: boolean, completed: boolean, message: string}>} If error is true that action was unsuccessful.
@@ -18,6 +19,7 @@ export default async function CreateSalesInvoice(
   products,
   file,
   orgs,
+  chosenCurrency,
   state,
   formData,
 ) {
@@ -47,12 +49,9 @@ export default async function CreateSalesInvoice(
       buyInvoiceId: element.invoiceId,
     });
   });
-
-  let chosenCurrency = formData.get("currency");
   let currencyExchangeDate = getExchangeDate(formData);
 
   let invoiceData = getData();
-
   const fs = require("node:fs");
   try {
     if (fs.existsSync(fileName)) {
@@ -107,11 +106,11 @@ export default async function CreateSalesInvoice(
       return {
         error: true,
         completed: true,
-        message: "Critical error.",
+        message: "Critical error",
       };
     }
   } catch {
-    console.error(" fetch failed.");
+    console.error("CreateSalesInvoice fetch failed.");
     try {
       fs.rmSync(fileName);
     } catch (error) {
@@ -134,6 +133,12 @@ export default async function CreateSalesInvoice(
    * @return {object}
    */
   function getData() {
+    let currValue;
+    if (formData.get("currencyExchange")) {
+      currValue = parseFloat(formData.get("currencyExchange").split(",")[1]);
+    } else {
+      currValue = 1;
+    }
     return {
       userId: parseInt(formData.get("user")),
       invoiceNumber: invoice,
@@ -151,6 +156,7 @@ export default async function CreateSalesInvoice(
           ? new Date().toLocaleDateString("en-CA")
           : currencyExchangeDate,
       currencyName: chosenCurrency,
+      currencyValue: currValue,
       paymentMethodId: parseInt(formData.get("paymentMethod")),
       paymentsStatusId: parseInt(formData.get("paymentStatus")),
       invoiceItems: transformProducts,
@@ -163,9 +169,10 @@ export default async function CreateSalesInvoice(
  * @return {string}      Date in string (yyyy-MM-dd).
  */
 function getExchangeDate(formData) {
-  return formData.get("currencyExchange")
-    ? formData.get("currencyExchange")
-    : formData.get("date");
+  if (formData.get("currencyExchange")) {
+    return formData.get("currencyExchange").split(",")[0];
+  }
+  return formData.get("date");
 }
 
 /**

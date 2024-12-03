@@ -31,7 +31,8 @@ export default async function getItems(currency, isOrg, sort, params) {
     }
 
     return [];
-  } catch {
+  } catch (error) {
+    console.error(error);
     console.error("getItems fetch failed.");
     return null;
   }

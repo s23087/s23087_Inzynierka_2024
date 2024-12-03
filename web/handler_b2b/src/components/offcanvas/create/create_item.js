@@ -38,7 +38,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
   /**
    * Checks if ean already exist in ean array
    * @param {string} variable Ean value
-  */
+   */
   const eanExist = (variable) => {
     return eans.findIndex((item) => item === variable) != -1;
   };
@@ -49,11 +49,11 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
   const [nameError, setNameError] = useState(false);
   /**
    * Check if form can be submitted
-  */
+   */
   const isErrorActive = () => partnumberError || nameError;
   /**
    * Reset form errors
-  */
+   */
   const resetErrors = () => {
     setPartnumberError(false);
     setNameError(false);
@@ -293,7 +293,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
 
   /**
    * Reset form state
-  */
+   */
   function resetState() {
     state.error = false;
     state.completed = false;

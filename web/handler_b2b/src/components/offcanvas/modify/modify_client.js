@@ -91,10 +91,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
         street: client.street,
         city: client.city,
         postalCode: client.postal,
-        statusId:
-          statues[Object.values(statues).findIndex(
-            (e) => e.name === restInfo.availability,
-          )].id,
+        statusId: -1,
       });
     }
   }, [showOffcanvas]);
@@ -127,7 +124,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
   const [creditError, setCreditError] = useState(false);
   /**
    * Reset form errors
-  */
+   */
   const resetErrors = () => {
     setNameError(false);
     setNipError(false);
@@ -138,7 +135,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
   };
   /**
    * Check if form can be submitted
-  */
+   */
   const getIsErrorActive = () => {
     return (
       nameError ||
@@ -234,17 +231,19 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   variant="as-link"
                   onClick={() => {
                     hideFunction();
+                    setIsBindingView(false);
+                    setBindingMessage("");
+                    setBindingFailure(false);
+                    setBindingSuccess(false);
+                    resetErrors();
+                    setIsLoading(false);
+                    state.completed = false;
                     if (!state.error && state.completed) {
                       router.refresh();
                     }
                     if (bindingSuccess) {
                       router.refresh();
                     }
-                    setIsBindingView(false);
-                    setBindingMessage("");
-                    setBindingFailure(false);
-                    setBindingSuccess(false);
-                    resetErrors();
                   }}
                   className="pe-0"
                 >
@@ -300,7 +299,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
               <Form.Group className="mb-3">
                 <Form.Label className="blue-main-text">Nip:</Form.Label>
                 <ErrorMessage
-                  message="Is empty, not a number or length is greater than 15."
+                  message="Is empty, not a number or length is greater than 9."
                   messageStatus={nipError}
                 />
                 <Form.Control
@@ -313,7 +312,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                     InputValidator.emptyNumberStringValidator(
                       e.target.value,
                       setNipError,
-                      15,
+                      9,
                     );
                   }}
                   maxLength={15}
@@ -448,11 +447,12 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                 <Form.Select
                   className="input-style shadow-sm maxInputWidth"
                   name="availability"
-                  defaultValue={statues[Object.values(statues).findIndex(
-                    (e) => e.name === restInfo.availability,
-                  )].id}
                 >
+                  <option value={-1} key={restInfo.availability}>
+                    {restInfo.availability}
+                  </option>
                   {Object.values(statues)
+                    .filter((e) => e.name !== restInfo.availability)
                     .map((value) => {
                       return (
                         <option key={value.id} value={value.id}>
@@ -469,10 +469,10 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                       variant="mainBlue"
                       className="w-100"
                       type="click"
-                      disabled={ getIsErrorActive()}
+                      disabled={getIsErrorActive()}
                       onClick={(e) => {
                         e.preventDefault();
-                        if ( getIsErrorActive()) return;
+                        if (getIsErrorActive()) return;
                         setIsLoading(true);
                         let form = document.getElementById("clientModify");
                         form.requestSubmit();
@@ -651,7 +651,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
 
   /**
    * Reset state of form
-  */
+   */
   function resetState() {
     state.error = false;
     state.completed = false;

@@ -41,7 +41,7 @@ function ViewRequestOffcanvas({ showOffcanvas, hideFunction, request, isOrg }) {
       });
     }
   }, [showOffcanvas]);
-  // True if file (not data) is downloaded 
+  // True if file (not data) is downloaded
   const [isDownloading, setIsDownloading] = useState(false);
   // True if status change is running, otherwise false
   const [isLoadingCompleted, setIsLoadingCompleted] = useState(false);

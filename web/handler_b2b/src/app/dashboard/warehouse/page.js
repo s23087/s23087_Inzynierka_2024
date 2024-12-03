@@ -69,7 +69,9 @@ async function WarehousePage({ searchParams }) {
       )
     : await getItems(currency, org_view, currentSort, params);
   // Pagination, default 10
-  let maxInstanceOnPage = searchParams.pagination ? searchParams.pagination : 10;
+  let maxInstanceOnPage = searchParams.pagination
+    ? searchParams.pagination
+    : 10;
   let productsLength = products ? products.length : 0;
   let pageQty = Math.ceil(productsLength / maxInstanceOnPage);
   pageQty = pageQty === 0 ? 1 : pageQty;

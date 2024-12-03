@@ -46,7 +46,7 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
   const [titleError, setTitleError] = useState(false);
   /**
    * Check if form can be submitted
-  */
+   */
   const isFromErrorActive = () =>
     documentError ||
     noteError ||
@@ -295,7 +295,7 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
 
   /**
    * Reset form state
-  */
+   */
   function resetState() {
     state.error = false;
     state.completed = false;

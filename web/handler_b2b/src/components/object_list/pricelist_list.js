@@ -71,7 +71,7 @@ function PricelistList({
   const [selectedQty, setSelectedQty] = useState(0); // Number of selected objects
   const [selectedPricelist] = useState([]); // Selected proforma keys
   // Filter
-  const [showFilter, setShowFilter] = useState(false);  // useState for showing filter offcanvas
+  const [showFilter, setShowFilter] = useState(false); // useState for showing filter offcanvas
   // mass action
   const [showDeleteAll, setDeleteAll] = useState(false); // useState for showing mass action delete window
   const [deleteAllErrorMessage, setDeleteAllErrorMessage] = useState(""); // error message of mass delete action

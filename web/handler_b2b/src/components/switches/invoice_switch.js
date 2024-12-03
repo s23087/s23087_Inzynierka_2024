@@ -47,7 +47,7 @@ function InvoiceSwitch({ type, is_role_solo }) {
   /**
    * Reset filters and set query param to chosen type.
    * @param {string} type Name of document type
-  */
+   */
   const changeDoc = (type) => {
     const newParams = new URLSearchParams(params);
     newParams.delete("orderBy");

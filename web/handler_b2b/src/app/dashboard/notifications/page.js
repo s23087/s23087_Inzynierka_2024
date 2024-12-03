@@ -23,7 +23,9 @@ async function NotificationsPage({ searchParams }) {
   // download
   let notifs = await getNotifications();
   // Pagination, default 10
-  let maxInstanceOnPage = searchParams.pagination ? searchParams.pagination : 10;
+  let maxInstanceOnPage = searchParams.pagination
+    ? searchParams.pagination
+    : 10;
   let pageQty = Math.ceil(notifs.length / maxInstanceOnPage);
   pageQty = pageQty === 0 ? 1 : pageQty;
   let currentPage = parseInt(searchParams.page)

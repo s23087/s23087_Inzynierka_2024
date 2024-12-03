@@ -122,13 +122,13 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
         chosenCurrency,
         invoiceDate,
         new Date().toLocaleDateString("en-CA"),
-      ).then((data) =>
-          setCurrencyList({
-            error: data.error,
-            message: data.message,
-            rates: data.rates,
-          }),
-        )
+      ).then((data) => {
+        setCurrencyList({
+          error: data.error,
+          message: data.message,
+          rates: data.rates ?? [],
+        });
+      });
     }
   }, [showCurrencyExchange, invoiceDate, chosenCurrency]);
   // Form errors
@@ -138,7 +138,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
   const [dateError, setDateError] = useState(false);
   /**
    * Check if form can be submitted
-  */
+   */
   const isFormErrorActive = () =>
     proformaError ||
     transportError ||
@@ -243,7 +243,6 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
                   id="userSelect"
                   className="input-style shadow-sm maxInputWidth"
                   name="user"
-                  disabled={products.length > 0}
                   onChange={(e) => {
                     setChosenUser(e.target.value);
                   }}
@@ -418,7 +417,10 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
                       ? null
                       : currencyList.rates.map((val) => {
                           return (
-                            <option key={val} value={val.effectiveDate}>
+                            <option
+                              key={val.effectiveDate}
+                              value={val.effectiveDate}
+                            >
                               {val.mid} Date: {val.effectiveDate}
                             </option>
                           );
@@ -441,7 +443,10 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
                   placeholder="transport cost"
                   isInvalid={transportError}
                   onInput={(e) => {
-                    InputValidator.decimalValidator(e.target.value, setTransportError)
+                    InputValidator.decimalValidator(
+                      e.target.value,
+                      setTransportError,
+                    );
                   }}
                 />
               </Form.Group>
@@ -492,7 +497,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
                   {products.map((value, key) => {
                     return (
                       <ProductHolder
-                        key={value}
+                        key={key}
                         value={value}
                         deleteValue={() => {
                           products.splice(key, 1);
@@ -646,7 +651,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
 
   /**
    * Reset form state
-  */
+   */
   function resetState() {
     state.error = false;
     state.completed = false;

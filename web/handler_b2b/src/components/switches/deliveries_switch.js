@@ -39,7 +39,7 @@ function DeliverySwitch({ isDeliveryToUser }) {
   /**
    * Sets query parameter to chosen type
    * @param {string} type Name of proforma type
-  */
+   */
   const buttonAction = (type) => {
     const newParams = new URLSearchParams(params);
     newParams.set("deliveryType", type);

@@ -29,7 +29,7 @@ function ProductHolder({ value, deleteValue }) {
   /**
    * Calculate row number in input depend on how much information in object is available.
    * @return {Number}
-  */
+   */
   let getRowNumber = () => {
     let result = 5;
     if (!value.invoiceNumber) result--;

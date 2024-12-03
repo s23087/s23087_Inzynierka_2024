@@ -85,7 +85,7 @@ namespace database_communicator.Services
         /// Checks if any of given eans exist in database.
         /// </summary>
         /// <param name="eans">Array of eans</param>
-        /// <returns>True if at least one ean exist in database, ohterwise false.</returns>
+        /// <returns>True if at least one ean exist in database, otherwise false.</returns>
         public async Task<bool> EanExist(IEnumerable<string> eans)
         {
             return await _handlerContext.Eans.AnyAsync(e => eans.Contains(e.EanValue));
@@ -291,10 +291,10 @@ namespace database_communicator.Services
                         .Select(e => e.Price)
                         .Union(
                             instance.OwnedItems
-                            .SelectMany(e => e.PurchasePrices)
-                            .SelectMany(e => e.CreditNoteItems)
-                            .Where(e => !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
-                            .Select(e => e.NewPrice)
+                                .SelectMany(e => e.PurchasePrices)
+                                .SelectMany(e => e.CreditNoteItems)
+                                .Where(e => e.CreditNote.Invoice.SellingPrices.Count == 0 && e.Qty > 0)
+                                .Select(e => e.NewPrice)
                         )
                         .Average(),
                     Sources = instance.OwnedItems.Select(e => e.Invoice).Select(e => e.SellerNavigation).GroupBy(e => e.OrgName).Select(e => e.Key).ToList()
@@ -349,7 +349,7 @@ namespace database_communicator.Services
                             insta.OwnedItems
                             .SelectMany(e => e.PurchasePrices)
                             .SelectMany(e => e.CreditNoteItems)
-                            .Where(e => !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
+                            .Where(e => e.CreditNote.Invoice.SellingPrices.Count == 0 && e.Qty > 0)
                             .SelectMany(e => e.CalculatedCreditNotePrices)
                             .Where(e => e.CurrencyName == currency)
                             .Select(e => e.Price)
@@ -458,7 +458,8 @@ namespace database_communicator.Services
                             .Where(e =>
                             e.Qty
                             - e.SellingPrices.Select(d => d.Qty).Sum()
-                            + e.CreditNoteItems.Select(d => d.Qty).Sum()
+                            - e.CreditNoteItems.Select(d => Math.Abs(d.Qty)).Sum()
+                            + e.CreditNoteItems.Where(d => d.Qty > 0 && e.SellingPrices.Select(f => f.SellInvoiceId).Contains(d.CreditNote.InvoiceId)).Select(d => d.Qty).Sum()
                             > 0
                             ).SelectMany(e => e.CalculatedPrices)
                             .Where(e => e.CurrencyName == currency)
@@ -467,7 +468,7 @@ namespace database_communicator.Services
                                 instc.OwnedItems
                                 .SelectMany(e => e.PurchasePrices)
                                 .SelectMany(e => e.CreditNoteItems)
-                                .Where(e => !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
+                                .Where(e => e.CreditNote.Invoice.SellingPrices.Count == 0 && e.Qty > 0)
                                 .SelectMany(e => e.CalculatedCreditNotePrices)
                                 .Where(e => e.CurrencyName == currency)
                                 .Select(e => e.Price)
@@ -546,7 +547,7 @@ namespace database_communicator.Services
                             .Where(pp =>
                             pp.Qty
                             - pp.SellingPrices.Select(d => d.Qty).Sum()
-                            + pp.CreditNoteItems.Select(d => d.Qty).Sum()
+                            - pp.CreditNoteItems.Select(d => Math.Abs(d.Qty)).Sum()
                             + pp.CreditNoteItems.Where(d => d.Qty > 0 && pp.SellingPrices.Select(f => f.SellInvoiceId).Contains(d.CreditNote.InvoiceId)).Select(d => d.Qty).Sum()
                             > 0
                             ).SelectMany(e => e.CalculatedPrices)
@@ -556,7 +557,7 @@ namespace database_communicator.Services
                                 instac.OwnedItems
                                 .SelectMany(e => e.PurchasePrices)
                                 .SelectMany(e => e.CreditNoteItems)
-                                .Where(e => !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
+                                .Where(e => e.CreditNote.Invoice.SellingPrices.Count == 0 && e.Qty > 0)
                                 .SelectMany(e => e.CalculatedCreditNotePrices)
                                 .Where(e => e.CurrencyName == currency)
                                 .Select(e => e.Price)
@@ -612,7 +613,7 @@ namespace database_communicator.Services
                         StatusName = WarehouseUtils.GetItemStatus(
                                 inst.OwnedItems.SelectMany(e => e.ItemOwners).Where(e => e.IdUser == userId).Select(e => e.Qty).Sum(),
                                 inst.OutsideItems.Select(e => e.Qty).Sum(),
-                                inst.ProformaFutureItems.SelectMany(e => e.Proforma.Deliveries).Any(e => e.DeliveryStatus.StatusName == "In transport")
+                                inst.ProformaFutureItems.SelectMany(e => e.Proforma.Deliveries).Any(e => e.DeliveryStatus.StatusName == "In transport" && e.Proforma.UserId == userId)
                             ),
                         Eans = inst.Eans.Select(e => e.EanValue),
                         Qty = inst.OwnedItems
@@ -622,10 +623,7 @@ namespace database_communicator.Services
                         PurchasePrice = inst.OwnedItems
                             .SelectMany(e => e.PurchasePrices)
                             .Where(pur =>
-                            pur.Qty
-                            - pur.SellingPrices.Select(d => d.Qty).Sum()
-                            + pur.CreditNoteItems.Select(d => d.Qty).Sum()
-                            + pur.CreditNoteItems.Where(d => d.Qty > 0 && pur.SellingPrices.Select(f => f.SellInvoiceId).Contains(d.CreditNote.InvoiceId)).Select(d => d.Qty).Sum()
+                            pur.OwnedItem.ItemOwners.Where(x => x.OwnedItemId == pur.OwnedItemId && x.IdUser == userId).Sum(x => x.Qty)
                             > 0
                             )
                             .Select(e => e.Price)
@@ -633,7 +631,7 @@ namespace database_communicator.Services
                                 inst.OwnedItems
                                 .SelectMany(e => e.PurchasePrices)
                                 .SelectMany(e => e.CreditNoteItems)
-                                .Where(e => !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
+                                .Where(e => e.CreditNote.Invoice.SellingPrices.Count == 0 && e.Qty > 0)
                                 .Select(e => e.NewPrice)
                             )
                             .Average(),
@@ -657,7 +655,7 @@ namespace database_communicator.Services
                         StatusName = WarehouseUtils.GetItemStatus(
                                 instace.OwnedItems.SelectMany(e => e.ItemOwners).Where(e => e.IdUser == userId).Select(e => e.Qty).Sum(),
                                 instace.OutsideItems.Select(e => e.Qty).Sum(),
-                                instace.ProformaFutureItems.SelectMany(e => e.Proforma.Deliveries).Any(e => e.DeliveryStatus.StatusName == "In transport")
+                                instace.ProformaFutureItems.SelectMany(e => e.Proforma.Deliveries).Any(e => e.DeliveryStatus.StatusName == "In transport" && e.Proforma.UserId == userId)
                             ),
                         Eans = instace.Eans.Select(e => e.EanValue),
                         Qty = instace.OwnedItems
@@ -667,10 +665,7 @@ namespace database_communicator.Services
                         PurchasePrice = instace.OwnedItems
                             .SelectMany(e => e.PurchasePrices)
                             .Where(e =>
-                            e.Qty
-                            - e.SellingPrices.Select(d => d.Qty).Sum()
-                            + e.CreditNoteItems.Select(d => d.Qty).Sum()
-                            + e.CreditNoteItems.Where(d => d.Qty > 0 && e.SellingPrices.Select(f => f.SellInvoiceId).Contains(d.CreditNote.InvoiceId)).Select(d => d.Qty).Sum()
+                            e.OwnedItem.ItemOwners.Where(x => x.OwnedItemId == e.OwnedItemId && x.IdUser == userId).Sum(x => x.Qty)
                             > 0
                             ).SelectMany(e => e.CalculatedPrices)
                             .Where(e => e.CurrencyName == currency)
@@ -679,7 +674,7 @@ namespace database_communicator.Services
                                 instace.OwnedItems
                                 .SelectMany(e => e.PurchasePrices)
                                 .SelectMany(e => e.CreditNoteItems)
-                                .Where(e => !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
+                                .Where(e => e.CreditNote.Invoice.SellingPrices.Count == 0 && e.Qty > 0)
                                 .SelectMany(e => e.CalculatedCreditNotePrices)
                                 .Where(e => e.CurrencyName == currency)
                                 .Select(e => e.Price)
@@ -738,7 +733,7 @@ namespace database_communicator.Services
                         StatusName = WarehouseUtils.GetItemStatus(
                                 obj.OwnedItems.SelectMany(e => e.ItemOwners).Where(e => e.IdUser == userId).Select(e => e.Qty).Sum(),
                                 obj.OutsideItems.Select(e => e.Qty).Sum(),
-                                obj.ProformaFutureItems.SelectMany(e => e.Proforma.Deliveries).Any(e => e.DeliveryStatus.StatusName == "In transport")
+                                obj.ProformaFutureItems.SelectMany(e => e.Proforma.Deliveries).Any(e => e.DeliveryStatus.StatusName == "In transport" && e.Proforma.UserId == userId)
                             ),
                         Eans = obj.Eans.Select(e => e.EanValue),
                         Qty = obj.OwnedItems
@@ -748,10 +743,7 @@ namespace database_communicator.Services
                         PurchasePrice = obj.OwnedItems
                             .SelectMany(e => e.PurchasePrices)
                             .Where(e =>
-                            e.Qty
-                            - e.SellingPrices.Select(d => d.Qty).Sum()
-                            + e.CreditNoteItems.Select(d => d.Qty).Sum()
-                            + e.CreditNoteItems.Where(d => d.Qty > 0 && e.SellingPrices.Select(f => f.SellInvoiceId).Contains(d.CreditNote.InvoiceId)).Select(d => d.Qty).Sum()
+                            e.OwnedItem.ItemOwners.Where(x => x.OwnedItemId == e.OwnedItemId && x.IdUser == userId).Sum(x => x.Qty)
                             > 0
                             ).SelectMany(e => e.CalculatedPrices)
                             .Where(e => e.CurrencyName == currency)
@@ -760,7 +752,7 @@ namespace database_communicator.Services
                                 obj.OwnedItems
                                 .SelectMany(e => e.PurchasePrices)
                                 .SelectMany(e => e.CreditNoteItems)
-                                .Where(e => !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
+                                .Where(e => e.CreditNote.Invoice.SellingPrices.Count == 0 && e.Qty > 0)
                                 .SelectMany(e => e.CalculatedCreditNotePrices)
                                 .Where(e => e.CurrencyName == currency)
                                 .Select(e => e.Price)
@@ -788,7 +780,7 @@ namespace database_communicator.Services
                         StatusName = WarehouseUtils.GetItemStatus(
                                 objs.OwnedItems.SelectMany(e => e.ItemOwners).Where(e => e.IdUser == userId).Select(e => e.Qty).Sum(),
                                 objs.OutsideItems.Select(e => e.Qty).Sum(),
-                                objs.ProformaFutureItems.SelectMany(e => e.Proforma.Deliveries).Any(e => e.DeliveryStatus.StatusName == "In transport")
+                                objs.ProformaFutureItems.SelectMany(e => e.Proforma.Deliveries).Any(e => e.DeliveryStatus.StatusName == "In transport" && e.Proforma.UserId == userId)
                             ),
                         Eans = objs.Eans.Select(e => e.EanValue),
                         Qty = objs.OwnedItems
@@ -798,10 +790,7 @@ namespace database_communicator.Services
                         PurchasePrice = objs.OwnedItems
                             .SelectMany(e => e.PurchasePrices)
                             .Where(pri =>
-                            pri.Qty
-                            - pri.SellingPrices.Select(d => d.Qty).Sum()
-                            + pri.CreditNoteItems.Select(d => d.Qty).Sum()
-                            + pri.CreditNoteItems.Where(d => d.Qty > 0 && pri.SellingPrices.Select(f => f.SellInvoiceId).Contains(d.CreditNote.InvoiceId)).Select(d => d.Qty).Sum()
+                            pri.OwnedItem.ItemOwners.Where(x => x.OwnedItemId == pri.OwnedItemId && x.IdUser == userId).Sum(x => x.Qty)
                             > 0
                             ).SelectMany(e => e.CalculatedPrices)
                             .Where(e => e.CurrencyName == currency)
@@ -810,7 +799,7 @@ namespace database_communicator.Services
                                 objs.OwnedItems
                                 .SelectMany(e => e.PurchasePrices)
                                 .SelectMany(e => e.CreditNoteItems)
-                                .Where(e => !e.CreditNote.Invoice.SellingPrices.Any() && e.Qty > 0)
+                                .Where(e => e.CreditNote.Invoice.SellingPrices.Count == 0 && e.Qty > 0)
                                 .SelectMany(e => e.CalculatedCreditNotePrices)
                                 .Where(e => e.CurrencyName == currency)
                                 .Select(e => e.Price)
@@ -902,17 +891,17 @@ namespace database_communicator.Services
 
                 if (postItem.ItemName != null)
                 {
-                    await _handlerContext.Items.ExecuteUpdateAsync(setter => setter.SetProperty(s => s.ItemName, postItem.ItemName));
+                    var nameQtyChanged = await _handlerContext.Items.Where(e => e.ItemId == postItem.Id).ExecuteUpdateAsync(setter => setter.SetProperty(s => s.ItemName, postItem.ItemName));
                 }
 
-                if (postItem.ItemDescription == null)
+                if (postItem.ItemDescription != null)
                 {
-                    await _handlerContext.Items.ExecuteUpdateAsync(setter => setter.SetProperty(s => s.ItemDescription, postItem.ItemDescription));
+                    await _handlerContext.Items.Where(e => e.ItemId == postItem.Id).ExecuteUpdateAsync(setter => setter.SetProperty(s => s.ItemDescription, postItem.ItemDescription));
                 }
 
-                if (postItem.PartNumber == null)
+                if (postItem.PartNumber != null)
                 {
-                    await _handlerContext.Items.ExecuteUpdateAsync(setter => setter.SetProperty(s => s.PartNumber, postItem.PartNumber));
+                    await _handlerContext.Items.Where(e => e.ItemId == postItem.Id).ExecuteUpdateAsync(setter => setter.SetProperty(s => s.PartNumber, postItem.PartNumber));
                 }
 
                 await _handlerContext.SaveChangesAsync();

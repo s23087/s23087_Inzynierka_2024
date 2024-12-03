@@ -2,6 +2,7 @@
 
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
+import logout from "../auth/logout";
 
 /**
  * Sends request to get purchase invoices where invoice number contains search string. Can be filtered or sorted using sort and param arguments.
@@ -34,7 +35,7 @@ export default async function getSearchYoursInvoices(
     if (items.status === 404) {
       logout();
     }
-    
+
     if (items.ok) {
       return await items.json();
     }

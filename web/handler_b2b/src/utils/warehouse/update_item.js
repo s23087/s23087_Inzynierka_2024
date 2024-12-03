@@ -102,7 +102,7 @@ export default async function updateItem(eans, prevState, state, formData) {
 /**
  * Validate form data.
  * @param  {FormData} formData Contain form data.
- * @return {string}      Return error message. "Error:" means no error occurred.
+ * @return {string} Return error message. "Error:" means no error occurred.
  */
 function validateData(formData) {
   let message = "Error:";
@@ -110,18 +110,18 @@ function validateData(formData) {
     !validators.lengthSmallerThen(formData.get("name"), 250) ||
     !validators.stringIsNotEmpty(formData.get("name"))
   )
-    message += "\nName is empty or exceed required lenght";
+    message += "\nName is empty or exceed required length";
 
   if (
     !validators.lengthSmallerThen(formData.get("description"), 500) ||
     !validators.stringIsNotEmpty(formData.get("description"))
   )
-    message += "\nDescription is empty or exceed required lenght";
+    message += "\nDescription is empty or exceed required length";
 
   if (
     !validators.lengthSmallerThen(formData.get("partNumber"), 150) ||
     !validators.stringIsNotEmpty(formData.get("partNumber"))
   )
-    message += "\nPartnumber is empty or exceed required lenght";
+    message += "\nPartnumber is empty or exceed required length";
   return message;
 }

@@ -50,7 +50,6 @@ namespace database_communicator.Services
         /// <returns>True if successfully created or false otherwise.</returns>
         public async Task<bool> CreateNewDatabase(string orgName)
         {
-            using var trans = await _handlerContext.Database.BeginTransactionAsync();
             try
             {
                 string createDbScript = await File.ReadAllTextAsync(_configuration["script:createDb"]);
@@ -61,13 +60,11 @@ namespace database_communicator.Services
                 var formattedScript = FormattableStringFactory.Create(createDbScript.Replace("template", orgName));
                 await _handlerContext.Database.ExecuteSqlAsync(formattedScript);
                 await _handlerContext.SaveChangesAsync();
-                await trans.CommitAsync();
                 return true;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Create database error.");
-                await trans.RollbackAsync();
                 return false;
             }
         }
@@ -77,7 +74,6 @@ namespace database_communicator.Services
         /// <returns>True if success or false otherwise.</returns>
         public async Task<bool> SetupDatabase()
         {
-            using var trans = await _handlerContext.Database.BeginTransactionAsync();
             try
             {
                 string setupDbScript = await File.ReadAllTextAsync(_configuration["script:setupDb"]);
@@ -88,13 +84,11 @@ namespace database_communicator.Services
                 var formattedScript = FormattableStringFactory.Create(setupDbScript);
                 await _handlerContext.Database.ExecuteSqlAsync(formattedScript);
                 await _handlerContext.SaveChangesAsync();
-                await trans.CommitAsync();
                 return true;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Setup error.");
-                await trans.RollbackAsync();
                 return false;
             }
         }

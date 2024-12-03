@@ -6,7 +6,7 @@ import Image from "next/image";
 import CloseIcon from "../../../public/icons/close_black.png";
 
 /**
- * Modal element that show list of actions for user to choose. List contains: 
+ * Modal element that show list of actions for user to choose. List contains:
  * create, select all on page, select all, deselect.
  * @component
  * @param {object} props Component props

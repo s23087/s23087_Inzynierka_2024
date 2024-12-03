@@ -48,7 +48,7 @@ export default async function deleteRequest(requestId) {
         };
       }
     }
-    if (info.status === 500){
+    if (info.status === 500) {
       return {
         error: true,
         message: "Server error.",

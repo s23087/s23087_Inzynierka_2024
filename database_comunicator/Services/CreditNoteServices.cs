@@ -165,10 +165,8 @@ namespace database_communicator.Services
                 var invoiceCurrencyDate = await _handlerContext.Invoices.Where(e => e.InvoiceId == data.InvoiceId).Select(e => e.CurrencyValueDate).FirstAsync();
                 if (currencyName != "PLN")
                 {
-                    var currencyVal = await _handlerContext.Invoices
-                        .Where(e => e.InvoiceId == data.InvoiceId)
-                        .Select(e => e.Currency)
-                        .Where(e => e.CurrencyName == currencyName)
+                    var currencyVal = await _handlerContext.CurrencyValues
+                        .Where(e => e.CurrencyName == currencyName && e.UpdateDate.Equals(invoiceCurrencyDate))
                         .Select(e => e.CurrencyValue1).FirstAsync();
 
                     var creditItems = data.CreditNoteItems.Select(e => new CreditNoteItem
@@ -194,18 +192,16 @@ namespace database_communicator.Services
 
                     if (data.IsYourCreditNote)
                     {
-                        var secVal = await _handlerContext.Invoices
-                            .Where(e => e.InvoiceId == data.InvoiceId)
-                            .Select(e => e.Currency)
-                            .Where(e => e.CurrencyName != currencyName && e.CurrencyName != "PLN")
-                            .Select(e => e.CurrencyValue1).FirstAsync();
+                        var secVal = await _handlerContext.CurrencyValues
+                            .Where(e => e.CurrencyName != currencyName && e.CurrencyName != "PLN" && e.UpdateDate == invoiceCurrencyDate)
+                            .Select(e => new { e.CurrencyValue1, e.CurrencyName}).FirstAsync();
 
                         var secCalculatedItems = creditItems.Select(e => new CalculatedCreditNotePrice
                         {
-                            CurrencyName = currencyName,
+                            CurrencyName = secVal.CurrencyName,
                             UpdateDate = invoiceCurrencyDate,
                             CreditItemId = e.CreditItemId,
-                            Price = e.NewPrice / secVal
+                            Price = e.NewPrice / secVal.CurrencyValue1
                         }).ToList();
 
                         await _handlerContext.CalculatedCreditNotePrices.AddRangeAsync(secCalculatedItems);
@@ -523,7 +519,7 @@ namespace database_communicator.Services
         /// <param name="userId">Id of user that owns credit note.</param>
         /// <param name="invoiceId">Id of invoice that credit note will be applied.</param>
         /// <param name="itemId">Id of item that quantity will be deduced from.</param>
-        /// <param name="qty">Quantity that will be deduced.</param>
+        /// <param name="qty">Quantity that will be deduced. Must be negative.</param>
         /// <returns>True if can be deduced or false if can't</returns>
         public async Task<bool> CreditDeductionCanBeApplied(int userId, int invoiceId, int itemId, int qty)
         {
@@ -533,7 +529,7 @@ namespace database_communicator.Services
             var currentResult = await _handlerContext.ItemOwners
                 .Where(e => e.IdUser == userId && e.InvoiceId == invoiceId && e.OwnedItemId == itemId)
                 .Select(e => e.Qty).FirstAsync();
-            return currentResult - qty >= 0;
+            return (currentResult + qty) >= 0;
         }
         /// <summary>
         /// Checks if credit note with given invoice id and credit note number exist.

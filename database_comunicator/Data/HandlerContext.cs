@@ -103,12 +103,18 @@ public partial class HandlerContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        var dbName = _httpContextAccessor?.HttpContext?.Request.Path.ToString()
+        if (optionsBuilder.IsConfigured)
+        {
+            base.OnConfiguring(optionsBuilder);
+        } else
+        {
+            var dbName = _httpContextAccessor?.HttpContext?.Request.Path.ToString()
             .Split('/')[1];
-        dbName ??= "template";
-        var defPath = _configuration["ConnectionStrings:flexible"];
-        var connectionString = defPath?.Replace("db_name", dbName);
-        optionsBuilder.UseSqlServer(connectionString);
+            dbName ??= "template";
+            var defPath = _configuration["ConnectionStrings:flexible"];
+            var connectionString = defPath?.Replace("db_name", dbName);
+            optionsBuilder.UseSqlServer(connectionString);
+        }
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -268,7 +274,7 @@ public partial class HandlerContext : DbContext
             entity.HasOne(d => d.CurrencyValue).WithMany(p => p.CalculatedPrices)
                 .HasForeignKey(d => new { d.UpdateDate, d.CurrencyName })
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("Calculated_Price_Currency_Value_realtion");
+                .HasConstraintName("Calculated_Price_Currency_Value_relation");
         });
 
         modelBuilder.Entity<Country>(entity =>
@@ -357,7 +363,7 @@ public partial class HandlerContext : DbContext
             entity.Property(e => e.Curenncy)
                 .HasMaxLength(5)
                 .IsUnicode(false)
-                .HasColumnName("curenncy");
+                .HasColumnName("currency");
         });
 
         modelBuilder.Entity<CurrencyValue>(entity =>
@@ -656,7 +662,7 @@ public partial class HandlerContext : DbContext
             entity.Property(e => e.CurrencyName)
                 .HasMaxLength(5)
                 .IsUnicode(false)
-                .HasColumnName("curenncy_name");
+                .HasColumnName("currency_name");
             entity.Property(e => e.OfferName)
                 .HasMaxLength(100)
                 .IsUnicode(false)
@@ -900,7 +906,7 @@ public partial class HandlerContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.Proformas)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("Proforma_App_User_realtion");
+                .HasConstraintName("Proforma_App_User_relation");
 
             entity.HasOne(d => d.BuyerNavigation).WithMany(p => p.ProformaBuyerNavigations)
                 .HasForeignKey(d => d.Buyer)
@@ -1131,7 +1137,7 @@ public partial class HandlerContext : DbContext
             entity.Property(e => e.Referance)
                 .HasMaxLength(300)
                 .IsUnicode(false)
-                .HasColumnName("referance");
+                .HasColumnName("reference");
             entity.Property(e => e.UsersId).HasColumnName("users_id");
 
             entity.HasOne(d => d.ObjectType).WithMany(p => p.UserNotifications)

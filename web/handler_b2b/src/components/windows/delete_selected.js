@@ -15,7 +15,7 @@ import { useState } from "react";
  * @param {Function} props.deleteItemFunc Function to active, when confirming delete.
  * @param {string} props.instanceName Name of object that will be deleted.
  * @param {boolean} props.isError True if error occurred in delete action.
- * @param {string} props.errorMessage 
+ * @param {string} props.errorMessage
  * @return {JSX.Element} Modal element
  */
 function DeleteSelectedWindow({
@@ -28,7 +28,7 @@ function DeleteSelectedWindow({
 }) {
   /**
    * If action is activated true, otherwise should be false.
-  */
+   */
   const [isActivated, setIsActivated] = useState(false);
   return (
     <Modal

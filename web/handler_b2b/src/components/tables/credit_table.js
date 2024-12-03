@@ -31,9 +31,9 @@ function CreditNoteTable({ creditItems, currency }) {
         </tr>
       </thead>
       <tbody key={creditItems}>
-        {Object.values(creditItems).map((value) => {
+        {Object.values(creditItems).map((value, key) => {
           return (
-            <tr key={value}>
+            <tr key={key}>
               <td>
                 <p className="mb-0 break-spaces">
                   {value.partnumber + "\n" + value.itemName}

@@ -16,7 +16,7 @@ import ErrorMessage from "./error_message";
  * @param {Function} props.existFun Function that will check if value already exist in array.
  * @param {Function} props.validatorFunc Function that validates input when modifying.
  * @param {string} props.errorMessage Error message when input does not pass validation.
- * @return {JSX.Element} 
+ * @return {JSX.Element}
  */
 function SpecialInput({
   value,

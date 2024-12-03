@@ -49,7 +49,7 @@ function ModifyDeliveryOffcanvas({
   /**
    * Check if waybill exists in array of waybills
    * @param {string} variable waybill value
-  */
+   */
   const waybillExist = (variable) => {
     return waybills.findIndex((item) => item === variable) != -1;
   };
@@ -79,7 +79,7 @@ function ModifyDeliveryOffcanvas({
   const [isAddCompanyShow, setIsAddCompanyShow] = useState(false);
   /**
    * Check if Form can be submitted
-  */
+   */
   const isFormErrorActive = () => {
     return deliveryCompanies.length === 0 || companiesDownloadError;
   };

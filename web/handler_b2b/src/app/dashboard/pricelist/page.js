@@ -61,7 +61,9 @@ async function PricelistPage({ searchParams }) {
     ? await getSearchPricelists(searchParams.searchQuery, currentSort, params)
     : await getPricelists(currentSort, params);
   // Pagination, default 10
-  let maxInstanceOnPage = searchParams.pagination ? searchParams.pagination : 10;
+  let maxInstanceOnPage = searchParams.pagination
+    ? searchParams.pagination
+    : 10;
   let itemsLength = pricelists === null ? 0 : pricelists.length;
   let pageQty = Math.ceil(itemsLength / maxInstanceOnPage);
   pageQty = pageQty === 0 ? 1 : pageQty;

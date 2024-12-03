@@ -55,7 +55,7 @@ function PricelistContainer({
       fluid
     >
       <Row>
-        <Col xs="12" md="7" lg="5" xxl="3">
+        <Col xs="12" md="7" lg="5" xxl="4">
           <Row className="gy-2">
             <Col className="pe-1" xs="auto">
               <span className="spanStyle main-grey-bg d-flex rounded-span px-2">
@@ -88,7 +88,7 @@ function PricelistContainer({
             </Col>
           </Row>
         </Col>
-        <Col xs="12" md="5" lg="4" xxl="3" className="mt-2 mt-xl-0">
+        <Col xs="12" md="5" lg="4" xxl="2" className="mt-2 mt-xl-0">
           <Row className="gy-2 h-100 align-items-center">
             <Col xs="12">
               <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2">

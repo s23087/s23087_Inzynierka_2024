@@ -51,7 +51,9 @@ async function OutsideItemsPage({ searchParams }) {
     ? await getSearchOutsideItems(searchParams.searchQuery, currentSort, params)
     : await getOutsideItems(currentSort, params);
   // Pagination, default 10
-  let maxInstanceOnPage = searchParams.pagination ? searchParams.pagination : 10;
+  let maxInstanceOnPage = searchParams.pagination
+    ? searchParams.pagination
+    : 10;
   let pageQty = Math.ceil(outsideItems.length / maxInstanceOnPage);
   pageQty = pageQty === 0 ? 1 : pageQty;
   let currentPage = parseInt(searchParams.page)

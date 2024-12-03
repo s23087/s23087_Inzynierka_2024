@@ -139,7 +139,7 @@ async function InvoicesPage({ searchParams }) {
   let filterActivated = getFilterActivated();
   let orgActivated =
     searchParams.isOrg !== undefined ? searchParams.isOrg : false;
-    // Check if current role can access the page with org view enabled
+  // Check if current role can access the page with org view enabled
   let org_view = getOrgView(current_role, orgActivated === "true");
   let isSearchTrue = searchParams.searchQuery !== undefined;
   let docType = searchParams.docType ? searchParams.docType : "Yours invoices";
@@ -155,7 +155,9 @@ async function InvoicesPage({ searchParams }) {
     : await getDocuments(docType, org_view, null, currentSort, params);
   // Pagination, default 10
   let invoiceLength = invoices ? invoices.length : 0;
-  let maxInstanceOnPage = searchParams.pagination ? searchParams.pagination : 10;
+  let maxInstanceOnPage = searchParams.pagination
+    ? searchParams.pagination
+    : 10;
   let pageQty = Math.ceil(invoiceLength / maxInstanceOnPage);
   pageQty = pageQty === 0 ? 1 : pageQty;
   let currentPage = parseInt(searchParams.page)

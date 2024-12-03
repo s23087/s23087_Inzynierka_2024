@@ -96,7 +96,7 @@ function AddProductWindow({ modalShow, onHideFunction, addFunction }) {
               isInvalid={qtyError}
               placeholder="qty"
               onInput={(e) => {
-                InputValidator.onlyNumberValidator(e.target.value, setQtyError)
+                InputValidator.onlyNumberValidator(e.target.value, setQtyError);
               }}
             />
           </Form.Group>
@@ -113,7 +113,7 @@ function AddProductWindow({ modalShow, onHideFunction, addFunction }) {
               placeholder="price"
               isInvalid={priceError}
               onInput={(e) => {
-                InputValidator.decimalValidator(e.target.value, setPriceError)
+                InputValidator.decimalValidator(e.target.value, setPriceError);
               }}
             />
           </Form.Group>
@@ -121,15 +121,11 @@ function AddProductWindow({ modalShow, onHideFunction, addFunction }) {
             <Button
               variant="mainBlue"
               className="me-2 w-100"
-              disabled={
-                getIsFormErrorActive()
-              }
+              disabled={getIsFormErrorActive()}
               onClick={() => {
                 // Check for errors, then use add function
                 setShowSuccess(false);
-                if (
-                  getIsFormErrorActive()
-                ) {
+                if (getIsFormErrorActive()) {
                   return;
                 }
                 let product = document.getElementById("product").value;
@@ -186,7 +182,7 @@ function AddProductWindow({ modalShow, onHideFunction, addFunction }) {
 
   /**
    * True if any of conditions are fulfilled, otherwise false
-  */
+   */
   function getIsFormErrorActive() {
     return priceError || qtyError || downloadError || products.length === 0;
   }
