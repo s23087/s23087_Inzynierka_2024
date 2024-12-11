@@ -1,5 +1,4 @@
 ﻿using database_communicator.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
 using System.Globalization;
 using System.Linq.Expressions;
 
@@ -10,7 +9,7 @@ namespace database_communicator.FilterClass
     /// </summary>
     public class OfferFiltersTemplate
     {
-        public string? Status { get; set; } 
+        public string? Status { get; set; }
         public string? Currency { get; set; }
         public string? Type { get; set; }
         public int? TotalL { get; set; }

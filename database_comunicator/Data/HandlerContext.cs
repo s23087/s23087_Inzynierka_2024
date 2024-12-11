@@ -106,7 +106,8 @@ public partial class HandlerContext : DbContext
         if (optionsBuilder.IsConfigured)
         {
             base.OnConfiguring(optionsBuilder);
-        } else
+        }
+        else
         {
             var dbName = _httpContextAccessor?.HttpContext?.Request.Path.ToString()
             .Split('/')[1];

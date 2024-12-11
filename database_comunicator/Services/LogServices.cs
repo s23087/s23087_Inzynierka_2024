@@ -51,7 +51,8 @@ namespace database_communicator.Services
                 _handlerContext.Add<ActionLog>(newLog);
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogCritical(ex, "Action log was not created.");
                 await trans.RollbackAsync();

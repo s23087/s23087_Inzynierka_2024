@@ -9,7 +9,7 @@ namespace database_communicator.FilterClass
     /// </summary>
     public class ProformaFiltersTemplate
     {
-        public int? QtyL { get; set; } 
+        public int? QtyL { get; set; }
         public int? QtyG { get; set; }
         public int? TotalL { get; set; }
         public int? TotalG { get; set; }

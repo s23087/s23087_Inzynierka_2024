@@ -1,13 +1,11 @@
 ﻿using database_communicator.Data;
-using database_communicator.Models;
-using database_communicator.Utils;
 using database_communicator.FilterClass;
+using database_communicator.Models;
 using database_communicator.Models.DTOs.Create;
 using database_communicator.Models.DTOs.Get;
 using database_communicator.Models.DTOs.Modify;
+using database_communicator.Utils;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Linq.Expressions;
 
 namespace database_communicator.Services
 {
@@ -19,7 +17,7 @@ namespace database_communicator.Services
         public Task<IEnumerable<GetPaymentStatuses>> GetPaymentStatuses();
         public Task<int> AddPurchaseInvoice(AddPurchaseInvoice data);
         public Task<int> AddSalesInvoice(AddSalesInvoice data);
-        public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string? sort, InvoiceFiltersTemplate  filters);
+        public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string? sort, InvoiceFiltersTemplate filters);
         public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(string search, string? sort, InvoiceFiltersTemplate filters);
         public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string? sort, InvoiceFiltersTemplate filters);
         public Task<IEnumerable<GetInvoices>> GetPurchaseInvoices(int userId, string search, string? sort, InvoiceFiltersTemplate filters);
@@ -141,7 +139,7 @@ namespace database_communicator.Services
         public async Task<IEnumerable<GetPaymentStatuses>> GetPaymentStatuses()
         {
             return await _handlerContext.PaymentStatuses.Select(e => new GetPaymentStatuses
-            { 
+            {
                 PaymentStatusId = e.PaymentStatusId,
                 StatusName = e.StatusName,
             }).ToListAsync();
@@ -153,12 +151,12 @@ namespace database_communicator.Services
         /// <returns>Created invoice id or 0 when failure.</returns>
         public async Task<int> AddPurchaseInvoice(AddPurchaseInvoice data)
         {
-            var plnData = new DateTime(2024,9,3,0,0,0,DateTimeKind.Utc);
+            var plnData = new DateTime(2024, 9, 3, 0, 0, 0, DateTimeKind.Utc);
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
             try
             {
                 var currVal = new List<CurrencyValue>()
-                { 
+                {
                     new() {
                         CurrencyName = "USD",
                         UpdateDate = data.CurrencyValueDate,
@@ -178,7 +176,8 @@ namespace database_communicator.Services
                     if (check)
                     {
                         _handlerContext.CurrencyValues.Update(val);
-                    } else
+                    }
+                    else
                     {
                         _handlerContext.CurrencyValues.Add(val);
                     }
@@ -251,7 +250,9 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return invoiceId;
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 _logger.LogError(ex, "Create purchase invoice error.");
                 await trans.RollbackAsync();
                 return 0;
@@ -264,7 +265,7 @@ namespace database_communicator.Services
         /// <returns>Created invoice id or 0 when failure.</returns>
         public async Task<int> AddSalesInvoice(AddSalesInvoice data)
         {
-            var plnData = new DateTime(2024, 9, 3, 0,0,0,DateTimeKind.Utc);
+            var plnData = new DateTime(2024, 9, 3, 0, 0, 0, DateTimeKind.Utc);
             using var trans = await _handlerContext.Database.BeginTransactionAsync();
             try
             {
@@ -287,7 +288,8 @@ namespace database_communicator.Services
                 if (checkCurrency)
                 {
                     _handlerContext.CurrencyValues.Update(currVal);
-                } else
+                }
+                else
                 {
                     _handlerContext.CurrencyValues.Add(currVal);
                 }
@@ -325,7 +327,7 @@ namespace database_communicator.Services
 
                 foreach (var item in data.InvoiceItems)
                 {
-                    await _handlerContext.ItemOwners.Where(e => e.IdUser == data.UserId && e.InvoiceId == item.BuyInvoiceId && e.OwnedItemId == item.ItemId).ExecuteUpdateAsync(setters => 
+                    await _handlerContext.ItemOwners.Where(e => e.IdUser == data.UserId && e.InvoiceId == item.BuyInvoiceId && e.OwnedItemId == item.ItemId).ExecuteUpdateAsync(setters =>
                         setters.SetProperty(s => s.Qty, s => s.Qty - item.Qty)
                     );
                 }
@@ -642,7 +644,7 @@ namespace database_communicator.Services
                 .OrderByWithDirection(sortFunc, direction)
                 .Select(obj => new GetInvoices
                 {
-                    Users = obj.SellingPrices.Select(e => e.User).GroupBy(e => new {e.IdUser, e.Username, e.Surname}).Select(e => e.Key.Username + " " + e.Key.Surname).ToList(),
+                    Users = obj.SellingPrices.Select(e => e.User).GroupBy(e => new { e.IdUser, e.Username, e.Surname }).Select(e => e.Key.Username + " " + e.Key.Surname).ToList(),
                     InvoiceId = obj.InvoiceId,
                     InvoiceNumber = obj.InvoiceNumber,
                     ClientName = obj.BuyerNavigation.OrgName,
@@ -900,7 +902,8 @@ namespace database_communicator.Services
                             Qty = e.Qty,
                             Price = e.Price
                         }).Where(e => e.Qty > 0).ToListAsync();
-                } else
+                }
+                else
                 {
                     return await _handlerContext.OwnedItems
                         .Where(e => e.InvoiceId == invoiceId)
@@ -975,7 +978,10 @@ namespace database_communicator.Services
             {
                 var sellingPrices = await _handlerContext.SellingPrices.Where(e => e.SellInvoiceId == invoiceId).Select(e => new
                 {
-                    e.Qty, e.IdUser, e.PurchasePrice.InvoiceId, e.PurchasePrice.OwnedItemId
+                    e.Qty,
+                    e.IdUser,
+                    e.PurchasePrice.InvoiceId,
+                    e.PurchasePrice.OwnedItemId
 
                 }).ToListAsync();
                 foreach (var price in sellingPrices)
@@ -1081,7 +1087,8 @@ namespace database_communicator.Services
                     Qty = e.Qty,
                     Price = e.Price
                 }).ToListAsync();
-            } else
+            }
+            else
             {
                 itemsInfo = await _handlerContext.PurchasePrices
                 .Where(e => e.InvoiceId == invoiceId)
@@ -1211,7 +1218,8 @@ namespace database_communicator.Services
                         await _handlerContext.Invoices.Where(e => e.InvoiceId == data.InvoiceId).ExecuteUpdateAsync(setter =>
                         setter.SetProperty(s => s.Seller, data.ClientId)
                         );
-                    } else
+                    }
+                    else
                     {
                         await _handlerContext.Invoices.Where(e => e.InvoiceId == data.InvoiceId).ExecuteUpdateAsync(setter =>
                         setter.SetProperty(s => s.Buyer, data.ClientId)
@@ -1221,7 +1229,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Modify invoice error.");
                 await trans.RollbackAsync();
@@ -1247,7 +1256,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Modify invoice status error.");
                 await trans.RollbackAsync();

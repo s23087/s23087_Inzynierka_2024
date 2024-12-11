@@ -14,12 +14,12 @@ namespace database_communicator.FilterClass
         public string? DueL { get; set; }
         public string? DueG { get; set; }
         public int? QtyL { get; set; }
-        public int? QtyG { get; set; } 
-        public int? TotalL { get; set; } 
-        public int? TotalG { get; set; } 
+        public int? QtyG { get; set; }
+        public int? TotalL { get; set; }
+        public int? TotalG { get; set; }
         public int? Recipient { get; set; }
-        public string? Currency { get; set; } 
-        public int? PaymentStatus { get; set; } 
+        public string? Currency { get; set; }
+        public int? PaymentStatus { get; set; }
         public bool? Status { get; set; }
     }
     /// <summary>

@@ -1,6 +1,5 @@
 ﻿using database_communicator.Models;
 using database_communicator.Models.DTOs.Get;
-using System;
 using System.Linq.Expressions;
 
 namespace database_communicator.Utils
@@ -17,12 +16,13 @@ namespace database_communicator.Utils
         /// <returns>Function used in order by function.</returns>
         public static Func<GetManyItems, Object> GetItemSort(string? sort)
         {
-            Func <GetManyItems, Object > orderBy;
+            Func<GetManyItems, Object> orderBy;
             if (sort == null)
             {
                 orderBy = e => e.Qty!;
                 return orderBy;
-            } else
+            }
+            else
             {
                 var changedSort = sort[1..];
                 orderBy = changedSort switch

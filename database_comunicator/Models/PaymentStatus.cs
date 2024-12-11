@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace database_communicator.Models;
+﻿namespace database_communicator.Models;
 
 public partial class PaymentStatus
 {

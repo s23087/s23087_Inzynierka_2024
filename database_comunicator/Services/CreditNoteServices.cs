@@ -194,7 +194,7 @@ namespace database_communicator.Services
                     {
                         var secVal = await _handlerContext.CurrencyValues
                             .Where(e => e.CurrencyName != currencyName && e.CurrencyName != "PLN" && e.UpdateDate == invoiceCurrencyDate)
-                            .Select(e => new { e.CurrencyValue1, e.CurrencyName}).FirstAsync();
+                            .Select(e => new { e.CurrencyValue1, e.CurrencyName }).FirstAsync();
 
                         var secCalculatedItems = creditItems.Select(e => new CalculatedCreditNotePrice
                         {

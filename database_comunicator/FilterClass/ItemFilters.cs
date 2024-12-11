@@ -9,7 +9,7 @@ namespace database_communicator.FilterClass
     /// </summary>
     public class ItemFiltersTemplate
     {
-        public string? Status { get; set; } 
+        public string? Status { get; set; }
         public string? Ean { get; set; }
         public int? QtyL { get; set; }
         public int? QtyG { get; set; }

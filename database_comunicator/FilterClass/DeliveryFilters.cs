@@ -9,13 +9,13 @@ namespace database_communicator.FilterClass
     /// </summary>
     public class DeliveryFiltersTemplate
     {
-        public string? EstimatedL { get; set; } 
+        public string? EstimatedL { get; set; }
         public string? EstimatedG { get; set; }
         public string? DeliveredL { get; set; }
         public string? DeliveredG { get; set; }
         public int? Recipient { get; set; }
-        public int? Status { get; set; } 
-        public int? Company { get; set; } 
+        public int? Status { get; set; }
+        public int? Company { get; set; }
         public string? Waybill { get; set; }
     }
     public static class DeliveryFilters
