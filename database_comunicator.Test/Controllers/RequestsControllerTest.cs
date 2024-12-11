@@ -1,5 +1,4 @@
 ﻿using database_communicator.Controllers;
-using database_communicator.Models;
 using database_communicator.Models.DTOs.Create;
 using database_communicator.Models.DTOs.Get;
 using database_communicator.Models.DTOs.Modify;
@@ -7,7 +6,6 @@ using database_communicator.Services;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace database_communicator_Test.Controllers
 {

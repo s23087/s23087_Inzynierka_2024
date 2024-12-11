@@ -191,7 +191,8 @@ namespace database_communicator_Test.Services
         public async Task InvoiceServices_ModifyInvoice_ReturnTrue()
         {
             //Arrange
-            var data = new ModifyInvoice { 
+            var data = new ModifyInvoice
+            {
                 InvoiceId = 1,
                 IsYourInvoice = true,
                 Note = "test"

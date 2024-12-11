@@ -1,6 +1,6 @@
-﻿using database_communicator.Models;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Linq.Expressions;
+using database_communicator.Models;
 
 namespace database_communicator.FilterClass
 {

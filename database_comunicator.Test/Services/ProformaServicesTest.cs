@@ -45,7 +45,7 @@ namespace database_communicator_Test.Services
                 CurrencyName = "PLN",
                 CurrencyValue = 1,
                 UserId = 1,
-                ProformaItems = 
+                ProformaItems =
                 [
                     new(){
                         ItemId = 1,
@@ -143,8 +143,8 @@ namespace database_communicator_Test.Services
         public async Task ProformaServices_ModifyProforma_ReturnTrue()
         {
             //Arrange
-            var data = new ModifyProforma 
-            { 
+            var data = new ModifyProforma
+            {
                 IsYourProforma = true,
                 ProformaId = 2,
                 ProformaNumber = "Proforma yours B"

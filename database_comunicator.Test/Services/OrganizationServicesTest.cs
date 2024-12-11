@@ -75,7 +75,8 @@ namespace database_communicator_Test.Services
         public async Task OrganizationServices_ModifyOrg_ReturnTrue()
         {
             //Arrange
-            var data = new ModifyOrg { 
+            var data = new ModifyOrg
+            {
                 OrgId = 2,
                 CountryId = 44,
                 Nip = 56453
@@ -107,7 +108,7 @@ namespace database_communicator_Test.Services
             var data = new SetUserClientBindings
             {
                 OrgId = 2,
-                UsersId = [1,2,3]
+                UsersId = [1, 2, 3]
             };
 
             //Act
@@ -148,7 +149,7 @@ namespace database_communicator_Test.Services
         public async Task OrganizationServices_ManyUserExist_ReturnTrue()
         {
             //Arrange
-            List<int> users = [1,2,3];
+            List<int> users = [1, 2, 3];
 
             //Act
             var result = await _organizationServices.ManyUserExist(users);

@@ -53,11 +53,11 @@ namespace database_communicator_Test.Services
         public async Task OutsideItemServices_AddItems_ReturnEmptyArray()
         {
             //Arrange
-            var data = new CreateOutsideItems 
-            { 
+            var data = new CreateOutsideItems
+            {
                 OrgId = 3,
                 Currency = "PLN",
-                Items = 
+                Items =
                 [
                     new(){
                         Partnumber = "itemA",

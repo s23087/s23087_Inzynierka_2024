@@ -1,5 +1,4 @@
 ﻿using database_communicator.Controllers;
-using database_communicator.Models;
 using database_communicator.Models.DTOs.Create;
 using database_communicator.Models.DTOs.Get;
 using database_communicator.Models.DTOs.Modify;

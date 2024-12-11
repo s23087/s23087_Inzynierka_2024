@@ -5,7 +5,6 @@ using database_communicator.Services;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using System.Runtime.CompilerServices;
 
 namespace database_communicator_Test.Controllers
 {

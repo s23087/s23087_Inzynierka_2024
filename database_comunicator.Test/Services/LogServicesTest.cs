@@ -1,8 +1,6 @@
 ﻿using database_communicator.Data;
-using database_communicator.Models.DTOs.Create;
 using database_communicator.Services;
 using FakeItEasy;
-using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

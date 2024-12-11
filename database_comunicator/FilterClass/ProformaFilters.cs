@@ -1,6 +1,6 @@
-﻿using database_communicator.Models;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Linq.Expressions;
+using database_communicator.Models;
 
 namespace database_communicator.FilterClass
 {
@@ -9,7 +9,7 @@ namespace database_communicator.FilterClass
     /// </summary>
     public class ProformaFiltersTemplate
     {
-        public int? QtyL { get; set; } 
+        public int? QtyL { get; set; }
         public int? QtyG { get; set; }
         public int? TotalL { get; set; }
         public int? TotalG { get; set; }

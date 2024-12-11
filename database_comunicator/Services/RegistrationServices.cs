@@ -1,7 +1,7 @@
-﻿using database_communicator.Data;
+﻿using System.Runtime.CompilerServices;
+using database_communicator.Data;
 using database_communicator.Models.DTOs.Get;
 using Microsoft.EntityFrameworkCore;
-using System.Runtime.CompilerServices;
 
 namespace database_communicator.Services
 {

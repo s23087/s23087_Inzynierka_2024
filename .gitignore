@@ -13,8 +13,8 @@ db_setup/
 
 # pricelist
 
-**/*.csv
-**/*.xml
+**/pricelist/*
+!pricelist/[folder]
 
 ## C#
 

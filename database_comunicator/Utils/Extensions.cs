@@ -23,7 +23,7 @@ namespace database_communicator.Utils
                 bool descending
             )
         {
-            return descending ? source.OrderByDescending(orderBy) 
+            return descending ? source.OrderByDescending(orderBy)
                 : source.OrderBy(orderBy);
         }
         /// <summary>

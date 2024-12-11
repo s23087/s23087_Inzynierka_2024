@@ -1,6 +1,6 @@
-﻿using database_communicator.Models;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Linq.Expressions;
+using database_communicator.Models;
 
 namespace database_communicator.FilterClass
 {
@@ -56,9 +56,9 @@ namespace database_communicator.FilterClass
         {
             return qtyL == null ?
                 e => true
-                : 
-                e => (e.CreditNoteItems.Any(d => d.Qty > 0) 
-                ? e.CreditNoteItems.Where(d => d.Qty > 0).Select(d => d.Qty).Sum() 
+                :
+                e => (e.CreditNoteItems.Any(d => d.Qty > 0)
+                ? e.CreditNoteItems.Where(d => d.Qty > 0).Select(d => d.Qty).Sum()
                 : e.CreditNoteItems.Sum(d => d.Qty)) <= qtyL;
         }
         /// <summary>
@@ -70,8 +70,8 @@ namespace database_communicator.FilterClass
         {
             return qtyG == null ?
                 e => true
-                : e => (e.CreditNoteItems.Any(d => d.Qty > 0) 
-                ? e.CreditNoteItems.Where(d => d.Qty > 0).Select(d => d.Qty).Sum() 
+                : e => (e.CreditNoteItems.Any(d => d.Qty > 0)
+                ? e.CreditNoteItems.Where(d => d.Qty > 0).Select(d => d.Qty).Sum()
                 : e.CreditNoteItems.Sum(d => d.Qty)) >= qtyG;
         }
         /// <summary>

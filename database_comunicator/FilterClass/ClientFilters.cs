@@ -1,5 +1,5 @@
-﻿using database_communicator.Models;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
+using database_communicator.Models;
 
 namespace database_communicator.FilterClass
 {

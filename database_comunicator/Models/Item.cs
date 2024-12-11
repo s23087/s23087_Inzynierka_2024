@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using database_communicator.Models;
-
-namespace database_communicator.Models;
+﻿namespace database_communicator.Models;
 
 public partial class Item
 {

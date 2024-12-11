@@ -1,6 +1,6 @@
-﻿using database_communicator.Models;
+﻿using System.Linq.Expressions;
+using database_communicator.Models;
 using database_communicator.Models.DTOs.Get;
-using System.Linq.Expressions;
 
 namespace database_communicator.FilterClass
 {
@@ -9,7 +9,7 @@ namespace database_communicator.FilterClass
     /// </summary>
     public class ItemFiltersTemplate
     {
-        public string? Status { get; set; } 
+        public string? Status { get; set; }
         public string? Ean { get; set; }
         public int? QtyL { get; set; }
         public int? QtyG { get; set; }

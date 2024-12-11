@@ -1,5 +1,4 @@
-﻿using Castle.Components.DictionaryAdapter.Xml;
-using database_communicator.Controllers;
+﻿using database_communicator.Controllers;
 using database_communicator.FilterClass;
 using database_communicator.Models.DTOs.Create;
 using database_communicator.Models.DTOs.Get;

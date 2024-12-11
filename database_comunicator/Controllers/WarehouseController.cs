@@ -3,7 +3,6 @@ using database_communicator.Models.DTOs.Create;
 using database_communicator.Models.DTOs.Get;
 using database_communicator.Models.DTOs.Modify;
 using database_communicator.Services;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace database_communicator.Controllers

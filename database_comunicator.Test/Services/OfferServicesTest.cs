@@ -4,7 +4,6 @@ using database_communicator.Models.DTOs.Modify;
 using database_communicator.Services;
 using FakeItEasy;
 using FluentAssertions;
-using LINQtoCSV;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -95,7 +94,7 @@ namespace database_communicator_Test.Services
             {
                 UserId = 1,
                 OfferName = "Test",
-                Path = "test",
+                Path = "src/app/api/pricelist/testEnv/test.xslx",
                 OfferStatusId = 1,
                 MaxQty = 10,
                 Currency = "PLN",

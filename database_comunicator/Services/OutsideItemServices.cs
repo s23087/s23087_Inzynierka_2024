@@ -1,11 +1,10 @@
 ﻿using database_communicator.Data;
-using database_communicator.Models;
-using database_communicator.Utils;
 using database_communicator.FilterClass;
+using database_communicator.Models;
 using database_communicator.Models.DTOs.Create;
 using database_communicator.Models.DTOs.Get;
+using database_communicator.Utils;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace database_communicator.Services
 {
@@ -156,7 +155,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Delete outside item error.");
                 await trans.RollbackAsync();
@@ -209,7 +209,8 @@ namespace database_communicator.Services
                             Qty = item.Qty,
                             CurrencyName = data.Currency,
                         });
-                    } else
+                    }
+                    else
                     {
                         var itemId = await _handlerContext.Items.Where(e => e.PartNumber == item.Partnumber).Select(e => e.ItemId).FirstAsync();
                         var outsideItemExist = await _handlerContext.OutsideItems.AnyAsync(x => x.ItemId == itemId && x.OrganizationId == data.OrgId);
@@ -222,7 +223,8 @@ namespace database_communicator.Services
                                     .SetProperty(s => s.PurchasePrice, item.Price)
                                     .SetProperty(s => s.CurrencyName, data.Currency)
                                 );
-                        } else
+                        }
+                        else
                         {
                             await _handlerContext.OutsideItems.AddAsync(new OutsideItem
                             {
@@ -238,7 +240,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return errorItems;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Create outside item error.");
                 await trans.RollbackAsync();

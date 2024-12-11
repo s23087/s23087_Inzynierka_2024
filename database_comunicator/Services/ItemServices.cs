@@ -1,14 +1,12 @@
 ﻿using database_communicator.Data;
-using database_communicator.Models;
-using database_communicator.Utils;
 using database_communicator.FilterClass;
+using database_communicator.Models;
 using database_communicator.Models.DTOs.Create;
 using database_communicator.Models.DTOs.Get;
 using database_communicator.Models.DTOs.Modify;
+using database_communicator.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Linq;
-using System.Linq.Expressions;
 
 namespace database_communicator.Services
 {
@@ -74,7 +72,8 @@ namespace database_communicator.Services
 
                 await trans.CommitAsync();
                 return item.ItemId;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Add item error.");
                 await trans.RollbackAsync();
@@ -191,7 +190,8 @@ namespace database_communicator.Services
                         Price = instance.OwnedItem.PurchasePrices.Select(e => e.Price).Average(),
                         Currency = "PLN"
                     }).ToListAsync();
-            } else
+            }
+            else
             {
                 result = await _handlerContext.ItemOwners
                     .Where(e => e.OwnedItemId == id && e.Qty > 0)
@@ -247,7 +247,8 @@ namespace database_communicator.Services
             if (orderBy == null)
             {
                 direction = true;
-            } else
+            }
+            else
             {
                 direction = orderBy.StartsWith('D');
             }
@@ -282,8 +283,8 @@ namespace database_communicator.Services
                     + instance.OwnedItems.SelectMany(e => e.PurchasePrices).SelectMany(e => e.CreditNoteItems).Select(d => d.Qty).Sum(),
                     PurchasePrice = instance.OwnedItems
                         .SelectMany(e => e.PurchasePrices)
-                        .Where(e => 
-                        e.Qty 
+                        .Where(e =>
+                        e.Qty
                         - e.SellingPrices.Select(d => d.Qty).Sum()
                         + e.CreditNoteItems.Select(d => d.Qty).Sum()
                         > 0
@@ -305,7 +306,8 @@ namespace database_communicator.Services
                 .Where(priceLCondition)
                 .ToListAsync();
                 return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
-            } else
+            }
+            else
             {
                 items = await _handlerContext.Items
                 .Where(eanCond)
@@ -481,8 +483,9 @@ namespace database_communicator.Services
                     .Where(priceGCondition)
                     .Where(priceLCondition)
                     .ToListAsync();
-                    return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
-            } else
+                return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
+            }
+            else
             {
                 items = await _handlerContext.Items
                     .Where(eanCond)
@@ -570,7 +573,7 @@ namespace database_communicator.Services
                     .Where(priceGCondition)
                     .Where(priceLCondition)
                     .ToListAsync();
-                    return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
+                return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
             }
         }
         /// <summary>
@@ -642,8 +645,9 @@ namespace database_communicator.Services
                     .Where(priceGCondition)
                     .Where(priceLCondition)
                     .ToListAsync();
-                    return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
-            } else
+                return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
+            }
+            else
             {
                 items = await _handlerContext.Items
                     .Where(eanCond)
@@ -687,7 +691,7 @@ namespace database_communicator.Services
                     .Where(priceGCondition)
                     .Where(priceLCondition)
                     .ToListAsync();
-                    return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
+                return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
             }
         }
         /// <summary>
@@ -765,8 +769,9 @@ namespace database_communicator.Services
                     .Where(priceGCondition)
                     .Where(priceLCondition)
                     .ToListAsync();
-                    return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
-            } else
+                return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
+            }
+            else
             {
                 items = await _handlerContext.Items
                     .Where(eanCond)
@@ -812,7 +817,7 @@ namespace database_communicator.Services
                     .Where(priceGCondition)
                     .Where(priceLCondition)
                     .ToListAsync();
-                    return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
+                return items.Where(statusCond).OrderByWithDirection(orderByFunc, direction);
             }
         }
         /// <summary>
@@ -856,7 +861,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Delete item error.");
                 await trans.RollbackAsync();
@@ -907,7 +913,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Modify item error.");
                 await trans.RollbackAsync();
@@ -939,7 +946,8 @@ namespace database_communicator.Services
                     InvoiceId = res.OwnedItem.InvoiceId
                 }).ToListAsync();
 
-            } else
+            }
+            else
             {
                 binding = await _handlerContext.ItemOwners
                     .Where(e => e.OwnedItemId == id)
@@ -1000,9 +1008,9 @@ namespace database_communicator.Services
                             InvoiceNumber = e.OwnedItem.Invoice.InvoiceNumber,
                             Partnumber = e.OwnedItem.OriginalItem.PartNumber,
                             Name = e.OwnedItem.OriginalItem.ItemName,
-                            Qty = e.Qty 
-                                - e.SellingPrices.Select(d => d.Qty).Sum() 
-                                + e.CreditNoteItems.Select(d => d.Qty).Sum() 
+                            Qty = e.Qty
+                                - e.SellingPrices.Select(d => d.Qty).Sum()
+                                + e.CreditNoteItems.Select(d => d.Qty).Sum()
                                 - e.OwnedItem.ItemOwners.Where(d => d.InvoiceId == e.InvoiceId && d.OwnedItemId == e.OwnedItemId && d.IdUser != userId).Select(d => d.Qty).Sum(),
                             Price = e.Price
                         }).Union(
@@ -1066,7 +1074,7 @@ namespace database_communicator.Services
         public async Task<IEnumerable<GetUsers>> GetItemOwners(int itemId)
         {
             return await _handlerContext.AppUsers
-                .Where(e => 
+                .Where(e =>
                     e.ItemOwners.Any(d => d.OwnedItemId == itemId && d.Qty > 0)
                     ||
                     e.Clients.SelectMany(d => d.OutsideItems).Any(d => d.ItemId == itemId)
@@ -1108,10 +1116,11 @@ namespace database_communicator.Services
                     {
                         await _handlerContext.ItemOwners
                             .Where(x => x.InvoiceId == group.InvoiceId && x.OwnedItemId == group.ItemId && x.IdUser == group.UserId)
-                            .ExecuteUpdateAsync(setters => 
+                            .ExecuteUpdateAsync(setters =>
                                 setters.SetProperty(s => s.Qty, s => s.Qty + group.toAdd)
                             );
-                    } else
+                    }
+                    else
                     {
                         await _handlerContext.AddAsync<ItemOwner>(new ItemOwner
                         {
@@ -1125,7 +1134,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Change item bindings error.");
                 await trans.RollbackAsync();

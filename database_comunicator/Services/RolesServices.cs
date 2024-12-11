@@ -1,9 +1,9 @@
-﻿using database_communicator.Data;
+﻿using System.Linq.Expressions;
+using database_communicator.Data;
 using database_communicator.Models;
 using database_communicator.Models.DTOs.Get;
 using database_communicator.Utils;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 
 namespace database_communicator.Services
 {

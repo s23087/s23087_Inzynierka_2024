@@ -5,7 +5,6 @@ using database_communicator.Services;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
 
 namespace database_communicator_Test.Controllers
 {
@@ -30,7 +29,7 @@ namespace database_communicator_Test.Controllers
             var controller = new RolesController(_rolesServices, _userServices);
 
             //Act
-            var result = await controller.GetUserWithRoles(userId, null,null, null);
+            var result = await controller.GetUserWithRoles(userId, null, null, null);
 
             //Assert
             result.Should().NotBeNull();

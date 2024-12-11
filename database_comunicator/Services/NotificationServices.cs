@@ -9,7 +9,7 @@ namespace database_communicator.Services
     public interface INotificationServices
     {
         public Task<int> CreateNotification(CreateNotification data);
-        public Task<bool> SetIsRead(int notifId,bool isRead);
+        public Task<bool> SetIsRead(int notifId, bool isRead);
         public Task<IEnumerable<GetNotifications>> GetNotifications(int userId);
         public Task<bool> NotificationExists(int notifId);
     }
@@ -53,7 +53,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return newNotif.NotificationId;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogCritical(ex, "Notification was not created");
                 await trans.RollbackAsync();
@@ -79,7 +80,8 @@ namespace database_communicator.Services
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Change notification status error.");
                 await trans.RollbackAsync();
