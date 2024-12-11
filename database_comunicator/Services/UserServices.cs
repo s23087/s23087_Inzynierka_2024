@@ -144,8 +144,8 @@ namespace database_communicator.Services
         /// <returns>True if is organization type, otherwise false.</returns>
         public async Task<bool> IsOrgUser(string email)
         {
-            var result = await _handlerContext.AppUsers.Where(e => e.Email == email).Select(e => e.OrgUserId).FirstOrDefaultAsync();
-            return result != 0;
+            var result = await _handlerContext.AppUsers.AnyAsync(e => e.Email == email && e.OrgUserId != null);
+            return result;
         }
         /// <summary>
         /// Checks if user with given id is organization type user.

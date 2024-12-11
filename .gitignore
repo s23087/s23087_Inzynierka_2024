@@ -8,8 +8,13 @@ database_comunicator/nlog.config
 ## Database dir
 database/
 
-# For the sake of Sonar for now
+# For the sake of Sonar
 db_setup/
+
+# pricelist
+
+**/*.csv
+**/*.xml
 
 ## C#
 
