@@ -18,6 +18,9 @@ db_setup/
 
 ## C#
 
+**/.futdcache.v2
+**/.dtbcache.v2
+**/.suo
 **/.classpath
 **/.dockerignore
 **/.env

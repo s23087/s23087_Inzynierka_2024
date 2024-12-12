@@ -184,6 +184,7 @@ public partial class HandlerContext : DbContext
 
             entity.HasOne(d => d.SoloUser).WithMany(p => p.AppUsers)
                 .HasForeignKey(d => d.SoloUserId)
+                .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("User_Solo_User_relation");
 
             entity.HasMany(d => d.Clients).WithMany(p => p.AppUsers)

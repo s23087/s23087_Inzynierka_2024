@@ -79,17 +79,14 @@ namespace database_communicator.Controllers
         /// <summary>
         /// Switch user from solo user to org user.
         /// </summary>
-        /// <param name="userId">Id of user.</param>
-        /// <returns>200 code when success, 400 when failure or 404 when not found.</returns>
+        /// <returns>200 code when success or 400 when failure.</returns>
         [HttpPost]
         [Route("switch")]
-        public async Task<IActionResult> SwitchToOrg(int userId)
+        public async Task<IActionResult> SwitchToOrg()
         {
-            var exist = await _userServices.UserExist(userId);
-            if (!exist) return NotFound();
-            var orgId = await _userServices.GetOrgId(userId, true);
+            var orgId = await _userServices.GetOrgId(1, false);
             var roleId = await _rolesServices.GetRoleId("Admin");
-            var result = await _userServices.SwitchToOrg(userId, roleId, orgId);
+            var result = await _userServices.SwitchToOrg(1, roleId, orgId);
             return result ? Ok() : BadRequest();
         }
         /// <summary>

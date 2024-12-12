@@ -164,7 +164,7 @@ namespace database_communicator.Services
         /// <returns>True if exist or false if not.</returns>
         public async Task<bool> UserExist(string email)
         {
-            return await _handlerContext.AppUsers.Where(e => e.Email == email).AnyAsync();
+            return await _handlerContext.AppUsers.AnyAsync(e => e.Email == email);
         }
         /// <summary>
         /// Checks if user with given id exist.
@@ -173,7 +173,7 @@ namespace database_communicator.Services
         /// <returns>True if exist or false if not.</returns>
         public async Task<bool> UserExist(int userId)
         {
-            return await _handlerContext.AppUsers.Where(e => e.IdUser == userId).AnyAsync();
+            return await _handlerContext.AppUsers.AnyAsync(e => e.IdUser == userId);
         }
         /// <summary>
         /// Verify if user password is correct.
@@ -303,19 +303,21 @@ namespace database_communicator.Services
             {
                 var soloUserId = await _handlerContext.AppUsers.Where(e => e.IdUser == userId).Select(e => e.SoloUserId).FirstOrDefaultAsync();
                 if (soloUserId == null) return false;
-                var changedUser = new AppUser
+                await _handlerContext.Database.ExecuteSqlAsync($"update App_User set solo_user_id = null where id_user = {userId};");
+                await _handlerContext.SaveChangesAsync();
+                var deletedRows = await _handlerContext.SoloUsers.ExecuteDeleteAsync();
+                await _handlerContext.SaveChangesAsync();
+                if (deletedRows == 0) return false;
+                var newOrgUser = new OrgUser
                 {
-                    IdUser = userId,
-                    SoloUserId = null,
-                    OrgUser = new OrgUser
-                    {
-                        RoleId = roleId,
-                        OrganizationsId = orgId
-                    }
+                    RoleId = roleId,
+                    OrganizationsId = orgId
                 };
+                await _handlerContext.OrgUsers.AddAsync(newOrgUser);
+                await _handlerContext.SaveChangesAsync();
 
-                _handlerContext.Update<AppUser>(changedUser);
-                _handlerContext.SoloUsers.Remove(new SoloUser { SoloUserId = (int)soloUserId, OrganizationsId = orgId });
+                await _handlerContext.AppUsers.Where(e => e.IdUser == userId)
+                    .ExecuteUpdateAsync(setter => setter.SetProperty(s => s.OrgUserId, newOrgUser.OrgUserId));
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
                 return true;
@@ -369,9 +371,9 @@ namespace database_communicator.Services
         {
             if (isOrg)
             {
-                return await _handlerContext.AppUsers.Where(e => e.IdUser == userId).Include(e => e.OrgUser).Select(e => e.OrgUser!.OrganizationsId).FirstOrDefaultAsync();
+                return await _handlerContext.AppUsers.Where(e => e.IdUser == userId).Select(e => e.OrgUser!.OrganizationsId).FirstOrDefaultAsync();
             }
-            return await _handlerContext.AppUsers.Where(e => e.IdUser == userId).Include(e => e.SoloUser).Select(e => e.SoloUser!.OrganizationsId).FirstOrDefaultAsync();
+            return await _handlerContext.AppUsers.Where(e => e.IdUser == userId).Select(e => e.SoloUser!.OrganizationsId).FirstOrDefaultAsync();
         }
         /// <summary>
         /// Using transactions change user role to given value.

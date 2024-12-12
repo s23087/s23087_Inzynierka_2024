@@ -19,6 +19,9 @@ function SettingMenu({ role }) {
   const linkStyle = {
     minHeight: "45px",
   };
+  const hrefStyle = {
+    maxWidth: "395px",
+  };
   const buttonStyle = {
     height: "55px",
     width: "254px",
@@ -78,7 +81,7 @@ function SettingMenu({ role }) {
         <>
           {Object.entries(adminLinksMap).map(([key, value]) => {
             return (
-              <Link href={value} key={key}>
+              <Link href={value} key={key} style={hrefStyle}>
                 <p className="blue-main-text ps-1" style={linkStyle}>
                   {key}
                 </p>
@@ -106,7 +109,7 @@ function SettingMenu({ role }) {
         <>
           {Object.entries(accountantLinksMap).map(([key, value]) => {
             return (
-              <Link href={value} key={key}>
+              <Link href={value} key={key} style={hrefStyle}>
                 <p className="blue-main-text ps-1" style={linkStyle}>
                   {key}
                 </p>
@@ -120,7 +123,7 @@ function SettingMenu({ role }) {
         <>
           {Object.entries(merchantLinksMap).map(([key, value]) => {
             return (
-              <Link href={value} key={key}>
+              <Link href={value} key={key} style={hrefStyle}>
                 <p className="blue-main-text ps-1" style={linkStyle}>
                   {key}
                 </p>
@@ -134,7 +137,7 @@ function SettingMenu({ role }) {
         <>
           {Object.entries(warehouseManagerLinksMap).map(([key, value]) => {
             return (
-              <Link href={value} key={key}>
+              <Link href={value} key={key} style={hrefStyle}>
                 <p className="blue-main-text ps-1" style={linkStyle}>
                   {key}
                 </p>
@@ -148,7 +151,7 @@ function SettingMenu({ role }) {
         <>
           {Object.entries(soloLinksMap).map(([key, value]) => {
             return (
-              <Link href={value} key={key}>
+              <Link href={value} key={key} style={hrefStyle}>
                 <p className="blue-main-text ps-1" style={linkStyle}>
                   {key}
                 </p>
