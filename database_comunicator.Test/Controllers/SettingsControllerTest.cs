@@ -302,17 +302,15 @@ namespace database_communicator_Test.Controllers
         public async Task SettingsController_SwitchToOrg_ReturnOk()
         {
             //Arrange
-            int userId = 1;
             int orgId = 1;
             int roleId = 1;
-            A.CallTo(() => _userServices.UserExist(userId)).Returns(true);
-            A.CallTo(() => _userServices.GetOrgId(userId, true)).Returns(orgId);
+            A.CallTo(() => _userServices.GetOrgId(A<int>.Ignored, false)).Returns(orgId);
             A.CallTo(() => _rolesServices.GetRoleId("Admin")).Returns(roleId);
-            A.CallTo(() => _userServices.SwitchToOrg(userId, roleId, orgId)).Returns(true);
+            A.CallTo(() => _userServices.SwitchToOrg(A<int>.Ignored, roleId, orgId)).Returns(true);
             var controller = new SettingsController(_logServices, _organizationServices, _userServices, _rolesServices);
 
             //Act
-            var result = await controller.SwitchToOrg(userId);
+            var result = await controller.SwitchToOrg();
 
             //Assert
             result.Should().NotBeNull();
@@ -322,41 +320,19 @@ namespace database_communicator_Test.Controllers
         public async Task SettingsController_SwitchToOrg_SwitchFails_Return400()
         {
             //Arrange
-            int userId = 1;
             int orgId = 1;
-            int roleId = 1;
-            A.CallTo(() => _userServices.UserExist(userId)).Returns(true);
-            A.CallTo(() => _userServices.GetOrgId(userId, true)).Returns(orgId);
+            int roleId = 1;;
+            A.CallTo(() => _userServices.GetOrgId(A<int>.Ignored, false)).Returns(orgId);
             A.CallTo(() => _rolesServices.GetRoleId("Admin")).Returns(roleId);
-            A.CallTo(() => _userServices.SwitchToOrg(userId, roleId, orgId)).Returns(false);
+            A.CallTo(() => _userServices.SwitchToOrg(A<int>.Ignored, roleId, orgId)).Returns(false);
             var controller = new SettingsController(_logServices, _organizationServices, _userServices, _rolesServices);
 
             //Act
-            var result = await controller.SwitchToOrg(userId);
+            var result = await controller.SwitchToOrg();
 
             //Assert
             result.Should().NotBeNull();
             result.Should().BeOfType<BadRequestResult>();
-        }
-        [Fact]
-        public async Task SettingsController_SwitchToOrg_UserNotFound_Return404()
-        {
-            //Arrange
-            int userId = 1;
-            int orgId = 1;
-            int roleId = 1;
-            A.CallTo(() => _userServices.UserExist(userId)).Returns(false);
-            A.CallTo(() => _userServices.GetOrgId(userId, true)).Returns(orgId);
-            A.CallTo(() => _rolesServices.GetRoleId("Admin")).Returns(roleId);
-            A.CallTo(() => _userServices.SwitchToOrg(userId, roleId, orgId)).Returns(true);
-            var controller = new SettingsController(_logServices, _organizationServices, _userServices, _rolesServices);
-
-            //Act
-            var result = await controller.SwitchToOrg(userId);
-
-            //Assert
-            result.Should().NotBeNull();
-            result.Should().BeOfType<NotFoundResult>();
         }
         [Fact]
         public async Task SettingsController_GetLogs_ReturnOk()
