@@ -7,7 +7,7 @@ import getRole from "@/utils/auth/get_role";
 export default async function SettingsPage() {
   const current_role = await getRole();
   return (
-    <Stack className="px-3 mx-2 mx-xl-4 pt-4">
+    <Stack className="px-3 mx-2 mx-xl-4 pt-4 pb-5">
       <SettingMenu role={current_role} />
     </Stack>
   );

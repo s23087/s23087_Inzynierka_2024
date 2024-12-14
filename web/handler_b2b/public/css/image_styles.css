@@ -1,0 +1,36 @@
+.userIconStyle {
+    width: 28px;
+    height: 28px;
+    background: no-repeat url("/icons/user_small_icon.png");
+    background-size: contain;
+}
+
+.logoIconStyle {
+    width: 49px;
+    height: 71px;
+    background: no-repeat url("/big_logo.png");
+    background-size: contain;
+}
+
+.menuIconStyle {
+    width: 45px;
+    height: 45px;
+    background: no-repeat url("/icons/sidebar_icon.png");
+    background-size: contain;
+}
+
+.noOrgSwitchIconStyle {
+    display: block;
+    width: 100px;
+    height: 45px;
+    background: no-repeat url("/switches/org_switch_solo.png");
+    background-size: contain;
+}
+
+.orgSwitchIconStyle {
+    display: block;
+    width: 100px;
+    height: 45px;
+    background: no-repeat url("/switches/org_switch_org.png");
+    background-size: contain;
+}

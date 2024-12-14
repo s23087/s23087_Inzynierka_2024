@@ -57,7 +57,7 @@ function ModifyUserOrgForm({ orgInfo, countries }) {
     height: "55px",
   };
   return (
-    <Container className="px-4 pt-4" fluid>
+    <Container className="px-4 pt-4 pb-5" fluid>
       <Form className="mx-1 mx-xl-4" id="UserOrgModify" action={formAction}>
         <Form.Group className="mb-3">
           <Form.Label className="blue-main-text h5">

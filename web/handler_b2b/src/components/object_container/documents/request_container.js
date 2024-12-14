@@ -1,8 +1,6 @@
 import PropTypes from "prop-types";
-import Image from "next/image";
 import { Container, Row, Col } from "react-bootstrap";
 import ContainerButtons from "@/components/smaller_components/container_buttons";
-import user_small_icon from "../../../../public/icons/user_small_icon.png";
 
 /**
  * Create element that represent request object. If org view is true then button will switch up to show reject and complete options.
@@ -59,11 +57,7 @@ function RequestContainer({
           {is_org ? (
             <Row className="mb-2">
               <Col className="d-flex">
-                <Image
-                  src={user_small_icon}
-                  alt="user small icon"
-                  className="me-2 mt-1"
-                />
+                <span className="me-2 mt-1 userIconStyle" title="user icon"/>
                 <span className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1">
                   <p className="mb-0">{request.username}</p>
                 </span>

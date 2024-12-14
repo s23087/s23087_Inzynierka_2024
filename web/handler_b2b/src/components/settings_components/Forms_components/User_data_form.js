@@ -146,7 +146,7 @@ function ModifyUserForm({ email, name, surname }) {
           </Button>
         </Stack>
       </Form>
-      <Stack className="px-1 px-xl-4">
+      <Stack className="px-1 px-xl-4 pb-5">
         <Button
           className="mt-3 mx-auto ms-sm-0"
           variant="secBlue"

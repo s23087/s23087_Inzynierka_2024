@@ -30,7 +30,7 @@ export default function ChangePasswordPage() {
     maxWidth: "519px",
   };
   return (
-    <Container className="px-4 pt-4" fluid>
+    <Container className="px-4 pt-4 pb-5" fluid>
       <Form className="mx-1 mx-xl-3" id="changePassForm" action={formAction}>
         <Form.Group className="mb-3" style={maxInputWidth}>
           <Form.Label className="blue-main-text">Old Password:</Form.Label>

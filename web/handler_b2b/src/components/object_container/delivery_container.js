@@ -1,8 +1,6 @@
 import PropTypes from "prop-types";
-import Image from "next/image";
 import { Container, Row, Col } from "react-bootstrap";
 import ContainerButtons from "../smaller_components/container_buttons";
-import user_small_icon from "../../../public/icons/user_small_icon.png";
 import getDeliveryStatusColor from "@/utils/deliveries/get_delivery_status_color";
 
 /**
@@ -45,11 +43,7 @@ function DeliveryContainer({
           {is_org ? (
             <Row className="mb-2">
               <Col className="d-flex">
-                <Image
-                  src={user_small_icon}
-                  alt="user small icon"
-                  className="me-2 mt-1"
-                />
+              <span className="me-2 mt-1 userIconStyle" title="user icon"/>
                 <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1">
                   <p className="mb-0">{delivery.user}</p>
                 </span>

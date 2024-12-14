@@ -32,11 +32,7 @@ function OrgSwitcher({ is_org }) {
         router.push(`${pathName}?${accessParams}`);
       }}
     >
-      <Image
-        src={is_org === true ? org_switch : solo_switch}
-        alt={is_org === true ? "Org switch" : "Solo switch"}
-        priority={true}
-      />
+      <span className={is_org === true ? "orgSwitchIconStyle" : "noOrgSwitchIconStyle"} title="view switch"/>
     </Button>
   );
 }

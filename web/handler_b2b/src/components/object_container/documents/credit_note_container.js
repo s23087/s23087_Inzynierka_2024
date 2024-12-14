@@ -1,8 +1,6 @@
 import PropTypes from "prop-types";
-import Image from "next/image";
 import { Container, Row, Col } from "react-bootstrap";
 import ContainerButtons from "@/components/smaller_components/container_buttons";
-import user_small_icon from "../../../../public/icons/user_small_icon.png";
 import getDocumentStatusStyle from "@/utils/documents/get_document_status_color";
 
 /**
@@ -46,11 +44,7 @@ function CreditNoteContainer({
           {is_org ? (
             <Row className="mb-2">
               <Col className="d-flex">
-                <Image
-                  src={user_small_icon}
-                  alt="user small icon"
-                  className="me-2 mt-1"
-                />
+                <span className="me-2 mt-1 userIconStyle" title="user icon"/>
                 <span className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1 text-truncate d-block">
                   <p className="mb-0">{credit_note.user}</p>
                 </span>

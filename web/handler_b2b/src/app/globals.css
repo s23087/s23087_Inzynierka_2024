@@ -9,6 +9,7 @@
 @import "../../public/css/custom_border.css";
 @import "../../public/css/container_styles.css";
 @import "../../public/css/custom_tables.css";
+@import "../../public/css/image_styles.css";
 
 :root {
   --foreground-rgb: 0, 0, 0;

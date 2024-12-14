@@ -55,7 +55,7 @@ export default function AddUserPage() {
     maxWidth: "519px",
   };
   return (
-    <Container className="px-4 pt-4" fluid>
+    <Container className="px-4 pt-4 pb-5" fluid>
       <Form className="mx-1 mx-xl-4" id="addUserForm" action={formAction}>
         <ErrorMessage
           message="Could not download role list."

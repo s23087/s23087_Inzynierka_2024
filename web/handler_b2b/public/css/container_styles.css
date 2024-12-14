@@ -29,7 +29,13 @@
 
 @media (orientation: landscape) {
   .scrollableHeight {
-    height: 75.5vh;
+    height: 48vh;
+  }
+}
+
+@media (orientation: landscape) and (min-height: 300px) {
+  .scrollableHeight {
+    height: 69.5vh;
   }
 }
 
