@@ -383,45 +383,48 @@ function AddCreditNoteOffcanvas({
             </Form>
           </Container>
           <Container className="main-grey-bg p-3 fixed-bottom w-100" fluid>
-                <Row style={maxStyle} className="mx-auto minScalableWidth offcanvasButtonsStyle">
-                  <Col>
-                    <Button
-                      variant="mainBlue"
-                      className="w-100"
-                      type="submit"
-                      disabled={isFormErrorActive()}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setIsLoading(true);
+            <Row
+              style={maxStyle}
+              className="mx-auto minScalableWidth offcanvasButtonsStyle"
+            >
+              <Col>
+                <Button
+                  variant="mainBlue"
+                  className="w-100"
+                  type="submit"
+                  disabled={isFormErrorActive()}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsLoading(true);
 
-                        let form = document.getElementById("creditNoteForm");
-                        form.requestSubmit();
-                      }}
-                    >
-                      {isLoading && !state.completed ? (
-                        <div className="spinner-border main-text"></div>
-                      ) : (
-                        "Create"
-                      )}
-                    </Button>
-                  </Col>
-                  <Col>
-                    <Button
-                      variant="red"
-                      className="w-100"
-                      onClick={() => {
-                        hideFunction();
-                        setProducts([]);
-                        if (!state.error && state.completed) {
-                          router.refresh();
-                        }
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                  </Col>
-                </Row>
-              </Container>
+                    let form = document.getElementById("creditNoteForm");
+                    form.requestSubmit();
+                  }}
+                >
+                  {isLoading && !state.completed ? (
+                    <div className="spinner-border main-text"></div>
+                  ) : (
+                    "Create"
+                  )}
+                </Button>
+              </Col>
+              <Col>
+                <Button
+                  variant="red"
+                  className="w-100"
+                  onClick={() => {
+                    hideFunction();
+                    setProducts([]);
+                    if (!state.error && state.completed) {
+                      router.refresh();
+                    }
+                  }}
+                >
+                  Cancel
+                </Button>
+              </Col>
+            </Row>
+          </Container>
         </Offcanvas.Body>
         <AddCreditProductWindow
           modalShow={showProductWindow}

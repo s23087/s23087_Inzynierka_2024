@@ -198,29 +198,32 @@ function ModifyItemOffcanvas({
                 <p className="blue-main-text h4 mb-0">Id: {item.itemId}</p>
               </Col>
               <Col xs="4" lg="2" xl="1" className="ps-1 text-end">
-              {isOrg ? 
-                <Button
-                  variant="as-link"
-                  onClick={() => {
-                    setIsProductView(!isProductView);
-                  }}
-                  className="ps-0"
-                >
-                  <Image
-                    src={
-                      isProductView ? switch_product_view : switch_binding_view
-                    }
-                    className="h-auto w-auto"
-                    alt="switch view"
-                  />
-                </Button> : null}
+                {isOrg ? (
+                  <Button
+                    variant="as-link"
+                    onClick={() => {
+                      setIsProductView(!isProductView);
+                    }}
+                    className="ps-0"
+                  >
+                    <Image
+                      src={
+                        isProductView
+                          ? switch_product_view
+                          : switch_binding_view
+                      }
+                      className="h-auto w-auto"
+                      alt="switch view"
+                    />
+                  </Button>
+                ) : null}
               </Col>
               <Col xs="2" lg="1" className="ps-1 text-end">
                 <Button
                   variant="as-link"
                   onClick={() => {
                     resetErrors();
-                    setIsProductView(true)
+                    setIsProductView(true);
                     hideFunction();
                   }}
                   className="ps-2 pe-0"
@@ -231,7 +234,10 @@ function ModifyItemOffcanvas({
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0 scrollableHeight" as="div">
+        <Offcanvas.Body
+          className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0 scrollableHeight"
+          as="div"
+        >
           <Container
             className="p-0"
             style={isProductView ? unhidden : hidden}
@@ -339,7 +345,9 @@ function ModifyItemOffcanvas({
                   key={description}
                   type="text"
                   name="description"
-                  defaultValue={description !== undefined ? description : "Loading.."}
+                  defaultValue={
+                    description !== undefined ? description : "Loading.."
+                  }
                   maxLength={500}
                 />
               </Form.Group>
@@ -450,7 +458,10 @@ function ModifyItemOffcanvas({
             </Form>
           </Container>
           <Container className="main-grey-bg p-3 fixed-bottom w-100" fluid>
-            <Row style={maxStyle} className="mx-auto minScalableWidth offcanvasButtonsStyle">
+            <Row
+              style={maxStyle}
+              className="mx-auto minScalableWidth offcanvasButtonsStyle"
+            >
               <Col>
                 <Button
                   variant="mainBlue"
@@ -481,7 +492,7 @@ function ModifyItemOffcanvas({
                   className="w-100"
                   onClick={() => {
                     resetErrors();
-                    setIsProductView(true)
+                    setIsProductView(true);
                     hideFunction();
                     if (!state.error && state.completed) {
                       router.refresh();

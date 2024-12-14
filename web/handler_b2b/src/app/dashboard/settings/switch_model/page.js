@@ -14,7 +14,7 @@ export default function ChangeAppType() {
   // True if modify action is running
   const [isLoading, setIsLoading] = useState(false);
   // Form error
-  const [errorMessage, setErrorMessage] = useState(""); 
+  const [errorMessage, setErrorMessage] = useState("");
   return (
     <Container className="px-4 pt-4" fluid>
       <Form className="mx-1 mx-xl-3">
@@ -23,7 +23,8 @@ export default function ChangeAppType() {
           messageStatus={errorMessage !== ""}
         />
         <p className="blue-main-text text-center text-sm-start mb-1">
-          Are you sure that you want to change from solo type to organization type? The change will be permanent.
+          Are you sure that you want to change from solo type to organization
+          type? The change will be permanent.
         </p>
         <p className="blue-main-text text-center text-sm-start mb-1">
           If you accept you will be logout.
@@ -38,7 +39,7 @@ export default function ChangeAppType() {
                   e.preventDefault();
                   setIsLoading(true);
                   let result = await changeTypeToOrganization();
-                  if (!result.error){
+                  if (!result.error) {
                     setIsLoading(false);
                     setErrorMessage("");
                     router.push("/");
@@ -57,14 +58,14 @@ export default function ChangeAppType() {
             </Col>
             <Col xs="12" sm="6" lg="5" xl="3" xxl="2">
               <Button
-                  className="mt-3 py-3 w-100"
-                  variant="secBlue"
-                  type="Click"
-                  onClick={() => {
-                    router.push(".");
-                  }}
-                >
-                  Go back
+                className="mt-3 py-3 w-100"
+                variant="secBlue"
+                type="Click"
+                onClick={() => {
+                  router.push(".");
+                }}
+              >
+                Go back
               </Button>
             </Col>
           </Row>

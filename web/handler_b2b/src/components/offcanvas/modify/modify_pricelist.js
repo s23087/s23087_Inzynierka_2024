@@ -280,7 +280,10 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
                 </Button>
               </Form.Group>
               <Container className="main-grey-bg p-3 fixed-bottom w-100" fluid>
-                <Row style={maxStyle} className="mx-auto minScalableWidth offcanvasButtonsStyle">
+                <Row
+                  style={maxStyle}
+                  className="mx-auto minScalableWidth offcanvasButtonsStyle"
+                >
                   <Col>
                     <Button
                       variant="mainBlue"
