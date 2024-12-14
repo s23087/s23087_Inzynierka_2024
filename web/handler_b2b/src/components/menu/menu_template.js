@@ -40,7 +40,7 @@ function MenuTemplate({
     <Stack className="px-3" direction="horizontal" style={menuSize}>
       <Container className="w-auto ms-0 ms-xl-3 me-0 me-xl-4">
         <Link href={`${pathName}${finalParam}`}>
-          <span className="d-block logoIconStyle" title="logo"/>
+          <span className="d-block logoIconStyle" title="logo" />
         </Link>
       </Container>
       <Container className="mx-auto ms-xl-0 text-center text-xl-start">
@@ -52,7 +52,7 @@ function MenuTemplate({
           className="pe-0 position-relative py-0 d-xl-none"
           onClick={sidebar_action}
         >
-          <span className="d-block menuIconStyle" title="menu"/>
+          <span className="d-block menuIconStyle" title="menu" />
           <NotificationBadge qty={current_notification_qty} />
         </Button>
         <Container className="pe-0 position-relative py-0 d-none d-xl-block">

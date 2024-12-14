@@ -1,10 +1,7 @@
 "use client";
 
 import PropTypes from "prop-types";
-import Image from "next/image";
 import { Button } from "react-bootstrap";
-import org_switch from "../../../public/switches/org_switch_org.png";
-import solo_switch from "../../../public/switches/org_switch_solo.png";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 /**
@@ -32,7 +29,12 @@ function OrgSwitcher({ is_org }) {
         router.push(`${pathName}?${accessParams}`);
       }}
     >
-      <span className={is_org === true ? "orgSwitchIconStyle" : "noOrgSwitchIconStyle"} title="view switch"/>
+      <span
+        className={
+          is_org === true ? "orgSwitchIconStyle" : "noOrgSwitchIconStyle"
+        }
+        title="view switch"
+      />
     </Button>
   );
 }

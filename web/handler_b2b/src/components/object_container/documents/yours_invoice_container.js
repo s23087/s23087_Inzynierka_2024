@@ -44,7 +44,7 @@ function InvoiceContainer({
           {is_org ? (
             <Row className="mb-2">
               <Col className="d-flex">
-                <span className="me-2 mt-1 userIconStyle" title="user icon"/>
+                <span className="me-2 mt-1 userIconStyle" title="user icon" />
                 <span className="spanStyle main-grey-bg d-flex rounded-span px-2 w-100 my-1">
                   <p className="mb-0 text-truncate d-block w-100">
                     {invoice.users.length > 0 ? invoice.users.join(", ") : "-"}

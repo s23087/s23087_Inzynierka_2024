@@ -34,7 +34,7 @@ function RoleContainer({
         <Col xs="12" sm="7" lg="6" xl="8" xxl="7">
           <Row className="mb-2">
             <Col className="d-flex">
-            <span className="me-2 mt-1 userIconStyle" title="user icon"/>
+              <span className="me-2 mt-1 userIconStyle" title="user icon" />
               <span className="spanStyle main-blue-bg main-text d-flex rounded-span px-2 w-100 my-1">
                 <p className="mb-0 text-truncate d-block w-100">
                   {role.username + " " + role.surname}
