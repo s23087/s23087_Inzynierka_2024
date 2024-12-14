@@ -188,9 +188,6 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
   const maxStyle = {
     maxWidth: "393px",
   };
-  const vhStyle = {
-    height: "81vh",
-  };
   const hidden = {
     display: "none",
   };
@@ -227,7 +224,8 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                   onClick={() => {
                     hideFunction();
                     setProducts([]);
-                    if (!state.error && state.complete) {
+                    setShowCurrencyExchange(false);
+                    if (!state.error && state.completed) {
                       router.refresh();
                     }
                   }}
@@ -239,8 +237,8 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
-          <Container className="p-0" style={vhStyle} fluid>
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0 scrollableHeight" as="div">
+          <Container className="p-0" fluid>
             <Form
               className="mx-1 mx-xl-3"
               id="invoiceForm"
@@ -632,7 +630,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                 />
               </Form.Group>
               <Container className="main-grey-bg p-3 fixed-bottom w-100" fluid>
-                <Row style={maxStyle} className="mx-auto minScalableWidth">
+                <Row style={maxStyle} className="mx-auto minScalableWidth offcanvasButtonsStyle">
                   <Col>
                     <Button
                       variant="mainBlue"

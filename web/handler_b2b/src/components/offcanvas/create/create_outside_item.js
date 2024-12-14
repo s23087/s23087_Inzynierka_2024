@@ -58,9 +58,6 @@ function AddOutsideItemsOffcanvas({ showOffcanvas, hideFunction }) {
   const maxStyle = {
     maxWidth: "393px",
   };
-  const vhStyle = {
-    height: "81vh",
-  };
   return (
     <Offcanvas
       className="h-100 minScalableWidth"
@@ -92,10 +89,10 @@ function AddOutsideItemsOffcanvas({ showOffcanvas, hideFunction }) {
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
-          <Container className="p-0" style={vhStyle} fluid>
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0 scrollableHeight" as="div">
+          <Container className="p-0" fluid>
             <Form
-              className="mx-1 mx-xl-3"
+              className="mx-1 pb-5 mx-xl-3"
               id="outsideItemForm"
               action={addItemsAction}
             >
@@ -153,7 +150,7 @@ function AddOutsideItemsOffcanvas({ showOffcanvas, hideFunction }) {
                   }}
                 />
               </Form.Group>
-              <Container className="px-0 blue-main-text" fluid>
+              <Container className="px-0 pb-4 blue-main-text" fluid>
                 <p>
                   The file must be a comma separated UTF-8 csv file and must
                   contain columns:
@@ -173,7 +170,7 @@ function AddOutsideItemsOffcanvas({ showOffcanvas, hideFunction }) {
                 </p>
               </Container>
               <Container className="main-grey-bg p-3 fixed-bottom w-100" fluid>
-                <Row style={maxStyle} className="mx-auto minScalableWidth">
+                <Row style={maxStyle} className="mx-auto minScalableWidth offcanvasButtonsStyle">
                   <Col>
                     <Button
                       variant="mainBlue"

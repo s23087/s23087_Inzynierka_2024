@@ -40,11 +40,8 @@ function ProductFilterOffcanvas({
   // Order options
   const orderBy = ["Id", "Partnumber", "Qty", "Price", "Name"];
   // Styles
-  const vhStyle = {
-    height: "81vh",
-  };
   const maxStyle = {
-    maxWidth: "393px",
+    maxWidth: "373px",
   };
   return (
     <Offcanvas
@@ -55,8 +52,8 @@ function ProductFilterOffcanvas({
     >
       <Container className="h-100 w-100 p-0" fluid>
         <FilterHeader hideFunction={hideFunction} />
-        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
-          <Container className="p-0 mx-1 mx-xl-3" style={vhStyle} fluid>
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0 scrollableHeight" as="div">
+          <Container className="p-0 pb-5 mx-1 mx-xl-3" fluid>
             <SortOrderComponent isAsc={isAsc} setIsAsc={setIsAsc} />
             <Container className="px-1 ms-0 mb-3">
               <p className="blue-main-text">Sort:</p>
@@ -188,7 +185,7 @@ function ProductFilterOffcanvas({
               </Stack>
               <Stack className="mt-2">
                 <p className="mb-1 blue-sec-text">Ean:</p>
-                <Container className="px-0">
+                <Container className="px-0 pb-5">
                   <InputGroup style={maxStyle}>
                     <Form.Control
                       type="text"
@@ -208,7 +205,7 @@ function ProductFilterOffcanvas({
             </Container>
           </Container>
           <Container className="main-grey-bg p-3 fixed-bottom w-100" fluid>
-            <Row style={maxStyle} className="mx-auto minScalableWidth">
+            <Row style={maxStyle} className="mx-auto minScalableWidth offcanvasButtonsStyle">
               <Col>
                 <Button
                   variant="green"

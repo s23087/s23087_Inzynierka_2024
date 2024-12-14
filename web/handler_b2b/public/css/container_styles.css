@@ -18,3 +18,23 @@
   color: var(--text-main-color);
   border-radius: 10px;
 }
+
+.offcanvasButtonsStyle {
+  min-width: 364px !important;
+}
+
+.scrollableHeight {
+  height: 82.5vh;
+}
+
+@media (orientation: landscape) {
+  .scrollableHeight {
+    height: 75.5vh;
+  }
+}
+
+@media (orientation: landscape) and (min-height: 500px) {
+  .scrollableHeight {
+    height: 82.5vh;
+  }
+}

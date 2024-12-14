@@ -176,14 +176,6 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
   const maxStyle = {
     maxWidth: "393px",
   };
-  const vhStyleHidden = {
-    height: "81vh",
-    display: "none",
-  };
-  const vhStyleUnhidden = {
-    height: "81vh",
-    display: "block",
-  };
   const hidden = {
     display: "none",
   };
@@ -214,13 +206,13 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                   onClick={() => {
                     setIsBindingView(!isBindingView);
                   }}
+                  style={isOrg ? unhidden : hidden}
                   className="ps-0"
                 >
                   <Image
                     src={
                       isBindingView ? switch_binding_view : switch_product_view
                     }
-                    style={isOrg ? unhidden : hidden}
                     className="h-auto w-auto"
                     alt="switch view"
                   />
@@ -255,8 +247,8 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
         </Offcanvas.Header>
         <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
           <Container
-            className="p-0"
-            style={isBindingView ? vhStyleHidden : vhStyleUnhidden}
+            className="p-0 scrollableHeight"
+            style={isBindingView ? hidden : unhidden}
             fluid
           >
             <ErrorMessage
@@ -270,7 +262,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
               }
             />
             <Form
-              className="mx-1 mx-xl-3"
+              className="mx-1 mx-xl-3 pb-5"
               id="clientModify"
               action={formAction}
             >
@@ -463,7 +455,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                 </Form.Select>
               </Form.Group>
               <Container className="main-grey-bg p-3 fixed-bottom w-100" fluid>
-                <Row style={maxStyle} className="mx-auto minScalableWidth">
+                <Row style={maxStyle} className="mx-auto minScalableWidth offcanvasButtonsStyle">
                   <Col>
                     <Button
                       variant="mainBlue"
@@ -509,8 +501,8 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
             </Form>
           </Container>
           <Container
-            className="p-0 pt-3 px-1 px-xl-3"
-            style={isBindingView ? vhStyleUnhidden : vhStyleHidden}
+            className="p-0 pt-3 px-1 px-xl-3 scrollableHeight"
+            style={isBindingView ? unhidden : hidden}
             fluid
           >
             <p

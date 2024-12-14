@@ -61,9 +61,9 @@ function AddCreditNoteOffcanvas({
         }
         setInvoiceListDownloadError(false);
         setInvoiceList(data);
-        setChosenInvoice(data[0].invoiceId ? data[0].invoiceId : null);
-        setChosenClient(data[0].clientName ?? "Is loading");
-        setUserOrg(data[0].orgName ?? "Is loading");
+        setChosenInvoice(data[0] ? data[0].invoiceId : null);
+        setChosenClient(data[0] ? data[0].clientName : "Is loading");
+        setUserOrg(data[0] ? data[0].orgName : "Is loading");
       });
     }
   }, [showOffcanvas, isYourCreditNote]);
@@ -113,9 +113,6 @@ function AddCreditNoteOffcanvas({
   const maxStyle = {
     maxWidth: "393px",
   };
-  const vhStyle = {
-    height: "81vh",
-  };
   const buttonStyle = {
     maxWidth: "250px",
     minWidth: "200px",
@@ -158,8 +155,8 @@ function AddCreditNoteOffcanvas({
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
-          <Container className="p-0" style={vhStyle} fluid>
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0 scrollableHeight" as="div">
+          <Container className="p-0" fluid>
             <Form
               className="mx-1 mx-xl-3"
               id="creditNoteForm"
@@ -383,8 +380,10 @@ function AddCreditNoteOffcanvas({
                   maxLength={500}
                 />
               </Form.Group>
-              <Container className="main-grey-bg p-3 fixed-bottom w-100" fluid>
-                <Row style={maxStyle} className="mx-auto minScalableWidth">
+            </Form>
+          </Container>
+          <Container className="main-grey-bg p-3 fixed-bottom w-100" fluid>
+                <Row style={maxStyle} className="mx-auto minScalableWidth offcanvasButtonsStyle">
                   <Col>
                     <Button
                       variant="mainBlue"
@@ -423,8 +422,6 @@ function AddCreditNoteOffcanvas({
                   </Col>
                 </Row>
               </Container>
-            </Form>
-          </Container>
         </Offcanvas.Body>
         <AddCreditProductWindow
           modalShow={showProductWindow}

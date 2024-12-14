@@ -65,7 +65,7 @@ function CustomSidebar({
       <Offcanvas.Body>
         <Container className="h-100">
           <Row className="h-100">
-            <Col xs="12" className="align-self-start">
+            <Col xs="12" className="align-self-start pb-5">
               <Stack gap={4}>{children}</Stack>
             </Col>
             <Col xs="12" className="align-self-end pb-5">

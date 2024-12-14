@@ -108,9 +108,6 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
   const maxStyle = {
     maxWidth: "393px",
   };
-  const vhStyle = {
-    height: "81vh",
-  };
   const buttonStyle = {
     maxWidth: "250px",
     minWidth: "200px",
@@ -152,8 +149,8 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
-          <Container className="p-0" style={vhStyle} fluid>
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0 scrollableHeight" as="div">
+          <Container className="p-0" fluid>
             <Form className="mx-1 mx-xl-3" id="offerForm" action={formAction}>
               <ErrorMessage
                 message="Could not download all necessary information."
@@ -283,7 +280,7 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
                 </Button>
               </Form.Group>
               <Container className="main-grey-bg p-3 fixed-bottom w-100" fluid>
-                <Row style={maxStyle} className="mx-auto minScalableWidth">
+                <Row style={maxStyle} className="mx-auto minScalableWidth offcanvasButtonsStyle">
                   <Col>
                     <Button
                       variant="mainBlue"

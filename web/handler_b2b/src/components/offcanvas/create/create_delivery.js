@@ -105,9 +105,6 @@ function AddDeliveryOffcanvas({
   const maxStyle = {
     maxWidth: "393px",
   };
-  const vhStyle = {
-    height: "81vh",
-  };
   const buttonStyle = {
     maxWidth: "250px",
     borderRadius: "5px",
@@ -145,8 +142,8 @@ function AddDeliveryOffcanvas({
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
-          <Container className="p-0" style={vhStyle} fluid>
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0 scrollableHeight" as="div">
+          <Container className="p-0" fluid>
             <Form
               className="mx-1 mx-xl-3"
               id="createDelivery"
@@ -253,7 +250,7 @@ function AddDeliveryOffcanvas({
                   </Button>
                 </Stack>
               </Form.Group>
-              <Form.Group className="mb-5" controlId="formDescription">
+              <Form.Group className="mb-5 pb-5" controlId="formDescription">
                 <Form.Label className="blue-main-text maxInputWidth-desc">
                   Note:
                 </Form.Label>
@@ -268,7 +265,7 @@ function AddDeliveryOffcanvas({
                 />
               </Form.Group>
               <Container className="main-grey-bg p-3 fixed-bottom w-100" fluid>
-                <Row style={maxStyle} className="mx-auto minScalableWidth">
+                <Row style={maxStyle} className="mx-auto minScalableWidth offcanvasButtonsStyle">
                   <Col>
                     <Button
                       variant="mainBlue"

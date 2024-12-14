@@ -66,9 +66,6 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
     maxWidth: "250px",
     borderRadius: "5px",
   };
-  const vhStyle = {
-    height: "81vh",
-  };
   // True if create action is running
   const [isLoading, setIsLoading] = useState(false);
   // Form action
@@ -108,8 +105,8 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 pb-0" as="div">
-          <Container className="p-0" style={vhStyle} fluid>
+        <Offcanvas.Body className="px-4 px-xl-5 pb-0 scrollableHeight" as="div">
+          <Container className="p-0" fluid>
             <Form action={formAction} id="addItemForm" className="mx-1 mx-xl-3">
               <Form.Group className="mb-3 maxInputWidth">
                 <Form.Label className="blue-main-text">P/N:</Form.Label>
@@ -197,7 +194,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                   </Button>
                 </Stack>
               </Form.Group>
-              <Form.Group className="mb-5" controlId="formDescription">
+              <Form.Group className="mb-5 pb-5" controlId="formDescription">
                 <Form.Label className="blue-main-text maxInputWidth-desc">
                   Description:
                 </Form.Label>
@@ -212,7 +209,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                 />
               </Form.Group>
               <Container className="main-grey-bg p-3 fixed-bottom w-100" fluid>
-                <Row style={maxStyle} className="mx-auto minScalableWidth">
+                <Row style={maxStyle} className="mx-auto minScalableWidth offcanvasButtonsStyle">
                   <Col>
                     <Button
                       variant="mainBlue"

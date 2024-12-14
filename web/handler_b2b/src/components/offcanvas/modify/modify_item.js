@@ -169,14 +169,6 @@ function ModifyItemOffcanvas({
     maxWidth: "250px",
     borderRadius: "5px",
   };
-  const vhStyleHidden = {
-    height: "81vh",
-    display: "none",
-  };
-  const vhStyleUnhidden = {
-    height: "81vh",
-    display: "block",
-  };
   const hidden = {
     display: "none",
   };
@@ -206,6 +198,7 @@ function ModifyItemOffcanvas({
                 <p className="blue-main-text h4 mb-0">Id: {item.itemId}</p>
               </Col>
               <Col xs="4" lg="2" xl="1" className="ps-1 text-end">
+              {isOrg ? 
                 <Button
                   variant="as-link"
                   onClick={() => {
@@ -217,17 +210,17 @@ function ModifyItemOffcanvas({
                     src={
                       isProductView ? switch_product_view : switch_binding_view
                     }
-                    style={isOrg ? unhidden : hidden}
                     className="h-auto w-auto"
                     alt="switch view"
                   />
-                </Button>
+                </Button> : null}
               </Col>
               <Col xs="2" lg="1" className="ps-1 text-end">
                 <Button
                   variant="as-link"
                   onClick={() => {
                     resetErrors();
+                    setIsProductView(true)
                     hideFunction();
                   }}
                   className="ps-2 pe-0"
@@ -238,10 +231,10 @@ function ModifyItemOffcanvas({
             </Row>
           </Container>
         </Offcanvas.Header>
-        <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0" as="div">
+        <Offcanvas.Body className="px-4 px-xl-5 mx-1 mx-xl-3 pb-0 scrollableHeight" as="div">
           <Container
             className="p-0"
-            style={isProductView ? vhStyleUnhidden : vhStyleHidden}
+            style={isProductView ? unhidden : hidden}
             fluid
           >
             <Form action={formAction} id="modifyItemForm">
@@ -335,7 +328,7 @@ function ModifyItemOffcanvas({
                   />
                 </Stack>
               </Form.Group>
-              <Form.Group className="mb-5" key={description}>
+              <Form.Group className="mb-5 pb-5" key={description}>
                 <Form.Label className="blue-main-text maxInputWidth-desc">
                   Description:
                 </Form.Label>
@@ -343,21 +336,22 @@ function ModifyItemOffcanvas({
                   className="input-style shadow-sm"
                   as="textarea"
                   rows={5}
+                  key={description}
                   type="text"
                   name="description"
-                  defaultValue={description ? description : "Loading.."}
+                  defaultValue={description !== undefined ? description : "Loading.."}
                   maxLength={500}
                 />
               </Form.Group>
             </Form>
           </Container>
           <Container
-            className="p-0"
-            style={!isProductView ? vhStyleUnhidden : vhStyleHidden}
+            className="p-0 scrollableHeight"
+            style={!isProductView ? unhidden : hidden}
             fluid
           >
-            <Form>
-              <Form.Group className="mb-5" controlId="formDescription">
+            <Form className="pb-5">
+              <Form.Group className="mb-3" controlId="formDescription">
                 <Form.Label className="blue-main-text maxInputWidth">
                   Users:
                 </Form.Label>
@@ -366,7 +360,7 @@ function ModifyItemOffcanvas({
                   .map((value, key) => {
                     return (
                       <BindingInput
-                        value={key}
+                        value={value}
                         key={[
                           key,
                           value.username,
@@ -456,7 +450,7 @@ function ModifyItemOffcanvas({
             </Form>
           </Container>
           <Container className="main-grey-bg p-3 fixed-bottom w-100" fluid>
-            <Row style={maxStyle} className="mx-auto minScalableWidth">
+            <Row style={maxStyle} className="mx-auto minScalableWidth offcanvasButtonsStyle">
               <Col>
                 <Button
                   variant="mainBlue"
@@ -487,7 +481,7 @@ function ModifyItemOffcanvas({
                   className="w-100"
                   onClick={() => {
                     resetErrors();
-                    setEans([]);
+                    setIsProductView(true)
                     hideFunction();
                     if (!state.error && state.completed) {
                       router.refresh();
