@@ -96,6 +96,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                     if (!state.error && state.completed) {
                       router.refresh();
                     }
+                    resetState();
                   }}
                   className="pe-0"
                 >
@@ -259,6 +260,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                         if (!state.error && state.completed) {
                           router.refresh();
                         }
+                        resetState()
                       }}
                     >
                       Cancel

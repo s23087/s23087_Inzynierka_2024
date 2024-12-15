@@ -210,6 +210,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
                     if (!state.error && state.completed) {
                       router.refresh();
                     }
+                    resetState();
                   }}
                   className="pe-0"
                 >
@@ -601,6 +602,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
                         if (!state.error && state.completed) {
                           router.refresh();
                         }
+                        resetState();
                       }}
                     >
                       Cancel

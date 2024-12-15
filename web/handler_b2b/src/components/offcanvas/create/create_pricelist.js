@@ -101,12 +101,13 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
                 <Button
                   variant="as-link"
                   onClick={() => {
-                    hideFunction();
                     setProducts([]);
                     setChosenCurrency("PLN");
-                    if (!state.error && state.complete) {
+                    hideFunction();
+                    if (!state.error && state.completed) {
                       router.refresh();
                     }
+                    resetState();
                   }}
                   className="pe-0"
                 >
@@ -269,11 +270,12 @@ function AddPricelistOffcanvas({ showOffcanvas, hideFunction }) {
                       variant="red"
                       className="w-100"
                       onClick={() => {
-                        hideFunction();
                         setProducts([]);
+                        hideFunction();
                         if (!state.error && state.completed) {
                           router.refresh();
                         }
+                        resetState();
                       }}
                     >
                       Cancel

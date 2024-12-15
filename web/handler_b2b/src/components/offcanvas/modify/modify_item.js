@@ -224,6 +224,7 @@ function ModifyItemOffcanvas({
                   onClick={() => {
                     resetErrors();
                     setIsProductView(true);
+                    resetState();
                     hideFunction();
                   }}
                   className="ps-2 pe-0"
@@ -497,6 +498,7 @@ function ModifyItemOffcanvas({
                     if (!state.error && state.completed) {
                       router.refresh();
                     }
+                    resetState();
                   }}
                 >
                   Cancel

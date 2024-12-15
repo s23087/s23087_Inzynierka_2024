@@ -143,9 +143,10 @@ function AddCreditNoteOffcanvas({
                   onClick={() => {
                     hideFunction();
                     setProducts([]);
-                    if (!state.error && state.complete) {
+                    if (!state.error && state.completed) {
                       router.refresh();
                     }
+                    resetState();
                   }}
                   className="pe-0"
                 >
@@ -418,6 +419,7 @@ function AddCreditNoteOffcanvas({
                     if (!state.error && state.completed) {
                       router.refresh();
                     }
+                    resetState();
                   }}
                 >
                   Cancel

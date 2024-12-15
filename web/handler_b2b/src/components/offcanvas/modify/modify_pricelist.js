@@ -137,9 +137,10 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
                     hideFunction();
                     setProducts([]);
                     setChosenCurrency("PLN");
-                    if (!state.error && state.complete) {
+                    if (!state.error && state.completed) {
                       router.refresh();
                     }
+                    resetState();
                   }}
                   className="pe-0"
                 >
@@ -315,6 +316,7 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
                         if (!state.error && state.completed) {
                           router.refresh();
                         }
+                        resetState();
                       }}
                     >
                       Cancel

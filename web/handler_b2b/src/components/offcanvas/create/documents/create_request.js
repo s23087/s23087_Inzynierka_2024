@@ -84,11 +84,11 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
                   variant="as-link"
                   onClick={() => {
                     hideFunction();
-                    resetState();
                     document.getElementById("requestForm").reset();
-                    if (!state.error && state.complete) {
+                    if (!state.error && state.completed) {
                       router.refresh();
                     }
+                    resetState();
                     setNoteError(false);
                     setDocumentError(false);
                     setTitleError(false);
@@ -252,10 +252,8 @@ function AddRequestOffcanvas({ showOffcanvas, hideFunction }) {
                         document.getElementById("requestForm").reset();
                         if (!state.error && state.completed) {
                           router.refresh();
-                          resetState();
-                        } else {
-                          resetState();
                         }
+                        resetState();
                         setNoteError(false);
                         setDocumentError(false);
                         setTitleError(false);

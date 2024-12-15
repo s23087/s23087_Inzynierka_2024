@@ -159,9 +159,10 @@ function ModifyInvoiceOffcanvas({
                   variant="as-link"
                   onClick={() => {
                     hideFunction();
-                    if (!state.error && state.complete) {
+                    if (!state.error && state.completed) {
                       router.refresh();
                     }
+                    resetState();
                   }}
                   className="pe-0"
                 >
@@ -416,6 +417,7 @@ function ModifyInvoiceOffcanvas({
                         if (!state.error && state.completed) {
                           router.refresh();
                         }
+                        resetState();
                       }}
                     >
                       Cancel

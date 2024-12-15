@@ -117,13 +117,13 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
                   variant="as-link"
                   onClick={() => {
                     hideFunction();
-                    resetState();
                     setNoteError(false);
                     setDocumentError(false);
                     document.getElementById("requestModifyForm").reset();
-                    if (!state.error && state.complete) {
+                    if (!state.error && state.completed) {
                       router.refresh();
                     }
+                    resetState();
                   }}
                   className="pe-0"
                 >
@@ -295,10 +295,8 @@ function ModifyRequestOffcanvas({ showOffcanvas, hideFunction, request }) {
                         document.getElementById("requestModifyForm").reset();
                         if (!state.error && state.completed) {
                           router.refresh();
-                          resetState();
-                        } else {
-                          resetState();
                         }
+                        resetState();
                         setNoteError(false);
                         setDocumentError(false);
                       }}

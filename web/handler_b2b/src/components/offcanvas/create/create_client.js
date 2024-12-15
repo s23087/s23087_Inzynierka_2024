@@ -117,9 +117,10 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                   onClick={() => {
                     hideFunction();
                     clearFormErrors();
-                    if (!state.error && state.complete) {
+                    if (!state.error && state.completed) {
                       router.refresh();
                     }
+                    resetState();
                   }}
                   className="pe-0"
                 >
@@ -343,6 +344,7 @@ function AddClientOffcanvas({ showOffcanvas, hideFunction }) {
                         if (!state.error && state.completed) {
                           router.refresh();
                         }
+                        resetState();
                       }}
                     >
                       Cancel

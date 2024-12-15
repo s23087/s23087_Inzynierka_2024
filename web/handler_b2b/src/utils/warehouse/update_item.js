@@ -113,10 +113,9 @@ function validateData(formData) {
     message += "\nName is empty or exceed required length";
 
   if (
-    !validators.lengthSmallerThen(formData.get("description"), 500) ||
-    !validators.stringIsNotEmpty(formData.get("description"))
+    !validators.lengthSmallerThen(formData.get("description"), 500)
   )
-    message += "\nDescription is empty or exceed required length";
+    message += "\nDescription or exceed required length";
 
   if (
     !validators.lengthSmallerThen(formData.get("partNumber"), 150) ||

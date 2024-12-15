@@ -229,13 +229,13 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                     setBindingSuccess(false);
                     resetErrors();
                     setIsLoading(false);
-                    state.completed = false;
                     if (!state.error && state.completed) {
                       router.refresh();
                     }
                     if (bindingSuccess) {
                       router.refresh();
                     }
+                    resetState();
                   }}
                   className="pe-0"
                 >
@@ -492,6 +492,7 @@ function ModifyClientOffcanvas({ showOffcanvas, hideFunction, client, isOrg }) {
                         if (bindingSuccess) {
                           router.refresh();
                         }
+                        resetState();
                         setIsBindingView(false);
                         resetErrors();
                       }}
