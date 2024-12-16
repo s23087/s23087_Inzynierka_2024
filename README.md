@@ -9,20 +9,20 @@ This is web application that allow user to manage his organization warehouse and
 
 Each of registered user will have their own database created. The app allow to create two types of accounts. One the solo one which target people working in their own organizations without employees and organization one which allow to add users and assigned role to them.
 
-# Prequest to run the appliaction.
+# Prequest to run the application.
 
 1. Setting .env for next.js project
 
 For next.js application to run smoothly you need to create .env file in folder web/handler_b2b containing variables:
 
 <ul>
-    <li>SESSION_SECRET - secret key to sign JWT token. Genereted using command 'openssl rand -base64 32'</li>
-    <li>API_DEST - Value of .Net Api Endpoint. If you host the api localy on port 5050, then te value would probably be 'http://localhost:5050'</li>
+    <li>SESSION_SECRET - secret key to sign JWT token. Generated using command 'openssl rand -base64 32'</li>
+    <li>API_DEST - Value of .Net Api Endpoint. If you host the api locally on port 5050, then te value would probably be 'http://localhost:5050'</li>
 </ul>
 
 2. Create folder named 'database'. In this folder the new databases will be saved.
 
-3. Create folder named 'Logs' in database_comunicator. This is where the errors from Api will be loged.
+3. Create folder named 'Logs' in database_comunicator. This is where the errors from Api will be logged.
 
 4. Create nlog.config in database_comunicator. You can create your own way to log errors or you can use template below.
 
