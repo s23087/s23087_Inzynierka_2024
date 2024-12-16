@@ -8,9 +8,6 @@ database_comunicator/nlog.config
 ## Database dir
 database/
 
-# For the sake of Sonar
-db_setup/
-
 # pricelist
 
 **/pricelist/*
