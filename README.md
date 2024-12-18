@@ -68,7 +68,7 @@ The test one needs:
 
 If you want run the app without using default script (start_up.ps1), then you can use this consol commands to start up processes.
 
-0. (Only for the frist time) Use ```npm install``` in the web/handler_b2b folder to install dependecies.
+0. (Only for the frist time) Use ```npm install``` in the web/handler_b2b folder to install dependencies.
 
 1. Build Next.js application using ```npm run build``` in web/handler_b2b folder.
 
