@@ -1,6 +1,6 @@
 # s23087_Inzynierka_2024
 
-# Project Description
+## Project Description
 This is web application that allow user to manage his organization warehouse and sales. It split in the 3 parts:
 
 1. .Net Api that allow to communicate with SQL Server and it's databases.
@@ -9,11 +9,11 @@ This is web application that allow user to manage his organization warehouse and
 
 Each of registered user will have their own database created. The app allow to create two types of accounts. One the solo one which target people working in their own organizations without employees and organization one which allow to add users and assigned role to them.
 
-# Prequest to run the application.
+## Prequests to run the application
 
 1. Setting .env for next.js project
 
-For next.js application to run smoothly you need to create .env file in folder web/handler_b2b containing variables:
+	For next.js application to run smoothly you need to create .env file in folder web/handler_b2b containing variables:
 
 <ul>
     <li>SESSION_SECRET - secret key to sign JWT token. Generated using command 'openssl rand -base64 32'</li>
@@ -61,3 +61,15 @@ The test one needs:
 <ul>
 <li>testDb -> The connection string to test database</li>
 </ul>
+
+6. Create new tasks in Task Scheduler to run Python scripts.
+
+## Running the application
+
+If you want run the app without using default script (start_up.ps1), then you can use this consol commands to start up processes.
+
+1. Build Next.js application using ```npm run build```.
+
+2. Start the Api using command ```dotnet run --launch-profile "production"``` (You need to install .Net Cli to run this command).
+
+3. Start Next.js application using ```npm run start```.
