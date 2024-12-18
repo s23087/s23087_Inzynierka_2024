@@ -68,8 +68,10 @@ The test one needs:
 
 If you want run the app without using default script (start_up.ps1), then you can use this consol commands to start up processes.
 
-1. Build Next.js application using ```npm run build```.
+0. (Only for the frist time) Use ```npm install``` in the web/handler_b2b folder to install dependecies.
 
-2. Start the Api using command ```dotnet run --launch-profile "production"``` (You need to install .Net Cli to run this command).
+1. Build Next.js application using ```npm run build``` in web/handler_b2b folder.
 
-3. Start Next.js application using ```npm run start```.
+2. Start the Api using command ```dotnet run --launch-profile "production"``` (You need to install .Net Cli to run this command) in database_comunicator folder.
+
+3. Start Next.js application using ```npm run start``` in web/handler_b2b folder.
