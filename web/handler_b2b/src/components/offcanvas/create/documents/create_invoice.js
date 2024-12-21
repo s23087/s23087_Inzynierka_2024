@@ -225,6 +225,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                     hideFunction();
                     setProducts([]);
                     setShowCurrencyExchange(false);
+                    setChosenCurrency("PLN");
                     if (!state.error && state.completed) {
                       router.refresh();
                     }
@@ -663,6 +664,8 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
                       onClick={() => {
                         hideFunction();
                         setProducts([]);
+                        setShowCurrencyExchange(false);
+                        setChosenCurrency("PLN");
                         if (!state.error && state.completed) {
                           router.refresh();
                         }
