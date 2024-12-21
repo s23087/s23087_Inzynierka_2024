@@ -3,6 +3,8 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import validators from "../validators/validator";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to modify chosen item. When data is unchanged the attribute in request will be null.
@@ -14,6 +16,8 @@ import validators from "../validators/validator";
  * Completed will always be true, to deliver information to component that action has been completed.
  */
 export default async function updateItem(eans, prevState, state, formData) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   let message = validateData(formData);
 
   if (message.length > 6) {
@@ -112,9 +116,7 @@ function validateData(formData) {
   )
     message += "\nName is empty or exceed required length";
 
-  if (
-    !validators.lengthSmallerThen(formData.get("description"), 500)
-  )
+  if (!validators.lengthSmallerThen(formData.get("description"), 500))
     message += "\nDescription or exceed required length";
 
   if (

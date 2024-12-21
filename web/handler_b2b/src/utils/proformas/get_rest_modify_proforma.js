@@ -1,6 +1,8 @@
 "use server";
 
 import getDbName from "../auth/get_db_name";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to get rest information of chosen proforma needed for modification.
@@ -9,6 +11,8 @@ import getDbName from "../auth/get_db_name";
  * If connection is lost or proforma is not found return error message in attribute payment method and note.
  */
 export default async function getRestModifyProforma(proformaId) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const dbName = await getDbName();
   let url = `${process.env.API_DEST}/${dbName}/Proformas/get/rest/modify/${proformaId}`;
   try {

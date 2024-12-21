@@ -5,6 +5,8 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 import validators from "../validators/validator";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to add outside items from file. File is updated asynchronous and even if function return already something pipeline may still progress.
@@ -16,6 +18,8 @@ import validators from "../validators/validator";
  * Completed will always be true, to deliver information to component that action has been completed.
  */
 export default async function addOutsideItems(file, state, formData) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const userId = await getUserId();
   const dbName = await getDbName();
   let errorMessage = "Error:";

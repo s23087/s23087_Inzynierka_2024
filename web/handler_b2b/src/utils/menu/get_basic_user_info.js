@@ -2,12 +2,16 @@
 
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to get basic info of current user.
  * @return {Promise<{username: string, surname: string, orgName: string,}>} Object containing user information. If error occur it's message will be passed.
  */
 export default async function getBasicInfo() {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const dbName = await getDbName();
   const userId = await getUserId();
   try {

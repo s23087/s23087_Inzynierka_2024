@@ -1,7 +1,6 @@
 import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 /**
  * Loaded secret key from env.
@@ -72,7 +71,7 @@ async function verifySession() {
   const session = await decrypt(cookie);
 
   if (!session.userId) {
-    redirect("/");
+    return false;
   }
 
   return true;

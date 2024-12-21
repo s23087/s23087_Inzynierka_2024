@@ -3,6 +3,8 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to create delivery company.
@@ -12,6 +14,8 @@ import logout from "../auth/logout";
  * Completed will always be true, to deliver information to component that action has been completed.
  */
 export default async function createDeliveryCompany(state, formData) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   let companyName = formData.get("name");
   if (!companyName)
     return {

@@ -1,8 +1,10 @@
 "use server";
 
+import { NextResponse } from "next/server";
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
+import SessionManagement from "../auth/session_management";
 import validators from "../validators/validator";
 
 /**
@@ -13,6 +15,8 @@ import validators from "../validators/validator";
  * Completed will always be true, to deliver information to component that action has been completed.
  */
 export default async function createClient(state, formData) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   let nip = formData.get("nip");
   let credit = formData.get("credit");
   let orgData = {

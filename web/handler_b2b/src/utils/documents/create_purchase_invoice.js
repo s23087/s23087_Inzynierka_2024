@@ -4,6 +4,8 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import getCurrencyValueByDate from "../flexible/get_chosen_currency_value";
 import validators from "../validators/validator";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to create purchase invoice.
@@ -24,6 +26,8 @@ export default async function CreatePurchaseInvoice(
   state,
   formData,
 ) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   let invoiceNumber = formData.get("invoice");
   let transport = formData.get("transport");
   let errorMessage = validateData(invoiceNumber, transport, products, file);

@@ -2,6 +2,8 @@
 
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to get user requests. Can be filtered or sorted using sort and parameters.
@@ -21,6 +23,8 @@ export default async function getRequests(
   type,
   status,
 ) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const dbName = await getDbName();
   const userId = await getUserId();
   let url = "";

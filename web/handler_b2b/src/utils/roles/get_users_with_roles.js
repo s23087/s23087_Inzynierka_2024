@@ -4,6 +4,8 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 import { redirect } from "next/navigation";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to get users roles. Can be filtered or sorted using sort and role arguments. If encounter error will redirect you to correct site. If encounter error 404 will logout user.
@@ -13,6 +15,8 @@ import { redirect } from "next/navigation";
  * @return {Promise<Array<{userId: Number, username: string, surname: string, roleName: string}>>}      Array of objects that contain user information. If connection was lost return null. If error occurred return empty array.
  */
 export default async function getUserRoles(search, sort, role) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const dbName = await getDbName();
   const userId = await getUserId();
   let url;

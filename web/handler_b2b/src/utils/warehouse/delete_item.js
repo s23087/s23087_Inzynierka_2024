@@ -3,6 +3,8 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to delete chosen item. If user do not exist server will logout them.
@@ -10,6 +12,8 @@ import logout from "../auth/logout";
  * @return {Promise<{result: boolean, message: string}>} If result is true, then item has been successfully deleted. Message is only returned when there's error.
  */
 export default async function deleteItem(itemId) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const dbName = await getDbName();
   const userId = await getUserId();
   let url = `${process.env.API_DEST}/${dbName}/Warehouse/delete/item/${itemId}/${userId}`;

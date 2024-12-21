@@ -3,6 +3,8 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import getProformaPath from "./get_proforma_path";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to delete proforma.
@@ -11,6 +13,8 @@ import getProformaPath from "./get_proforma_path";
  * @return {Promise<{error: boolean, message: string}>} Return action result with message. If error is true that action was unsuccessful.
  */
 export default async function deleteProforma(isYourProforma, proformaId) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const dbName = await getDbName();
   const path = await getProformaPath(proformaId);
   if (path === null) {

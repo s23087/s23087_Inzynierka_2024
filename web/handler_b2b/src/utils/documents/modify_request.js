@@ -4,6 +4,8 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 import { getRequestPath } from "./get_document_path";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 const fs = require("node:fs");
 /**
@@ -23,6 +25,8 @@ export default async function updateRequest(
   state,
   formData,
 ) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   let receiverId = parseInt(formData.get("user"));
   let objectType = formData.get("type");
   let note = formData.get("note");

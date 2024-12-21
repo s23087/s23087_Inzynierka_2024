@@ -3,6 +3,8 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to modify delivery. When data is unchanged the attribute in request will be null.
@@ -23,6 +25,8 @@ export default async function updateDelivery(
   state,
   formData,
 ) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   let estimated = formData.get("estimated");
   let company = formData.get("company");
 

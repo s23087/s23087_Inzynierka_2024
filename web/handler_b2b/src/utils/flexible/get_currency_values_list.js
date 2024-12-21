@@ -1,5 +1,8 @@
 "use server";
 
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
+
 /**
  * Sends request to get chosen currency values from NPB site within specified date range. If start day is not week day then it will take as starting date the last friday from this date.
  * @param  {string} currency Shortcut name of currency.
@@ -12,6 +15,8 @@ export default async function getCurrencyValuesList(
   startDate,
   endDate,
 ) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   let url = "";
   let curr = currency.toLowerCase();
   let newDate = new Date(startDate);

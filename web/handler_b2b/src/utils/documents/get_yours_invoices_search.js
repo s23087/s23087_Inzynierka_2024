@@ -3,6 +3,8 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to get purchase invoices where invoice number contains search string. Can be filtered or sorted using sort and param arguments.
@@ -18,6 +20,8 @@ export default async function getSearchYoursInvoices(
   sort,
   params,
 ) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   let url = "";
   let prepParams = getPrepParams(sort, params);
   const dbName = await getDbName();

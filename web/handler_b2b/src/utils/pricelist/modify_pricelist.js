@@ -5,6 +5,8 @@ import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 import validators from "../validators/validator";
 import getUserOrgName from "./get_org_name";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 const fs = require("node:fs");
 
@@ -27,6 +29,8 @@ export default async function modifyPricelist(
   state,
   formData,
 ) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   let offerName = formData.get("name");
   let status = formData.get("status");
   let type = formData.get("type");

@@ -4,6 +4,8 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 import { getInvoicePath } from "./get_document_path";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to delete chosen invoice. If user do not exist server will logout them.
@@ -12,6 +14,8 @@ import { getInvoicePath } from "./get_document_path";
  * @return {Promise<{error: boolean, message: string}>} Return action result with message. If error is true that action was unsuccessful.
  */
 export default async function deleteInvoice(invoiceId, isYourInvoice) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const dbName = await getDbName();
   let invoicePath = await getInvoicePath(invoiceId);
   if (invoicePath === null) {

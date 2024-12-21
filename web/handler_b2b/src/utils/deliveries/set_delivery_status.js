@@ -1,6 +1,8 @@
 "use server";
 
 import getDbName from "../auth/get_db_name";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to change delivery status.
@@ -9,6 +11,8 @@ import getDbName from "../auth/get_db_name";
  * @return {Promise<Boolean>}      Return true if operation succeed, otherwise false.
  */
 export default async function setDeliveryStatus(deliveryId, statusName) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const dbName = await getDbName();
   let data = {
     statusName: statusName,

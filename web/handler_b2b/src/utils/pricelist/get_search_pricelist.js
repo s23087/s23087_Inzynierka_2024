@@ -2,6 +2,8 @@
 
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to get pricelists that name contains search string. Can be filtered or sorted using sort and param arguments.
@@ -11,6 +13,8 @@ import getUserId from "../auth/get_user_id";
  * @return {Promise<Array<{pricelistId: Number, created: string, status: string, name: string, totalItems: Number, path: string, currency: string, modified: string}>>} Array of objects that contain pricelist information. If connection was lost return null. If error occurred return empty array.
  */
 export default async function getSearchPricelists(search, sort, params) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const dbName = await getDbName();
   const userId = await getUserId();
   let prepParams = getPrepParams(sort, params);

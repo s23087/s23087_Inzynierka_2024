@@ -3,6 +3,8 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to change client - user bindings.
@@ -11,6 +13,8 @@ import logout from "../auth/logout";
  * @return {Promise<{ok: boolean, message: string}>} Return result of action in object. If ok is true, then operation is success, otherwise false.
  */
 export default async function setUserClientBindings(orgId, userIds) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   let data = {
     orgId: orgId,
     usersId: userIds,

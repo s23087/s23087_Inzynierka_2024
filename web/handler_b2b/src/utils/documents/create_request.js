@@ -3,6 +3,8 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 const fs = require("node:fs");
 
@@ -15,6 +17,8 @@ const fs = require("node:fs");
  * Completed will always be true, to deliver information to component that action has been completed.
  */
 export default async function createRequest(file, state, formData) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   let receiver = parseInt(formData.get("user"));
   let type = formData.get("type");
   let note = formData.get("note");

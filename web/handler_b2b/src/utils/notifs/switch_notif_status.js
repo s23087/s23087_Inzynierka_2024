@@ -1,6 +1,8 @@
 "use server";
 
 import getDbName from "../auth/get_db_name";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to change notification status.
@@ -8,6 +10,8 @@ import getDbName from "../auth/get_db_name";
  * @param  {Number} notifBool Notification current bool value.
  */
 export default async function switchNotifStatus(notifId, notifBool) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const dbName = await getDbName();
   try {
     await fetch(

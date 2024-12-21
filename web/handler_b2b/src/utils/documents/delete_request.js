@@ -3,6 +3,8 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import { getRequestPath } from "./get_document_path";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to delete chosen user request. If user do not exist server will logout them.
@@ -10,6 +12,8 @@ import { getRequestPath } from "./get_document_path";
  * @return {Promise<{error: boolean, message: string}>} Return action result with message. If error is true that action was unsuccessful.
  */
 export default async function deleteRequest(requestId) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const dbName = await getDbName();
   const path = await getRequestPath(requestId);
   if (path === null) {

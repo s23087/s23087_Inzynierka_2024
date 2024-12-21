@@ -1,6 +1,8 @@
 "use server";
 
 import getDbName from "../auth/get_db_name";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to get rest information of chosen credit note. If not found return object without properties. Other wise return object with properties:
@@ -9,6 +11,8 @@ import getDbName from "../auth/get_db_name";
  * @return {Promise<{creditNoteNumber: string, currencyName: string, note: string, path: string, creditItems: Array<{creditItemId: Number, partnumber: string, itemName: string, qty: Number, price: Number}>}>} Object that that contain invoice information. If connection was lost return null.
  */
 export default async function getRestCreditNote(creditId) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const dbName = await getDbName();
   let url = `${process.env.API_DEST}/${dbName}/CreditNote/rest/${creditId}`;
   try {

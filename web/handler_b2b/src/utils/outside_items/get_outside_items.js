@@ -1,6 +1,8 @@
 "use server";
 
 import getDbName from "../auth/get_db_name";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to get outside items. Can be filtered or sorted using sort and param arguments.
@@ -9,6 +11,8 @@ import getDbName from "../auth/get_db_name";
  * @return {Promise<Array<{users: Array<string>|undefined, partnumber: string, itemId: Number, orgId: Number, orgName: string, price: Number, qty: Number, currency: string}>>}      Array of objects that contain outside item information. If connection was lost return null. If error occurred return empty array.
  */
 export default async function getOutsideItems(sort, params) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const dbName = await getDbName();
   let url = "";
   let prepParams = getPrepParams(sort, params);

@@ -3,12 +3,16 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends post request to local api. If answer is positive it will change user app type from solo to organization and logout the user. If fails it return string with error message.
  * @return {Promise<{error: boolean, message: string}>}
  */
 export default async function changeTypeToOrganization() {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   try {
     const dbName = await getDbName();
     const userId = await getUserId();

@@ -1,6 +1,8 @@
 "use server";
 
 import getDbName from "../auth/get_db_name";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to get chosen invoice item list.
@@ -12,6 +14,8 @@ export default async function getInvoiceItemForCredit(
   invoiceId,
   isYourInvoice,
 ) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const dbName = await getDbName();
   let url;
   if (isYourInvoice) {

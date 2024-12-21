@@ -4,6 +4,8 @@ import getUserId from "../auth/get_user_id";
 import getDbName from "../auth/get_db_name";
 import logout from "../auth/logout";
 import { redirect } from "next/navigation";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to modify user password.
@@ -13,6 +15,8 @@ import { redirect } from "next/navigation";
  * Completed will always be true, to deliver information to component that action has been completed.
  */
 export default async function ChangePassword(state, formData) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   if (!formData.get("newPassword") || !formData.get("oldPassword")) {
     return {
       error: true,

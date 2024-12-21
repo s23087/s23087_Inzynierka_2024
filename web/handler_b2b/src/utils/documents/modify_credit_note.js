@@ -5,6 +5,8 @@ import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 import validators from "../validators/validator";
 import { getCreditPath } from "./get_document_path";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to modify credit note. When data is unchanged the attribute in request will be null.
@@ -25,6 +27,8 @@ export default async function updateCreditNote(
   state,
   formData,
 ) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const fs = require("node:fs");
   let creditNoteNumber = formData.get("creditNumber");
   let date = formData.get("date");

@@ -5,6 +5,8 @@ import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 import validators from "../validators/validator";
 import getUserOrgName from "./get_org_name";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to create pricelist. If user is not found in database server will logout them.
@@ -21,6 +23,8 @@ export default async function createPricelist(
   state,
   formData,
 ) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   let offerName = formData.get("name");
   let status = formData.get("status");
   let maxQty = formData.get("maxQty");

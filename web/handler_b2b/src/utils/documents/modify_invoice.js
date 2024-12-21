@@ -4,6 +4,8 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import validators from "../validators/validator";
 import { getInvoicePath } from "./get_document_path";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 const fs = require("node:fs");
 
@@ -26,6 +28,8 @@ export default async function updateInvoice(
   state,
   formData,
 ) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   let invoiceNumber = formData.get("invoice");
   let transport = formData.get("transport");
   let client = parseInt(formData.get("org"));

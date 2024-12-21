@@ -260,7 +260,7 @@ function AddItemOffcanvas({ showOffcanvas, hideFunction }) {
                         if (!state.error && state.completed) {
                           router.refresh();
                         }
-                        resetState()
+                        resetState();
                       }}
                     >
                       Cancel

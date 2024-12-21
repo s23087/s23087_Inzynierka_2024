@@ -3,6 +3,8 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import validators from "../validators/validator";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to create sales invoice.
@@ -23,6 +25,8 @@ export default async function CreateSalesInvoice(
   state,
   formData,
 ) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   let invoice = formData.get("invoice");
   let transport = formData.get("transport");
   let message = validateData(invoice, transport, products, file);

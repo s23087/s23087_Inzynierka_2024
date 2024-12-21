@@ -1,6 +1,8 @@
 "use server";
 
 import getDbName from "../auth/get_db_name";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to get invoice path.
@@ -8,6 +10,8 @@ import getDbName from "../auth/get_db_name";
  * @return {Promise<string>}      String that contain path information. If connection was lost or error occurred return null.
  */
 export async function getInvoicePath(invoiceId) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const dbName = await getDbName();
   let url = `${process.env.API_DEST}/${dbName}/Invoices/get/path/${invoiceId}`;
   try {
@@ -32,6 +36,8 @@ export async function getInvoicePath(invoiceId) {
  * @return {Promise<string>}      String that contain path information. If connection was lost or error occurred return null.
  */
 export async function getRequestPath(requestId) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const dbName = await getDbName();
   let url = `${process.env.API_DEST}/${dbName}/Requests/get/path/${requestId}`;
   try {
@@ -56,6 +62,8 @@ export async function getRequestPath(requestId) {
  * @return {Promise<string>}      String that contain path information. If connection was lost or error occurred return null.
  */
 export async function getCreditPath(creditId) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const dbName = await getDbName();
   let url = `${process.env.API_DEST}/${dbName}/CreditNote/get/path/${creditId}`;
   try {

@@ -3,6 +3,8 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to get purchase invoices. Can be filtered or sorted using sort and param arguments.
@@ -12,6 +14,8 @@ import logout from "../auth/logout";
  * @return {Promise<Array<{users: Array<string>|undefined, invoiceId: Number, invoiceNumber: string, clientName: string, invoiceDate: string, dueDate: string, paymentStatus: string, inSystem: boolean, qty: Number, price: Number}>>}      Array of objects that contain invoice information. If connection was lost return null. If error occurred return empty array.
  */
 export default async function getYoursInvoices(isOrg, sort, params) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   let url = "";
   let prepParams = getPrepParams(sort, params);
   const dbName = await getDbName();

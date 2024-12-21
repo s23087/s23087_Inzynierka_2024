@@ -1,6 +1,8 @@
 "use server";
 
 import getDbName from "../auth/get_db_name";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to get available to sell user items if user id and currency are passed. Otherwise return list of items.
@@ -9,6 +11,8 @@ import getDbName from "../auth/get_db_name";
  * @return {Promise<Array<{itemId: Number, priceId: Number, invoiceId: Number, invoiceNumber: string, partnumber: string, name: string, qty: Number, price: Number}|{id: Number, partnumber: string, name: string}>>} Array of objects that contain items information. If connection was lost return null. If sales option is true return first option, otherwise second.
  */
 export default async function getItemsList(userId, currency) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const dbName = await getDbName();
   let url = "";
   if (userId && currency) {

@@ -2,6 +2,8 @@
 
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to get items. Can be filtered or sorted using sort and param arguments.
@@ -12,6 +14,8 @@ import getUserId from "../auth/get_user_id";
  * @return {Promise<Array<{users: Array<string>, itemId: Number, itemName: string, partNumber: string, statusName: string, eans: Array<string>, qty: Number, purchasePrice: Number, sources: Array<string>}>>}      Array of objects that contain item information. If connection was lost return null. If error occurred return empty array.
  */
 export default async function getItems(currency, isOrg, sort, params) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   let url = "";
   const dbName = await getDbName();
   let prepParams = getPrepParams(sort, params);

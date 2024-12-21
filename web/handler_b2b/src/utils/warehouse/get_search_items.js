@@ -2,6 +2,8 @@
 
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to get items that part number or name contains search string. Can be filtered or sorted using sort and param arguments.
@@ -19,6 +21,8 @@ export default async function getSearchItems(
   sort,
   params,
 ) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   let url = "";
   const dbName = await getDbName();
   let prepParams = getPrepParams(sort, params);

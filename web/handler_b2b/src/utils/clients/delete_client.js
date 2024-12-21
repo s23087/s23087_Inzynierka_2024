@@ -3,6 +3,8 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to delete chosen client. If user do not exist server will logout them.
@@ -10,6 +12,8 @@ import logout from "../auth/logout";
  * @return {Promise<{error: boolean, message: string}>} Return action result with message. If error is true that action was unsuccessful.
  */
 export default async function deleteClient(orgId) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const dbName = await getDbName();
   const userId = await getUserId();
   let url = `${process.env.API_DEST}/${dbName}/Client/delete/${orgId}/${userId}`;

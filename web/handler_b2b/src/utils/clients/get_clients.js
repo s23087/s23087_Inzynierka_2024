@@ -3,6 +3,8 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to get clients. Can be filtered or sorted using sort and country arguments. Will logout user if does not exist.
@@ -12,6 +14,8 @@ import logout from "../auth/logout";
  * @return {Promise<Array<{clientId: Number, clientName: string, street: string, city: string, postal: string, nip: Number|undefined, country: string}>>} Array of objects that contain invoice information. If connection was lost return null. If error occurred return empty array.
  */
 export default async function getClients(isOrg, sort, country) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   let url = "";
   const userId = await getUserId();
   const dbName = await getDbName();

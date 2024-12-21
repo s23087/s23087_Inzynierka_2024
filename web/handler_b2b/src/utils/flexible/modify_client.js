@@ -4,6 +4,8 @@ import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 import validators from "../validators/validator";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to modify organization. When data is unchanged the attribute in request will be null. If user do not exist server will logout them.
@@ -15,6 +17,8 @@ import validators from "../validators/validator";
  * Completed will always be true, to deliver information to component that action has been completed.
  */
 export default async function modifyClient(orgId, prevState, state, formData) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const userId = await getUserId();
   let nip = formData.get("nip");
   let credit = formData.get("credit");

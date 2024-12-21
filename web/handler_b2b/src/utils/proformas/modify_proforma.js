@@ -5,6 +5,8 @@ import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 import validators from "../validators/validator";
 import getProformaPath from "./get_proforma_path";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 const fs = require("node:fs");
 
@@ -29,6 +31,8 @@ export default async function updateProforma(
   state,
   formData,
 ) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   let user = formData.get("user");
   let proformaNumber = formData.get("proformaNumber");
   let note = formData.get("note");

@@ -5,6 +5,8 @@ import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
 import getCurrencyValueByDate from "../flexible/get_chosen_currency_value";
 import validators from "../validators/validator";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to create proforma.
@@ -25,6 +27,8 @@ export default async function createProforma(
   state,
   formData,
 ) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   let chosenUser = formData.get("user");
   let proformaNumber = formData.get("proformaNumber");
   let seller = formData.get("org");

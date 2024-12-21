@@ -3,6 +3,8 @@
 import getDbName from "../auth/get_db_name";
 import getUserId from "../auth/get_user_id";
 import logout from "../auth/logout";
+import SessionManagement from "../auth/session_management";
+import { NextResponse } from "next/server";
 
 /**
  * Sends request to get proforma's without existing delivery. The object in array have properties id and proformaNumber.
@@ -10,6 +12,8 @@ import logout from "../auth/logout";
  * @return {Promise<Array<{id: Number, proformaNumber: string}>>} Array of objects that that contain proforma information. If connection was lost return null.
  */
 export default async function getProformaListWithoutDelivery(isDeliveryToUser) {
+  let userAuthorized = await SessionManagement.verifySession();
+  if (!userAuthorized) NextResponse.redirect(new URL("/"));
   const dbName = await getDbName();
   const userId = await getUserId();
   let url = `${process.env.API_DEST}/${dbName}/Delivery/get/${isDeliveryToUser ? "user" : "client"}/proformas/${userId}`;
