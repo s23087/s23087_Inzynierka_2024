@@ -75,6 +75,6 @@ export default async function signIn(state, formData) {
   }
   const body = await response.json();
   await SessionManagement.createSession(body.id, body.role, dbName);
-  if (body.role === "Warehouse Manager") redirect("dashboard/deliveries");
-  redirect("dashboard/warehouse");
+  if (body.role === "Warehouse Manager") redirect("/dashboard/deliveries");
+  redirect("/dashboard/warehouse");
 }

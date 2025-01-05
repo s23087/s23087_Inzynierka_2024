@@ -151,7 +151,7 @@ function ModifyPricelistOffcanvas({ showOffcanvas, hideFunction, pricelist }) {
           </Container>
         </Offcanvas.Header>
         <Offcanvas.Body className="px-4 px-xl-5 pb-0 scrollableHeight" as="div">
-          <Container className="p-0" fluid>
+          <Container className="p-0 pb-5" fluid>
             <Form className="mx-1 mx-xl-3" id="offerForm" action={formAction}>
               <ErrorMessage
                 message="Could not download all necessary information."
