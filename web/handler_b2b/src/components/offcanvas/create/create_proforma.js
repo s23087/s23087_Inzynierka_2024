@@ -628,7 +628,7 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
           }}
           userId={chosenUser}
           currency={chosenCurrency}
-          addedProductsQty={products.length}
+          addedProducts={products}
         />
         <Toastes.ErrorToast
           showToast={state.completed && state.error}
@@ -659,6 +659,8 @@ function AddProformaOffcanvas({ showOffcanvas, hideFunction, isYourProforma }) {
     state.error = false;
     state.completed = false;
     state.message = "";
+    setChosenCurrency("PLN");
+    setShowCurrencyExchange(false);
     setIsLoading(false);
   }
 }

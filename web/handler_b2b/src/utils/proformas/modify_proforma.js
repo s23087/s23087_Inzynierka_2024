@@ -12,6 +12,7 @@ const fs = require("node:fs");
 
 /**
  * Sends request to modify proforma. When data is unchanged the attribute in request will be null.
+ * @param  {Array<{id: Number, priceId: Number|undefined, qty: Number, price: Number}>} products Products added to proforma. PriceId is undefined only if isYourProforma is true.
  * @param  {FormData} file FormData object containing file binary data.
  * @param  {{orgName: string, restOrgs: Array<{orgName: string, orgId: Number}>}} orgs Object that contain user organization name.
  * @param  {{proformaNumber: string, userId: Number, client: Number, transport: Number, paymentMethod: Number, status: boolean, note: string}} prevState Object that contain information about previous state of chosen item.
@@ -23,6 +24,7 @@ const fs = require("node:fs");
  * Completed will always be true, to deliver information to component that action has been completed.
  */
 export default async function updateProforma(
+  products,
   file,
   orgs,
   prevState,
@@ -41,7 +43,7 @@ export default async function updateProforma(
   let paymentMethod = formData.get("paymentMethod");
   let status = formData.get("status") === "true";
   let path = "";
-  let message = validateData(proformaNumber, user, org, transport);
+  let message = validateData(proformaNumber, user, org, transport, products);
 
   if (message.length > 6) {
     return {
@@ -53,6 +55,7 @@ export default async function updateProforma(
   const dbName = await getDbName();
   const userId = await getUserId();
   let prevPath = await getProformaPath(proformaId);
+  let transformProducts = getTransformedProducts(products, isYourProforma);
 
   if (file) {
     if (prevPath === null) {
@@ -119,7 +122,7 @@ export default async function updateProforma(
       return {
         error: false,
         completed: true,
-        message: "Success! You have modified the request.",
+        message: "Success! You have modified the proforma.",
       };
     } else {
       return {
@@ -135,6 +138,23 @@ export default async function updateProforma(
       completed: true,
       message: "Connection error",
     };
+  }
+  /**
+   * Check response for error statuses. If no error occurred return null.
+   * @param  {Array<object>} products Products added to proforma.
+   * @param  {boolean} isYourProforma Is proforma type "Yours proformas".
+   * @return {Array<object>}      Return products prepared for fetch data.
+  */
+  function getTransformedProducts(products, isYourProforma) {
+    let transformProducts = [];
+    products.forEach((element) => {
+      transformProducts.push({
+        itemId: isYourProforma ? element.id : element.priceId,
+        qty: element.qty,
+        price: element.price,
+      });
+    });
+    return transformProducts;
   }
   /**
    * Overwrite file with new data.
@@ -177,6 +197,7 @@ export default async function updateProforma(
       inSystem: status !== prevState.status ? status : null,
       path: path ?? null,
       note: note !== prevState.note ? note : null,
+      proformaItems: products.length > 0 ? transformProducts : null
     };
   }
 }
@@ -251,7 +272,7 @@ async function changePath(
  * @param  {string} transport Transport cost in form of string.
  * @return {string} Return error message. If no error occurred return only "Error:"
  */
-function validateData(proformaNumber, user, org, transport) {
+function validateData(proformaNumber, user, org, transport, products) {
   let message = "Error:";
   if (!proformaNumber || proformaNumber.length > 40)
     message += "\nProforma must not be empty or exceed 40 chars.";
@@ -259,5 +280,6 @@ function validateData(proformaNumber, user, org, transport) {
   if (!org) message += "\nClient must not be empty.";
   if (!transport || !validators.isPriceFormat(transport))
     message += "\nTransport must be a number and not empty.";
+  if (products.length <= 0) message += "\nProforma must have products.";
   return message;
 }

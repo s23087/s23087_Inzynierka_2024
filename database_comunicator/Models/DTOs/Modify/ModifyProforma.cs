@@ -1,4 +1,6 @@
-﻿namespace database_communicator.Models.DTOs.Modify
+﻿using database_communicator.Models.DTOs.Create;
+
+namespace database_communicator.Models.DTOs.Modify
 {
     public class ModifyProforma
     {
@@ -12,5 +14,6 @@
         public bool? InSystem { get; set; }
         public string? Path { get; set; }
         public string? Note { get; set; }
+        public IEnumerable<AddProformaItem>? ProformaItems { get; set; } = new List<AddProformaItem>();
     }
 }

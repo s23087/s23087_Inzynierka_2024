@@ -695,7 +695,7 @@ function AddInvoiceOffcanvas({ showOffcanvas, hideFunction, isYourInvoice }) {
           }}
           userId={chosenUser}
           currency={chosenCurrency}
-          addedProductsQty={products.length}
+          addedProducts={products}
         />
         <Toastes.ErrorToast
           showToast={state.completed && state.error}

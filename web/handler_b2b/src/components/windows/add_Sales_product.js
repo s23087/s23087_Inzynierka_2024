@@ -26,7 +26,8 @@ import InputValidator from "@/utils/validators/form_validator/inputValidator";
  * @param {Function} props.addFunction Function that will activate after clicking add button.
  * @param {Number} props.userId User id.
  * @param {string} props.currency Shortcut of chosen by user currency name.
- * @param {Number} props.addedProductsQty Length of array of already added products.
+ * @param {Array<object>} props.addedProducts Added products.
+ * @param {boolean} props.forModify True if used for modifying
  * @return {JSX.Element} Modal element
  */
 function AddSaleProductWindow({
@@ -35,20 +36,38 @@ function AddSaleProductWindow({
   addFunction,
   userId,
   currency,
-  addedProductsQty,
+  addedProducts,
+  forModify = false
 }) {
   // Product list
   const [products, setProducts] = useState([]);
   // Chosen product index
   const [currentProduct, setCurrentProduct] = useState(0);
+  // Rerender part variable
+  const [rerenderQty, setRerenderQty] = useState(false);
+  const [rerenderPrice, setRerenderPrice] = useState(false);
   // True if download error occurred
   const [downloadError, setDownloadError] = useState(false);
   useEffect(() => {
-    if (modalShow && addedProductsQty === 0) {
+    if (modalShow && addedProducts.length === 0) {
       getItemsList(userId, currency).then((data) => {
         if (data !== null) {
           setDownloadError(false);
           setProducts(data);
+          setRerenderPrice(!rerenderPrice)
+          setRerenderQty(!rerenderQty)
+        } else {
+          setDownloadError(true);
+        }
+      });
+    } else if (forModify) {
+      getItemsList(userId, currency).then((data) => {
+        if (data !== null) {
+          setDownloadError(false);
+          let newData = getFilteredData(data);
+          setProducts(newData);
+          setRerenderPrice(!rerenderPrice)
+          setRerenderQty(!rerenderQty)
         } else {
           setDownloadError(true);
         }
@@ -58,7 +77,7 @@ function AddSaleProductWindow({
       setCurrentProduct(currentProductIndex);
     }
     setShowSuccess(false);
-  }, [modalShow, addedProductsQty, userId, currency]);
+  }, [modalShow, addedProducts, userId, currency]);
   // Errors
   const [salesPriceError, setSalesPriceError] = useState(false);
   const [qtyError, setQtyError] = useState(false);
@@ -128,7 +147,7 @@ function AddSaleProductWindow({
               type="number"
               id="qty"
               isInvalid={qtyError}
-              key={[currentProduct, products]}
+              key={[currentProduct, products, rerenderQty]}
               defaultValue={
                 products[currentProduct] ? products[currentProduct].qty : 0
               }
@@ -156,7 +175,7 @@ function AddSaleProductWindow({
               className="input-style shadow-sm maxInputWidth"
               type="text"
               id="price"
-              key={[currentProduct, products]}
+              key={[currentProduct, products, rerenderPrice]}
               defaultValue={
                 products[currentProduct]
                   ? products[currentProduct].price
@@ -263,6 +282,15 @@ function AddSaleProductWindow({
       qty <= 0
     );
   }
+  /**
+   * Drop product that are already added
+   */
+  function getFilteredData(data) {
+    return data.filter(
+      (e) =>
+        Object.values(addedProducts).findIndex((x) => x.id == e.itemId && x.priceId == e.priceId) === -1,
+    );
+  }
 }
 
 AddSaleProductWindow.propTypes = {
@@ -271,7 +299,7 @@ AddSaleProductWindow.propTypes = {
   addFunction: PropTypes.func.isRequired,
   userId: PropTypes.number.isRequired,
   currency: PropTypes.string.isRequired,
-  addedProductsQty: PropTypes.number.isRequired,
+  addedProducts: PropTypes.array.isRequired,
 };
 
 export default AddSaleProductWindow;

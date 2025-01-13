@@ -13,6 +13,9 @@ import InputValidator from "@/utils/validators/form_validator/inputValidator";
 import getRestModifyProforma from "@/utils/proformas/get_rest_modify_proforma";
 import getUsers from "@/utils/flexible/get_users";
 import updateProforma from "@/utils/proformas/modify_proforma";
+import AddProductWindow from "@/components/windows/addProduct";
+import AddSaleProductWindow from "@/components/windows/add_Sales_product";
+import ProductHolder from "@/components/smaller_components/product_holder";
 
 /**
  * Create offcanvas that allow to modify chosen proforma.
@@ -31,6 +34,10 @@ function ModifyProformaOffcanvas({
   proforma,
 }) {
   const router = useRouter();
+  // Styles
+  const maxHScrollContainer = {
+    maxHeight: "200px",
+  };
   // download data holders
   const [restInfo, setRestInfo] = useState({
     userId: -1,
@@ -44,6 +51,14 @@ function ModifyProformaOffcanvas({
     restOrgs: [],
   });
   const [paymentMethods, setPaymentMethods] = useState([]);
+  // Product element key to rerender when product array change
+  const [resetSeed, setResetSeed] = useState(false);
+  // products holder
+  const [products, setProducts] = useState([]);
+  // useState for showing add product window
+  const [showProductWindow, setShowProductWindow] = useState(false);
+  // useState for showing add sales product window
+  const [showSalesProductWindow, setShowSalesProductWindow] = useState(false);
   // download error
   const [userDownloadError, setUserDownloadError] = useState(false);
   const [orgDownloadError, setOrgDownloadError] = useState(false);
@@ -90,6 +105,8 @@ function ModifyProformaOffcanvas({
           prevState.note = data.note;
           prevState.status = data.inSystem;
           prevState.userId = data.userId;
+          setProducts(data.items)
+          setResetSeed(!resetSeed)
         }
       });
     }
@@ -128,6 +145,7 @@ function ModifyProformaOffcanvas({
   // Form action with state
   const [state, formPurchaseAction] = useFormState(
     updateProforma
+      .bind(null, products)
       .bind(null, file)
       .bind(null, orgs)
       .bind(null, prevState)
@@ -337,6 +355,45 @@ function ModifyProformaOffcanvas({
                 </Form.Select>
               </Form.Group>
               <Form.Group className="mb-4 maxInputWidth">
+                <Form.Label className="blue-main-text">Product:</Form.Label>
+                <Container
+                  className="overflow-y-scroll px-0"
+                  style={maxHScrollContainer}
+                  key={resetSeed}
+                >
+                  {products.map((value, key) => {
+                    return (
+                      <ProductHolder
+                        key={key}
+                        value={value}
+                        deleteValue={() => {
+                          products.splice(key, 1);
+                          setResetSeed(!resetSeed);
+                        }}
+                      />
+                    );
+                  })}
+                </Container>
+                <Button
+                  variant="mainBlue"
+                  className="mb-3 mt-4 ms-3 py-3"
+                  style={{
+                    maxWidth: "250px",
+                    minWidth: "200px",
+                    borderRadius: "5px",
+                  }}
+                  onClick={() => {
+                    if (isYourProforma) {
+                      setShowProductWindow(true);
+                    } else {
+                      setShowSalesProductWindow(true);
+                    }
+                  }}
+                >
+                  Add Product
+                </Button>
+              </Form.Group>
+              <Form.Group className="mb-4 maxInputWidth">
                 <Form.Label className="blue-main-text">Document:</Form.Label>
                 <ErrorMessage
                   message="Must be a pdf file."
@@ -435,6 +492,24 @@ function ModifyProformaOffcanvas({
             hideFunction();
             router.refresh();
           }}
+        />
+        <AddProductWindow
+          modalShow={showProductWindow}
+          onHideFunction={() => setShowProductWindow(false)}
+          addFunction={(val) => {
+            products.push(val);
+          }}
+        />
+        <AddSaleProductWindow
+          modalShow={showSalesProductWindow}
+          onHideFunction={() => setShowSalesProductWindow(false)}
+          addFunction={(val) => {
+            products.push(val);
+          }}
+          userId={prevState.userId}
+          currency={proforma.currencyName}
+          addedProducts={products}
+          forModify={true}
         />
       </Container>
     </Offcanvas>

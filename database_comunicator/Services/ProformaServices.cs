@@ -506,7 +506,30 @@ namespace database_communicator.Services
                     UserId = e.UserId,
                     PaymentMethod = e.PaymentMethod.MethodName,
                     InSystem = e.InSystem,
-                    Note = e.Note
+                    Note = e.Note,
+                    Items = !e.ProformaFutureItems.Any() ? e.ProformaOwnedItems.Select(d => new GetProformaItem
+                    {
+                        Id = d.Item.OwnedItemId,
+                        PriceId = d.PurchasePriceId,
+                        Qty = d.Qty,
+                        Price = d.SellingPrice,
+                        PurchasePrice = d.Proforma.CurrencyName == "PLN" ? 
+                        d.Item.Price 
+                        : 
+                        d.Item.CalculatedPrices.Where(x => x.CurrencyName == d.Proforma.CurrencyName).Select(x => x.Price).First(),
+                        Name = d.Item.OwnedItem.OriginalItem.ItemName,
+                        Partnumber = d.Item.OwnedItem.OriginalItem.PartNumber,
+                        InvoiceNumber = d.Item.OwnedItem.Invoice.InvoiceNumber
+                    }) 
+                    :
+                    e.ProformaFutureItems.Select(d => new GetProformaItem
+                    {
+                        Id = d.ItemId,
+                        Qty = d.Qty,
+                        Price = d.PurchasePrice,
+                        Name = d.Item.ItemName,
+                        Partnumber = d.Item.PartNumber
+                    })
                 }).FirstAsync();
         }
         /// <summary>
@@ -582,6 +605,35 @@ namespace database_communicator.Services
                         .ExecuteUpdateAsync(setter =>
                             setter.SetProperty(s => s.Note, data.Note)
                         );
+                }
+                if (data.ProformaItems != null)
+                {
+                    if (data.IsYourProforma)
+                    {
+                        await _handlerContext.ProformaFutureItems.Where(e => e.ProformaId == data.ProformaId).ExecuteDeleteAsync();
+                        var futureItems = data.ProformaItems
+                            .Select(e => new ProformaFutureItem
+                            {
+                                ProformaId = data.ProformaId,
+                                ItemId = e.ItemId,
+                                Qty = e.Qty,
+                                PurchasePrice = e.Price
+                            }).ToList();
+                        await _handlerContext.ProformaFutureItems.AddRangeAsync(futureItems);
+                    }
+                    else
+                    {
+                        await _handlerContext.ProformaOwnedItems.Where(e => e.ProformaId == data.ProformaId).ExecuteDeleteAsync();
+                        var ownedItems = data.ProformaItems
+                            .Select(e => new ProformaOwnedItem
+                            {
+                                ProformaId = data.ProformaId,
+                                PurchasePriceId = e.ItemId,
+                                Qty = e.Qty,
+                                SellingPrice = e.Price
+                            }).ToList();
+                        await _handlerContext.ProformaOwnedItems.AddRangeAsync(ownedItems);
+                    }
                 }
                 await _handlerContext.SaveChangesAsync();
                 await trans.CommitAsync();
