@@ -1,4 +1,4 @@
-USE [TestHandlerB2B]
+USE [testEnv]
 GO
 DELETE FROM [dbo].[Proforma_Owned_Item]
 GO
@@ -606,31 +606,31 @@ SET IDENTITY_INSERT [dbo].[Taxes] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Invoice] ON 
 GO
-INSERT [dbo].[Invoice] ([invoice_id], [invoice_number], [seller], [buyer], [invoice_date], [due_date], [note], [in_system], [transport_cost], [invoice_file_path], [taxes], [currency_value_date], [currency_name], [payment_method_id], [payments_status_Id]) VALUES (1, N'Purchase invoice A', 2, 1, CAST(N'2024-11-26T00:00:00.000' AS DateTime), CAST(N'2024-12-26T00:00:00.000' AS DateTime), N'', 1, CAST(249.00 AS Decimal(20, 2)), N'../../database/TestHandlerB2B/documents/Purchase_invoice_A_112_2024_11_261732635572740.pdf', 1, CAST(N'2024-11-26T00:00:00.000' AS DateTime), N'EUR', 3, 2)
+INSERT [dbo].[Invoice] ([invoice_id], [invoice_number], [seller], [buyer], [invoice_date], [due_date], [note], [in_system], [transport_cost], [invoice_file_path], [taxes], [currency_value_date], [currency_name], [payment_method_id], [payments_status_Id]) VALUES (1, N'Purchase invoice A', 2, 1, CAST(N'2024-11-26T00:00:00.000' AS DateTime), CAST(N'2024-12-26T00:00:00.000' AS DateTime), N'', 1, CAST(249.00 AS Decimal(20, 2)), N'../../database/testEnv/documents/Purchase_invoice_A_112_2024_11_261732635572740.pdf', 1, CAST(N'2024-11-26T00:00:00.000' AS DateTime), N'EUR', 3, 2)
 GO
-INSERT [dbo].[Invoice] ([invoice_id], [invoice_number], [seller], [buyer], [invoice_date], [due_date], [note], [in_system], [transport_cost], [invoice_file_path], [taxes], [currency_value_date], [currency_name], [payment_method_id], [payments_status_Id]) VALUES (2, N'Purchase Invoice B', 4, 1, CAST(N'2024-11-21T00:00:00.000' AS DateTime), CAST(N'2024-12-05T00:00:00.000' AS DateTime), N'', 1, CAST(0.00 AS Decimal(20, 2)), N'../../database/TestHandlerB2B/documents/Purchase_Invoice_B_114_2024_11_211732638874583.pdf', 1, CAST(N'2024-11-25T00:00:00.000' AS DateTime), N'EUR', 2, 1)
+INSERT [dbo].[Invoice] ([invoice_id], [invoice_number], [seller], [buyer], [invoice_date], [due_date], [note], [in_system], [transport_cost], [invoice_file_path], [taxes], [currency_value_date], [currency_name], [payment_method_id], [payments_status_Id]) VALUES (2, N'Purchase Invoice B', 4, 1, CAST(N'2024-11-21T00:00:00.000' AS DateTime), CAST(N'2024-12-05T00:00:00.000' AS DateTime), N'', 1, CAST(0.00 AS Decimal(20, 2)), N'../../database/testEnv/documents/Purchase_Invoice_B_114_2024_11_211732638874583.pdf', 1, CAST(N'2024-11-25T00:00:00.000' AS DateTime), N'EUR', 2, 1)
 GO
-INSERT [dbo].[Invoice] ([invoice_id], [invoice_number], [seller], [buyer], [invoice_date], [due_date], [note], [in_system], [transport_cost], [invoice_file_path], [taxes], [currency_value_date], [currency_name], [payment_method_id], [payments_status_Id]) VALUES (3, N'Sales Invoice A', 1, 4, CAST(N'2024-11-21T00:00:00.000' AS DateTime), CAST(N'2024-12-05T00:00:00.000' AS DateTime), N'', 1, CAST(0.00 AS Decimal(20, 2)), N'../../database/TestHandlerB2B/documents/Sales_Invoice_A_114_2024_11_211732643520043.pdf', 1, CAST(N'2024-11-21T00:00:00.000' AS DateTime), N'EUR', 2, 1)
+INSERT [dbo].[Invoice] ([invoice_id], [invoice_number], [seller], [buyer], [invoice_date], [due_date], [note], [in_system], [transport_cost], [invoice_file_path], [taxes], [currency_value_date], [currency_name], [payment_method_id], [payments_status_Id]) VALUES (3, N'Sales Invoice A', 1, 4, CAST(N'2024-11-21T00:00:00.000' AS DateTime), CAST(N'2024-12-05T00:00:00.000' AS DateTime), N'', 1, CAST(0.00 AS Decimal(20, 2)), N'../../database/testEnv/documents/Sales_Invoice_A_114_2024_11_211732643520043.pdf', 1, CAST(N'2024-11-21T00:00:00.000' AS DateTime), N'EUR', 2, 1)
 GO
-INSERT [dbo].[Invoice] ([invoice_id], [invoice_number], [seller], [buyer], [invoice_date], [due_date], [note], [in_system], [transport_cost], [invoice_file_path], [taxes], [currency_value_date], [currency_name], [payment_method_id], [payments_status_Id]) VALUES (4, N'Purchase invoice C', 3, 1, CAST(N'2024-11-21T00:00:00.000' AS DateTime), CAST(N'2024-12-05T00:00:00.000' AS DateTime), N'', 0, CAST(150.00 AS Decimal(20, 2)), N'../../database/TestHandlerB2B/documents/Purchase_invoice_C_113_2024_11_211732645918046.pdf', 1, CAST(N'2024-11-26T00:00:00.000' AS DateTime), N'USD', 3, 2)
+INSERT [dbo].[Invoice] ([invoice_id], [invoice_number], [seller], [buyer], [invoice_date], [due_date], [note], [in_system], [transport_cost], [invoice_file_path], [taxes], [currency_value_date], [currency_name], [payment_method_id], [payments_status_Id]) VALUES (4, N'Purchase invoice C', 3, 1, CAST(N'2024-11-21T00:00:00.000' AS DateTime), CAST(N'2024-12-05T00:00:00.000' AS DateTime), N'', 0, CAST(150.00 AS Decimal(20, 2)), N'../../database/testEnv/documents/Purchase_invoice_C_113_2024_11_211732645918046.pdf', 1, CAST(N'2024-11-26T00:00:00.000' AS DateTime), N'USD', 3, 2)
 GO
-INSERT [dbo].[Invoice] ([invoice_id], [invoice_number], [seller], [buyer], [invoice_date], [due_date], [note], [in_system], [transport_cost], [invoice_file_path], [taxes], [currency_value_date], [currency_name], [payment_method_id], [payments_status_Id]) VALUES (5, N'Sales Invoice C', 1, 3, CAST(N'2024-11-22T00:00:00.000' AS DateTime), CAST(N'2024-12-26T00:00:00.000' AS DateTime), N'', 0, CAST(250.00 AS Decimal(20, 2)), N'../../database/TestHandlerB2B/documents/Sales_Invoice_C_113_2024_11_221732646008398.pdf', 1, CAST(N'2024-11-22T00:00:00.000' AS DateTime), N'EUR', 3, 2)
+INSERT [dbo].[Invoice] ([invoice_id], [invoice_number], [seller], [buyer], [invoice_date], [due_date], [note], [in_system], [transport_cost], [invoice_file_path], [taxes], [currency_value_date], [currency_name], [payment_method_id], [payments_status_Id]) VALUES (5, N'Sales Invoice C', 1, 3, CAST(N'2024-11-22T00:00:00.000' AS DateTime), CAST(N'2024-12-26T00:00:00.000' AS DateTime), N'', 0, CAST(250.00 AS Decimal(20, 2)), N'../../database/testEnv/documents/Sales_Invoice_C_113_2024_11_221732646008398.pdf', 1, CAST(N'2024-11-22T00:00:00.000' AS DateTime), N'EUR', 3, 2)
 GO
-INSERT [dbo].[Invoice] ([invoice_id], [invoice_number], [seller], [buyer], [invoice_date], [due_date], [note], [in_system], [transport_cost], [invoice_file_path], [taxes], [currency_value_date], [currency_name], [payment_method_id], [payments_status_Id]) VALUES (7, N'Purchase invoice D', 2, 1, CAST(N'2024-11-21T00:00:00.000' AS DateTime), CAST(N'2024-12-20T00:00:00.000' AS DateTime), N'', 1, CAST(250.00 AS Decimal(20, 2)), N'../../database/TestHandlerB2B/documents/Purchase_invoice_D_112_2024_11_211732974978289.pdf', 1, CAST(N'2024-11-21T00:00:00.000' AS DateTime), N'EUR', 3, 2)
+INSERT [dbo].[Invoice] ([invoice_id], [invoice_number], [seller], [buyer], [invoice_date], [due_date], [note], [in_system], [transport_cost], [invoice_file_path], [taxes], [currency_value_date], [currency_name], [payment_method_id], [payments_status_Id]) VALUES (7, N'Purchase invoice D', 2, 1, CAST(N'2024-11-21T00:00:00.000' AS DateTime), CAST(N'2024-12-20T00:00:00.000' AS DateTime), N'', 1, CAST(250.00 AS Decimal(20, 2)), N'../../database/testEnv/documents/Purchase_invoice_D_112_2024_11_211732974978289.pdf', 1, CAST(N'2024-11-21T00:00:00.000' AS DateTime), N'EUR', 3, 2)
 GO
 SET IDENTITY_INSERT [dbo].[Invoice] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Credit_note] ON 
 GO
-INSERT [dbo].[Credit_note] ([id_credit_note], [credit_note_number], [credit_note_date], [in_system], [is_paid], [note], [invoice_id], [credit_file_path], [id_user]) VALUES (8, N'Credit A', CAST(N'2024-11-29' AS Date), 1, 1, N'', 2, N'../../database/TestHandlerB2B/documents/cn_Credit_A_1Test_Handler_B2BClient_C_2024_11_29_1732889632774.pdf', 1)
+INSERT [dbo].[Credit_note] ([id_credit_note], [credit_note_number], [credit_note_date], [in_system], [is_paid], [note], [invoice_id], [credit_file_path], [id_user]) VALUES (8, N'Credit A', CAST(N'2024-11-29' AS Date), 1, 1, N'', 2, N'../../database/testEnv/documents/cn_Credit_A_1Test_Handler_B2BClient_C_2024_11_29_1732889632774.pdf', 1)
 GO
-INSERT [dbo].[Credit_note] ([id_credit_note], [credit_note_number], [credit_note_date], [in_system], [is_paid], [note], [invoice_id], [credit_file_path], [id_user]) VALUES (9, N'Credit B', CAST(N'2024-11-29' AS Date), 0, 1, N'', 1, N'../../database/TestHandlerB2B/documents/cn_Credit_B_1Test_Handler_B2BClient_A_2024_11_29_1732890994291.pdf', 1)
+INSERT [dbo].[Credit_note] ([id_credit_note], [credit_note_number], [credit_note_date], [in_system], [is_paid], [note], [invoice_id], [credit_file_path], [id_user]) VALUES (9, N'Credit B', CAST(N'2024-11-29' AS Date), 0, 1, N'', 1, N'../../database/testEnv/documents/cn_Credit_B_1Test_Handler_B2BClient_A_2024_11_29_1732890994291.pdf', 1)
 GO
-INSERT [dbo].[Credit_note] ([id_credit_note], [credit_note_number], [credit_note_date], [in_system], [is_paid], [note], [invoice_id], [credit_file_path], [id_user]) VALUES (13, N'Credit C', CAST(N'2024-11-29' AS Date), 0, 0, N'', 4, N'../../database/TestHandlerB2B/documents/cn_Credit_C_1Test_Handler_B2BClient_B_2024_11_29_1732892942076.pdf', 1)
+INSERT [dbo].[Credit_note] ([id_credit_note], [credit_note_number], [credit_note_date], [in_system], [is_paid], [note], [invoice_id], [credit_file_path], [id_user]) VALUES (13, N'Credit C', CAST(N'2024-11-29' AS Date), 0, 0, N'', 4, N'../../database/testEnv/documents/cn_Credit_C_1Test_Handler_B2BClient_B_2024_11_29_1732892942076.pdf', 1)
 GO
-INSERT [dbo].[Credit_note] ([id_credit_note], [credit_note_number], [credit_note_date], [in_system], [is_paid], [note], [invoice_id], [credit_file_path], [id_user]) VALUES (15, N'CreditS B', CAST(N'2024-11-29' AS Date), 0, 1, N'', 5, N'../../database/TestHandlerB2B/documents/cn_CreditS_B_1Test_Handler_B2BClient_B_2024_11_29_1732896359646.pdf', 1)
+INSERT [dbo].[Credit_note] ([id_credit_note], [credit_note_number], [credit_note_date], [in_system], [is_paid], [note], [invoice_id], [credit_file_path], [id_user]) VALUES (15, N'CreditS B', CAST(N'2024-11-29' AS Date), 0, 1, N'', 5, N'../../database/testEnv/documents/cn_CreditS_B_1Test_Handler_B2BClient_B_2024_11_29_1732896359646.pdf', 1)
 GO
-INSERT [dbo].[Credit_note] ([id_credit_note], [credit_note_number], [credit_note_date], [in_system], [is_paid], [note], [invoice_id], [credit_file_path], [id_user]) VALUES (16, N'CreditS C', CAST(N'2024-11-30' AS Date), 0, 1, N'', 5, N'../../database/TestHandlerB2B/documents/cn_CreditS_C_1Test_Handler_B2BClient_B_2024_11_30_1732972199509.pdf', 1)
+INSERT [dbo].[Credit_note] ([id_credit_note], [credit_note_number], [credit_note_date], [in_system], [is_paid], [note], [invoice_id], [credit_file_path], [id_user]) VALUES (16, N'CreditS C', CAST(N'2024-11-30' AS Date), 0, 1, N'', 5, N'../../database/testEnv/documents/cn_CreditS_C_1Test_Handler_B2BClient_B_2024_11_30_1732972199509.pdf', 1)
 GO
 SET IDENTITY_INSERT [dbo].[Credit_note] OFF
 GO
@@ -784,25 +784,25 @@ SET IDENTITY_INSERT [dbo].[Offer_status] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Offer] ON 
 GO
-INSERT [dbo].[Offer] ([offer_id], [offer_name], [creation_date], [modification_date], [path_to_file], [offer_status_id], [max_qty], [currency_name], [id_user]) VALUES (1, N'Pricelist A', CAST(N'2024-11-30T14:29:15.343' AS DateTime), CAST(N'2024-11-30T14:29:15.343' AS DateTime), N'src/app/api/pricelist/TestHandlerB2B/Pricelist_A25EUR1732973355284.csv', 1, 25, N'EUR', 1)
+INSERT [dbo].[Offer] ([offer_id], [offer_name], [creation_date], [modification_date], [path_to_file], [offer_status_id], [max_qty], [currency_name], [id_user]) VALUES (1, N'Pricelist A', CAST(N'2024-11-30T14:29:15.343' AS DateTime), CAST(N'2024-11-30T14:29:15.343' AS DateTime), N'src/app/api/pricelist/testEnv/Pricelist_A25EUR1732973355284.csv', 1, 25, N'EUR', 1)
 GO
-INSERT [dbo].[Offer] ([offer_id], [offer_name], [creation_date], [modification_date], [path_to_file], [offer_status_id], [max_qty], [currency_name], [id_user]) VALUES (2, N'Pricelist B', CAST(N'2024-11-30T14:38:21.717' AS DateTime), CAST(N'2024-11-30T14:38:21.717' AS DateTime), N'src/app/api/pricelist/TestHandlerB2B/Pricelist_B25PLN1732973901684.xlsx', 1, 25, N'PLN', 1)
+INSERT [dbo].[Offer] ([offer_id], [offer_name], [creation_date], [modification_date], [path_to_file], [offer_status_id], [max_qty], [currency_name], [id_user]) VALUES (2, N'Pricelist B', CAST(N'2024-11-30T14:38:21.717' AS DateTime), CAST(N'2024-11-30T14:38:21.717' AS DateTime), N'src/app/api/pricelist/testEnv/Pricelist_B25PLN1732973901684.xlsx', 1, 25, N'PLN', 1)
 GO
-INSERT [dbo].[Offer] ([offer_id], [offer_name], [creation_date], [modification_date], [path_to_file], [offer_status_id], [max_qty], [currency_name], [id_user]) VALUES (3, N'Pricelist C', CAST(N'2024-11-30T14:38:21.717' AS DateTime), CAST(N'2024-11-30T14:38:21.717' AS DateTime), N'src/app/api/pricelist/TestHandlerB2B/Pricelist_C25PLN1732973901684.xlsx', 1, 25, N'PLN', 1)
+INSERT [dbo].[Offer] ([offer_id], [offer_name], [creation_date], [modification_date], [path_to_file], [offer_status_id], [max_qty], [currency_name], [id_user]) VALUES (3, N'Pricelist C', CAST(N'2024-11-30T14:38:21.717' AS DateTime), CAST(N'2024-11-30T14:38:21.717' AS DateTime), N'src/app/api/pricelist/testEnv/Pricelist_C25PLN1732973901684.xlsx', 1, 25, N'PLN', 1)
 GO
 SET IDENTITY_INSERT [dbo].[Offer] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Proforma] ON 
 GO
-INSERT [dbo].[Proforma] ([proforma_id], [proforma_number], [seller], [buyer], [proforma_date], [transport_cost], [note], [in_system], [proforma_file_path], [taxes], [payment_method_id], [currency_value_date], [currency_name], [id_user]) VALUES (1, N'Proforma A', 2, 1, CAST(N'2024-11-26T00:00:00.000' AS DateTime), CAST(250.00 AS Decimal(6, 2)), N'', 1, N'../../database/TestHandlerB2B/documents/pr_Proforma_A_112_2024_11_2611732631976834.pdf', 1, 3, CAST(N'2024-11-26T00:00:00.000' AS DateTime), N'EUR', 1)
+INSERT [dbo].[Proforma] ([proforma_id], [proforma_number], [seller], [buyer], [proforma_date], [transport_cost], [note], [in_system], [proforma_file_path], [taxes], [payment_method_id], [currency_value_date], [currency_name], [id_user]) VALUES (1, N'Proforma A', 2, 1, CAST(N'2024-11-26T00:00:00.000' AS DateTime), CAST(250.00 AS Decimal(6, 2)), N'', 1, N'../../database/testEnv/documents/pr_Proforma_A_112_2024_11_2611732631976834.pdf', 1, 3, CAST(N'2024-11-26T00:00:00.000' AS DateTime), N'EUR', 1)
 GO
-INSERT [dbo].[Proforma] ([proforma_id], [proforma_number], [seller], [buyer], [proforma_date], [transport_cost], [note], [in_system], [proforma_file_path], [taxes], [payment_method_id], [currency_value_date], [currency_name], [id_user]) VALUES (2, N'Proforma B', 3, 1, CAST(N'2024-11-21T00:00:00.000' AS DateTime), CAST(150.00 AS Decimal(6, 2)), N'', 1, N'../../database/TestHandlerB2B/documents/pr_Proforma_B_113_2024_11_2111732633802314.pdf', 1, 3, CAST(N'2024-11-26T00:00:00.000' AS DateTime), N'EUR', 1)
+INSERT [dbo].[Proforma] ([proforma_id], [proforma_number], [seller], [buyer], [proforma_date], [transport_cost], [note], [in_system], [proforma_file_path], [taxes], [payment_method_id], [currency_value_date], [currency_name], [id_user]) VALUES (2, N'Proforma B', 3, 1, CAST(N'2024-11-21T00:00:00.000' AS DateTime), CAST(150.00 AS Decimal(6, 2)), N'', 1, N'../../database/testEnv/documents/pr_Proforma_B_113_2024_11_2111732633802314.pdf', 1, 3, CAST(N'2024-11-26T00:00:00.000' AS DateTime), N'EUR', 1)
 GO
-INSERT [dbo].[Proforma] ([proforma_id], [proforma_number], [seller], [buyer], [proforma_date], [transport_cost], [note], [in_system], [proforma_file_path], [taxes], [payment_method_id], [currency_value_date], [currency_name], [id_user]) VALUES (3, N'ProformaS A', 1, 2, CAST(N'2024-11-30T00:00:00.000' AS DateTime), CAST(250.00 AS Decimal(6, 2)), N'', 0, N'../../database/TestHandlerB2B/documents/pr_ProformaS_A_112_2024_11_3011732972731630.pdf', 1, 3, CAST(N'2024-11-29T00:00:00.000' AS DateTime), N'EUR', 1)
+INSERT [dbo].[Proforma] ([proforma_id], [proforma_number], [seller], [buyer], [proforma_date], [transport_cost], [note], [in_system], [proforma_file_path], [taxes], [payment_method_id], [currency_value_date], [currency_name], [id_user]) VALUES (3, N'ProformaS A', 1, 2, CAST(N'2024-11-30T00:00:00.000' AS DateTime), CAST(250.00 AS Decimal(6, 2)), N'', 0, N'../../database/testEnv/documents/pr_ProformaS_A_112_2024_11_3011732972731630.pdf', 1, 3, CAST(N'2024-11-29T00:00:00.000' AS DateTime), N'EUR', 1)
 GO
-INSERT [dbo].[Proforma] ([proforma_id], [proforma_number], [seller], [buyer], [proforma_date], [transport_cost], [note], [in_system], [proforma_file_path], [taxes], [payment_method_id], [currency_value_date], [currency_name], [id_user]) VALUES (4, N'Proforma E', 4, 1, CAST(N'2024-11-30T00:00:00.000' AS DateTime), CAST(150.00 AS Decimal(6, 2)), N'', 0, N'../../database/TestHandlerB2B/documents/pr_Proforma_E_314_2024_11_3031732978234968.pdf', 1, 3, CAST(N'2024-11-29T00:00:00.000' AS DateTime), N'EUR', 3)
+INSERT [dbo].[Proforma] ([proforma_id], [proforma_number], [seller], [buyer], [proforma_date], [transport_cost], [note], [in_system], [proforma_file_path], [taxes], [payment_method_id], [currency_value_date], [currency_name], [id_user]) VALUES (4, N'Proforma E', 4, 1, CAST(N'2024-11-30T00:00:00.000' AS DateTime), CAST(150.00 AS Decimal(6, 2)), N'', 0, N'../../database/testEnv/documents/pr_Proforma_E_314_2024_11_3031732978234968.pdf', 1, 3, CAST(N'2024-11-29T00:00:00.000' AS DateTime), N'EUR', 3)
 GO
-INSERT [dbo].[Proforma] ([proforma_id], [proforma_number], [seller], [buyer], [proforma_date], [transport_cost], [note], [in_system], [proforma_file_path], [taxes], [payment_method_id], [currency_value_date], [currency_name], [id_user]) VALUES (5, N'Proforma to delete', 2, 1, CAST(N'2024-11-26T00:00:00.000' AS DateTime), CAST(250.00 AS Decimal(6, 2)), N'', 1, N'../../database/TestHandlerB2B/documents/pr_Proforma_A_112_2024_11_2611732631976834.pdf', 1, 3, CAST(N'2024-11-26T00:00:00.000' AS DateTime), N'EUR', 1)
+INSERT [dbo].[Proforma] ([proforma_id], [proforma_number], [seller], [buyer], [proforma_date], [transport_cost], [note], [in_system], [proforma_file_path], [taxes], [payment_method_id], [currency_value_date], [currency_name], [id_user]) VALUES (5, N'Proforma to delete', 2, 1, CAST(N'2024-11-26T00:00:00.000' AS DateTime), CAST(250.00 AS Decimal(6, 2)), N'', 1, N'../../database/testEnv/documents/pr_Proforma_A_112_2024_11_2611732631976834.pdf', 1, 3, CAST(N'2024-11-26T00:00:00.000' AS DateTime), N'EUR', 1)
 GO
 SET IDENTITY_INSERT [dbo].[Proforma] OFF
 GO
@@ -858,19 +858,19 @@ SET IDENTITY_INSERT [dbo].[Request_status] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Request] ON 
 GO
-INSERT [dbo].[Request] ([request_id], [id_user_creator], [id_user_receiver], [request_status_id], [object_type_id], [filePath], [note], [title], [creation_date]) VALUES (1, 1, 1, 1, 5, N'../../database/TestHandlerB2B/documents/req_11Yoursinvoices1732972387411.pdf', N'abc
+INSERT [dbo].[Request] ([request_id], [id_user_creator], [id_user_receiver], [request_status_id], [object_type_id], [filePath], [note], [title], [creation_date]) VALUES (1, 1, 1, 1, 5, N'../../database/testEnv/documents/req_11Yoursinvoices1732972387411.pdf', N'abc
 [Fulfilled] 30/11/2024 14:13
 ', N'Request A', CAST(N'2024-11-30T14:13:07.520' AS DateTime))
 GO
-INSERT [dbo].[Request] ([request_id], [id_user_creator], [id_user_receiver], [request_status_id], [object_type_id], [filePath], [note], [title], [creation_date]) VALUES (2, 1, 2, 2, 4, N'../../database/TestHandlerB2B/documents/req_21Salesinvoices1732972763814.pdf', N'afasf
+INSERT [dbo].[Request] ([request_id], [id_user_creator], [id_user_receiver], [request_status_id], [object_type_id], [filePath], [note], [title], [creation_date]) VALUES (2, 1, 2, 2, 4, N'../../database/testEnv/documents/req_21Salesinvoices1732972763814.pdf', N'afasf
 [Request cancelled] 30/11/2024 15:09
 ', N'Request B', CAST(N'2024-11-30T14:19:23.843' AS DateTime))
 GO
-INSERT [dbo].[Request] ([request_id], [id_user_creator], [id_user_receiver], [request_status_id], [object_type_id], [filePath], [note], [title], [creation_date]) VALUES (3, 1, 2, 1, 3, N'../../database/TestHandlerB2B/documents/req_21ClientsProformas1732972797347.pdf', N'abc
+INSERT [dbo].[Request] ([request_id], [id_user_creator], [id_user_receiver], [request_status_id], [object_type_id], [filePath], [note], [title], [creation_date]) VALUES (3, 1, 2, 1, 3, N'../../database/testEnv/documents/req_21ClientsProformas1732972797347.pdf', N'abc
 [Fulfilled] 30/11/2024 15:09
 ', N'Request C', CAST(N'2024-11-30T14:19:57.383' AS DateTime))
 GO
-INSERT [dbo].[Request] ([request_id], [id_user_creator], [id_user_receiver], [request_status_id], [object_type_id], [filePath], [note], [title], [creation_date]) VALUES (4, 3, 2, 3, 5, N'../../database/TestHandlerB2B/documents/req_23Yoursinvoices1732976893097.pdf', N'pls add', N'Request E', CAST(N'2024-11-30T15:28:13.253' AS DateTime))
+INSERT [dbo].[Request] ([request_id], [id_user_creator], [id_user_receiver], [request_status_id], [object_type_id], [filePath], [note], [title], [creation_date]) VALUES (4, 3, 2, 3, 5, N'../../database/testEnv/documents/req_23Yoursinvoices1732976893097.pdf', N'pls add', N'Request E', CAST(N'2024-11-30T15:28:13.253' AS DateTime))
 GO
 SET IDENTITY_INSERT [dbo].[Request] OFF
 GO
