@@ -330,7 +330,7 @@ function InvoiceFilterOffcanvas({
                       <Form.Select
                         className="input-style"
                         style={maxStyle}
-                        id="currency"
+                        id="currencyFilter"
                         defaultValue={newParams.get("currency") ?? "none"}
                       >
                         <option value="none">None</option>
